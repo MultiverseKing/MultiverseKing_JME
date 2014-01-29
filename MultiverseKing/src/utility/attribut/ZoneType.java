@@ -5,7 +5,7 @@
 package utility.attribut;
 
 /**
- *
+ * Used to configure the battlefield.
  * @author roah
  */
 public enum ZoneType {

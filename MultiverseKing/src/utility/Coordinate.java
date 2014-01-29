@@ -6,12 +6,11 @@ package utility;
 
 /**
  *
- * @author Perier Emmanuel with the help of :
- * Mathis Chenuet => http://artemis.art.free.fr/ 
+ * @author Roah with the help of :
+ * ArtemisArt => http://artemis.art.free.fr/ 
  * && http://www.redblobgames.com
  * 
- * This Class is only used as a converter system so we can simplifie algorith
- * we use.
+ * This Class is only used as a converter system so we can simplifie algorithm.
  */
 public final class Coordinate {
         public final class Offset {

@@ -5,7 +5,7 @@
 package utility.attribut;
 
 /**
- *
+ * MENU and MAIN State could be redundant...
  * @author roah
  */
 public enum GameState {

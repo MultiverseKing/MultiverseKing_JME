@@ -4,18 +4,15 @@
  */
 package hexsystem;
 
-import hexsystem.TilesManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import GUI.EditorGUI;
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -29,29 +26,29 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import java.util.List;
 import kingofmultiverse.MultiverseMain;
-import utility.attribut.ElementalAttribut;
 import utility.attribut.GameState;
 import utility.MouseRay;
 import utility.Vector2Int;
 
 /**
- * global control.
+ * global hexfield controller, work at all time mainly.
+ * @todo Adding AppState corresponding to -> BattleMode - ExplorationMode.
+ * @todo Finish EditorMode then do BattleMode -> ExplorationMode.
  * @author roah
  */
-public class HexMapManager extends AbstractAppState{
-    private final MouseRay mouseRay;
-    private MultiverseMain main;
-    private TilesManager tilesManager;
-    private Node hexMapNode;
-    private Node hexTilesNode;
-//    private Vector2Int mapSize;
-    private HexCursor hexCursor; //TODO
-    private AppState hexGUI;
-    private HexTile[][] hexTiles;
-    private Geometry mark;
+public class HexMap extends AbstractAppState{
+    private final MouseRay mouseRay;    //@see utility/MouseRay.
+    private MultiverseMain main;        //used to get some global variable.
+    private TilesManager tilesManager;  //@see TilesManager.
+    private Node hexMapNode;            //Could be remove ?
+    private Node hexTilesNode;          //Keep track of all Tiles currently instanced.
+    private HexCursor hexCursor;        //@todo see HexCursor script.
+    private AppState hexGUI;            //Current GUI used. Maybe pointless ?
+//    private HexTile[][] hexTiles;       //Will be used later for faster calculation, mainly neighbourg, pathfinding etc...
+    private Geometry mark;              //Debug purpose, show where the mouse ray collide, sould be mouved to utility/MouseRay ?
     
 
-    public HexMapManager() {
+    public HexMap() {
         mouseRay = new MouseRay();
     }
     
@@ -64,17 +61,26 @@ public class HexMapManager extends AbstractAppState{
         hexMapNode = new Node("HexMap");
         hexTilesNode = new Node("TilesGroup");
         tilesManager = new TilesManager(app.getAssetManager());
+//      As a bit paranoiaque we put the position Node to Zero, maybe redundant ?
         hexMapNode.setLocalTranslation(Vector3f.ZERO);
         hexTilesNode.setLocalTranslation(Vector3f.ZERO);
         hexMapNode.attachChild(hexTilesNode);
-        
+       
+        /**
+         * As we don't know the current gameState before runtime and each gameState got his own GUI
+         * we look what is the current gameState then we instantiate the needed GUI, we store it so we can access later to.
+         * This have to be change to use a switch, at final stage the game could only start on three type of mode :
+         * BATTLE       -> If the player are playing in arena mode.
+         * EXPLORATION  -> If the player are playing normaly.
+         * EDITOR       -> Should be only used by develloper since it's pointless for player, have to be hidden.
+         */
         if(main.getGameState() == GameState.EDITOR){
             EditorGUI editorGUI = new EditorGUI();
             hexGUI = editorGUI;
             newEditorMap();
              
         } else {
-            System.out.println("No GUI to initialize");
+            System.out.println("No GUI to initialize"); //Debug
         }
         main.getStateManager().attach(hexGUI);
         
@@ -87,27 +93,23 @@ public class HexMapManager extends AbstractAppState{
 //        hexMapNode.attachChild(hexZoneGenerator.generateEmptyZone(mapSize, hexTiles));
         main.getRootNode().attachChild(hexMapNode);
     }
-
-    /**
-     * TODO used to test the chunk alteration..
-     * @param closestCollision 
-     */
-    void moveUpTile(CollisionResult closestCollision) {
-//        tilesManager.updateChunk(closestCollision.getGeometry(), closestCollision.getContactPoint().x);
-    }
     
     /**
-     * TODO
+     * @todo lot of thing...
      * @param selectedTile 
      */
     void selectedHex(Vector2Int selectedTile) {
         //The operation depend on what needed.
-        //First think to do is to position the cursor at the right place.
+        //First think to do is to set the cursor position where the player left clicked.
         if(hexCursor == null){
             hexCursor = new HexCursor(this);
         } 
     }
     
+    /**
+     * HexMap base input, it not depend on the gameMode or other thing if hexMap 
+     * is instanced that mean Tiles is or will be instanced so this input too.
+     */
     private void initInput() {
         main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         main.getInputManager().addListener(actionListener, new String[] {"LeftMouse"});
@@ -138,7 +140,10 @@ public class HexMapManager extends AbstractAppState{
         }
     };
     
-    /** A red ball that marks the last spot that was "hit" by the "shot". */
+    /** 
+     * A red ball that marks the last spot that was "hit" by the "shot".
+     * Should be moved in utility/MouseRay ?
+     */
     protected final void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
         mark = new Geometry("BOOM!", sphere);
@@ -147,6 +152,11 @@ public class HexMapManager extends AbstractAppState{
         mark.setMaterial(mark_mat);
     }
     
+    /**
+     * Convert the Ray world collision to hexGrid position so we can use Tiles Array to get the needed hex/Tiles.
+     * @param closestCollision Last collision with the mouse.
+     * @return HexGrid Position.
+     */
     private Vector2Int selectedTile(CollisionResult closestCollision){
 //        
         int positionY = Integer.parseInt(closestCollision.getGeometry().getName());
@@ -164,6 +174,11 @@ public class HexMapManager extends AbstractAppState{
         return null;
     }
 
+    /**
+     * Change all Tiles textures/materials, visual effect of a selected Zone.
+     * @todo Have to change a zone not all the Map.
+     * @param eAttribut Element choose.
+     */
     public void changeZoneElement(String eAttribut) {
 //        Node zoneToChange = (Node) hexMapNode.getChild("TilesGroup");
         List<Spatial> chunk = hexTilesNode.getChildren();

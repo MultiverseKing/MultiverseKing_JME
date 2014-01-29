@@ -17,7 +17,8 @@ public class MouseRay {
     public MouseRay(){}
     
     /**
-     * Convert the 2d screen coordinates of the click to 3D world coordinates. Then cast a ray from it.
+     * Convert the 2d screen coordinates of the mouse to 3D world coordinates, then cast a ray from it.
+     * Got his own class cause it could be used for more then the mouse left clic.
      * @param app 
      * @return 
      */

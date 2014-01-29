@@ -10,16 +10,13 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
-import hexsystem.HexMapManager;
+import hexsystem.HexMap;
 import java.util.logging.Level;
 import utility.attribut.GameState;
 import tonegod.gui.core.Screen;
-import utility.Coordinate;
 import utility.ArrowShape;
-import utility.attribut.ElementalAttribut;
 
 /**
  * test
@@ -87,6 +84,11 @@ public class MultiverseMain extends SimpleApplication {
         chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
         chaseCam.setSmoothMotion(true);
     }
+    
+    /**
+     * Use to generate a character who can move on the field, 
+     * this will be used for Exploration mode configuration, jme terrain is called with it.
+     */
     private void initPlayer(){
         Player player = new Player();
         stateManager.attach(player);
@@ -116,7 +118,7 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     public void generateHexMap() {
-        HexMapManager hexMap = new HexMapManager();
+        HexMap hexMap = new HexMap();
         stateManager.attach(hexMap);
 //        hexMap.generateNewHexMap(new Integer(5), new Integer(5));
 //        rootNode.attachChild(hexMap.getHexMapNode());

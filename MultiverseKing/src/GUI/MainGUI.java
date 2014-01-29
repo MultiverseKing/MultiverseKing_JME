@@ -15,7 +15,7 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
 
 /**
- *
+ * @todo User should not be able to move windows.
  * @author roah
  */
 public class MainGUI extends AbstractAppState{

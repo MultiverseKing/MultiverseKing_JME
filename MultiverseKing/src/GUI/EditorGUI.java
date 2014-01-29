@@ -9,19 +9,16 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import hexsystem.HexMapManager;
+import hexsystem.HexMap;
 import kingofmultiverse.MultiverseMain;
 import utility.attribut.ElementalAttribut;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.buttons.CheckBox;
-import tonegod.gui.controls.buttons.RadioButton;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.Element;
 
 /**
- *
+ * @todo User should not be able to move the main windows.
  * @author roah
  */
 public class EditorGUI extends AbstractAppState{
@@ -37,7 +34,6 @@ public class EditorGUI extends AbstractAppState{
         win.setWindowTitle("Main Windows");
         win.setMinDimensions(new Vector2f(130, 100));
         win.setWidth(new Float(50));
-//        win.setIsMovable(false);
         win.setIgnoreMouse(true);
         main.getScreen().addElement(win);
 
@@ -59,15 +55,6 @@ public class EditorGUI extends AbstractAppState{
                 new Vector2f( (main.getScreen().getWidth()/2)-175, (main.getScreen().getHeight()/2)-100 )
         );
         eWin.setWindowTitle("Elemental Windows");
-//        ButtonAdapter closeWindow = new ButtonAdapter( main.getScreen(), "Close", new Vector2f(15, 40) ) {
-//            @Override
-//            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-//                main.getScreen().removeElement(this.getElementParent());
-//            }
-//        };
-//        closeWindow.setText("Close");
-//        eWin.addChild(closeWindow);
-
         RadioButtonGroup elementG = new RadioButtonGroup(main.getScreen(), "EButtonGroup") {
             @Override
             public void onSelect(int index, Button value) {
@@ -82,7 +69,7 @@ public class EditorGUI extends AbstractAppState{
             }
 
             private void changeMapElement(String eAttribut) {
-                main.getStateManager().getState(HexMapManager.class).changeZoneElement(eAttribut);
+                main.getStateManager().getState(HexMap.class).changeZoneElement(eAttribut);
             }
         };
         for(int i = 0; i < ElementalAttribut.getSize(); i++){
@@ -92,10 +79,6 @@ public class EditorGUI extends AbstractAppState{
             
         }
         elementG.addButton(new ButtonAdapter( main.getScreen(), "Close", new Vector2f(15, 40+(40*ElementalAttribut.getSize()))));
-//        elementG.addButton(new ButtonAdapter(main.getScreen(), ""));
-//        elementG.addButton(new ButtonAdapter(main.getScreen(), new Vector2f(10,10)));
-//        rbg.addButton(new CheckBox(main.getScreen(), new Vector2f(10,30)));
-//        rbg.addButton(new RadioButton(main.getScreen(), new Vector2f(10,50)));
         elementG.setDisplayElement(eWin); // null adds the button list to the screen layer
         
         main.getScreen().addElement(eWin);

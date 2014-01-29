@@ -12,34 +12,36 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
 import jme3tools.optimize.GeometryBatchFactory;
-import utility.attribut.ElementalAttribut;
-import utility.Vector2Int;
 
 /**
- * V.01 of GridGenerator. Handle hex mesh generation.
- * Pour un maximum d'optimisation generer les map sur X.
- * TODO realtime chunk modification.
+ * V.01 of GridGenerator, Handle hex mesh generation.
+ * At the current stage to get the maximum power of this mesh generation chunk have to be generated on the X axis.
+ * @todo Algorithm have to be improve.
+ * @todo Mesh update, modification of the mesh even after it hav been instanced. 
+ * @todo Maybe make this as a custom control with some adjustement would work better than the current stage ?
+ * @see http://www.redblobgames.com/grids/hexagons/#basics as hex algorithm starter guide.
+ * @see http://0fps.wordpress.com/2012/06/30/meshing-in-a-minecraft-game/ as the chunk system idea came from there.
  * @author roah
  */
 class TilesManager {
-    final float sqrt = FastMath.sqrt(3);
-    final float hexSize = 1f;      //rayon du hex
-    final float hexWidth = sqrt * hexSize;
-    private final AssetManager assetManager;
+    final float sqrt = FastMath.sqrt(3);        //Make life easier.
+    final float hexSize = 1f;                   //hex radius.
+    final float hexWidth = sqrt * hexSize;      //Make life easier.
+    private final AssetManager assetManager;    //Used to set Material and texture, should be moved in another place?
 
     public float getHexSize() {return hexSize;}
     public float getHexWidth() {return hexWidth;}
-    public AssetManager getAssetManager() {return assetManager;}
+//    public AssetManager getAssetManager() {return assetManager;}    //Pointless?
     
     
     /**
-     * Constructor to initialize the chunk, generateTiles() have to be call to generate it.
+     * Constructor to initialize the Manager, generateTiles() have to be call to generate a Chunk/TileGroup.
+     * @see generateJMESpatialTiles()
      * @param assetManager Must be set.
      */
     TilesManager(AssetManager assetManager){
@@ -47,20 +49,20 @@ class TilesManager {
     }
     
     /**
-     * Generate a chunk, the odd row is set to false as default. cant be NULL
-     * @param count Number of tiles in the chunk. != 0, min value == 1.
-     * @param gridPosition Position of the chunk on the map. != 0, min vallue == 1.
-     * @return A newly generated chunk.
+     * Generate a chunk, the odd row is set to false as defaul (odd variable cant be NULL).
+     * @param count Number of tiles to link with the chunk. (!= 0, min value == 1).
+     * @param gridPosition Currently not used, have to be rework.
+     * @return Newly generated chunk.
      */
     Spatial generateTiles(int count, int gridPosition) {
         return generateJMESpatialTiles(getMergedTiles(false, count, gridPosition), gridPosition);
     }
     
     /**
-     * Generate a chunk, the odd row can be set as a boolean.
-     * @param count Number of tiles in the chunk. != 0, min value == 1.
-     * @param gridPosition Position of the chunk on the map. != 0, min value == 1.
-     * @param odd Is the chunk is odd or not.
+     * Generate a chunk, the odd row have to be set as a boolean.
+     * @param count Number of tiles to link with the chunk. (!= 0, min value == 1).
+     * @param gridPosition Currently not used, have to be rework.
+     * @param odd Currently not used, have to be rework.
      * @return A newly generated chunk.
      */
     Spatial generateTiles(int count, int gridPosition, boolean odd) {
@@ -70,10 +72,10 @@ class TilesManager {
     /**
      * Texture Splatter have to be used to handle texture. 
      * @todo Texture splatting to handle texturing. jme terrain mat' maybe could do the trick.
-     * @param odd
-     * @param count
-     * @param gridPosition
-     * @return
+     * @param odd @deprecated
+     * @param count 
+     * @param gridPosition @deprecated
+     * @return Generated Mesh.
      */
     private Mesh getMergedTiles(boolean odd, int count, int gridPosition){
         
@@ -139,8 +141,6 @@ class TilesManager {
 //      +[01]++++[05]++++[09]++++[13]++++[17]+
 //      +++++[00]++++[04]++++[08]++++[12]+++++
 //      ++++++++++++++++++++++++++++++++++++++ = Y+
-         
-        
          
         return index;
     }
@@ -222,6 +222,12 @@ class TilesManager {
         return texCoord;
     }
  
+    /**
+     * @deprecated Not the right place.
+     * @param finalChunk
+     * @param gridPosition
+     * @return 
+     */
     private Spatial generateJMESpatialTiles(Mesh finalChunk, int gridPosition) {
         Geometry finalGeometryChunk = new Geometry(Integer.toString(gridPosition), finalChunk);
         Material material = assetManager.loadMaterial("Materials/hexMat.j3m");
@@ -234,6 +240,9 @@ class TilesManager {
         return (Spatial)finalGeometryChunk;
     }
 
+    /**
+     * @deprecated not the right place.
+     */
 //    Spatial generateEmptyZone(Vector2Int mapSize, HexTile[][] hexTiles) {
 //        
 //        Spatial[] chunk = new Geometry[mapSize.y];

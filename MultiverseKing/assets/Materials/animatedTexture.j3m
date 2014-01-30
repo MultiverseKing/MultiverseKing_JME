@@ -1,0 +1,10 @@
+Material My Material : ShaderBlow/MatDefs/SimpleSprite/SimpleSprite.j3md {
+     MaterialParameters {
+        Speed : 18
+        AniTexMap : Repeat Textures/animation/CrossAnimEditor.png
+        numTilesV : 8
+        numTilesU : 1
+     }
+    AdditionalRenderState {
+    }
+}

@@ -13,6 +13,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -20,15 +21,18 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import java.util.List;
 import kingofmultiverse.MultiverseMain;
+import utility.Coordinate;
 import utility.attribut.GameState;
 import utility.MouseRay;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
 
 /**
  * global hexfield controller, work at all time mainly.
@@ -38,33 +42,35 @@ import utility.Vector2Int;
  */
 public class HexMap extends AbstractAppState{
     private final MouseRay mouseRay;    //@see utility/MouseRay.
+    private final Coordinate coordinate;
     private MultiverseMain main;        //used to get some global variable.
-    private TilesManager tilesManager;  //@see TilesManager.
+    private MeshManager meshManager;    //@see MeshManager.
     private Node hexMapNode;            //Could be remove ?
-    private Node hexTilesNode;          //Keep track of all Tiles currently instanced.
-    private HexCursor hexCursor;        //@todo see HexCursor script.
+    private Node tilesNode;             //Keep track of all Tiles currently instanced.
+    private Spatial hexCursor;          //@todo see HexCursor script.
     private AppState hexGUI;            //Current GUI used. Maybe pointless ?
-//    private HexTile[][] hexTiles;       //Will be used later for faster calculation, mainly neighbourg, pathfinding etc...
+    private List<HexTile> hexTiles;       //Will be used later for faster calculation, mainly neighbourg, pathfinding etc...
     private Geometry mark;              //Debug purpose, show where the mouse ray collide, sould be mouved to utility/MouseRay ?
     
 
     public HexMap() {
         mouseRay = new MouseRay();
+        coordinate = new Coordinate();
     }
     
-    public Node getHexMapNode() {return this.hexMapNode;}
+    public Node getHexMapNode() {return this.hexMapNode;}   //To avoid search tought rootnode.
     
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         main = (MultiverseMain) app;
         hexMapNode = new Node("HexMap");
-        hexTilesNode = new Node("TilesGroup");
-        tilesManager = new TilesManager(app.getAssetManager());
+        tilesNode = new Node("Tiles");              //HexMap could have other thing attach to it so All tile will be grouped under this node.
+        meshManager = new MeshManager();
 //      As a bit paranoiaque we put the position Node to Zero, maybe redundant ?
         hexMapNode.setLocalTranslation(Vector3f.ZERO);
-        hexTilesNode.setLocalTranslation(Vector3f.ZERO);
-        hexMapNode.attachChild(hexTilesNode);
+        tilesNode.setLocalTranslation(Vector3f.ZERO);
+        hexMapNode.attachChild(tilesNode);
        
         /**
          * As we don't know the current gameState before runtime and each gameState got his own GUI
@@ -89,9 +95,7 @@ public class HexMap extends AbstractAppState{
     }
     
     private void newEditorMap(){
-        hexTilesNode.attachChild(tilesManager.generateTiles(5,0));
-//        hexMapNode.attachChild(hexZoneGenerator.generateEmptyZone(mapSize, hexTiles));
-        main.getRootNode().attachChild(hexMapNode);
+        hexTiles.add(new HexTile(coordinate.new Offset(0, 0), ElementalAttribut.EARTH, 0));
     }
     
     /**
@@ -101,9 +105,7 @@ public class HexMap extends AbstractAppState{
     void selectedHex(Vector2Int selectedTile) {
         //The operation depend on what needed.
         //First think to do is to set the cursor position where the player left clicked.
-        if(hexCursor == null){
-            hexCursor = new HexCursor(this);
-        } 
+        setCursor(selectedTile);
     }
     
     /**
@@ -162,11 +164,11 @@ public class HexMap extends AbstractAppState{
         int positionY = Integer.parseInt(closestCollision.getGeometry().getName());
 //        System.out.println("Chunk position "+positionY);                      //TODO Debug to remove.
         
-        float floatTilePosition = closestCollision.getContactPoint().x/tilesManager.getHexWidth();
+        float floatTilePosition = closestCollision.getContactPoint().x/meshManager.getHexWidth();
         int absTilePosition = (int)FastMath.floor(FastMath.abs(floatTilePosition));
         floatTilePosition -= absTilePosition;
         
-        if((positionY & 1) == 0 && FastMath.abs(floatTilePosition) > tilesManager.getHexWidth()/4) {
+        if((positionY & 1) == 0 && FastMath.abs(floatTilePosition) > meshManager.getHexWidth()/4) {
             absTilePosition += 1;
         }
 //        System.out.println("Final tile is : "+absTilePosition);               //TODO Debug to remove.
@@ -181,7 +183,7 @@ public class HexMap extends AbstractAppState{
      */
     public void changeZoneElement(String eAttribut) {
 //        Node zoneToChange = (Node) hexMapNode.getChild("TilesGroup");
-        List<Spatial> chunk = hexTilesNode.getChildren();
+        List<Spatial> chunk = tilesNode.getChildren();
         Geometry g;
         int o =0;
         Texture2D tex = (Texture2D) main.getAssetManager().loadTexture("Textures/Test/"+eAttribut+"Center.png");
@@ -194,5 +196,13 @@ public class HexMap extends AbstractAppState{
             System.out.println(o);
             o++;
         }
+    }
+
+    private void setCursor(Vector2Int selectedTile) {
+//        if(hexCursor == null) {
+            hexCursor = (Spatial)main.getAssetManager().loadModel("Models/utility/AnimPlane.j3o");
+            main.getRootNode().attachChild(hexCursor);
+//        }
+        hexCursor.setLocalTranslation(new Vector3f(0, -0.5f, 0));
     }
 }

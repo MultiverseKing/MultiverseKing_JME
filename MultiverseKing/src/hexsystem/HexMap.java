@@ -95,7 +95,7 @@ public class HexMap extends AbstractAppState{
     }
     
     private void newEditorMap(){
-        hexTiles.add(new HexTile(coordinate.new Offset(0, 0), ElementalAttribut.EARTH, 0));
+//        hexTiles.add(new HexTile(coordinate.new Offset(0, 0), ElementalAttribut.EARTH, 0));
     }
     
     /**

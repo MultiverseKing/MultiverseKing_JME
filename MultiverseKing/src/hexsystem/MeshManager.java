@@ -28,7 +28,7 @@ import jme3tools.optimize.GeometryBatchFactory;
  * @see http://0fps.wordpress.com/2012/06/30/meshing-in-a-minecraft-game/ as the chunk system idea came from there.
  * @author roah
  */
-class MeshManager {
+public class MeshManager {
     final float sqrt = FastMath.sqrt(3);        //Make life easier.
     final float hexSize = 1f;                   //hex radius.
     final float hexWidth = sqrt * hexSize;      //Make life easier.
@@ -49,7 +49,7 @@ class MeshManager {
      * @param size Number of tiles to link with the Mesh.
      * @return A newly generated mesh.
      */
-    Mesh generateTiles(int size) {
+    public Mesh generateTiles(int size) {
         Mesh result = new Mesh();
         if(size != 0){
             result = getTiles(size);

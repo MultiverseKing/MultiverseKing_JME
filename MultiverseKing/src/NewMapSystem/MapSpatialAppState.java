@@ -1,12 +1,21 @@
 package NewMapSystem;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetManager;
+import com.jme3.material.Material;
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import java.util.HashMap;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture2D;
+import hexsystem.TilesManager;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -14,38 +23,76 @@ import utility.Vector2Int;
  */
 public class MapSpatialAppState extends AbstractAppState implements TileChangeListener {
 
-    private final int chunkSizeX = 3;
-    private final int chunkSizeY = 3;
     private Node mapNode;
-    private HashMap<Vector2Int, Spatial> chunks = new HashMap<Vector2Int, Spatial>();
     private MapData mapData;
-    private MeshGenerator meshGen = new MeshGenerator(chunkSizeX, chunkSizeY);
+    private Geometry[][] tiles;
+    Material[] materials;
+    private float tileSize = 1f;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+        setupMaterials(app.getAssetManager());
         mapData = stateManager.getState(MapData.class);
-        HexTile[][] tiles = mapData.getAllTiles();
-        for (int x = 0; x < tiles.length; x += chunkSizeX) {
-            for (int y = 0; y < tiles.length; y += chunkSizeY) {
-                Vector2Int pos = getChunkForPosition(x, y);
-                Spatial spat = meshGen.generateChunk(tiles, pos);
-                chunks.put(pos, spat);
-                mapNode.attachChild(spat);
+        mapData.registerTileChangeListener(this);
+        HexTile[][] tileData = mapData.getAllTiles();
+        tiles = new Geometry[tileData.length][tileData[0].length];
+
+        mapNode = new Node("HexMap");
+        ((SimpleApplication) app).getRootNode().attachChild(mapNode);
+
+
+        //TODO: Create mesh in a nicer way
+        TilesManager mm = new TilesManager(app.getAssetManager());
+        Mesh hexagon = mm.getMergedTiles(false, 1, 0);
+        hexagon.createCollisionData();
+        hexagon.updateBound();
+        for (int x = 0; x < tileData.length; x++) {
+            for (int y = 0; y < tileData.length; y++) {
+
+                Geometry geom = new Geometry(x + "|" + y, hexagon);
+                //TODO: Set Position and scale correctly
+                geom.setLocalScale(tileSize);
+
+                geom.setLocalTranslation(getSpatialPositionForTile(x, y));
+
+                geom.setMaterial(getMaterialForTile(tileData[x][y]));
+                tiles[x][y] = geom;
+                mapNode.attachChild(geom);
             }
         }
     }
 
-    private Vector2Int getChunkForPosition(int x, int y) {
-        return new Vector2Int(x / chunkSizeX, y / chunkSizeY);
+    private void setupMaterials(AssetManager assetManager) {
+        materials = new Material[ElementalAttribut.getSize()];
+        int i = 0;
+        for (ElementalAttribut e : ElementalAttribut.values()) {
+            Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
+            Texture2D tex = (Texture2D) assetManager.loadTexture("Textures/Test/" + e.name() + "Center.png");
+            tex.setWrap(Texture.WrapMode.Repeat);
+//            g.getMaterial().getParam("Diffuse").setValue(tex);
+            mat.setTexture("ColorMap", tex);
+            materials[i++] = mat;
+        }
+    }
+
+    private Material getMaterialForTile(HexTile tile) {
+        return materials[tile.getHexElement().ordinal()];
     }
 
     public void tileChange(TileChangeEvent event) {
-        Vector2Int chunkPosition = getChunkForPosition(event.getX(), event.getY());
-        Spatial oldSpat = chunks.get(chunkPosition);
-        mapNode.detachChild(oldSpat);
-        Spatial newSpat = meshGen.generateChunk(mapData.getAllTiles(), chunkPosition);
-        mapNode.attachChild(newSpat);
-        chunks.put(chunkPosition, newSpat);
+        tiles[event.getX()][event.getY()].setMaterial(getMaterialForTile(event.getNewTile()));
+    }
+
+    public Vector3f getSpatialPositionForTile(int x, int y) {
+        float gridX = x * tileSize * 2 + (y % 2 == 1 ? tileSize : 0);
+        float gridY = tileSize * FastMath.sqrt(3) * y;
+        return new Vector3f(gridX, 0, gridY);
+    }
+
+    public Vector2Int getTilePositionForCoordinate(Vector3f coord) {
+        int gridY = Math.round((coord.z / tileSize) / FastMath.sqrt(3));
+        int gridX = Math.round((coord.x - (gridY % 2 == 1 ? tileSize : 0)) / 2 / tileSize);
+        return new Vector2Int(gridX, gridY);
     }
 }

@@ -2,6 +2,7 @@ package NewMapSystem;
 
 import com.jme3.app.state.AbstractAppState;
 import java.util.ArrayList;
+import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -44,6 +45,8 @@ public class MapData extends AbstractAppState {
 
     public HexTile getTile(int x, int y) {
         return hexTiles[x][y];
+    }    public HexTile getTile(Vector2Int pos) {
+        return hexTiles[pos.x][pos.y];
     }
 
     public void registerTileChangeListener(TileChangeListener l) {

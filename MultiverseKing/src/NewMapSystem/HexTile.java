@@ -14,4 +14,9 @@ public class HexTile {
     public HexTile(ElementalAttribut eAttribut) {
         this.hexElement = eAttribut;
     }
+
+    public ElementalAttribut getHexElement() {
+        return hexElement;
+    }
+    
 }

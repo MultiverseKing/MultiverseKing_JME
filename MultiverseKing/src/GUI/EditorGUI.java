@@ -59,11 +59,9 @@ public class EditorGUI extends AbstractAppState{
             @Override
             public void onSelect(int index, Button value) {
 //                System.out.println(index);
-                if(index != ElementalAttribut.getSize() && index != 1){
+                if(index != ElementalAttribut.getSize()){
                     changeMapElement(ElementalAttribut.toString(ElementalAttribut.convert(index)));
-                } else if (index == 1){
-                    System.out.println("no Implemented");
-                }else {
+                } else {
                     main.getScreen().removeElement(main.getScreen().getElementById("EWindows"));
                 }
             }
@@ -76,9 +74,10 @@ public class EditorGUI extends AbstractAppState{
             ButtonAdapter button = new ButtonAdapter(main.getScreen(), "Button+"+ElementalAttribut.convert(i), new Vector2f(15, 40+(40*i)));
             button.setText(ElementalAttribut.toString(ElementalAttribut.convert(i)));
             elementG.addButton(button);
-            
         }
-        elementG.addButton(new ButtonAdapter( main.getScreen(), "Close", new Vector2f(15, 40+(40*ElementalAttribut.getSize()))));
+        Button closeButton = new ButtonAdapter( main.getScreen(), "Close", new Vector2f(15, 40+(40*ElementalAttribut.getSize())));
+        closeButton.setText("CLOSE");
+        elementG.addButton(closeButton);
         elementG.setDisplayElement(eWin); // null adds the button list to the screen layer
         
         main.getScreen().addElement(eWin);

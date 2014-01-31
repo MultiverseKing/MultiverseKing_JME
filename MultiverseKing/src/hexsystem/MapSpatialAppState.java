@@ -28,8 +28,11 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     private MapData mapData;
     private Geometry[][] tiles;
     Material[] materials;
-    /** Set to 1 for gaps between tiles <=> the gap come from the fact (hexSize > hexWidth), not solve since the effect is pretty cool */
-    private float tileSize = 0.85f; 
+    /**
+     * Set to 1 for gaps between tiles <=> the gap come from the fact (hexSize >
+     * hexWidth), not solve since the effect is pretty cool
+     */
+    private float tileSize = 0.85f;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -49,7 +52,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
         Mesh hexagon = meshManager.generateTile();
         for (int x = 0; x < tileData.length; x++) {
             for (int y = 0; y < tileData.length; y++) {
-
+//TODO: Take tileheight into account
                 Geometry geom = new Geometry(x + "|" + y, hexagon);
                 //TODO: Set Position and scale correctly
 //                geom.setLocalScale(tileSize);
@@ -81,7 +84,13 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     }
 
     public void tileChange(TileChangeEvent event) {
-        tiles[event.getX()][event.getY()].setMaterial(getMaterialForTile(event.getNewTile()));
+        HexTile oldTile = event.getOldTile();
+        HexTile newTile = event.getNewTile();
+        if (newTile.getHexElement() != oldTile.getHexElement()) {
+            tiles[event.getX()][event.getY()].setMaterial(getMaterialForTile(event.getNewTile()));
+        } else if (newTile.getHeight() != oldTile.getHeight()) {
+            //TODO: Regenerate mesh
+        }
     }
 
     public Vector3f getSpatialPositionForTile(int x, int y) {

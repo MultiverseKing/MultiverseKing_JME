@@ -1,4 +1,4 @@
-package NewMapSystem;
+package test;
 
 import GUI.EditorGUI;
 import com.jme3.app.Application;
@@ -15,6 +15,9 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import hexsystem.HexTile;
+import hexsystem.MapData;
+import hexsystem.MapSpatialAppState;
 import kingofmultiverse.MultiverseMain;
 import utility.MouseRay;
 import utility.Vector2Int;

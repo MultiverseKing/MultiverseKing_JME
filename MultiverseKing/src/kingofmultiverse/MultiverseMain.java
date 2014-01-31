@@ -1,9 +1,9 @@
 package kingofmultiverse;
 
 import GUI.MainGUI;
-import NewMapSystem.MapData;
-import NewMapSystem.MapEditorTest;
-import NewMapSystem.MapSpatialAppState;
+import hexsystem.MapData;
+import test.MapEditorTest;
+import hexsystem.MapSpatialAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;

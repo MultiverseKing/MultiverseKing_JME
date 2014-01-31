@@ -27,6 +27,7 @@ import jme3tools.optimize.GeometryBatchFactory;
 * @see http://www.redblobgames.com/grids/hexagons/#basics as hex algorithm starter guide.
 * @see http://0fps.wordpress.com/2012/06/30/meshing-in-a-minecraft-game/ as the chunk system idea came from there.
 * @author roah
+* @deprecated
 */
 public class TilesManager {
     final float sqrt = FastMath.sqrt(3); //Make life easier.

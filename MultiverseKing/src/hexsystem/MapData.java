@@ -1,5 +1,7 @@
-package NewMapSystem;
+package hexsystem;
 
+import hexsystem.events.TileChangeListener;
+import hexsystem.events.TileChangeEvent;
 import com.jme3.app.state.AbstractAppState;
 import java.util.ArrayList;
 import utility.Vector2Int;

@@ -1,4 +1,6 @@
-package NewMapSystem;
+package hexsystem.events;
+
+import hexsystem.HexTile;
 
 /**
  *

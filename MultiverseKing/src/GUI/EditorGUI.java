@@ -9,7 +9,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import hexsystem.HexMap;
 import kingofmultiverse.MultiverseMain;
 import utility.attribut.ElementalAttribut;
 import tonegod.gui.controls.buttons.Button;
@@ -67,7 +66,7 @@ public class EditorGUI extends AbstractAppState{
             }
 
             private void changeMapElement(String eAttribut) {
-                main.getStateManager().getState(HexMap.class).changeZoneElement(eAttribut);
+//                main.getStateManager().getState(HexMap.class).changeZoneElement(eAttribut);
             }
         };
         for(int i = 0; i < ElementalAttribut.getSize(); i++){

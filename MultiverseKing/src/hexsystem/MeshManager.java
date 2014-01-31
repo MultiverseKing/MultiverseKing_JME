@@ -4,15 +4,11 @@
  */
 package hexsystem;
 
-import com.jme3.asset.AssetManager;
-import com.jme3.material.Material;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
@@ -40,7 +36,7 @@ public class MeshManager {
      * Generate one hex mesh.
      * @return newly generated hex.
      */
-    Mesh generateTiles() {
+    Mesh generateTile() {
         return generateTiles(1);
     }
     
@@ -59,9 +55,6 @@ public class MeshManager {
         return result;
     }
     
-    /**
-     * @todo Texture splatting to handle texturing. jme terrain mat' maybe could do the trick.
-     */
     private Mesh getTiles(int size){
         
         Vector3f[] triVertices = getTriVerticesPosition(size);
@@ -88,7 +81,6 @@ public class MeshManager {
         
         Mesh finalChunk = new Mesh();
         GeometryBatchFactory.mergeGeometries(geoChunk, finalChunk);
-        
         finalChunk.createCollisionData();
         finalChunk.updateBound();
         
@@ -100,11 +92,11 @@ public class MeshManager {
         return index;
     }
     
-    private int[] getTriIndex(int count){
-        int[] index = new int[(count*2)*3];
+    private int[] getTriIndex(int size){
+        int[] index = new int[(size*2)*3];
         
         int j = 0;
-        for(int i = 0; i < (count*2)*3; i+= 6){
+        for(int i = 0; i < (size*2)*3; i+= 6){
 //            Hex in Y+
             index[i] = j+5;
             index[i+1] = j+1;
@@ -112,7 +104,7 @@ public class MeshManager {
             
             //Hex in Y-
             index[i+3] = j+2;
-            if(((i+6) < ((count*2)*3))){
+            if(((i+6) < ((size*2)*3))){
                 index[i+4] = j+6;
             } else {
                 index[i+4] = j+4;
@@ -141,12 +133,12 @@ public class MeshManager {
             currentHex = j*hexWidth;
             vertices[i] = new Vector3f(currentHex, 0, hexSize);
             vertices[i+1] = new Vector3f(currentHex -(hexWidth/2), 0, (hexSize/2));
-            vertices[i+2] = new Vector3f(currentHex -(hexWidth/2), 0, (hexSize/2));
-            vertices[i+3] = new Vector3f(currentHex, 0, hexSize);
+            vertices[i+2] = new Vector3f(currentHex -(hexWidth/2), 0, -(hexSize/2));
+            vertices[i+3] = new Vector3f(currentHex, 0, -hexSize);
             j++;
         }
         currentHex = j*hexWidth;
-        vertices[size*4] = new Vector3f(currentHex - (hexWidth/2), 0, hexSize/2);
+        vertices[size*4] = new Vector3f(currentHex - (hexWidth/2), 0, -(hexSize/2));
         vertices[size*4+1] = new Vector3f(currentHex - (hexWidth/2), 0, hexSize/2);
         
         return vertices;
@@ -154,10 +146,10 @@ public class MeshManager {
     
     private Vector3f[] getQuadVerticesPosition(int size){
         Vector3f[] vertices = new Vector3f[4];
-        vertices[0] = new Vector3f(hexWidth/2, 0, hexSize/2);
+        vertices[0] = new Vector3f(-(hexWidth/2), 0, hexSize/2);
         vertices[1] = new Vector3f((size * hexWidth)-(hexWidth/2), 0, hexSize/2);
-        vertices[2] = new Vector3f((size * hexWidth)-(hexWidth/2), 0, hexSize/2);
-        vertices[3] = new Vector3f(hexWidth/2, 0, hexSize/2);
+        vertices[2] = new Vector3f((size * hexWidth)-(hexWidth/2), 0, -(hexSize/2));
+        vertices[3] = new Vector3f(-(hexWidth/2), 0, -(hexSize/2));
         
         return vertices;
     }

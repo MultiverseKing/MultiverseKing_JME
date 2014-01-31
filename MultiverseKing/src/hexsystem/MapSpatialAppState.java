@@ -15,7 +15,6 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
-import hexsystem.TilesManager;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -45,10 +44,8 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
 
 
         //TODO: Create mesh in a nicer way
-        TilesManager mm = new TilesManager(app.getAssetManager());
-        Mesh hexagon = mm.getMergedTiles(false, 1, 0);
-        hexagon.createCollisionData();
-        hexagon.updateBound();
+        MeshManager meshManager = new MeshManager();
+        Mesh hexagon = meshManager.generateTile();
         for (int x = 0; x < tileData.length; x++) {
             for (int y = 0; y < tileData.length; y++) {
 
@@ -68,7 +65,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     private void setupMaterials(AssetManager assetManager) {
         materials = new Material[ElementalAttribut.getSize()];
         int i = 0;
-        for (ElementalAttribut e : ElementalAttribut.values()) {
+        for (ElementalAttribut e : ElementalAttribut.values()) { //ElementalAttribut.SIZE do the same
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             Texture2D tex = (Texture2D) assetManager.loadTexture("Textures/Test/" + e.name() + "Center.png");
             tex.setWrap(Texture.WrapMode.Repeat);

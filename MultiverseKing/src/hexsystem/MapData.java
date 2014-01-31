@@ -45,9 +45,23 @@ public class MapData extends AbstractAppState {
         }
     }
 
+    public boolean exist(Vector2Int pos){
+        boolean result = false;
+        try{
+            if(hexTiles[pos.x][pos.y] != null){
+                result = true;
+            }
+        } catch (ArrayIndexOutOfBoundsException e){
+            System.err.println("Hex index out of bounds !");
+        }
+        return result;
+    }
+    
     public HexTile getTile(int x, int y) {
         return hexTiles[x][y];
-    }    public HexTile getTile(Vector2Int pos) {
+    }    
+    
+    public HexTile getTile(Vector2Int pos) {
         return hexTiles[pos.x][pos.y];
     }
 

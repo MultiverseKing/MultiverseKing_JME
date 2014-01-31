@@ -103,16 +103,19 @@ public class MapEditorTest extends AbstractAppState {
 
         Vector2Int tilePos = spats.getTilePositionForCoordinate(cr.getContactPoint());
 
+        if(md.exist(tilePos)){
+            if (md.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
 
-        if (md.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
+                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH));
+            } else if (md.getTile(tilePos).getHexElement() == ElementalAttribut.EARTH) {
 
-            md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH));
-        } else if (md.getTile(tilePos).getHexElement() == ElementalAttribut.EARTH) {
+                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE));
+            } else {
 
-            md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE));
+                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
+            }
         } else {
-
-            md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
+            System.out.println("No hex selected.");
         }
 
     }

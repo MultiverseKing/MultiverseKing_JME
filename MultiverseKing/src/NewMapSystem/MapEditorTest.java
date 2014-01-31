@@ -67,7 +67,7 @@ public class MapEditorTest extends AbstractAppState {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("LeftMouse") && isPressed) {
                 CollisionResults results = new CollisionResults();
-                main.getRootNode().collideWith(mouseRay.get3DRay(main), results);
+                main.getRootNode().getChild("MapNode").collideWith(mouseRay.get3DRay(main), results);
                 if (results.size() != 0) {
                     if (results.size() > 0) {
                         CollisionResult closest = results.getClosestCollision();
@@ -98,7 +98,6 @@ public class MapEditorTest extends AbstractAppState {
 
     private void selectedHex(CollisionResult cr) {
 
-        setCursor(cr);
         Vector2Int tilePos = spats.getTilePositionForCoordinate(cr.getContactPoint());
 
 
@@ -113,13 +112,5 @@ public class MapEditorTest extends AbstractAppState {
             md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
         }
 
-    }
-
-    private void setCursor(CollisionResult cr) {
-        if (hexCursor == null) {
-            hexCursor = (Spatial) main.getAssetManager().loadModel("Models/utility/AnimPlane.j3o");
-            main.getRootNode().attachChild(hexCursor);
-        }
-        hexCursor.setLocalTranslation(cr.getContactPoint());
     }
 }

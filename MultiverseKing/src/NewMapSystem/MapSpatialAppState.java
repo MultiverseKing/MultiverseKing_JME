@@ -27,7 +27,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     private MapData mapData;
     private Geometry[][] tiles;
     Material[] materials;
-    private float tileSize = 1f;
+    private float tileSize = 0.85f; //Set to 1 for gaps between tiles
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -38,7 +38,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
         HexTile[][] tileData = mapData.getAllTiles();
         tiles = new Geometry[tileData.length][tileData[0].length];
 
-        mapNode = new Node("HexMap");
+        mapNode = new Node("MapNode");
         ((SimpleApplication) app).getRootNode().attachChild(mapNode);
 
 
@@ -52,7 +52,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
 
                 Geometry geom = new Geometry(x + "|" + y, hexagon);
                 //TODO: Set Position and scale correctly
-                geom.setLocalScale(tileSize);
+//                geom.setLocalScale(tileSize);
 
                 geom.setLocalTranslation(getSpatialPositionForTile(x, y));
 

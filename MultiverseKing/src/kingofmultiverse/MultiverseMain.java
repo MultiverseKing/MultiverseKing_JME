@@ -134,7 +134,7 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     public void generateHexMap() {
-        MapData md = new MapData(5);
+        MapData md = new MapData(25);
         stateManager.attach(md);
         MapSpatialAppState msas = new MapSpatialAppState();
         stateManager.attach(msas);

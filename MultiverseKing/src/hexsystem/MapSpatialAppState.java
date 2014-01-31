@@ -28,7 +28,8 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     private MapData mapData;
     private Geometry[][] tiles;
     Material[] materials;
-    private float tileSize = 0.85f; //Set to 1 for gaps between tiles
+    /** Set to 1 for gaps between tiles <=> the gap come from the fact (hexSize > hexWidth), not solve since the effect is pretty cool */
+    private float tileSize = 0.85f; 
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {

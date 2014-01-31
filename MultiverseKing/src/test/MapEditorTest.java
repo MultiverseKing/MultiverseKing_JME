@@ -12,6 +12,8 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
@@ -35,16 +37,30 @@ public class MapEditorTest extends AbstractAppState {
     private Spatial mark;
     private MultiverseMain main;        //used to get some global variable.
     private AppState hexGUI;            //Current GUI used. Maybe pointless ?
-    private MapData md;
+    private MapData mapData;
     private MapSpatialAppState spats;
+    private final float offset = 0.15f;               //Got an offset issue with hex_void_anim.png this will solve it temporary
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         mouseRay = new MouseRay();
         main = (MultiverseMain) app;
-        md = stateManager.getState(MapData.class);
-        spats = stateManager.getState(MapSpatialAppState.class);
+        mapData = stateManager.getState(MapData.class);
+        spats = stateManager.getState(MapSpatialAppState.class); //variable name should be changed, hard to read as say before
+        
+        /** Testing cursor */
+        hexCursor = main.getAssetManager().loadModel("Models/utility/SimpleSprite.j3o");
+        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+        animShader.setInt("Speed", 16);
+//        Material animShader = main.getAssetManager().loadMaterial("Materials/debugMat.j3m");
+        hexCursor.setMaterial(animShader);
+        main.getRootNode().attachChild(hexCursor);
+        hexCursor.rotate(-FastMath.HALF_PI, FastMath.PI, 0f);
+        hexCursor.setLocalTranslation(new Vector3f(0f, 0.01f,offset)); //Remove offset and set it to zero if hex_void_anim.png is not used
+        hexCursor.scale(2f);
+//        hexCursor.setCullHint(Spatial.CullHint.Always);
+        
         if (main.getGameState() == GameState.EDITOR) {
             EditorGUI editorGUI = new EditorGUI();
             hexGUI = editorGUI;
@@ -103,16 +119,16 @@ public class MapEditorTest extends AbstractAppState {
 
         Vector2Int tilePos = spats.getTilePositionForCoordinate(cr.getContactPoint());
 
-        if(md.exist(tilePos)){
-            if (md.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
-
-                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH));
-            } else if (md.getTile(tilePos).getHexElement() == ElementalAttribut.EARTH) {
-
-                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE));
+        if(mapData.exist(tilePos)){
+            Vector3f cursorPos = spats.getSpatialPositionForTile(tilePos.x, tilePos.y);
+            hexCursor.setLocalTranslation(cursorPos.x, hexCursor.getLocalTranslation().y, cursorPos.z + offset); //Remove offset and set it to zero if hex_void_anim.png is not used
+            
+            if (mapData.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH));
+            } else if (mapData.getTile(tilePos).getHexElement() == ElementalAttribut.EARTH) {
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE));
             } else {
-
-                md.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
             }
         } else {
             System.out.println("No hex selected.");

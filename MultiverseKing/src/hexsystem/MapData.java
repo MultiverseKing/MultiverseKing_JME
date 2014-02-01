@@ -68,7 +68,7 @@ public class MapData extends AbstractAppState {
     public void registerTileChangeListener(TileChangeListener l) {
         listeners.add(l);
     }
-    public void setHeight(int x, int y, float height){
+    public void setHeight(int x, int y, int height){
         setTile(x,y,hexTiles[x][y].cloneChangedHeight(height));
     }
 }

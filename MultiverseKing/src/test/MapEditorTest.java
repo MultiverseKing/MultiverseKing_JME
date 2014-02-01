@@ -124,11 +124,11 @@ public class MapEditorTest extends AbstractAppState {
             hexCursor.setLocalTranslation(cursorPos.x, hexCursor.getLocalTranslation().y, cursorPos.z + offset); //Remove offset and set it to zero if hex_void_anim.png is not used
             
             if (mapData.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
-                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH));
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.EARTH, 2));
             } else if (mapData.getTile(tilePos).getHexElement() == ElementalAttribut.EARTH) {
-                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE));
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.ICE, 3));
             } else {
-                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE));
+                mapData.setTile(tilePos.x, tilePos.y, new HexTile(ElementalAttribut.NATURE, -2));
             }
         } else {
             System.out.println("No hex selected.");

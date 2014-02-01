@@ -28,11 +28,11 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     private MapData mapData;
     private Geometry[][] tiles;
     Material[] materials;
+    MeshManager meshManager;
     /**
-     * Set to 1 for gaps between tiles <=> the gap come from the fact (hexSize >
-     * hexWidth), not solve since the effect is pretty cool
+     * To got a gap between Hex Change tileSize during initialize and set it to 1.
      */
-    private float tileSize = 0.85f;
+    private float tileSize;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -48,8 +48,9 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
 
 
         //TODO: Create mesh in a nicer way
-        MeshManager meshManager = new MeshManager();
-        Mesh hexagon = meshManager.generateTile();
+        meshManager = new MeshManager();
+        tileSize = meshManager.getHexWidth()/2;
+        Mesh hexagon = meshManager.getTile();
         for (int x = 0; x < tileData.length; x++) {
             for (int y = 0; y < tileData.length; y++) {
 //TODO: Take tileheight into account
@@ -74,6 +75,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
             Texture2D tex = (Texture2D) assetManager.loadTexture("Textures/Test/" + e.name() + "Center.png");
             tex.setWrap(Texture.WrapMode.Repeat);
 //            g.getMaterial().getParam("Diffuse").setValue(tex);
+//            mat.getAdditionalRenderState().setWireframe(true); //needed for debug on MeshManager
             mat.setTexture("ColorMap", tex);
             materials[i++] = mat;
         }
@@ -88,8 +90,11 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
         HexTile newTile = event.getNewTile();
         if (newTile.getHexElement() != oldTile.getHexElement()) {
             tiles[event.getX()][event.getY()].setMaterial(getMaterialForTile(event.getNewTile()));
+            tiles[event.getX()][event.getY()].setMesh(meshManager.getHeightedTile(event.getNewTile().getHeight()));
         } else if (newTile.getHeight() != oldTile.getHeight()) {
             //TODO: Regenerate mesh
+            System.out.println("Work");
+//            tiles[event.getX()][event.getY()].setMesh(meshManager.getHeightedTile(event.getNewTile().getHeight()));
         }
     }
 

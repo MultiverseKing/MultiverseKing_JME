@@ -1,6 +1,5 @@
 package hexsystem;
 
-import utility.Coordinate;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -10,14 +9,14 @@ import utility.attribut.ElementalAttribut;
 public class HexTile {
 
     private final ElementalAttribut hexElement;
-    private final float height;
+    private int height;
 
     public HexTile(ElementalAttribut eAttribut) {
         this.hexElement = eAttribut;
         this.height = 0;
     }
 
-    public HexTile(ElementalAttribut hexElement, float height) {
+    public HexTile(ElementalAttribut hexElement, int height) {
         this.hexElement = hexElement;
         this.height = height;
     }
@@ -26,7 +25,7 @@ public class HexTile {
         return hexElement;
     }
 
-    public float getHeight() {
+    public int getHeight() {
         return height;
     }
 
@@ -36,7 +35,7 @@ public class HexTile {
      * @param height
      * @return
      */
-    public HexTile cloneChangedHeight(float height) {
+    public HexTile cloneChangedHeight(int height) {
         return new HexTile(hexElement, height);
     }
 }

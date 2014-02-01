@@ -11,6 +11,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 import java.util.ArrayList;
 import jme3tools.optimize.GeometryBatchFactory;
 
@@ -25,19 +26,42 @@ import jme3tools.optimize.GeometryBatchFactory;
  * @author roah
  */
 public class MeshManager {
+
     final float sqrt = FastMath.sqrt(3);        //Make life easier.
     final float hexSize = 1f;                   //hex radius.
     final float hexWidth = sqrt * hexSize;      //Make life easier.
+    final float floorHeight = 0.5f;             //ho much the result should be upped
+    private Hashtable generatedMesh = new Hashtable();
 
     public float getHexSize() {return hexSize;}
     public float getHexWidth() {return hexWidth;}
     
+    public MeshManager() {
+        generatedMesh.put(0, generateTile(1));
+    }
+    
     /**
-     * Generate one hex mesh.
+     * Generate one hex set to the ground as Y=0.
      * @return newly generated hex.
      */
-    Mesh generateTile() {
-        return generateTiles(1);
+    Mesh getTile() {
+        return (Mesh)generatedMesh.get(0);
+    }
+    
+    /**
+     * Return a mesh elevated from the ground (Y=0 == ground).
+     * @param floor needed elevation.
+     * @return Mesh
+     */
+    Mesh getHeightedTile(int floor){
+        Mesh result = new Mesh();
+        if(generatedMesh.containsKey(floor)) {
+            return (Mesh)generatedMesh.get(floor);
+        } else {
+            generatedMesh.put(floor, generateHeightedTile(floor));
+            result = (Mesh)generatedMesh.get(floor);
+        }
+        return result;
     }
     
     /**
@@ -45,46 +69,125 @@ public class MeshManager {
      * @param size Number of tiles to link with the Mesh.
      * @return A newly generated mesh.
      */
-    public Mesh generateTiles(int size) {
-        Mesh result = new Mesh();
-        if(size != 0){
-            result = getTiles(size);
+    Mesh generateTile(int size) {
+        Mesh result;
+        if(size != 1 && size != 0){
+            result = getMultipleTiles(size, 0);
         } else {
-            result = getTiles(new Integer(1));
+            result = getOneTile();
         }
         return result;
     }
     
-    private Mesh getTiles(int size){
+    private Mesh getOneTile(){
+        Vector3f[] triVertices = getTriVerticesPosition(1, 0);
+        Vector2f[] triTexCoord = getTriTexCoord(1);
+        int[] triIndex = getTriIndex(1, true);
         
-        Vector3f[] triVertices = getTriVerticesPosition(size);
-        Vector3f[] quadVertices = getQuadVerticesPosition(size);
+        return setCollisionBound(setAllBuffer(triVertices, triTexCoord, triIndex));
+    }
+    
+    private Mesh generateHeightedTile(int floor) {
+        Vector3f[][] triVertices = new Vector3f[3][];
+        triVertices[0] = getTriVerticesPosition(1, getHeight(floor));
+        triVertices[1] = getTriVerticesPosition(1, getHeight(floor));
+        triVertices[2] = getTriVerticesPosition(1, 0);
+        
+        Vector2f[] triTexCoord = getTriTexCoord(1);
+        Vector2f[] sideTexCoord = getHexHeightSideCoord(floor);
+        
+        int[] triIndex = getTriIndex(1, true);
+        int[] sideIndex = getHexHeightSideIndex();
+        
+        Vector3f[] combinedVertice = new Vector3f[triVertices[0].length*3+2];
+        System.arraycopy(triVertices[0], 0, combinedVertice, 0, triVertices[0].length);
+        System.arraycopy(triVertices[1], 0, combinedVertice, triVertices[0].length, triVertices[0].length);
+        System.arraycopy(triVertices[2], 0, combinedVertice, triVertices[0].length*2, triVertices[0].length);
+        combinedVertice[combinedVertice.length-2] = new Vector3f(0, getHeight(floor), hexSize);
+        combinedVertice[combinedVertice.length-1] = new Vector3f(0, 0, hexSize);
+                
+        Vector2f[] combinedTexCoord = new Vector2f[triTexCoord.length + sideTexCoord.length];
+        System.arraycopy(triTexCoord, 0, combinedTexCoord, 0, triTexCoord.length);
+        System.arraycopy(sideTexCoord, 0, combinedTexCoord, triTexCoord.length, sideTexCoord.length);
+        
+        int[] combinedIndex = new int[triIndex.length + sideIndex.length];
+        System.arraycopy(triIndex, 0, combinedIndex, 0, triIndex.length);
+        System.arraycopy(sideIndex, 0, combinedIndex, triIndex.length, sideIndex.length);
+        
+        System.out.println(triVertices[0].length);
+        System.out.println(combinedTexCoord.length);
+        System.out.println(combinedVertice.length);
+        
+        return setCollisionBound(setAllBuffer(combinedVertice, combinedTexCoord, combinedIndex));
+    }
+    
+    
+    
+    private Mesh getMultipleTiles(int size, float height){
+        Vector3f[] triVertices = getTriVerticesPosition(size, height);
+        Vector3f[] quadVertices = getQuadVerticesPosition(size, height);
         Vector2f[] triTexCoord = getTriTexCoord(size);
         Vector2f[] quadTexCoord = getQuadTexCoord(size);
         
-        int[] triIndex = getTriIndex(size);
+        int[] triIndex = getTriIndex(size, false);
         int[] quadIndex = getQuadIndex();
         
         Mesh[] chunk = {new Mesh(), new Mesh()};
         
-        chunk[0].setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(triVertices));
-        chunk[0].setBuffer(VertexBuffer.Type.TexCoord, 2 , BufferUtils.createFloatBuffer(triTexCoord));
-        chunk[0].setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(triIndex));
+        chunk[0] = setAllBuffer(triVertices, triTexCoord, triIndex);
+        chunk[1] = setAllBuffer(quadVertices, quadTexCoord, quadIndex);
         
-        chunk[1].setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(quadVertices));
-        chunk[1].setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(quadTexCoord));
-        chunk[1].setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(quadIndex));
-    
         ArrayList<Geometry> geoChunk = new ArrayList<Geometry>();
         geoChunk.add(new Geometry("chunk", chunk[0]));
         geoChunk.add(new Geometry("chunk", chunk[1]));
         
         Mesh finalChunk = new Mesh();
         GeometryBatchFactory.mergeGeometries(geoChunk, finalChunk);
-        finalChunk.createCollisionData();
-        finalChunk.updateBound();
         
-        return finalChunk;
+        return setCollisionBound(finalChunk);
+    }
+    
+    private int[] getHexHeightSideIndex(){
+        int[] result = new int[12*3];
+        
+        int i = 0;
+        int j;
+        for(j = 0; j < result.length-6; j+=6){
+            result[j] = 6 + i;
+            result[j+1] = 6 + i+1;
+            result[j+2] = 6*2 + i;
+            
+            result[j+3] = 6*2 + i+1;
+            result[j+4] = 6*2 + i;
+            result[j+5] = 6 + i+1;
+            
+            i++;
+        }
+        result[j] = 6*2 + i+2;
+        result[j+1] = 6 + i;
+        result[j+2] = 6*2 + i+1;
+
+        result[j+3] = 6*2 +i;
+        result[j+4] = 6 + i;
+        result[j+5] = 6*2 + i+2;
+        
+        return result;
+    }
+    
+    private Vector2f[] getHexHeightSideCoord(int floor) {
+        Vector2f[] result = new Vector2f[12+2];
+        
+        int revert = 1;
+        float xOffset = 0;
+        for(int i = 0; i < result.length-2; i+=2){
+            xOffset = (i >= (result.length-2)/2) ? floor/2 : 0f;
+            result[i] = new Vector2f(xOffset, 0.25f);
+            result[i+1] = new Vector2f(xOffset, 0.75f);
+        }
+        result[result.length-2] = new Vector2f(0, 0.25f);
+        result[result.length-1] = new Vector2f(floor/2, 0.25f);
+        
+        return result;
     }
     
     private int[] getQuadIndex(){
@@ -92,8 +195,8 @@ public class MeshManager {
         return index;
     }
     
-    private int[] getTriIndex(int size){
-        int[] index = new int[(size*2)*3];
+    private int[] getTriIndex(int size, boolean mergedQuad){
+        int[] index = (!mergedQuad) ? new int[(size*2)*3] : new int[(size*2+2)*3];
         
         int j = 0;
         for(int i = 0; i < (size*2)*3; i+= 6){
@@ -113,6 +216,15 @@ public class MeshManager {
             j+= 4;
         }
         
+        if(mergedQuad){
+            index[(size*2)*3] = 1;
+            index[(size*2)*3+1] = 4;
+            index[(size*2)*3+2] = 2;
+            
+            index[(size*2)*3+3] = 1;
+            index[(size*2)*3+4] = 5;
+            index[(size*2)*3+5] = 4;
+        }
 //      [XY] == World position
 //      ++++++++++++++++++++++++++++++++++++++ = Y-
 //      +++++[03]++++[07]++++[11]++++[15]+++++
@@ -125,31 +237,31 @@ public class MeshManager {
         return index;
     }
     
-    private Vector3f[] getTriVerticesPosition(int size) {
+    private Vector3f[] getTriVerticesPosition(int size, float height) {
         Vector3f[] vertices = new Vector3f[size*4+2];
         int j = 0;
         float currentHex;
         for(int i = 0; i < size*4; i+=4){
-            currentHex = j*hexWidth;
-            vertices[i] = new Vector3f(currentHex, 0, hexSize);
-            vertices[i+1] = new Vector3f(currentHex -(hexWidth/2), 0, (hexSize/2));
-            vertices[i+2] = new Vector3f(currentHex -(hexWidth/2), 0, -(hexSize/2));
-            vertices[i+3] = new Vector3f(currentHex, 0, -hexSize);
+            currentHex = j*hexWidth; 
+            vertices[i] = new Vector3f(currentHex, height, hexSize);
+            vertices[i+1] = new Vector3f(currentHex -(hexWidth/2), height, (hexSize/2));
+            vertices[i+2] = new Vector3f(currentHex -(hexWidth/2), height, -(hexSize/2));
+            vertices[i+3] = new Vector3f(currentHex, height, -hexSize);
             j++;
         }
         currentHex = j*hexWidth;
-        vertices[size*4] = new Vector3f(currentHex - (hexWidth/2), 0, -(hexSize/2));
-        vertices[size*4+1] = new Vector3f(currentHex - (hexWidth/2), 0, hexSize/2);
+        vertices[size*4] = new Vector3f(currentHex - (hexWidth/2), height, -(hexSize/2));
+        vertices[size*4+1] = new Vector3f(currentHex - (hexWidth/2), height, hexSize/2);
         
         return vertices;
     }
     
-    private Vector3f[] getQuadVerticesPosition(int size){
+    private Vector3f[] getQuadVerticesPosition(int size, float height){
         Vector3f[] vertices = new Vector3f[4];
-        vertices[0] = new Vector3f(-(hexWidth/2), 0, hexSize/2);
-        vertices[1] = new Vector3f((size * hexWidth)-(hexWidth/2), 0, hexSize/2);
-        vertices[2] = new Vector3f((size * hexWidth)-(hexWidth/2), 0, -(hexSize/2));
-        vertices[3] = new Vector3f(-(hexWidth/2), 0, -(hexSize/2));
+        vertices[0] = new Vector3f(-(hexWidth/2), height, hexSize/2);
+        vertices[1] = new Vector3f((size * hexWidth)-(hexWidth/2), height, hexSize/2);
+        vertices[2] = new Vector3f((size * hexWidth)-(hexWidth/2), height, -(hexSize/2));
+        vertices[3] = new Vector3f(-(hexWidth/2), height, -(hexSize/2));
         
         return vertices;
     }
@@ -182,5 +294,23 @@ public class MeshManager {
             texCoord[count*4+1] = new Vector2f(j+1f, 0.25f);
         }
         return texCoord;
+    }
+
+    private float getHeight(int floor) {
+        return floor*floorHeight;
+    }
+    
+    private Mesh setCollisionBound(Mesh meshToUpdate) {
+        meshToUpdate.createCollisionData();
+        meshToUpdate.updateBound();
+        return meshToUpdate;
+    }
+    
+    private Mesh setAllBuffer(Vector3f[] vertices, Vector2f[] texCoord, int[] index){
+        Mesh result = new Mesh();
+        result.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+        result.setBuffer(VertexBuffer.Type.TexCoord, 2 , BufferUtils.createFloatBuffer(texCoord));
+        result.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(index));
+        return result;
     }
 }

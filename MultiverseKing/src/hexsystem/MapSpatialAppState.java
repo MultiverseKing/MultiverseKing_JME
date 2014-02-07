@@ -65,7 +65,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
 //                mapNode.attachChild(geom);
 //            }
 //        }
-        Mesh hexagon = meshManager.generateChunk(new Vector2Int(10, 10));
+        Mesh hexagon = meshManager.generateChunk(new Vector2Int(5, 5));
         hexagon.setPointSize(4.0f);
 //        hexagon.setMode(Mesh.Mode.Points);
         Geometry geom = new Geometry(25 + "|" + 25, hexagon);

@@ -20,11 +20,12 @@ import tonegod.gui.controls.windows.Window;
  */
 public class MainGUI extends AbstractAppState{
 
+    private final MultiverseMain main;
+    
     public MainGUI(MultiverseMain main) {
         this.main = main;
         main.setGameState(GameState.MAIN);
     }
-    private final MultiverseMain main;
     
     @Override
     public void initialize(AppStateManager stateManager, Application app) {

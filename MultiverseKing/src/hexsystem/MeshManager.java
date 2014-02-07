@@ -79,6 +79,7 @@ public class MeshManager {
         return result;
     }
     
+    
     private Mesh getOneTile(){
         Vector3f[] triVertices = getTriVerticesPosition(1, 0);
         Vector2f[] triTexCoord = getTriTexCoord(1);
@@ -128,10 +129,10 @@ public class MeshManager {
         Vector3f[] quadVertices = getQuadVerticesPosition(size, height);
         Vector2f[] triTexCoord = getTriTexCoord(size);
         Vector2f[] quadTexCoord = getQuadTexCoord(size);
-        
+    
         int[] triIndex = getTriIndex(size, false);
         int[] quadIndex = getQuadIndex();
-        
+    
         Mesh[] chunk = {new Mesh(), new Mesh()};
         
         chunk[0] = setAllBuffer(triVertices, triTexCoord, triIndex);

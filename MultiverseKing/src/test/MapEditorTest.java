@@ -49,17 +49,17 @@ public class MapEditorTest extends AbstractAppState {
         mapData = stateManager.getState(MapData.class);
         spats = stateManager.getState(MapSpatialAppState.class); //variable name should be changed, hard to read as say before
         
-        /** Testing cursor */
-        hexCursor = main.getAssetManager().loadModel("Models/utility/SimpleSprite.j3o");
-        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-        animShader.setInt("Speed", 16);
-//        Material animShader = main.getAssetManager().loadMaterial("Materials/debugMat.j3m");
-        hexCursor.setMaterial(animShader);
-        main.getRootNode().attachChild(hexCursor);
-        hexCursor.rotate(-FastMath.HALF_PI, FastMath.PI, 0f);
-        hexCursor.setLocalTranslation(new Vector3f(0f, 0.01f,offset)); //Remove offset and set it to zero if hex_void_anim.png is not used
-        hexCursor.scale(2f);
-//        hexCursor.setCullHint(Spatial.CullHint.Always);
+//        /** Testing cursor */
+//        hexCursor = main.getAssetManager().loadModel("Models/utility/SimpleSprite.j3o");
+//        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+//        animShader.setInt("Speed", 16);
+////        Material animShader = main.getAssetManager().loadMaterial("Materials/debugMat.j3m");
+//        hexCursor.setMaterial(animShader);
+//        main.getRootNode().attachChild(hexCursor);
+//        hexCursor.rotate(-FastMath.HALF_PI, FastMath.PI, 0f);
+//        hexCursor.setLocalTranslation(new Vector3f(0f, 0.01f,offset)); //Remove offset and set it to zero if hex_void_anim.png is not used
+//        hexCursor.scale(2f);
+////        hexCursor.setCullHint(Spatial.CullHint.Always);
         
         if (main.getGameState() == GameState.EDITOR) {
             EditorGUI editorGUI = new EditorGUI();

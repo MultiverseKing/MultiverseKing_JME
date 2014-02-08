@@ -8,13 +8,17 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
+import kingofmultiverse.MultiverseMain;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -24,11 +28,14 @@ import utility.attribut.ElementalAttribut;
  */
 public class MapSpatialAppState extends AbstractAppState implements TileChangeListener {
 
+    MultiverseMain main;
     private Node mapNode;
     private MapData mapData;
     private Geometry[][] tiles;
-    Material[] materials;
-    MeshManagerV2 meshManager;
+    Hashtable hexMat = new Hashtable();
+    MeshManagerV3 meshManager;
+    
+    
     /**
      * To got a gap between Hex Change tileSize during initialize and set it to 1.
      */
@@ -37,7 +44,7 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
-        setupMaterials(app.getAssetManager());
+        this.main = (MultiverseMain) app;
         mapData = stateManager.getState(MapData.class);
         mapData.registerTileChangeListener(this);
         HexTile[][] tileData = mapData.getAllTiles();
@@ -46,48 +53,27 @@ public class MapSpatialAppState extends AbstractAppState implements TileChangeLi
         mapNode = new Node("MapNode");
         ((SimpleApplication) app).getRootNode().attachChild(mapNode);
 
-
-        //TODO: Create mesh in a nicer way
-        meshManager = new MeshManagerV2();
-//        tileSize = meshManager.getHexWidth()/2;
-//        Mesh hexagon = meshManager.getTile();
-//        for (int x = 0; x < tileData.length; x++) {
-//            for (int y = 0; y < tileData.length; y++) {
-////TODO: Take tileheight into account
-//                Geometry geom = new Geometry(x + "|" + y, hexagon);
-//                //TODO: Set Position and scale correctly
-////                geom.setLocalScale(tileSize);
-//
-//                geom.setLocalTranslation(getSpatialPositionForTile(x, y));
-//
-//                geom.setMaterial(getMaterialForTile(tileData[x][y]));
-//                tiles[x][y] = geom;
-//                mapNode.attachChild(geom);
-//            }
-//        }
-        Mesh hexagon = meshManager.generateChunk(new Vector2Int(5, 5));
+        meshManager = new MeshManagerV3();
+        Mesh hexagon = meshManager.generateChunk(new Vector2Int(10, 10));
         hexagon.setPointSize(4.0f);
 //        hexagon.setMode(Mesh.Mode.Points);
         Geometry geom = new Geometry(25 + "|" + 25, hexagon);
-        geom.setMaterial(materials[0]);
+        geom.setMaterial(hexMat.get(mapData.));
         mapNode.attachChild(geom);
+//        geom.setCullHint(Spatial.CullHint.Never);
     }
 
-    private void setupMaterials(AssetManager assetManager) {
-        materials = new Material[ElementalAttribut.getSize()];
-        int i = 0;
-        for (ElementalAttribut e : ElementalAttribut.values()) { //ElementalAttribut.SIZE do the same
-            Material mat = assetManager.loadMaterial("Materials/debugMat.j3m");
-            Texture2D tex = (Texture2D) assetManager.loadTexture("Textures/Test/" + e.name() + "Center.png");
-            tex.setWrap(Texture.WrapMode.Repeat);
-////            g.getMaterial().getParam("Diffuse").setValue(tex);
-////            mat.getAdditionalRenderState().setWireframe(true); //needed for debug on MeshManager
-            mat.setTexture("ColorMap", tex);
-            materials[i++] = mat;
-        }
+    private void addMaterials() {
+        Material mat = main.getAssetManager().loadMaterial("Materials/hexMat.j3m");
+        Texture2D tex = (Texture2D) main.getAssetManager().loadTexture("Textures/Test/" + e.name() + "Center.png");
+        tex.setWrap(Texture.WrapMode.Repeat);
+//        g.getMaterial().getParam("Diffuse").setValue(tex);
+//        mat.getAdditionalRenderState().setWireframe(true); //needed for debug on MeshManager
+        mat.setTexture("ColorMap", tex);
+        hexMat.put(e.name(), mat);
     }
 
-    private Material getMaterialForTile(HexTile tile) {
+    private Texture2D getTextureForTile(HexTile tile) {
         return materials[tile.getHexElement().ordinal()];
     }
 

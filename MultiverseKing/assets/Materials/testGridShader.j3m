@@ -1,6 +1,0 @@
-Material My Material : MatDefs/hexGen.j3md {
-     MaterialParameters {
-     }
-    AdditionalRenderState {
-    }
-}

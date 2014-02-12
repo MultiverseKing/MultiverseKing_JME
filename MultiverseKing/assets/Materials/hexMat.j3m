@@ -1,8 +1,11 @@
-Material My Material : Common/MatDefs/Misc/ColoredTextured.j3md {
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
      MaterialParameters {
-        Color : 0.6 1.0 0.4 1.0
-        ColorMap : Flip Repeat Textures/Test/drawing_revert.png
      }
     AdditionalRenderState {
+      ColorWrite On
+      Wireframe Off
+      Blend Alpha
+      DepthWrite Off
+        FaceCull Back
     }
 }

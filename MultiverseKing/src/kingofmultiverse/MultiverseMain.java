@@ -1,9 +1,8 @@
 package kingofmultiverse;
 
-import GUI.MainGUI;
+import gamestate.gui.MainGUI;
 import hexsystem.MapData;
-import test.MapEditorTest;
-import hexsystem.MapSpatialAppState;
+import gamestate.EditorAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
@@ -15,15 +14,17 @@ import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
+import hexsystem.HexSettings;
 import java.util.logging.Level;
-import utility.attribut.GameState;
+import utility.attribut.GameMode;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
+import utility.attribut.ElementalAttribut;
 
 /**
  * test
  *
- * @author normenhansen
+ * @author normenhansen, Roah
  */
 public class MultiverseMain extends SimpleApplication {
 
@@ -32,32 +33,35 @@ public class MultiverseMain extends SimpleApplication {
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
         app.start();
     }
+    
     private Screen screen;
-    private GameState gameState;
-
+    private GameMode currentMode;
+    private boolean debugMode;
+    
+    public boolean isDebugMode() {
+        return debugMode;
+    }
     public Screen getScreen() {
         return screen;
     }
-
-    public GameState getGameState() {
-        return gameState;
+    public GameMode getCurrentMode() {
+        return currentMode;
     }
-
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
+    public void setCurrentMode(GameMode newMode) {
+        this.currentMode = newMode;
     }
 
     @Override
     public void simpleInitApp() {
         // Disable the default flyby cam
         flyCam.setEnabled(false);
-//        initPlayer();
+        debugMode = true;
         initGUI();
-//        generateHexMap();
-//        cameraSettup(instanciatePlayer());
         lightSettup();
-        initDebug();
         generateHexMap();
+        if(debugMode){
+            initDebug();
+        }
     }
 
     @Override
@@ -96,6 +100,8 @@ public class MultiverseMain extends SimpleApplication {
     private void cameraSettup(Node target) {
         // Enable a chase cam for this target (typically the player).
         ChaseCamera chaseCam = new ChaseCamera(cam, target, this.inputManager);
+        chaseCam.setMaxDistance(30);
+        chaseCam.setMinDistance(5);
         chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
         chaseCam.setSmoothMotion(true);
     }
@@ -103,6 +109,7 @@ public class MultiverseMain extends SimpleApplication {
     /**
      * Use to generate a character who can move on the field, this will be used
      * for Exploration mode configuration, jme terrain is called with it.
+     * @deprecated No need for the physic system.
      */
     private void initPlayer() {
         Player player = new Player();
@@ -134,15 +141,11 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     public void generateHexMap() {
-        MapData md = new MapData(25);
-        stateManager.attach(md);
-        MapSpatialAppState msas = new MapSpatialAppState();
-        stateManager.attach(msas);
-        stateManager.attach(new MapEditorTest());
-//        HexMap hexMap = new HexMap();
-//        stateManager.attach(hexMap);
-//        hexMap.generateNewHexMap(new Integer(5), new Integer(5));
-//        rootNode.attachChild(hexMap.getHexMapNode());
+        MapData mapData = new MapData(new HexSettings());
+        stateManager.attach(mapData);
+        EditorAppState editorAppState = new EditorAppState(mapData, ElementalAttribut.ICE, this);
+        stateManager.attach(editorAppState);
+        
         cameraSettup((Node) instanciatePlayer());
         stateManager.detach(stateManager.getState(MainGUI.class));
     }

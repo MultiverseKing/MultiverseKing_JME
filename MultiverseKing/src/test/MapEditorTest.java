@@ -1,6 +1,7 @@
 package test;
 
-import GUI.EditorGUI;
+import gamestate.EditorAppState;
+import gamestate.gui.EditorGUI;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
@@ -12,33 +13,31 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import hexsystem.MapSpatialAppState;
 import kingofmultiverse.MultiverseMain;
 import utility.MouseRay;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
-import utility.attribut.GameState;
+import utility.attribut.GameMode;
 
 /**
  *
- * @author Eike Foede
+ * @author Eike Foede, Roah
  */
 public class MapEditorTest extends AbstractAppState {
 
+    private MultiverseMain main;        //used to get some global variable.
     private MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial hexCursor;          //@todo see HexCursor script.
     private Spatial mark;
-    private MultiverseMain main;        //used to get some global variable.
     private AppState hexGUI;            //Current GUI used. Maybe pointless ?
     private MapData mapData;
-    private MapSpatialAppState spats;
+    private EditorAppState editorAppState;
     private final float offset = 0.15f;               //Got an offset issue with hex_void_anim.png this will solve it temporary
 
     @Override
@@ -47,21 +46,21 @@ public class MapEditorTest extends AbstractAppState {
         mouseRay = new MouseRay();
         main = (MultiverseMain) app;
         mapData = stateManager.getState(MapData.class);
-        spats = stateManager.getState(MapSpatialAppState.class); //variable name should be changed, hard to read as say before
+        editorAppState = stateManager.getState(EditorAppState.class); //variable name should be changed, hard to read as say before
         
-        /** Testing cursor */
-        hexCursor = main.getAssetManager().loadModel("Models/utility/SimpleSprite.j3o");
-        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-        animShader.setInt("Speed", 16);
-//        Material animShader = main.getAssetManager().loadMaterial("Materials/debugMat.j3m");
-        hexCursor.setMaterial(animShader);
-        main.getRootNode().attachChild(hexCursor);
-        hexCursor.rotate(-FastMath.HALF_PI, FastMath.PI, 0f);
-        hexCursor.setLocalTranslation(new Vector3f(0f, 0.01f,offset)); //Remove offset and set it to zero if hex_void_anim.png is not used
-        hexCursor.scale(2f);
-//        hexCursor.setCullHint(Spatial.CullHint.Always);
+//        /** Testing cursor */
+//        hexCursor = main.getAssetManager().loadModel("Models/utility/SimpleSprite.j3o");
+//        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+//        animShader.setInt("Speed", 16);
+////        Material animShader = main.getAssetManager().loadMaterial("Materials/debugMat.j3m");
+//        hexCursor.setMaterial(animShader);
+//        main.getRootNode().attachChild(hexCursor);
+//        hexCursor.rotate(-FastMath.HALF_PI, FastMath.PI, 0f);
+//        hexCursor.setLocalTranslation(new Vector3f(0f, 0.01f,offset)); //Remove offset and set it to zero if hex_void_anim.png is not used
+//        hexCursor.scale(2f);
+////        hexCursor.setCullHint(Spatial.CullHint.Always);
         
-        if (main.getGameState() == GameState.EDITOR) {
+        if (main.getGameState() == GameMode.EDITOR) {
             EditorGUI editorGUI = new EditorGUI();
             hexGUI = editorGUI;
 
@@ -116,11 +115,10 @@ public class MapEditorTest extends AbstractAppState {
     }
 
     private void selectedHex(CollisionResult cr) {
-
-        Vector2Int tilePos = spats.getTilePositionForCoordinate(cr.getContactPoint());
+        Vector2Int tilePos = editorAppState.getTilePositionForCoordinate(cr.getContactPoint());
 
         if(mapData.exist(tilePos)){
-            Vector3f cursorPos = spats.getSpatialPositionForTile(tilePos.x, tilePos.y);
+            Vector3f cursorPos = editorAppState.getSpatialPositionForTile(tilePos.x, tilePos.y);
             hexCursor.setLocalTranslation(cursorPos.x, hexCursor.getLocalTranslation().y, cursorPos.z + offset); //Remove offset and set it to zero if hex_void_anim.png is not used
             
             if (mapData.getTile(tilePos).getHexElement() == ElementalAttribut.NATURE) {
@@ -133,6 +131,5 @@ public class MapEditorTest extends AbstractAppState {
         } else {
             System.out.println("No hex selected.");
         }
-
     }
 }

@@ -4,6 +4,7 @@ import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.app.state.AbstractAppState;
 import java.util.ArrayList;
+import kingofmultiverse.MultiverseMain;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -11,31 +12,30 @@ import utility.attribut.ElementalAttribut;
  * This class holds the data of the map. It's implementation can be easily
  * replaced using other datastructures, so that you can handle dynamic map sizes
  *
- * @author Eike Foede
+ * @author Eike Foede, Roah
  */
 public class MapData extends AbstractAppState {
-
-    private HexTile[][] hexTiles;       //Will be used later for faster calculation, mainly neighbourg, pathfinding etc...
+    private ArrayList<ArrayList<HexTile>> tiles = new ArrayList<ArrayList<HexTile>>();
+    private HexSettings hexSettings;
+    private ElementalAttribut mapElement;
     private ArrayList<TileChangeListener> listeners = new ArrayList<TileChangeListener>();
 
-    /**
-     * Initializes a new MapData,
-     *
-     * @param size
-     */
-    public MapData(int size) {
-        hexTiles = new HexTile[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                hexTiles[i][j] = new HexTile( ElementalAttribut.NATURE);
-            }
-        }
+    public HexSettings getHexSettings() {
+        return hexSettings;
+    }
+    public ElementalAttribut getMapElement() {
+        return mapElement;
+    }
+    
+    
+    public MapData(HexSettings hexSettings) {
+        this.hexSettings = hexSettings;
     }
 
-    public HexTile[][] getAllTiles() {
-        return hexTiles;
+    public void setCurrentTileChunk(){
+        
     }
-
+    
     //TODO: Check if position is out of bounds
     public void setTile(int x, int y, HexTile t) {
         TileChangeEvent tce = new TileChangeEvent(x, y, hexTiles[x][y], t);
@@ -70,5 +70,9 @@ public class MapData extends AbstractAppState {
     }
     public void setHeight(int x, int y, int height){
         setTile(x,y,hexTiles[x][y].cloneChangedHeight(height));
+    }
+
+    public void setMapElement(ElementalAttribut eAttribut) {
+        this.mapElement = eAttribut;
     }
 }

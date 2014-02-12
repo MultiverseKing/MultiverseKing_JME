@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package hexsystem;
+package Archives;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
@@ -173,18 +173,23 @@ public class MeshManagerV2 {
         
         int index = 4;    
         for(int i = 1; i < size.y; i++){
-            if((i&1)==0){
-                texCoord[index] = new Vector2f(0.5f, 0f);
-                texCoord[index+1] = new Vector2f(size.x+0.5f, 0f);
-            } else {
-                texCoord[index] = new Vector2f(-0.5f, 0f);
-                texCoord[index+1] = new Vector2f(size.x-0.5f, 0f);
-            }
+        
+        if((i&1)==0){
+            texCoord[index] = new Vector2f(0.5f, 0.001f);
+            texCoord[index+1] = new Vector2f(size.x+0.5f, 0.001f);
             texCoord[index+2] = new Vector2f(0f, 0.25f);
             texCoord[index+3] = new Vector2f(size.x, 0.25f);
             texCoord[index+4] = new Vector2f(0f, 0.75f);
             texCoord[index+5] = new Vector2f(size.x, 0.75f);
-            index+= 6;
+        } else {
+            texCoord[index] = new Vector2f(-0.5f, 0.001f);
+            texCoord[index+1] = new Vector2f(-(size.x+0.5f), 0.001f);
+            texCoord[index+2] = new Vector2f(-1f, 0.25f);
+            texCoord[index+3] = new Vector2f(-(size.x+1f), 0.25f);
+            texCoord[index+4] = new Vector2f(-1f, 0.75f);
+            texCoord[index+5] = new Vector2f(-(size.x+1f), 0.75f);
+        }
+        index+= 6;
         }
         
         return texCoord;

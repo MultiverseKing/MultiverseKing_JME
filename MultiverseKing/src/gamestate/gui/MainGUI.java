@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package GUI;
+package gamestate.gui;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -10,7 +10,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import kingofmultiverse.MultiverseMain;
-import utility.attribut.GameState;
+import utility.attribut.GameMode;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
 
@@ -24,7 +24,6 @@ public class MainGUI extends AbstractAppState{
     
     public MainGUI(MultiverseMain main) {
         this.main = main;
-        main.setGameState(GameState.MAIN);
     }
     
     @Override
@@ -46,7 +45,6 @@ public class MainGUI extends AbstractAppState{
                 startEditorConfig();
             }
             private void startEditorConfig(){
-                main.setGameState(GameState.EDITOR);
                 main.generateHexMap();
             }
         };

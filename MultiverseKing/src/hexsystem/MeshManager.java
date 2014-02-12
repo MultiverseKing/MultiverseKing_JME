@@ -16,20 +16,29 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public class MeshManagerV3 {
-    final float hexSize = 1f;                   //hex radius.
-    final float hexWidth = FastMath.sqrt(3) * hexSize;      //Make life easier.
+public class MeshManager {
+
+    private float hexSize;    //hex radius.
+    private float hexWidth;   //Make life easier.
     
-    Mesh generateChunk(Vector2Int size) {
+    public MeshManager(HexSettings settings) {
+        this.hexSize = settings.getHEX_RADIUS();
+        this.hexWidth = FastMath.sqrt(3) * hexSize;
+    }
+    
+    public Mesh generateMergedTile(Vector2Int size) {
         Mesh result = getMesh(size, 0);
+        return result;
+    }
+    
+    public Mesh generateOneTile() {
+        Mesh result = getMesh(new Vector2Int(0, 0), 0);
         return result;
     }
     
     private Mesh getMesh(Vector2Int size, int height){
         Vector3f[] vertices = getVerticesPosition(size, height);
-        
         Vector2f[] texCoord = getTexCoord(size);
-        
         int[] index = getIndex(size);
         
         Mesh chunk = new Mesh();
@@ -60,7 +69,7 @@ public class MeshManagerV3 {
         Vector3f[] vertices = new Vector3f[4*size.y];
         int index = 0;
         for(int i = 0; i < size.y; i++){
-            if((i&1) == 0){
+            if((i&1) == 0){ //even
                 vertices[index] = new Vector3f(-(hexWidth/2), height, hexSize+(i*(hexSize*1.5f)));
                 vertices[index+1] = new Vector3f((size.x * hexWidth)-(hexWidth/2), height, hexSize+(i*(hexSize*1.5f)));
                 vertices[index+2] = new Vector3f((size.x * hexWidth)-(hexWidth/2), height, -hexSize+(i*(hexSize*1.5f)));

@@ -4,11 +4,11 @@ import utility.attribut.ElementalAttribut;
 
 /**
  *
- * @author Eike Foede
+ * @author Eike Foede, Roah
  */
 public class HexTile {
 
-    private final ElementalAttribut hexElement;
+    private ElementalAttribut hexElement;
     private int height;
 
     public HexTile(ElementalAttribut eAttribut) {

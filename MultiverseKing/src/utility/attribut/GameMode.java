@@ -8,10 +8,8 @@ package utility.attribut;
  * MENU and MAIN State could be redundant...
  * @author roah
  */
-public enum GameState {
+public enum GameMode {
     EDITOR,
     EXPLORATION,
     BATTLE,
-    MENU, 
-    MAIN;
 }

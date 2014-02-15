@@ -8,21 +8,21 @@ import utility.attribut.ElementalAttribut;
  */
 public class HexTile {
 
-    private ElementalAttribut hexElement;
-    private int height;
+    private byte hexElement;
+    private byte height;
 
     public HexTile(ElementalAttribut eAttribut) {
-        this.hexElement = eAttribut;
+        this.hexElement = (byte) eAttribut.ordinal();
         this.height = 0;
     }
 
-    public HexTile(ElementalAttribut hexElement, int height) {
-        this.hexElement = hexElement;
+    public HexTile(ElementalAttribut hexElement, byte height) {
+        this.hexElement = (byte)hexElement.ordinal();
         this.height = height;
     }
 
     public ElementalAttribut getHexElement() {
-        return hexElement;
+        return ElementalAttribut.convert(hexElement);
     }
 
     public int getHeight() {
@@ -35,7 +35,7 @@ public class HexTile {
      * @param height
      * @return
      */
-    public HexTile cloneChangedHeight(int height) {
-        return new HexTile(hexElement, height);
+    public HexTile cloneChangedHeight(byte height) {
+        return new HexTile(ElementalAttribut.convert(hexElement), height);
     }
 }

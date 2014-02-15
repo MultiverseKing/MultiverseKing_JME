@@ -13,9 +13,9 @@ public enum ElementalAttribut {
     NATURE,
     ICE;
     
-    private static final int SIZE = ElementalAttribut.values().length;
+    private static final byte SIZE = (byte) ElementalAttribut.values().length;
     public static int getSize(){return SIZE;}
-    public static ElementalAttribut convert(int x){
+    public static ElementalAttribut convert(byte x){
         ElementalAttribut result = null;
         switch(x){
             case 0:

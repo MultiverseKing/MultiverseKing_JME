@@ -55,7 +55,7 @@ abstract class BaseInput extends AbstractAppState {
      * HexMap base input, it not depend on the gameMode or other thing if hexMap
      * is instanced that mean Tiles is or will be instanced so this input too.
      */
-    private final void initInput() {
+    private void initInput() {
         main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         main.getInputManager().addListener(actionListener, new String[]{"LeftMouse"});
     }
@@ -88,7 +88,7 @@ abstract class BaseInput extends AbstractAppState {
         }
     };
     
-    private final void initMarkDebug() {
+    private void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
         mark = new Geometry("BOOM!", sphere);
         Material mark_mat = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");

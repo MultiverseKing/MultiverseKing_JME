@@ -3,8 +3,10 @@ package hexsystem;
 import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.app.state.AbstractAppState;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 import java.util.ArrayList;
-import kingofmultiverse.MultiverseMain;
+import java.util.HashMap;
+import java.util.Map;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -15,7 +17,7 @@ import utility.attribut.ElementalAttribut;
  * @author Eike Foede, Roah
  */
 public class MapData extends AbstractAppState {
-    private ArrayList<ArrayList<HexTile>> tiles = new ArrayList<ArrayList<HexTile>>();
+    private ChunkData chunkData = new ChunkData();
     private HexSettings hexSettings;
     private ElementalAttribut mapElement;
     private ArrayList<TileChangeListener> listeners = new ArrayList<TileChangeListener>();
@@ -34,6 +36,17 @@ public class MapData extends AbstractAppState {
 
     public void setCurrentTileChunk(){
         
+    }
+    
+    public void addEmptyChunk(Vector2Int chunkPos){
+        HexTile[][] tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
+        for(int x = 0; x < hexSettings.getCHUNK_SIZE(); x++){
+            for(int y = 0; y < hexSettings.getCHUNK_SIZE(); y++){
+                tiles[x][y] = new HexTile(mapElement);
+            }
+        }
+        chunkData.add(chunkPos, tiles);
+        System.err.println("ChunkAdded");
     }
     
     //TODO: Check if position is out of bounds

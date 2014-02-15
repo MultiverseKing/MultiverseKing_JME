@@ -12,7 +12,6 @@ import com.jme3.scene.control.AbstractControl;
 import hexsystem.MapData;
 import hexsystem.MeshManager;
 import kingofmultiverse.MultiverseMain;
-import utility.attribut.ElementalAttribut;
 
 /**
  *

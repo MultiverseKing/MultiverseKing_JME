@@ -28,6 +28,7 @@ import utility.attribut.GameMode;
 /**
  *
  * @author Eike Foede, Roah
+ * @deprecated replaced by EditorAppState
  */
 public class MapEditorTest extends AbstractAppState {
 

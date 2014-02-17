@@ -17,11 +17,15 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import hexsystem.MapData;
+import hexsystem.MeshManager;
+import java.util.Iterator;
 import kingofmultiverse.MultiverseMain;
 import utility.Coordinate;
+import utility.Coordinate.Offset;
 import utility.MouseRay;
 
 /**
@@ -29,17 +33,23 @@ import utility.MouseRay;
  * @author roah
  */
 abstract class BaseInput extends AbstractAppState {
-    private final MouseRay mouseRay;    //@see utility/MouseRay.
-    private Spatial mark;
+    protected final MeshManager meshManager;
     protected final MultiverseMain main;
     protected final MapData mapData;
-    protected final Coordinate coordinate = new Coordinate();
+    protected final Node mapNode;
+    protected CollisionResults lastRayResults;
+    private final MouseRay mouseRay;    //@see utility/MouseRay.
+    private Spatial mark;
     
-
+    
+    
     public BaseInput(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
         this.mapData = mapData;
+        this.meshManager = new MeshManager(mapData.getHexSettings());
+        mapNode = new Node("mapNode");
+        main.getRootNode().attachChild(mapNode);
     }
 
     @Override
@@ -71,7 +81,8 @@ abstract class BaseInput extends AbstractAppState {
                             mark.setLocalTranslation(closest.getContactPoint());
                             main.getRootNode().attachChild(mark);    //TODO Debug to remove.
                         }
-                        main.getStateManager().getState(BaseInput.class).getleftMouseActionResult(results.getClosestCollision());
+                        main.getStateManager().getState(BaseInput.class).setleftMouseActionResult(results);
+                        main.getStateManager().getState(BaseInput.class).mouseLeftActionResult();
                     } else if (main.getRootNode().hasChild(mark)) {
                         // No hits? Then remove the red mark.
                         if(main.isDebugMode()){
@@ -96,17 +107,29 @@ abstract class BaseInput extends AbstractAppState {
         mark.setMaterial(mark_mat);
     }
     
-    protected final Coordinate.Offset convertWorldToGrid(Vector3f pos) {
-        float x = pos.x;
-        float z = pos.z+mapData.getHexSettings().getHEX_RADIUS();
-        x = x / mapData.getHexSettings().getHEX_WIDTH();
-
-        float t1 = z / mapData.getHexSettings().getHEX_RADIUS(), t2 = FastMath.floor(x + t1);
-        float r = FastMath.floor((FastMath.floor(t1 - x) + t2) / 3);
-        float q = FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r;
-
-        return coordinate.new Axial((int) q, (int) r).toOffset();
+    private void setleftMouseActionResult(CollisionResults results) {
+        this.lastRayResults = results;
     }
-
-    abstract void getleftMouseActionResult(CollisionResult closestCollision);
+    
+    protected final Coordinate.Offset getLastLeftMouseCollisionGridPos(){
+        Offset tilePos;
+        Vector3f pos;
+        Iterator<CollisionResult> i = lastRayResults.iterator();
+        
+        do{
+            pos = i.next().getContactPoint();
+            tilePos = mapData.convertWorldToGridPosition(pos);
+//            System.out.println(tilePos.toString());
+            if(mapData.getTile(tilePos) == null){
+                break;
+            } else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y)){
+                System.out.println(mapData.getTile(tilePos).getHeight()+"+"+(byte)FastMath.floor(pos.y));
+                return tilePos;
+            }
+        }while(i.hasNext());
+        
+        return null;
+    }
+    
+    abstract void mouseLeftActionResult();
 }

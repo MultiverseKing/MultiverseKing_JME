@@ -11,7 +11,6 @@ import com.jme3.math.FastMath;
  * @author roah
  */
 public final class HexSettings {
-    
     private final float HEX_RADIUS = 1;
     private final float HEX_WIDTH;
     private final int CHUNK_SIZE = 32; //must be power of two

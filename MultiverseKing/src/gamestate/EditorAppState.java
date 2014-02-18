@@ -8,13 +8,12 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import hexsystem.MeshManager;
 import hexsystem.chunksystem.ChunkControl;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -56,7 +55,7 @@ public class EditorAppState extends BaseInput implements TileChangeListener {
     public void tileChange(TileChangeEvent event) {
         HexTile oldTile = event.getOldTile();
         HexTile newTile = event.getNewTile();
-        if (newTile.getHexElement() != oldTile.getHexElement() || newTile.getHeight() != oldTile.getHeight()) {
+        if (newTile.getHexElement() != oldTile.getHexElement() && newTile.getHeight() != oldTile.getHeight()) {
 //            mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).changeTileElement(newTile.getHexElement(), event.tilePos());
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.tilePos());
 //            tiles[event.getX()][event.getY()].setMaterial(getMaterialForTile(event.getNewTile()));

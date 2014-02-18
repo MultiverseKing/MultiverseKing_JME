@@ -5,7 +5,7 @@
 package hexsystem;
 
 import com.jme3.math.FastMath;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 
 /**

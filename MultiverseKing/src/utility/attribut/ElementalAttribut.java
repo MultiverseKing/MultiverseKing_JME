@@ -31,19 +31,20 @@ public enum ElementalAttribut {
         return result;
     }
     
-    public static String toString(ElementalAttribut elementalAttribut){
-        String result = null;
-        switch(elementalAttribut){
-            case EARTH:
-                result = "EARTH";
-                break;
-            case ICE:
-                result = "NATURE";
-                break;
-            case NATURE:
-                result = "ICE";
-                break;
-        }
-        return result;
-    }
+//    @Override
+//    public String toString(){
+//        String result = null;
+//        switch(this.){
+//            case EARTH:
+//                result = "EARTH";
+//                break;
+//            case ICE:
+//                result = "NATURE";
+//                break;
+//            case NATURE:
+//                result = "ICE";
+//                break;
+//        }
+//        return result;
+//    }
 }

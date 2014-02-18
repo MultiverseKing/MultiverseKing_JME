@@ -6,8 +6,8 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
-import utility.Coordinate;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate;
+import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -142,7 +142,7 @@ public final class MapData extends AbstractAppState {
      * @param pos position to convert.
      * @return converted grid position.
      */
-    public Coordinate.Offset convertWorldToGridPosition(Vector3f pos) {
+    public HexCoordinate.Offset convertWorldToGridPosition(Vector3f pos) {
         float x = pos.x;
         float z = pos.z+hexSettings.getHEX_RADIUS();
         x = x / hexSettings.getHEX_WIDTH();
@@ -151,6 +151,6 @@ public final class MapData extends AbstractAppState {
         float r = FastMath.floor((FastMath.floor(t1 - x) + t2) / 3);
         float q = FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r;
 
-        return new Coordinate().new Axial((int) q, (int) r).toOffset();
+        return new HexCoordinate().new Axial((int) q, (int) r).toOffset();
     }
 }

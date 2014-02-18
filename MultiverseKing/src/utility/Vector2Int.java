@@ -12,7 +12,7 @@ import com.jme3.math.Vector2f;
  * @todo implement equals && hashCode Override 
  */
 public class Vector2Int {
-
+    public static final Vector2Int ZERO = new Vector2Int(0,0);
     public int x;
     public int y;
 
@@ -25,15 +25,14 @@ public class Vector2Int {
         return Integer.toString(this.x)+"|"+Integer.toString(this.y);
     }
     
-    
     public Vector2Int(){
         this(0,0);
     }
-    
+
     public Vector2Int(Vector2f value){
         this((int)value.x, (int)value.y);
     }
-    
+
     public Vector2Int(int x, int y){
         this.x = x;
         this.y = y;

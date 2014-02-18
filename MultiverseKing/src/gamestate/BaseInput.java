@@ -21,11 +21,11 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import hexsystem.MapData;
-import hexsystem.MeshManager;
+import hexsystem.chunksystem.MeshManager;
 import java.util.Iterator;
 import kingofmultiverse.MultiverseMain;
-import utility.Coordinate;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate;
+import utility.HexCoordinate.Offset;
 import utility.MouseRay;
 
 /**
@@ -111,7 +111,7 @@ abstract class BaseInput extends AbstractAppState {
         this.lastRayResults = results;
     }
     
-    protected final Coordinate.Offset getLastLeftMouseCollisionGridPos(){
+    protected final HexCoordinate.Offset getLastLeftMouseCollisionGridPos(){
         Offset tilePos;
         Vector3f pos;
         Iterator<CollisionResult> i = lastRayResults.iterator();

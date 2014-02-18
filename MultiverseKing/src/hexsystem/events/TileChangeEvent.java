@@ -1,7 +1,7 @@
 package hexsystem.events;
 
 import hexsystem.HexTile;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 
 /**

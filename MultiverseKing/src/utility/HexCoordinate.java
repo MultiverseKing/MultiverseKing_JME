@@ -11,7 +11,7 @@ package utility;
  *
  * This Class is only used as a converter system so we can simplifie algorithm.
  */
-public final class Coordinate {
+public final class HexCoordinate {
 
     public final class Cube {
 

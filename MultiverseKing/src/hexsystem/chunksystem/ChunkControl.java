@@ -16,11 +16,15 @@ import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import hexsystem.MeshManager;
+import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import kingofmultiverse.MultiverseMain;
-import utility.Coordinate;
-import utility.Coordinate.Offset;
+import utility.HexCoordinate;
+import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -71,34 +75,47 @@ public class ChunkControl extends AbstractControl {
      * @todo updata height
      * @param tilePos 
      */
-    public void updateChunk(Coordinate.Offset tilePos){
+    public void updateChunk(HexCoordinate.Offset tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
 //        Offset subChunkWorldGridPos = mapData.convertWorldToGridPosition(chunkSpatial.getSubChunkWorldPos(subChunkLocalGridPos));
         Offset subChunkWorldGridPos = chunkSpatial.getSubChunkWorldGridPos(subChunkLocalGridPos);
         
         HexTile[][] tile = new HexTile[subChunkSize][subChunkSize];
-        ArrayList<Material> mat = new ArrayList<Material>();
+        ArrayList<Byte> allo = new ArrayList<Byte>();
+//        ArrayList<ArrayList<Byte>> meshParameter = new ArrayList<ArrayList<Byte>()>();//[subChunkSize][subChunkSize];
+        HashMap mat = new HashMap();
+//        HashMap meshParam = new HashMap();
+        ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();
         
-        mat.add(getMaterial(mapData.getMapElement()));
-        
-        for(int x = 0; x < subChunkSize; x++){
-            for(int y = 0; y < subChunkSize; y++){
-                tile[x][y] = mapData.getTile(new Coordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
+        mat.put(mapData.getMapElement().ordinal(), getMaterial(mapData.getMapElement()));
+        boolean initParam = false;
+        for(int y = 0; y < subChunkSize; y++){
+            for(int x = 0; x < subChunkSize; x++){
+                tile[x][y] = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
                 if(tile[x][y].getHexElement() != mapData.getMapElement()){
-                    mat.add(getMaterial(tile[x][y].getHexElement()));
+                    mat.put(tile[x][y].getHexElement().ordinal(), getMaterial(tile[x][y].getHexElement()));
                 }
+                if(!initParam) {
+                    meshParam.add(new Vector2Int[2]);
+                    meshParam.get(0)[0] = new Vector2Int(x, y); //Start Position for the mesh
+                    initParam = true;
+                } else {
+                    
+                }
+//                meshParameter[x][y].add(tile[x][y].getHexElement().ordinal());  // = mat to use for the tile
+//                meshParameter[x][y].add(tile[x][y].getHeight());          // = get the height
             }
         }
-        chunkSpatial.updateSubChunk(subChunkLocalGridPos, mat);
+        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParameter, mat, subChunkSize);
     }
-
+    
     /**
      * @todo
      * @param hexElement
      * @param tilePos 
      * @deprecated use updateChunk
      */
-    public void changeTileElement(ElementalAttribut hexElement, Coordinate.Offset tilePos) {
+    public void changeTileElement(ElementalAttribut hexElement, HexCoordinate.Offset tilePos) {
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
 //        Offset subChunkWorldGridPos = mapData.convertWorldToGridPosition(chunkSpatial.getSubChunkWorldPos(subChunkLocalGridPos));
         Offset subChunkWorldGridPos = chunkSpatial.getSubChunkWorldGridPos(subChunkLocalGridPos);
@@ -109,7 +126,7 @@ public class ChunkControl extends AbstractControl {
         
         for(int x = 0; x < subChunkSize; x++){
             for(int y = 0; y < subChunkSize; y++){
-                tile[x][y] = mapData.getTile(new Coordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
+                tile[x][y] = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
                 if(tile[x][y].getHexElement() != mapData.getMapElement()){
                     mat.add(getMaterial(tile[x][y].getHexElement()));
                 }
@@ -130,7 +147,7 @@ public class ChunkControl extends AbstractControl {
     /**
      * @return SubChunk local grid position, relative to Chunk grid position.
      */
-    Vector2Int getSubChunkLocalGridPos(Coordinate.Offset tilePos){
+    Vector2Int getSubChunkLocalGridPos(HexCoordinate.Offset tilePos){
         return new Vector2Int((int) (FastMath.abs(tilePos.q)/mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize), 
                               (int) (FastMath.abs(tilePos.r)/mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize));
     }

@@ -4,6 +4,7 @@
  */
 package hexsystem.chunksystem;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -11,11 +12,20 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
+import com.jme3.scene.VertexBuffer;
+import com.jme3.shader.VarType;
+import com.jme3.texture.Image;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture2D;
+import com.jme3.texture.TextureArray;
 import hexsystem.HexSettings;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import jme3tools.optimize.GeometryBatchFactory;
+import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -23,33 +33,28 @@ import utility.Vector2Int;
  */
 class ChunkSpatial {
     private final MeshManager meshManager;
+    private final Material hexMat;
+    private Node rootChunk;
     private Geometry[][] geo;
-    private byte[][] subChunkTileElementCount; //keep track on how many tile got different element texture on specifiate subChunk
 
-    /**
-     * @deprecated no longuer needed ?
-     */
-    byte getSubChunkTileElementCount(Vector2Int subChunkPos) {
-        return subChunkTileElementCount[subChunkPos.x][subChunkPos.y];
-    }
     
-    ChunkSpatial(MeshManager meshManager) {
+    ChunkSpatial(MeshManager meshManager, Material hexMat) {
         this.meshManager = meshManager;
+        this.hexMat = hexMat;
     }
     
-    void initialize(Node rootNode, HexSettings hexSettings, int subChunkSize, Material mat){
+    void initialize(Node rootChunk, HexSettings hexSettings, int subChunkSize, ElementalAttribut eAttribut){
+        this.rootChunk = rootChunk;
         int subChunkCount = hexSettings.getCHUNK_SIZE()/subChunkSize;
         geo = new Geometry[subChunkCount][subChunkCount];
-        subChunkTileElementCount = new byte[subChunkCount][subChunkCount];
-        Mesh tileMesh = meshManager.generateMergedTile(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize));
+//        Mesh tileMesh = meshManager.getFlatMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize));
         
         for (int x = 0; x < subChunkCount; x++) {
             for (int y = 0; y < subChunkCount; y++) {
-                geo[x][y] = new Geometry(x*subChunkSize+"|"+y*subChunkSize, tileMesh);
+                geo[x][y] = new Geometry(Integer.toString(x/**subChunkSize*/)+"|"+Integer.toString(y/**subChunkSize*/), meshManager.getFlatMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize)));
                 geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
-                geo[x][y].setMaterial(mat);
-                rootNode.attachChild(geo[x][y]);
-                subChunkTileElementCount[x][y] = 1;
+                geo[x][y].setMaterial(hexMat);
+                rootChunk.attachChild(geo[x][y]);
             }
         }
     }
@@ -71,28 +76,30 @@ class ChunkSpatial {
     }
     
     //@todo update the spatial
-    void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList[][] meshParameter, HashMap mat, int subChunkSize) {
+    void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList<Vector2Int[]> meshParameter, int subChunkSize) {
         ArrayList<Geometry> geo = new ArrayList<Geometry>();
-        Vector2Int startPos = Vector2Int.ZERO;
-        Vector2Int endPos = Vector2Int.ZERO;
-        byte heigth = 0;
-        boolean initStartPos = false;
-        int x = 0;
-        int y = 0;
-        do{
-            for(y = 0; y < subChunkSize; y++) {
-                for(x = 0; x < subChunkSize; x++) {
-                    if(!initStartPos && meshParameter[x][y].get(0) == meshParameter[x+1][y].get(0) && 
-                                        meshParameter[x][y].get(1) == meshParameter[x+1][y].get(1) ) {
-                        startPos = new Vector2Int(x, y);
-                        initStartPos = true;
-                    } else {
-                        geo.add(new Geometry((x+"|"y), meshManager.getMesh(startPos, endPos, meshParameter[x][y].get(1)));
-                    }
-                }
-            }
-            y++;
-        } while(true);
+        this.rootChunk.detachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
+        for(int i = 0; i < meshParameter.size(); i++) {
+            Geometry subChunk = new Geometry(Integer.toString(i), meshManager.getMesh(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y, meshParameter.get(i)[2].x));
+//            subChunk.setMaterial(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getMaterial().clone());
+//            subChunk.getMaterial().setTexture("ColorMap", mat[meshParameter.get(i)[2].x]);
+            subChunk.setMaterial(hexMat);
+//            subChunk.setLocalTranslation(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().x, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().y+1, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().z);
+            geo.add(subChunk);
+//            subChunk.setBatchHint(Spatial.BatchHint.Never);
+        }
+        
+        
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = GeometryBatchFactory.makeBatches(geo).get(0);
+        
+//        GeometryBatchFactory.optimize(container);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = ;//.makeBatches(geo).get(0);//)mergeGeometries(geo, gateau);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setName(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y));// = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), gateau);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().x, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().y+1, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().z);
+        
+//        System.out.println("chunk : "+Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y));
+        System.out.println(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getName());
+        System.err.println("work.");
     }
 
     /**

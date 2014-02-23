@@ -27,19 +27,19 @@ public class MeshManager {
         this.hexWidth = FastMath.sqrt(3) * hexSize;
     }
     
-    Mesh generateMergedTile(Vector2Int startPos, Vector2Int endPos) {
-        Mesh result = getMesh(startPos, endPos, 0);
+    Mesh getFlatMesh(Vector2Int startPos, Vector2Int endPos) {
+        Mesh result = getMesh(startPos, endPos, 0, 0);
         return result;
     }
     
-    Mesh generateOneTile(Vector2Int startPos) {
-        Mesh result = getMesh(startPos, new Vector2Int(0, 0), 0);
+    Mesh getOneMesh(Vector2Int meshPos) {
+        Mesh result = getMesh(meshPos, new Vector2Int(0, 0), 0, 0);
         return result;
     }
     
-    Mesh getMesh(Vector2Int startPos, Vector2Int endPos, int height){
+    Mesh getMesh(Vector2Int startPos, Vector2Int endPos, int height, int element){
         Vector3f[] vertices = getVerticesPosition(startPos, endPos, height);
-        Vector2f[] texCoord = getTexCoord(endPos);
+        Vector3f[] texCoord = getTexCoord(endPos, element);
         int[] index = getIndex(endPos.y-startPos.y);
         
         Mesh chunk = new Mesh();
@@ -87,14 +87,14 @@ public class MeshManager {
         return vertices;
     }
     
-    private Vector2f[] getTexCoord(Vector2Int endPos){
-        Vector2f[] texCoord = new Vector2f[4*endPos.y];
+    private Vector3f[] getTexCoord(Vector2Int endPos, int element){
+        Vector3f[] texCoord = new Vector3f[4*endPos.y];
         int index = 0;
         for(int i = 0; i< endPos.y; i++){
-            texCoord[index] = new Vector2f(0f, 0f);
-            texCoord[index+1] = new Vector2f(endPos.x, 0f);
-            texCoord[index+2] = new Vector2f(endPos.x, 1f);
-            texCoord[index+3] = new Vector2f(0f, 1f);
+            texCoord[index] = new Vector3f(element, 0f, 0f);
+            texCoord[index+1] = new Vector3f(element, endPos.x, 0f);
+            texCoord[index+2] = new Vector3f(element, endPos.x, 1f);
+            texCoord[index+3] = new Vector3f(element, 0f, 1f);
             index+=4;
         }        
         return texCoord;
@@ -106,10 +106,10 @@ public class MeshManager {
         return meshToUpdate;
     }
     
-    private Mesh setAllBuffer(Vector3f[] vertices, Vector2f[] texCoord, int[] index){
+    private Mesh setAllBuffer(Vector3f[] vertices, Vector3f[] texCoord, int[] index){
         Mesh result = new Mesh();
         result.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
-        result.setBuffer(VertexBuffer.Type.TexCoord, 2 , BufferUtils.createFloatBuffer(texCoord));
+        result.setBuffer(VertexBuffer.Type.TexCoord, 3, BufferUtils.createFloatBuffer(texCoord));
         result.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(index));
         return result;
     }

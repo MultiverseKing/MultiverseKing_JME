@@ -79,10 +79,9 @@ public final class HexCoordinate {
          * Currently generated Grid.
          * @param string new string(x + "|" + y).
          */
-        public Offset(String string) {
-            String[] result = string.split("|");
-            this.q = Integer.parseInt(result[0]);
-            this.r = Integer.parseInt(result[1]);
+        public Offset(String value) {
+            this.q = Integer.parseInt(Character.toString(value.charAt(0)));
+            this.r = Integer.parseInt(Character.toString(value.charAt(2)));//Integer.parseInt(result[2]);
         }
 
         /**

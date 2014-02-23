@@ -20,45 +20,53 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.texture.Image;
+import com.jme3.texture.Texture;
+import com.jme3.texture.TextureArray;
 import hexsystem.MapData;
 import hexsystem.chunksystem.MeshManager;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.HexCoordinate.Offset;
 import utility.MouseRay;
+import utility.attribut.ElementalAttribut;
 
 /**
  *
  * @author roah
  */
-abstract class BaseInput extends AbstractAppState {
+abstract class AbstractHexMap extends AbstractAppState {
     protected final MeshManager meshManager;
     protected final MultiverseMain main;
     protected final MapData mapData;
-    protected final Node mapNode;
+    protected Node mapNode;
+    protected Material hexMat;
     protected CollisionResults lastRayResults;
     private final MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial mark;
     
     
     
-    public BaseInput(MultiverseMain main, MapData mapData) {
+    public AbstractHexMap(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
         this.mapData = mapData;
         this.meshManager = new MeshManager(mapData.getHexSettings());
-        mapNode = new Node("mapNode");
-        main.getRootNode().attachChild(mapNode);
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
+//        this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+        hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
+        mapNode = new Node("mapNode");
+        main.getRootNode().attachChild(mapNode);
+        addAllElement();
         initInput();
-        if(this.main.isDebugMode()){
-            initMarkDebug();
-        }
+        initMarkDebug();
     }
     
     /**
@@ -77,17 +85,15 @@ abstract class BaseInput extends AbstractAppState {
                 if (results.size() != 0) {
                     if (results.size() > 0) {
                         CollisionResult closest = results.getClosestCollision();
-                        if(main.isDebugMode()){
-                            mark.setLocalTranslation(closest.getContactPoint());
-                            main.getRootNode().attachChild(mark);    //TODO Debug to remove.
-                        }
-                        main.getStateManager().getState(BaseInput.class).setleftMouseActionResult(results);
-                        main.getStateManager().getState(BaseInput.class).mouseLeftActionResult();
+                        
+                        mark.setLocalTranslation(closest.getContactPoint());
+                        main.getRootNode().attachChild(mark);    //TODO Debug to remove.
+                            
+                        main.getStateManager().getState(AbstractHexMap.class).setleftMouseActionResult(results);
+                        main.getStateManager().getState(AbstractHexMap.class).mouseLeftActionResult();
                     } else if (main.getRootNode().hasChild(mark)) {
                         // No hits? Then remove the red mark.
-                        if(main.isDebugMode()){
-                            main.getRootNode().detachChild(mark);    //TODO Debug to remove.
-                        }
+                        main.getRootNode().detachChild(mark);    //TODO Debug to remove.
                     } else {
                         System.out.println("no  mark");
                     }
@@ -123,12 +129,20 @@ abstract class BaseInput extends AbstractAppState {
             if(mapData.getTile(tilePos) == null){
                 break;
             } else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y)){
-                System.out.println(mapData.getTile(tilePos).getHeight()+"+"+(byte)FastMath.floor(pos.y));
                 return tilePos;
             }
         }while(i.hasNext());
         
         return null;
+    }
+    
+    protected void addAllElement() {
+        List<Image> hexImages = new ArrayList<Image>();
+        for(ElementalAttribut e : ElementalAttribut.values()){
+            Texture text = (Texture) main.getAssetManager().loadTexture("Textures/Test/"+ e.name() +"Center.png");
+            hexImages.add(text.getImage());
+        }
+        hexMat.setTexture("ColorMap", new TextureArray(hexImages));
     }
     
     abstract void mouseLeftActionResult();

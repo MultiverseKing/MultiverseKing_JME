@@ -13,6 +13,8 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -48,8 +50,6 @@ abstract class AbstractHexMap extends AbstractAppState {
     private final MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial mark;
     
-    
-    
     public AbstractHexMap(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
@@ -60,8 +60,8 @@ abstract class AbstractHexMap extends AbstractAppState {
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
-//        this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
-        hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
+        this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+//        hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
         mapNode = new Node("mapNode");
         main.getRootNode().attachChild(mapNode);
         addAllElement();
@@ -142,7 +142,11 @@ abstract class AbstractHexMap extends AbstractAppState {
             Texture text = (Texture) main.getAssetManager().loadTexture("Textures/Test/"+ e.name() +"Center.png");
             hexImages.add(text.getImage());
         }
-        hexMat.setTexture("ColorMap", new TextureArray(hexImages));
+        TextureArray hexText = new TextureArray(hexImages);
+        hexText.setWrap(Texture.WrapMode.Repeat);
+        hexMat.setTexture("ColorMap", hexText);
+//        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+//        hexMat.getAdditionalRenderState().setAlphaTest(true);
     }
     
     abstract void mouseLeftActionResult();

@@ -6,6 +6,7 @@ package hexsystem.chunksystem;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
@@ -51,7 +52,7 @@ class ChunkSpatial {
         
         for (int x = 0; x < subChunkCount; x++) {
             for (int y = 0; y < subChunkCount; y++) {
-                geo[x][y] = new Geometry(Integer.toString(x/**subChunkSize*/)+"|"+Integer.toString(y/**subChunkSize*/), meshManager.getFlatMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize)));
+                geo[x][y] = new Geometry(Integer.toString(x/**subChunkSize*/)+"|"+Integer.toString(y/**subChunkSize*/), meshManager.getMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize), eAttribut.ordinal()));
                 geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
                 geo[x][y].setMaterial(hexMat);
                 rootChunk.attachChild(geo[x][y]);
@@ -76,29 +77,34 @@ class ChunkSpatial {
     }
     
     //@todo update the spatial
-    void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList<Vector2Int[]> meshParameter, int subChunkSize) {
+    void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList<Vector2Int[]> meshParameter, int subChunkSize, HexSettings hexSettings) {
         ArrayList<Geometry> geo = new ArrayList<Geometry>();
         this.rootChunk.detachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
-        for(int i = 0; i < meshParameter.size(); i++) {
-            Geometry subChunk = new Geometry(Integer.toString(i), meshManager.getMesh(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y, meshParameter.get(i)[2].x));
-//            subChunk.setMaterial(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getMaterial().clone());
-//            subChunk.getMaterial().setTexture("ColorMap", mat[meshParameter.get(i)[2].x]);
-            subChunk.setMaterial(hexMat);
-//            subChunk.setLocalTranslation(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().x, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().y+1, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().z);
-            geo.add(subChunk);
-//            subChunk.setBatchHint(Spatial.BatchHint.Never);
-        }
+//        for(int i = 0; i < meshParameter.size(); i++) {
+//            Geometry subChunk = new Geometry(Integer.toString(i), meshManager.getMesh(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y, meshParameter.get(i)[2].x));
+////            subChunk.setMaterial(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getMaterial().clone());
+////            subChunk.getMaterial().setTexture("ColorMap", mat[meshParameter.get(i)[2].x]);
+//            subChunk.setMaterial(hexMat);
+////            subChunk.setLocalTranslation(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().x, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().y+1, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().z);
+//            geo.add(subChunk);
+////            subChunk.setBatchHint(Spatial.BatchHint.Never);
+//        }
         
-        
-        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = GeometryBatchFactory.makeBatches(geo).get(0);
-        
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), meshManager.getMergedMesh(meshParameter));
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMaterial(hexMat);
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(getSubChunkLocalWorldPosition(subChunkLocalGridPos.x, subChunkLocalGridPos.y, hexSettings, subChunkSize));
 //        GeometryBatchFactory.optimize(container);
-//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = ;//.makeBatches(geo).get(0);//)mergeGeometries(geo, gateau);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = GeometryBatchFactory.makeBatches(geo).get(0);//.makeBatches(geo).get(0);//)mergeGeometries(geo, gateau);
 //        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setName(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y));// = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), gateau);
 //        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().x, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().y+1, this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getLocalTranslation().z);
         
 //        System.out.println("chunk : "+Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y));
-        System.out.println(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getName());
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setName(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y));
+//        hexMat.getAdditionalRenderState().setWireframe(true);
+        rootChunk.attachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setCullHint(CullHint.Never);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getMesh().setMode(Mesh.Mode.Points);
+//        System.out.println(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getName());
         System.err.println("work.");
     }
 

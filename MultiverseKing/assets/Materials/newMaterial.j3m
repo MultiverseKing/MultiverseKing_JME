@@ -4,6 +4,6 @@ Material My Material : MatDefs/UnshadedArray.j3md {
     AdditionalRenderState {
       Blend Alpha
       FaceCull Back
-        ColorWrite On
+      ColorWrite On
     }
 }

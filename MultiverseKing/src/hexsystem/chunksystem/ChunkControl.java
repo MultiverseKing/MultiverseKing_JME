@@ -66,8 +66,6 @@ public class ChunkControl extends AbstractControl {
     public void updateChunk(HexCoordinate.Offset tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         Offset subChunkWorldGridPos = chunkSpatial.getSubChunkWorldGridPos(subChunkLocalGridPos);
-        
-        HexTile[][] tile = new HexTile[subChunkSize][subChunkSize];
         ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();
         
         int i = 0;
@@ -78,26 +76,28 @@ public class ChunkControl extends AbstractControl {
                 i++;
             }
             for(int x = 0; x < subChunkSize; x++){
-                tile[x][y] = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
+                HexTile tile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
+                HexTile nearTile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x-1, subChunkWorldGridPos.r+y));
                 if(!initParam) {
                     meshParam.add(new Vector2Int[3]);
                     meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
-                    meshParam.get(i)[1] = new Vector2Int(x+1, y+1); //End Position for the mesh
-                    meshParam.get(i)[2] = new Vector2Int(tile[x][y].getHexElement().ordinal(), tile[x][y].getHeight()); //Element to put on the mesh / height of the mesh
+                    meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
+                    meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
                     initParam = true;
-                } else if (tile[x-1][y].getHexElement() == tile[x][y].getHexElement() && 
-                           tile[x-1][y].getHeight() == tile[x][y].getHeight() ) {
+                } else if (nearTile.getHexElement() == tile.getHexElement() && 
+                           nearTile.getHeight() == tile.getHeight() ) {
                     meshParam.get(i)[1].x++;
                 } else {
-                    initParam = false;
                     i++;
+                    meshParam.add(new Vector2Int[3]);
+                    meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
+                    meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
+                    meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
                 }
             }
         }
-        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam, subChunkSize);
+        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam, subChunkSize, mapData.getHexSettings());
     }
-    
-    
     
     /**
      * @return SubChunk local grid position, relative to Chunk grid position.

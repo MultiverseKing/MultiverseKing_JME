@@ -51,10 +51,10 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
     }
 
     public void tileChange(TileChangeEvent event) {
-        HexTile oldTile = event.getOldTile();
-        HexTile newTile = event.getNewTile();
-        if (newTile.getHexElement() != oldTile.getHexElement() || newTile.getHeight() != oldTile.getHeight()) {
+        if (event.getNewTile().getHexElement() != event.getOldTile().getHexElement() || 
+                event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.tilePos());
+//            System.out.println(event.getChunkPos());
         }
     }
     

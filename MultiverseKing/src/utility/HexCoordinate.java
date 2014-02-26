@@ -72,17 +72,6 @@ public final class HexCoordinate {
             this.q = q;
             this.r = r;
         }
-        
-        /**
-         * Create new Odd-R Offset grid position from string,
-         * this have to be formated as : new string(x + "|" + y) to work properly. 
-         * Currently generated Grid.
-         * @param string new string(x + "|" + y).
-         */
-        public Offset(String value) {
-            this.q = Integer.parseInt(Character.toString(value.charAt(0)));
-            this.r = Integer.parseInt(Character.toString(value.charAt(2)));//Integer.parseInt(result[2]);
-        }
 
         /**
          * Convert Odd-R Offset to Cube coordinate.

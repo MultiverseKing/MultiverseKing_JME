@@ -71,12 +71,12 @@ public class MeshManager {
         int mergedtextCoordCount = 0;
         int mergedIndexCount = 0;
         
-        for(int i = 0; i < meshParameter.size(); i++) {
+        for(int i = 0; i < meshParameter.size(); i++) {            
             vertices.add(getVerticesPosition(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y));
             texCoord.add(getTexCoord(meshParameter.get(i)[1], meshParameter.get(i)[2].x));
             index.add(getIndex(meshParameter.get(i)[1].y, mergedVerticeCount));
             
-            System.out.println(meshParameter.get(i)[0] +" "+ meshParameter.get(i)[1]+ " " + meshParameter.get(i)[2].x);
+//            System.out.println(meshParameter.get(i)[0] +" "+ meshParameter.get(i)[1]+ " " + meshParameter.get(i)[2].x); //debug
             
             mergedVerticeCount += vertices.get(i).length;
             mergedtextCoordCount += texCoord.get(i).length;
@@ -97,9 +97,7 @@ public class MeshManager {
             mergedVerticeCount += vertices.get(i).length;
             mergedtextCoordCount += texCoord.get(i).length;
             mergedIndexCount += index.get(i).length;
-//            System.out.println(index.get(i).length);
         }
-        
         return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
     }
     
@@ -121,19 +119,20 @@ public class MeshManager {
     }
     
     private Vector3f[] getVerticesPosition(Vector2Int position, Vector2Int size, float height){
+//        System.out.println(position +" "+ size + " " + height); //debug
         Vector3f[] vertices = new Vector3f[4*size.y];
         int index = 0;
-        for(int i = position.y; i < size.y; i++){
-            if((i&1) == 0){ //even
-                vertices[index] = new Vector3f(-(hexWidth/2) + (position.x * hexWidth), height, hexSize+(i*(hexSize*1.5f)));
-                vertices[index+1] = new Vector3f((size.x * hexWidth)-(hexWidth/2), height, hexSize+(i*(hexSize*1.5f)) );
-                vertices[index+2] = new Vector3f((size.x * hexWidth)-(hexWidth/2), height, -hexSize+(i*(hexSize*1.5f)) );
-                vertices[index+3] = new Vector3f(-(hexWidth/2) + (position.x * hexWidth), height, -hexSize+(i*(hexSize*1.5f)) );
+        for(int i = 0; i < size.y; i++){
+            if((position.y+i&1) == 0){ //even
+                vertices[index] = new Vector3f(-(hexWidth/2) + (position.x * hexWidth), height, hexSize+((position.y+i)*(hexSize*1.5f)));
+                vertices[index+1] = new Vector3f((size.x * hexWidth)-(hexWidth/2)+(position.x * hexWidth), height, hexSize+((position.y+i)*(hexSize*1.5f)) );
+                vertices[index+2] = new Vector3f((size.x * hexWidth)-(hexWidth/2)+(position.x * hexWidth), height, -hexSize+((position.y+i)*(hexSize*1.5f)) );
+                vertices[index+3] = new Vector3f(-(hexWidth/2) + (position.x * hexWidth), height, -hexSize+((position.y+i)*(hexSize*1.5f)) );
             } else {
-                vertices[index] = new Vector3f((position.x * hexWidth), height+0.001f, hexSize+(i*(hexSize*1.5f)));
-                vertices[index+1] = new Vector3f((size.x * hexWidth), height+0.001f, hexSize+(i*(hexSize*1.5f)));
-                vertices[index+2] = new Vector3f((size.x * hexWidth), height+0.001f, -hexSize+(i*(hexSize*1.5f)));
-                vertices[index+3] = new Vector3f((position.x * hexWidth), height+0.001f, -hexSize+(i*(hexSize*1.5f)));
+                vertices[index] = new Vector3f((position.x * hexWidth), height+0.001f, hexSize+((position.y+i)*(hexSize*1.5f)));
+                vertices[index+1] = new Vector3f((size.x * hexWidth)+(position.x * hexWidth), height+0.001f, hexSize+((position.y+i)*(hexSize*1.5f)));
+                vertices[index+2] = new Vector3f((size.x * hexWidth)+(position.x * hexWidth), height+0.001f, -hexSize+((position.y+i)*(hexSize*1.5f)));
+                vertices[index+3] = new Vector3f((position.x * hexWidth), height+0.001f, -hexSize+((position.y+i)*(hexSize*1.5f)));
             }
             index+= 4;
         }

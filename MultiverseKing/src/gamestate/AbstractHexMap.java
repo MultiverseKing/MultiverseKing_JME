@@ -145,8 +145,8 @@ abstract class AbstractHexMap extends AbstractAppState {
         TextureArray hexText = new TextureArray(hexImages);
         hexText.setWrap(Texture.WrapMode.Repeat);
         hexMat.setTexture("ColorMap", hexText);
-//        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-//        hexMat.getAdditionalRenderState().setAlphaTest(true);
+        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        hexMat.getAdditionalRenderState().setAlphaTest(true);
     }
     
     abstract void mouseLeftActionResult();

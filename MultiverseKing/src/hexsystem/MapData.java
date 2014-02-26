@@ -71,7 +71,7 @@ public final class MapData extends AbstractAppState {
     }
     
     /**
-     * Get the selected tile chunk grid position in mapData.
+     * Get chunk grid position of a tile.
      * @param tilePos Offset coordinate of the tile.
      * @return Position of the chunk in mapData.
      * @todo check if the chunk exist.

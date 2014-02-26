@@ -65,8 +65,10 @@ public class ChunkControl extends AbstractControl {
      */
     public void updateChunk(HexCoordinate.Offset tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
-        Offset subChunkWorldGridPos = chunkSpatial.getSubChunkWorldGridPos(subChunkLocalGridPos);
+        Offset subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
         ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();
+        
+        System.out.println(subChunkWorldGridPos);
         
         int i = 0;
         boolean initParam = false;
@@ -75,24 +77,25 @@ public class ChunkControl extends AbstractControl {
                 initParam = false;
                 i++;
             }
-            for(int x = 0; x < subChunkSize; x++){
+            for(int x = 0; x < subChunkSize-1; x++){
                 HexTile tile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x-1, subChunkWorldGridPos.r+y));
+                HexTile nearTile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x+1, subChunkWorldGridPos.r+y));
                 if(!initParam) {
                     meshParam.add(new Vector2Int[3]);
                     meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
                     meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
                     meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
                     initParam = true;
-                } else if (nearTile.getHexElement() == tile.getHexElement() && 
+                } 
+                if (nearTile.getHexElement() == tile.getHexElement() && 
                            nearTile.getHeight() == tile.getHeight() ) {
                     meshParam.get(i)[1].x++;
                 } else {
                     i++;
                     meshParam.add(new Vector2Int[3]);
-                    meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
+                    meshParam.get(i)[0] = new Vector2Int(x+1, y);     //Start Position for the mesh
                     meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
-                    meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
+                    meshParam.get(i)[2] = new Vector2Int(nearTile.getHexElement().ordinal(), nearTile.getHeight()); //Element to put on the mesh / height of the mesh
                 }
             }
         }
@@ -106,5 +109,9 @@ public class ChunkControl extends AbstractControl {
         Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.q)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize), 
                               (int) ((FastMath.abs(tilePos.r)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize));
         return result;
+    }
+    
+    HexCoordinate.Offset getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
+        return new HexCoordinate().new Offset(subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
     }
 }

@@ -4,18 +4,15 @@
  */
 package hexsystem.chunksystem;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture2D;
 import hexsystem.HexSettings;
-import hexsystem.MeshManager;
+import java.util.ArrayList;
+import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -24,26 +21,38 @@ import utility.attribut.ElementalAttribut;
  * @author roah
  */
 class ChunkSpatial {
-    private static final int subChunkSize = 8; //a subchunk contain 16*16 tiles
-    private final Geometry[][] geo;
+    private final MeshManager meshManager;
+    private final Material hexMat;
+    private Node rootChunk;
+    private Geometry[][] geo;
 
     
-    ChunkSpatial(HexSettings hexSettings, MeshManager meshManager, AssetManager assetManager, ElementalAttribut eAttribut, Node rootChunk) {
-        geo = new Geometry[hexSettings.getCHUNK_SIZE()/subChunkSize][hexSettings.getCHUNK_SIZE()/subChunkSize];
-        Mesh tileMesh = meshManager.generateMergedTile(new Vector2Int(subChunkSize, subChunkSize));
-        Material material = getMaterial(assetManager, eAttribut);        
+    ChunkSpatial(MeshManager meshManager, Material hexMat) {
+        this.meshManager = meshManager;
+        this.hexMat = hexMat;
+    }
+    
+    void initialize(Node rootChunk, HexSettings hexSettings, int subChunkSize, ElementalAttribut eAttribut){
+        this.rootChunk = rootChunk;
+        int subChunkCount = hexSettings.getCHUNK_SIZE()/subChunkSize;
+        geo = new Geometry[subChunkCount][subChunkCount];
+//        Mesh tileMesh = meshManager.getFlatMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize));
         
-        for (int x = 0; x < hexSettings.getCHUNK_SIZE()/subChunkSize; x++) {
-            for (int y = 0; y < hexSettings.getCHUNK_SIZE()/subChunkSize; y++) {
-                geo[x][y] = new Geometry(x*subChunkSize+">"+(x+subChunkSize)+"|"+y*subChunkSize+">"+(y+subChunkSize), tileMesh);
-                geo[x][y].setLocalTranslation(getSubChunkPosition(x, y, hexSettings));
-                geo[x][y].setMaterial(material);
+        for (int x = 0; x < subChunkCount; x++) {
+            for (int y = 0; y < subChunkCount; y++) {
+                geo[x][y] = new Geometry(Integer.toString(x)+"|"+Integer.toString(y), meshManager.getMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize), eAttribut.ordinal()));
+                geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
+                geo[x][y].setMaterial(hexMat);
                 rootChunk.attachChild(geo[x][y]);
             }
         }
     }
 
-    public void setEnabled(boolean enabled) {
+    /**
+     * @todo custom cull
+     * @param enabled 
+     */
+    void setEnabled(boolean enabled) {
         CullHint culling = CullHint.Inherit;
         if(!enabled){
             culling = Spatial.CullHint.Always;
@@ -54,22 +63,38 @@ class ChunkSpatial {
             }
         }
     }
-    //@todo update the spatial
     
-    private static Vector3f getSubChunkPosition(int x, int y, HexSettings hexSettings) {
-        float posX = (x*subChunkSize) * hexSettings.getHEX_WIDTH() + (hexSettings.getHEX_WIDTH()/2);
-        float posY = 0;
-        float posZ = (y*subChunkSize) * (float)(hexSettings.getHEX_RADIUS()*1.5);
+    void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList<Vector2Int[]> meshParameter, int subChunkSize, HexSettings hexSettings) {
+        ArrayList<Geometry> geo = new ArrayList<Geometry>();
+        this.rootChunk.detachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
         
-        return new Vector3f(posX, posY, posZ);
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), meshManager.getMergedMesh(meshParameter));
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMaterial(hexMat);
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(getSubChunkLocalWorldPosition(subChunkLocalGridPos.x, subChunkLocalGridPos.y, hexSettings, subChunkSize));
+        rootChunk.attachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
     }
 
-    private static Material getMaterial(AssetManager assetManager, ElementalAttribut eAttribut) {
-        Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
-        Texture2D text = (Texture2D) assetManager.loadTexture("Textures/Test/"+ eAttribut.name() +"Center.png");
-        text.setWrap(Texture.WrapMode.Repeat);
-        mat.setTexture("ColorMap", text);
-//        mat.getAdditionalRenderState().setWireframe(true); //needed for debug on MeshManager
-        return mat;
+    /**
+     * Convert subChunk local grid position to world position.
+     * @param subChunklocalGridPos 
+     * @return world position of this subChunk.
+     * @deprecated no use of it
+     */
+    Vector3f getSubChunkWorldPos(Vector2Int subChunkLocalGridPos){
+        return geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].getWorldTranslation();
+    }
+
+    /**
+     * Convert SubChunk local grid position to local world position, relative to chunkNode.
+     * @param subChunkLocaGridPosX
+     * @param subChunkLocalGridPosY
+     * @return 
+     */
+    private Vector3f getSubChunkLocalWorldPosition(int subChunkLocaGridPosX, int subChunkLocalGridPosY, HexSettings hexSettings, int subChunkSize) {
+        float resultX = (subChunkLocaGridPosX*subChunkSize) * hexSettings.getHEX_WIDTH() + (hexSettings.getHEX_WIDTH()/2);
+        float resultY = 0;
+        float resultZ = (subChunkLocalGridPosY*subChunkSize) * (float)(hexSettings.getHEX_RADIUS()*1.5);
+        
+        return new Vector3f(resultX, resultY, resultZ);
     }
 }

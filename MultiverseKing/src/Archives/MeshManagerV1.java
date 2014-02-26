@@ -26,7 +26,6 @@ import jme3tools.optimize.GeometryBatchFactory;
  * @author roah
  */
 public class MeshManagerV1 {
-
     final float sqrt = FastMath.sqrt(3);        //Make life easier.
     final float hexSize = 1f;                   //hex radius.
     final float hexWidth = sqrt * hexSize;      //Make life easier.
@@ -79,7 +78,6 @@ public class MeshManagerV1 {
         return result;
     }
     
-    
     private Mesh getOneTile(){
         Vector3f[] triVertices = getTriVerticesPosition(1, 0);
         Vector2f[] triTexCoord = getTriTexCoord(1);
@@ -121,8 +119,6 @@ public class MeshManagerV1 {
         
         return setCollisionBound(setAllBuffer(combinedVertice, combinedTexCoord, combinedIndex));
     }
-    
-    
     
     private Mesh getMultipleTiles(int size, float height){
         Vector3f[] triVertices = getTriVerticesPosition(size, height);

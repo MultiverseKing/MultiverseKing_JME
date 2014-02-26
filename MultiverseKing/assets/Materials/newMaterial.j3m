@@ -1,0 +1,9 @@
+Material My Material : MatDefs/UnshadedArray.j3md {
+     MaterialParameters {
+     }
+    AdditionalRenderState {
+      Blend Alpha
+      FaceCull Back
+      ColorWrite On
+    }
+}

@@ -9,6 +9,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
@@ -31,16 +32,12 @@ public class MultiverseMain extends SimpleApplication {
     public static void main(String[] args) {
         MultiverseMain app = new MultiverseMain();
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
+        
         app.start();
     }
     
     private Screen screen;
     private GameMode currentMode;
-    private boolean debugMode;
-    
-    public boolean isDebugMode() {
-        return debugMode;
-    }
     public Screen getScreen() {
         return screen;
     }
@@ -54,14 +51,13 @@ public class MultiverseMain extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         // Disable the default flyby cam
+        if(!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)){
+            throw new UnsupportedOperationException("Your hardware does not support TextureArray");
+        }
         flyCam.setEnabled(false);
-        debugMode = true;
         initGUI();
         lightSettup();
         generateHexMap();
-        if(debugMode){
-            initDebug();
-        }
     }
 
     @Override

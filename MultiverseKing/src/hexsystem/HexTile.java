@@ -8,8 +8,8 @@ import utility.attribut.ElementalAttribut;
  */
 public class HexTile {
 
-    private byte hexElement;
-    private byte height;
+    private final byte hexElement;
+    private final byte height;
 
     public HexTile(ElementalAttribut eAttribut) {
         this.hexElement = (byte) eAttribut.ordinal();

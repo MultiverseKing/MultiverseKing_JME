@@ -7,6 +7,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import utility.HexCoordinate;
+import utility.HexCoordinate.Axial;
 import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -89,7 +90,7 @@ public final class MapData extends AbstractAppState {
         Vector2Int chunkPos = getChunkGridPos(tilePos);
         TileChangeEvent tce = new TileChangeEvent(chunkPos, tilePos, chunkData.getTile(chunkPos, tilePos), tile);
         if(tce.getOldTile() != null){
-        chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
+            chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
             for (TileChangeListener l : listeners) {
                 l.tileChange(tce);
             }
@@ -100,7 +101,7 @@ public final class MapData extends AbstractAppState {
      * @todo
      */
     public void setTileHeight(Offset tilePos, byte height){
-        setTile(tilePos, hexTiles[x][y].cloneChangedHeight(height));
+        setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
     
     /**
@@ -152,5 +153,23 @@ public final class MapData extends AbstractAppState {
         float q = FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r;
 
         return new HexCoordinate().new Axial((int) q, (int) r).toOffset();
+    }
+    
+    public ArrayList<HexTile> getNeighbors(Offset position, int range){
+        Axial axial = position.toAxial();
+        ArrayList<HexTile> result = new ArrayList<HexTile>();
+        int i = 0;
+        for(int x = -range; x <= range; x++) {
+            for(int y = Math.max(-range, -x-range); y <= Math.min(range, range-y); y++){
+                HexTile tile = getTile(new HexCoordinate().new Axial(x + axial.q, y+axial.r).toOffset());
+                if(tile != null){
+                    result.add(tile);
+                    System.out.println(result.get(i).getHeight());
+                    i++;
+                }
+            }
+        }
+        
+        return result;
     }
 }

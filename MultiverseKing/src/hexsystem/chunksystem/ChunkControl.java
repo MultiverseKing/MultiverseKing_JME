@@ -66,9 +66,7 @@ public class ChunkControl extends AbstractControl {
     public void updateChunk(HexCoordinate.Offset tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         Offset subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
-        ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();
-        
-        System.out.println(subChunkWorldGridPos);
+        ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();        ArrayList<Byte[]> meshParamNeighbors = new ArrayList<Byte[]>();
         
         int i = 0;
         boolean initParam = false;
@@ -94,7 +92,7 @@ public class ChunkControl extends AbstractControl {
                     i++;
                     meshParam.add(new Vector2Int[3]);
                     meshParam.get(i)[0] = new Vector2Int(x+1, y);     //Start Position for the mesh
-                    meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
+                    meshParam.get(i)[1] = new Vector2Int(1, 1);       //End Position for the mesh
                     meshParam.get(i)[2] = new Vector2Int(nearTile.getHexElement().ordinal(), nearTile.getHeight()); //Element to put on the mesh / height of the mesh
                 }
             }

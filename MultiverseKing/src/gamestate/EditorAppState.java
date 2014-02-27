@@ -54,7 +54,6 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
         if (event.getNewTile().getHexElement() != event.getOldTile().getHexElement() || 
                 event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.tilePos());
-//            System.out.println(event.getChunkPos());
         }
     }
     
@@ -81,11 +80,11 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
         HexTile tile = mapData.getTile(tilePos);
         if(tile != null){
             if (tile.getHexElement() == ElementalAttribut.NATURE) {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH));
+                mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH, (byte)2));
             } else if (tile.getHexElement() == ElementalAttribut.EARTH) {
                 mapData.setTile(tilePos, new HexTile(ElementalAttribut.ICE));
             } else {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE));
+                mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE, (byte)5));
             }
         } else {
             System.out.println("No hex selected.");

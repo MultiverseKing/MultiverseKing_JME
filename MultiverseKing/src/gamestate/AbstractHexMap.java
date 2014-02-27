@@ -128,7 +128,7 @@ abstract class AbstractHexMap extends AbstractAppState {
 //            System.out.println(tilePos.toString());
             if(mapData.getTile(tilePos) == null){
                 break;
-            } else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y)){
+            } else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
                 return tilePos;
             }
         }while(i.hasNext());

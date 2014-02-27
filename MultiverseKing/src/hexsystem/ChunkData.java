@@ -123,10 +123,6 @@ class ChunkData {
                 return result;
             }
         }
-        return result = 4;
+        return 4;
     }
-
-    
-
-    
 }

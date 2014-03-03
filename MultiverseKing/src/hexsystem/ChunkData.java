@@ -119,7 +119,7 @@ class ChunkData {
     private byte getChunkID(Vector2Int chunk){
         byte result;
         for(result = 0; result < 4; result++){
-            if(chunkKey[result].x == chunk.x && chunkKey[result].y == chunk.y){
+            if(chunkKey[result] != null && chunkKey[result].x == chunk.x && chunkKey[result].y == chunk.y){
                 return result;
             }
         }

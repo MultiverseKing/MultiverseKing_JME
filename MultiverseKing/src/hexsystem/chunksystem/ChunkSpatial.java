@@ -62,15 +62,23 @@ class ChunkSpatial {
             }
         }
     }
-    
+    int test = 0;
     void updateSubChunk(Vector2Int subChunkLocalGridPos, ArrayList<Vector2Int[]> meshParameter, int subChunkSize, HexSettings hexSettings) {
         ArrayList<Geometry> geo = new ArrayList<Geometry>();
-        this.rootChunk.detachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
-        
-        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), meshManager.getMergedMesh(meshParameter));
-        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMaterial(hexMat);
-        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(getSubChunkLocalWorldPosition(subChunkLocalGridPos.x, subChunkLocalGridPos.y, hexSettings, subChunkSize));
-        rootChunk.attachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
+        if (test == 2)
+//            this.rootChunk.detachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
+        test++;
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y] = new Geometry(Integer.toString(subChunkLocalGridPos.x)+"|"+Integer.toString(subChunkLocalGridPos.y), meshManager.getMergedMesh(meshParameter));
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMaterial(hexMat);
+//        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setLocalTranslation(getSubChunkLocalWorldPosition(subChunkLocalGridPos.x, subChunkLocalGridPos.y, hexSettings, subChunkSize));
+        this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMesh(meshManager.getMergedMesh(meshParameter));
+//        rootChunk.attachChild(this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y]);
+//        rootChunk.detachChildNamed("testHeight");
+//        Geometry test = new Geometry("testHeight", meshManager.getHeight(meshParameter));
+//        test.setMaterial(hexMat);
+//        rootChunk.attachChild(test);
+//        test.getMesh().setMode(Mesh.Mode.Lines);
+//        test.setCullHint(CullHint.Never);
     }
 
     /**

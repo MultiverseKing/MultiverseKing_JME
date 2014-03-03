@@ -25,7 +25,7 @@ import utility.Vector2Int;
 public class ChunkControl extends AbstractControl {
     private final MapData mapData;
     private ChunkSpatial chunkSpatial;      //Contain the spatial for the chunk to work with
-    private final int subChunkSize = 8;     //a subchunk contain 8*8 tiles
+    private final int subChunkSize = 16;    //how much tile in a subchunk, must be power of two, /!\ chunk contain 32 tiles /!\
     
     public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat) {
         this.mapData = mapData;
@@ -61,6 +61,7 @@ public class ChunkControl extends AbstractControl {
     
     /**
      * @todo updata height
+     * @todo wrapper for meshparameter
      * @param tilePos 
      */
     public void updateChunk(HexCoordinate.Offset tilePos){
@@ -81,7 +82,7 @@ public class ChunkControl extends AbstractControl {
                 if(!initParam) {
                     meshParam.add(new Vector2Int[3]);
                     meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
-                    meshParam.get(i)[1] = new Vector2Int(1, 1); //End Position for the mesh
+                    meshParam.get(i)[1] = new Vector2Int(1, 1);     //End Position for the mesh
                     meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
                     initParam = true;
                 } 

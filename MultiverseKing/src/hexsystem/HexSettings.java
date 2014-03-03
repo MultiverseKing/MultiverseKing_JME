@@ -14,7 +14,7 @@ public final class HexSettings {
     private final float HEX_RADIUS = 1;
     private final float HEX_WIDTH;
     private final int CHUNK_SIZE = 32; //must be power of two
-    private final float FLOOR_HEIGHT = 0.5f;
+    private final float FLOOR_HEIGHT = 0.25f;
 
     /**
      * Parameters to use when generating the map.

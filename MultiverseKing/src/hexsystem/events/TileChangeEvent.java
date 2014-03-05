@@ -29,7 +29,7 @@ public class TileChangeEvent {
     /**
      * @return Odd-R Offset coordinate of the tile relative to mapGrid
      */
-    public Offset tilePos() {
+    public Offset getTilePos() {
         return tilePos;
     }
 

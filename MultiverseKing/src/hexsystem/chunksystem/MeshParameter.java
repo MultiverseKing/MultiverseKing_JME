@@ -2,13 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package utility;
+package hexsystem.chunksystem;
 
 import com.jme3.math.FastMath;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.util.ArrayList;
+import utility.HexCoordinate;
 import utility.HexCoordinate.Offset;
+import utility.Vector2Int;
 
 /**
  *
@@ -16,14 +18,16 @@ import utility.HexCoordinate.Offset;
  */
 public class MeshParameter {
     private final MapData mapData;
+    private final Offset subChunkWorldGridPos;
     
     private ArrayList<Vector2Int> position = new ArrayList<Vector2Int>();
     private ArrayList<Vector2Int> size = new ArrayList<Vector2Int>();
     private ArrayList <Byte> elementType = new ArrayList<Byte>();
     private ArrayList <Byte> height = new ArrayList<Byte>();
 
-    public MeshParameter(MapData mapData) {
+    public MeshParameter(MapData mapData, Offset subChunkWorldGridPos) {
         this.mapData = mapData;
+        this.subChunkWorldGridPos = subChunkWorldGridPos;
     }
 
     public void add(Vector2Int position, Vector2Int size, byte elementType, byte height) {
@@ -61,7 +65,7 @@ public class MeshParameter {
         HexCoordinate hexCoord = new HexCoordinate();
         Boolean[][] neightborsCull = new Boolean[size.get(i).x][6];
         for(int j = 0; j < size.get(i).x; j++){
-            HexTile[] neightbors = mapData.getNeightbors(hexCoord.new Offset(position.get(i).x+j, position.get(i).y));
+            HexTile[] neightbors = mapData.getNeightbors(hexCoord.new Offset(position.get(i).x+subChunkWorldGridPos.q+j, position.get(i).y+subChunkWorldGridPos.r));
             for(byte k = 0; k < 6; k++){
                 if(neightbors[k] != null){
                     if(height.get(i) >= 0){ 

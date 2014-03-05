@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gamestate.gui;
+package gamestate.Editor;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -20,7 +20,7 @@ import tonegod.gui.controls.windows.Window;
  * @todo User should not be able to move the main windows.
  * @author roah
  */
-public class EditorGUI extends AbstractAppState{
+class EditorGUI extends AbstractAppState{
 
     private MultiverseMain main;
     
@@ -59,7 +59,7 @@ public class EditorGUI extends AbstractAppState{
             public void onSelect(int index, Button value) {
 //                System.out.println(index);
                 if(index != ElementalAttribut.getSize()){
-                    changeMapElement(ElementalAttribut.toString(ElementalAttribut.convert(index)));
+                    changeMapElement(ElementalAttribut.convert((byte)index).toString());
                 } else {
                     main.getScreen().removeElement(main.getScreen().getElementById("EWindows"));
                 }
@@ -70,8 +70,8 @@ public class EditorGUI extends AbstractAppState{
             }
         };
         for(int i = 0; i < ElementalAttribut.getSize(); i++){
-            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "Button+"+ElementalAttribut.convert(i), new Vector2f(15, 40+(40*i)));
-            button.setText(ElementalAttribut.toString(ElementalAttribut.convert(i)));
+            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "Button+"+ElementalAttribut.convert((byte)i), new Vector2f(15, 40+(40*i)));
+            button.setText(ElementalAttribut.convert((byte)i).toString());
             elementG.addButton(button);
         }
         Button closeButton = new ButtonAdapter( main.getScreen(), "Close", new Vector2f(15, 40+(40*ElementalAttribut.getSize())));

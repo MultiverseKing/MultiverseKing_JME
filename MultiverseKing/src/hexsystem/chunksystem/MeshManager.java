@@ -11,7 +11,6 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import hexsystem.HexSettings;
 import java.util.ArrayList;
-import utility.MeshParameter;
 import utility.Vector2Int;
 
 /**
@@ -22,7 +21,7 @@ public class MeshManager {
 
     private final float hexSize;    //hex radius.
     private final float hexWidth;   //Make life easier.
-    private final float floorHeight;             //ho much the result should be upped
+    private final float floorHeight;             //how much the result should be upped
 
     public MeshManager(HexSettings settings) {
         this.hexSize = settings.getHEX_RADIUS();
@@ -367,7 +366,7 @@ public class MeshManager {
 
     private Vector3f[] getSideVerticestexCoord(Vector2Int size, int height, int x) {
         Vector3f[] texCoord = new Vector3f[(size.x *4+3)*2];
-        float h = height/7.5f;
+        float h = height/5f;
         int j = 0;
         for(int i = 0; i < size.x; i++){
             texCoord[j] = new Vector3f(0, 0.25f, x);

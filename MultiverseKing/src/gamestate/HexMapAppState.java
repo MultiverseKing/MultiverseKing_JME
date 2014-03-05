@@ -15,7 +15,6 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -39,14 +38,14 @@ import utility.attribut.ElementalAttribut;
  *
  * @author roah
  */
-abstract class HexMapAppState extends AbstractAppState {
+public abstract class HexMapAppState extends AbstractAppState {
+    private final MouseRay mouseRay;    //@see utility/MouseRay.
     protected final MeshManager meshManager;
     protected final MultiverseMain main;
     protected final MapData mapData;
-    protected Node mapNode;
+    protected final Node mapNode;
     protected Material hexMat;
     protected CollisionResults lastRayResults;
-    private final MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial mark;
     
     public HexMapAppState(MultiverseMain main, MapData mapData) {
@@ -54,29 +53,29 @@ abstract class HexMapAppState extends AbstractAppState {
         this.mouseRay = new MouseRay();
         this.mapData = mapData;
         this.meshManager = new MeshManager(mapData.getHexSettings());
+        mapNode = new Node("mapNode");
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
-//        hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
-        mapNode = new Node("mapNode");
         main.getRootNode().attachChild(mapNode);
         addAllElement();
-        initInput();
         initMarkDebug();
+        initInput();
     }
     
     /**
-     * HexMapAppState base input, it not depend on the gameMode or other thing if hexMap
+     * Base input, it not depend on the gameMode or other thing if hexMap
      * is instanced that mean Tiles is or will be instanced so this input too.
      */
     private void initInput() {
         main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        main.getInputManager().addListener(actionListener, new String[]{"LeftMouse"});
+        main.getInputManager().addListener(tileActionListener, new String[]{"LeftMouse"});
     }
-    private final ActionListener actionListener = new ActionListener() {
+    
+    private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("LeftMouse") && isPressed) {
                 CollisionResults results = new CollisionResults();
@@ -124,12 +123,13 @@ abstract class HexMapAppState extends AbstractAppState {
         do{
             pos = i.next().getContactPoint();
             tilePos = mapData.convertWorldToGridPosition(pos);
-//            System.out.println(tilePos.toString());
             if(mapData.getTile(tilePos) == null){
                 break;
-            } else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
-                return tilePos;
-            }
+            } else {
+              return tilePos;  
+            }/*else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
+              return tilePos;
+            }*/
         }while(i.hasNext());
         
         return null;
@@ -146,7 +146,8 @@ abstract class HexMapAppState extends AbstractAppState {
         hexMat.setTexture("ColorMap", hexText);
         hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         hexMat.getAdditionalRenderState().setAlphaTest(true);
+//        hexMat.getAdditionalRenderState().setWireframe(true);
     }
     
-    abstract void mouseLeftActionResult();
+    abstract protected void mouseLeftActionResult();
 }

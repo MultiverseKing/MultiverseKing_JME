@@ -67,8 +67,6 @@ public class MeshParameter {
                 if(neightbors[k] != null){
                         if(neightbors[k].getHeight() >= height.get(i)){
                             neightborsCull[j][k] = false;
-                        } else if(neightbors[k].getHeight() == height.get(i)) {
-                            neightborsCull[j][k] = false;
                         } else {
                             neightborsCull[j][k] = true;
                         }

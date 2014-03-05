@@ -288,7 +288,7 @@ public class MeshManager {
                 index[r + 5] = j + 4;
             }
 
-            if(isNeightborsCull[i][1]){
+            if(isNeightborsCull[i][2]){
                 index[r + 6] = j + 2;
                 index[r + 7] = j + 6;
                 index[r + 8] = j + 3;
@@ -308,7 +308,7 @@ public class MeshManager {
                     index[r + 16] = j + 4;
                     index[r + 17] = j + 13;
                 }
-                if(isNeightborsCull[i][0]){
+                if(isNeightborsCull[i][1]){
                     index[r + 18] = j + 11;
                     index[r + 19] = j + 6;
                     index[r + 20] = j + 2;
@@ -328,7 +328,7 @@ public class MeshManager {
                     index[r + 17] = j + 8;
                 }
 
-                if(isNeightborsCull[i][0]){
+                if(isNeightborsCull[i][1]){
                     index[r + 18] = j + 6;
                     index[r + 19] = j + 2;
                     index[r + 20] = offset + ((sizeX *4+3)*2)-3;
@@ -341,7 +341,7 @@ public class MeshManager {
             j += 8;
         }
 
-        if(isNeightborsCull[sizeX-1][2]){
+        if(isNeightborsCull[sizeX-1][0]){
             index[index.length - 6] = offset + ((sizeX *4+3)*2)-6;
             index[index.length - 5] = offset + ((sizeX *4+3)*2)-4;
             index[index.length - 4] = offset + ((sizeX *4+3)*2)-2;

@@ -5,8 +5,11 @@
 package hexsystem;
 
 import com.jme3.math.FastMath;
+import hexsystem.events.ChunkChangeEvent;
 import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
+import utility.generators.Generator;
 
 /**
  *
@@ -14,8 +17,13 @@ import utility.Vector2Int;
  */
 class ChunkData {
     private byte lastAddedID;
-    private Vector2Int[] chunkKey = new Vector2Int[4]; //chunkKey[resultID] == chunkPos
-    private HexTile[][][] chunkValue = new HexTile[4][][]; //chunkValue[chunkID][tileX][tileY]
+    private Vector2Int[] chunkKey;      //chunkKey[resultID] == chunkPos
+    private HexTile[][][] chunkValue;   //chunkValue[chunkID][tileX][tileY]
+
+    ChunkData(byte limit) {
+        chunkKey = new Vector2Int[limit];
+        chunkValue = new HexTile[limit][][];
+    }
 
     void add(Vector2Int chunkPos, HexTile[][] tiles) {
         byte slotID = getEmptySlotID();
@@ -124,5 +132,33 @@ class ChunkData {
             }
         }
         return 4;
+    }
+
+    ChunkChangeEvent setAllTile(final ElementalAttribut eAttribut) {
+        Iterable<ChunkChangeEvent> it = new Generator<ChunkChangeEvent>() {
+        @Override protected void run() {
+            
+            for(int i = 0; i < chunkValue.length; i++){
+                ChunkChangeEvent cce = new ChunkChangeEvent(chunkKey[i], chunkValue[i], null);
+                for(int j = 0; j < chunkValue[i].length; j++){
+                    for(int k = 0; k < chunkValue[i][j].length; k++){
+                        chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+                    }
+                }
+                cce = cce.setNewTile(chunkValue[i]);
+                yield(cce);
+                return;
+            }
+        }
+//        for(int i = 0; i < chunkValue.length; i++){
+//            for(int j = 0; j < chunkValue[i].length; j++){
+//                for(int k = 0; k < chunkValue[i][j].length; k++){
+//                    chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+//                }
+//            }
+//        }
+//        return null;
+    };
+        return null;
     }
 }

@@ -7,10 +7,12 @@ package hexsystem.chunksystem;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
 import hexsystem.HexSettings;
+import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -21,28 +23,27 @@ import utility.attribut.ElementalAttribut;
 class ChunkSpatial {
     private final MeshManager meshManager;
     private final Material hexMat;
-    private ElementalAttribut mapElement;
     private Node rootChunk;
     private Geometry[][] geo;
 
     
-    ChunkSpatial(MeshManager meshManager, Material hexMat, ElementalAttribut mapElement) {
+    ChunkSpatial(MeshManager meshManager, Material hexMat) {
         this.meshManager = meshManager;
         this.hexMat = hexMat;
-        this.mapElement = mapElement;
     }
     
-    void initialize(Node rootChunk, HexSettings hexSettings, int subChunkSize){
-        this.rootChunk = rootChunk;
+    void initialize(Node rootChunk, HexSettings hexSettings, int subChunkSize, ChunkControl chunkControl){
         int subChunkCount = hexSettings.getCHUNK_SIZE()/subChunkSize;
         geo = new Geometry[subChunkCount][subChunkCount];
         
         for (int x = 0; x < subChunkCount; x++) {
             for (int y = 0; y < subChunkCount; y++) {
-                geo[x][y] = new Geometry(Integer.toString(x)+"|"+Integer.toString(y), meshManager.getMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize), mapElement.ordinal()));
+                geo[x][y] = new Geometry(Integer.toString(x)+"|"+Integer.toString(y), meshManager.getMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize), 0));
                 geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
                 geo[x][y].setMaterial(hexMat);
                 rootChunk.attachChild(geo[x][y]);
+                chunkControl.updateChunk(new HexCoordinate().new Offset(x*subChunkSize, y*subChunkSize));
+                
             }
         }
     }

@@ -46,10 +46,10 @@ public class MultiverseMain extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        // Disable the default flyby cam
         if(!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)){
             throw new UnsupportedOperationException("Your hardware does not support TextureArray");
         }
+        // Disable the default flyby cam
         flyCam.setEnabled(false);
         initGUI();
         lightSettup();
@@ -101,7 +101,7 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attach(player);
     }
 
-    private Spatial instanciatePlayer() {
+    private Spatial instanciatePlayer(HexSettings hexSettings) {
         Spatial player = assetManager.loadModel("Models/Characters/Model21.j3o");
         player.setName("Player");
         player.setShadowMode(RenderQueue.ShadowMode.Cast);
@@ -109,7 +109,7 @@ public class MultiverseMain extends SimpleApplication {
 //        int x = FastMath.nextRandomInt(2,9);
 //        int y = FastMath.nextRandomInt(2, 9);
 
-        player.setLocalTranslation(Vector3f.ZERO);
+        player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT()*hexSettings.getFloorHeight(), 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -126,10 +126,10 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     public void generateHexMap() {
-        MapData mapData = new MapData(new HexSettings());
-        EditorAppState editorAppState = new EditorAppState(mapData, ElementalAttribut.ICE, this);
+        MapData mapData = new MapData(ElementalAttribut.ICE);
+        EditorAppState editorAppState = new EditorAppState(mapData, this);
         stateManager.attach(editorAppState);
-        instanciatePlayer();
+        instanciatePlayer(mapData.getHexSettings());
         
 //        chaseCameraSettup((Node) instanciatePlayer());
         stateManager.detach(stateManager.getState(MainGUI.class));

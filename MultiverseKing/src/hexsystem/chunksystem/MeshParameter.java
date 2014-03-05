@@ -4,7 +4,6 @@
  */
 package hexsystem.chunksystem;
 
-import com.jme3.math.FastMath;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.util.ArrayList;
@@ -68,25 +67,16 @@ public class MeshParameter {
             HexTile[] neightbors = mapData.getNeightbors(hexCoord.new Offset(position.get(i).x+subChunkWorldGridPos.q+j, position.get(i).y+subChunkWorldGridPos.r));
             for(byte k = 0; k < 6; k++){
                 if(neightbors[k] != null){
-                    if(height.get(i) >= 0){ 
-                        if(FastMath.abs(neightbors[k].getHeight()) >= FastMath.abs(height.get(i))){
+                        if(neightbors[k].getHeight() >= height.get(i)){
                             neightborsCull[j][k] = false;
-                        } else if(FastMath.abs(neightbors[k].getHeight()) == FastMath.abs(height.get(i))) {
-                            neightborsCull[j][k] = false;
-                        } else {
-                            neightborsCull[j][k] = true;
-                        }
-                    } else {
-                        if(neightbors[k].getHeight() > height.get(i)){
-                            neightborsCull[j][k] = true;
                         } else if(neightbors[k].getHeight() == height.get(i)) {
                             neightborsCull[j][k] = false;
                         } else {
                             neightborsCull[j][k] = true;
                         }
                     }
-                } else {
-                    neightborsCull[j][k] = true;
+                else {
+                    neightborsCull[j][k] = false;
                 }
             }
         }

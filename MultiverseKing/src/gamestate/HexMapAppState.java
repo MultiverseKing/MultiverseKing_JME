@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import kingofmultiverse.MultiverseMain;
-import utility.HexCoordinate;
 import utility.HexCoordinate.Offset;
 import utility.MouseRay;
 import utility.attribut.ElementalAttribut;
@@ -115,7 +114,7 @@ public abstract class HexMapAppState extends AbstractAppState {
         this.lastRayResults = results;
     }
     
-    protected final HexCoordinate.Offset getLastLeftMouseCollisionGridPos(){
+    protected final Offset getLastLeftMouseCollisionGridPos(){
         Offset tilePos;
         Vector3f pos;
         Iterator<CollisionResult> i = lastRayResults.iterator();

@@ -29,7 +29,7 @@ public class ChunkControl extends AbstractControl {
     
     public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat, ElementalAttribut mapElement) {
         this.mapData = mapData;
-        chunkSpatial = new ChunkSpatial(meshManager, hexMat, mapElement);
+        chunkSpatial = new ChunkSpatial(meshManager, hexMat);
     }
     
     @Override
@@ -37,7 +37,13 @@ public class ChunkControl extends AbstractControl {
         super.setSpatial(spatial); //To change body of generated methods, choose Tools | Templates.
         if (spatial != null){
             // initialize
-            chunkSpatial.initialize((Node)spatial, mapData.getHexSettings(), subChunkSize);
+            chunkSpatial.initialize((Node)spatial, mapData.getHexSettings(), subChunkSize, this);
+//            int i = mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize;
+//            for(int j = 0; j < i; j++){
+//                for(int k = 0; k < i; k++){
+//                    updateChunk(new HexCoordinate().new Offset(j,k));
+//                }
+//            }
         } else {
             // cleanup
         }

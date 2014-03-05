@@ -4,6 +4,8 @@ import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import hexsystem.events.ChunkChangeEvent;
+import hexsystem.events.ChunkChangeListener;
 import java.util.ArrayList;
 import utility.HexCoordinate;
 import utility.HexCoordinate.Axial;
@@ -16,9 +18,11 @@ import utility.attribut.ElementalAttribut;
  * @author Eike Foede, Roah
  */
 public final class MapData {
-    private ChunkData chunkData = new ChunkData();
+    private ChunkData chunkData;
     private HexSettings hexSettings;
-    private ArrayList<TileChangeListener> listeners = new ArrayList<TileChangeListener>();
+    private ElementalAttribut mapElement;
+    private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
+    private ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
 
     /**
      * Global Settings for hex.
@@ -30,26 +34,37 @@ public final class MapData {
     
     /**
      * Base constructor.
-     * @param hexSettings Global properties.
      */
-    public MapData(HexSettings hexSettings) {
-        this.hexSettings = hexSettings;
+    public MapData(ElementalAttribut eAttribut) {
+        this.hexSettings = new HexSettings();
+        mapElement = eAttribut;
+        chunkData = new ChunkData(hexSettings.getCHUNK_DATA_LIMIT());
     }
     
     /**
      * Add a specifiate chunk in mapData at choosen position.
      * @param chunkPos Where to put the chunk.
-     * @todo Remove the chunkPos param ?
      */
-    public void addEmptyChunk(Vector2Int chunkPos, ElementalAttribut mapElement){
+    public void addEmptyChunk(Vector2Int chunkPos){
         HexTile[][] tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
         for(int x = 0; x < hexSettings.getCHUNK_SIZE(); x++){
             for(int y = 0; y < hexSettings.getCHUNK_SIZE(); y++){
-                tiles[x][y] = new HexTile(mapElement);
+                tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT());
             }
         }
         chunkData.add(chunkPos, tiles);
-        System.out.println("ChunkAdded");
+        chunkEvent(new ChunkChangeEvent(chunkPos, null, tiles));
+    }
+    
+    //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
+    public void setMapElement(ElementalAttribut eAttribut){
+        chunkData.setAllTile(eAttribut);
+    }
+    
+    private void chunkEvent(ChunkChangeEvent cce){
+        for (ChunkChangeListener l : chunkListeners) {
+            l.chunkChange(cce);
+        }
     }
     
     /**
@@ -81,7 +96,7 @@ public final class MapData {
         TileChangeEvent tce = new TileChangeEvent(chunkPos, tilePos, chunkData.getTile(chunkPos, tilePos), tile);
         if(tce.getOldTile() != null){
             chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
-            for (TileChangeListener l : listeners) {
+            for (TileChangeListener l : tileListeners) {
                 l.tileChange(tce);
             }
         }
@@ -94,11 +109,18 @@ public final class MapData {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
     
+    public void registerChunkChangeListener(ChunkChangeListener listener){
+        chunkListeners.add(listener);
+        if(listener instanceof TileChangeListener){
+            registerTileChangeListener((TileChangeListener) listener);
+        }
+    }
+    
     /**
      * @todo javadoc (Eike)
      */
     public void registerTileChangeListener(TileChangeListener listener) {
-        listeners.add(listener);
+        tileListeners.add(listener);
     }
 
     /**
@@ -173,5 +195,9 @@ public final class MapData {
             getTile(coordinate.new Offset(position.q - 1, position.r)), 
             getTile(coordinate.new Offset(position.q, position.r + 1)), 
             getTile(coordinate.new Offset(position.q + 1, position.r + 1))});
+    }
+
+    public ElementalAttribut getMapElement() {
+        return mapElement;
     }
 }

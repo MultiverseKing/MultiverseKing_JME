@@ -8,6 +8,7 @@ import utility.attribut.ElementalAttribut;
  */
 public class HexTile {
 
+    private static final byte tileGround = 10;
     private final byte hexElement;
     private final byte height;
 
@@ -36,6 +37,6 @@ public class HexTile {
      * @return
      */
     public HexTile cloneChangedHeight(byte height) {
-        return new HexTile(ElementalAttribut.convert(hexElement), height);
+        return new HexTile(ElementalAttribut.convert(hexElement), (byte) (height));
     }
 }

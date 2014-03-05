@@ -12,9 +12,9 @@ package utility;
  */
 public final class HexCoordinate {
 
-    public static final int TYPE_OFFSET = 0;
-    public static final int TYPE_AXIAL = 1;
-    public static final int TYPE_CUBIC = 2;
+    public static final int OFFSET = 0;
+    public static final int AXIAL = 1;
+    public static final int CUBIC = 2;
     /**
      * Axial position in Grid. q == x
      */
@@ -56,15 +56,19 @@ public final class HexCoordinate {
     }
 
     public HexCoordinate(int type, Vector2Int pos) {
-        if (type == TYPE_OFFSET) {
+        if (type == OFFSET) {
             pos = offsetToAxial(pos);
         }
         q = pos.x;
         r = pos.y;
     }
 
+    public HexCoordinate(int type, int x, int y) {
+        this(type, new Vector2Int(x, y));
+    }
+
     public HexCoordinate(int type, Vector3Int pos) {
-        if (type != TYPE_CUBIC) {
+        if (type != CUBIC) {
             throw new UnsupportedOperationException("Only TYPE_CUBIC expects a Vector3Int!");
         }
         Vector2Int posAxial = cubicToAxial(pos);
@@ -81,6 +85,8 @@ public final class HexCoordinate {
     }
 
     public HexCoordinate[] getNeighbours() {
+        Class c = HexCoordinate.class;
+
         HexCoordinate[] neighbours = new HexCoordinate[]{
             new HexCoordinate(q + 1, r),
             new HexCoordinate(q + 1, r - 1),
@@ -91,4 +97,17 @@ public final class HexCoordinate {
         };
         return neighbours;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof HexCoordinate){
+            HexCoordinate coord = (HexCoordinate) obj;
+            Vector2Int axial = coord.getAsAxial();
+            if(axial.x == q && axial.y == r){
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }

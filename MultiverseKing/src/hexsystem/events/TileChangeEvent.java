@@ -1,7 +1,7 @@
 package hexsystem.events;
 
 import hexsystem.HexTile;
-import utility.HexCoordinate.Offset;
+import utility.HexCoordinate;
 import utility.Vector2Int;
 
 /**
@@ -11,11 +11,11 @@ import utility.Vector2Int;
 public class TileChangeEvent {
 
     private Vector2Int chunkPos;
-    private Offset tilePos;
+    private HexCoordinate tilePos;
     private HexTile oldTile;
     private HexTile newTile;
 
-    public TileChangeEvent(Vector2Int chunkPos, Offset tilePos, HexTile oldTile, HexTile newTile) {
+    public TileChangeEvent(Vector2Int chunkPos, HexCoordinate tilePos, HexTile oldTile, HexTile newTile) {
         this.tilePos = tilePos;
         this.oldTile = oldTile;
         this.newTile = newTile;
@@ -29,7 +29,7 @@ public class TileChangeEvent {
     /**
      * @return Odd-R Offset coordinate of the tile relative to mapGrid
      */
-    public Offset getTilePos() {
+    public HexCoordinate getTilePos() {
         return tilePos;
     }
 

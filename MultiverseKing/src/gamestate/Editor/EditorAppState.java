@@ -20,7 +20,7 @@ import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
-import utility.HexCoordinate.Offset;
+import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -89,7 +89,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
     
     @Override
     protected void mouseLeftActionResult() {
-        Offset offsetPos = super.getLastLeftMouseCollisionGridPos();
+        HexCoordinate offsetPos = super.getLastLeftMouseCollisionGridPos();
         if(offsetPos != null){
 //            changeTile(offsetPos);
             moveCursor(offsetPos);
@@ -112,7 +112,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
                 event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.getTilePos());
         }
-        if(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equalsCoord(event.getTilePos())){
+        if(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())){
             cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight()*mapData.getHexSettings().getFloorHeight(), cursor.getLocalTranslation().z);
         }
     }
@@ -121,7 +121,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
      * @param tilePos 
      * @deprecated 
      */
-    private void changeTile(Offset tilePos) {
+    private void changeTile(HexCoordinate tilePos) {
         HexTile tile = mapData.getTile(tilePos);
         if(tile != null){
             if (tile.getHexElement() == ElementalAttribut.NATURE) {
@@ -159,7 +159,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         camTarget.setLocalTranslation(position);
     }
 
-    private void moveCursor(Offset offsetPos) {
+    private void moveCursor(HexCoordinate offsetPos) {
         Vector3f pos = mapData.getTileWorldPosition(offsetPos);
         cursor.setLocalTranslation(pos.x, mapData.getTile(offsetPos).getHeight()*mapData.getHexSettings().getFloorHeight()+((offsetPos.r&1) == 0 ? 0.001f : 0.002f), pos.z+cursorOffset);
     }

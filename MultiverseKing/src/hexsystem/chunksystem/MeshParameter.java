@@ -8,7 +8,6 @@ import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.util.ArrayList;
 import utility.HexCoordinate;
-import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 
 /**
@@ -17,14 +16,14 @@ import utility.Vector2Int;
  */
 public class MeshParameter {
     private final MapData mapData;
-    private final Offset subChunkWorldGridPos;
+    private final HexCoordinate subChunkWorldGridPos;
     
     private ArrayList<Vector2Int> position = new ArrayList<Vector2Int>();
     private ArrayList<Vector2Int> size = new ArrayList<Vector2Int>();
     private ArrayList <Byte> elementType = new ArrayList<Byte>();
     private ArrayList <Byte> height = new ArrayList<Byte>();
 
-    public MeshParameter(MapData mapData, Offset subChunkWorldGridPos) {
+    public MeshParameter(MapData mapData, HexCoordinate subChunkWorldGridPos) {
         this.mapData = mapData;
         this.subChunkWorldGridPos = subChunkWorldGridPos;
     }
@@ -61,10 +60,9 @@ public class MeshParameter {
     }
 
     public Boolean[][] getCulling(int i) {
-        HexCoordinate hexCoord = new HexCoordinate();
         Boolean[][] neightborsCull = new Boolean[size.get(i).x][6];
         for(int j = 0; j < size.get(i).x; j++){
-            HexTile[] neightbors = mapData.getNeightbors(hexCoord.new Offset(position.get(i).x+subChunkWorldGridPos.q+j, position.get(i).y+subChunkWorldGridPos.r));
+            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET,position.get(i).x+subChunkWorldGridPos.q+j, position.get(i).y+subChunkWorldGridPos.r));
             for(byte k = 0; k < 6; k++){
                 if(neightbors[k] != null){
                         if(neightbors[k].getHeight() >= height.get(i)){

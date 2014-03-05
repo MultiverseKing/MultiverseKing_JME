@@ -58,7 +58,10 @@ public final class MapData {
     
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
     public void setMapElement(ElementalAttribut eAttribut){
-        chunkData.setAllTile(eAttribut);
+        Iterable<ChunkChangeEvent> cce = chunkData.setAllTile(eAttribut);
+        do{
+            chunkEvent(cce.iterator().next());
+        }while (cce.iterator().hasNext());
     }
     
     private void chunkEvent(ChunkChangeEvent cce){

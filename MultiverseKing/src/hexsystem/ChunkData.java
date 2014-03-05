@@ -134,20 +134,21 @@ class ChunkData {
         return 4;
     }
 
-    ChunkChangeEvent setAllTile(final ElementalAttribut eAttribut) {
+    Iterable<ChunkChangeEvent> setAllTile(final ElementalAttribut eAttribut) {
         Iterable<ChunkChangeEvent> it = new Generator<ChunkChangeEvent>() {
         @Override protected void run() {
-            
             for(int i = 0; i < chunkValue.length; i++){
-                ChunkChangeEvent cce = new ChunkChangeEvent(chunkKey[i], chunkValue[i], null);
-                for(int j = 0; j < chunkValue[i].length; j++){
-                    for(int k = 0; k < chunkValue[i][j].length; k++){
-                        chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+                if(chunkKey[i] != null && chunkValue[i]!=null){
+                    ChunkChangeEvent cce = new ChunkChangeEvent(chunkKey[i], chunkValue[i], null);
+                    for(int j = 0; j < chunkValue[i].length; j++){
+                            for(int k = 0; k < chunkValue[i][j].length; k++){
+                                chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+                            }
                     }
+                    cce = cce.setNewTile(chunkValue[i]);
+                    yield(cce);
+                    return;
                 }
-                cce = cce.setNewTile(chunkValue[i]);
-                yield(cce);
-                return;
             }
         }
 //        for(int i = 0; i < chunkValue.length; i++){
@@ -159,6 +160,6 @@ class ChunkData {
 //        }
 //        return null;
     };
-        return null;
+        return it;
     }
 }

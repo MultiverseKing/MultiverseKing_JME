@@ -6,7 +6,7 @@ package hexsystem;
 
 import com.jme3.math.FastMath;
 import hexsystem.events.ChunkChangeEvent;
-import utility.HexCoordinate.Offset;
+import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 import utility.generators.Generator;
@@ -45,11 +45,12 @@ class ChunkData {
      * @param tilePos tilePos inside the chunk.
      * @return null if the tile doesn't exist.
      */
-    HexTile getTile(Vector2Int chunk, Offset tilePos) {
+    HexTile getTile(Vector2Int chunk, HexCoordinate tilePos) {
+        Vector2Int tileOffset = tilePos.getAsOffset();
         byte chunkID = getChunkID(chunk);
         if(chunkID != 4){
             try {
-                return chunkValue[chunkID][tilePos.q][tilePos.r];
+                return chunkValue[chunkID][tileOffset.x][tileOffset.y];
             } catch (ArrayIndexOutOfBoundsException e){
                 System.err.println("Hex index out of bounds");
             }
@@ -66,11 +67,12 @@ class ChunkData {
      * @param t tile properties.
      * @return true if the value is set correctly, false otherwise.
      */
-    boolean setTile(Vector2Int chunk, Offset tilePos, HexTile t) {
+    boolean setTile(Vector2Int chunk, HexCoordinate tilePos, HexTile t) {
+        Vector2Int tileOffset = tilePos.getAsOffset();
         byte chunkID = getChunkID(chunk);
         if(chunkID != 4){
             try {
-                chunkValue[chunkID][tilePos.q][tilePos.r] = t;
+                chunkValue[chunkID][tileOffset.x][tileOffset.y] = t;
                 return true;
             } catch (ArrayIndexOutOfBoundsException e){
                 System.err.println("Hex index out of bounds");

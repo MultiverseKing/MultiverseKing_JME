@@ -18,7 +18,6 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
-import utility.HexCoordinate.Offset;
 
 /**
  * @todo User should not be able to move the main windows.
@@ -28,7 +27,7 @@ class EditorGUI extends AbstractAppState {
 
     private final MapData mapData;
     private MultiverseMain main;
-    private Offset currentTilePosition;
+    private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
     
     EditorGUI(MapData mapData){
@@ -95,8 +94,8 @@ class EditorGUI extends AbstractAppState {
         main.getScreen().addElement(eWin);
     }
     
-    void openWin(Offset tile) {
-        currentTilePosition = new HexCoordinate().new Offset(tile.q, tile.r);
+    void openWin(HexCoordinate tile) {
+        currentTilePosition = tile;
         if(main.getScreen().getElementById("tileP") != null) {
             tilePButtonGroup.setSelected(mapData.getTile(tile).getHexElement().ordinal());
         } else {

@@ -14,7 +14,6 @@ import com.jme3.scene.control.AbstractControl;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import utility.HexCoordinate;
-import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -70,9 +69,10 @@ public class ChunkControl extends AbstractControl {
      * @todo wrapper for meshparameter
      * @param tilePos 
      */
-    public void updateChunk(HexCoordinate.Offset tilePos){
+    public void updateChunk(HexCoordinate tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
-        Offset subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
+        HexCoordinate subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
+        Vector2Int subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
 //        ArrayList<MeshParameter> meshParam = new ArrayList<MeshParameter>();
         MeshParameter meshParam = new MeshParameter(mapData, subChunkWorldGridPos);
         
@@ -84,8 +84,8 @@ public class ChunkControl extends AbstractControl {
                 i++;
             }
             for(int x = 0; x < subChunkSize-1; x++){
-                HexTile tile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x+1, subChunkWorldGridPos.r+y));
+                HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET,subChunkWorldGridPosOffset.x+x, subChunkWorldGridPosOffset.y+y));
+                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x+x+1, subChunkWorldGridPosOffset.y+y));
                 if(!initParam) {
                     meshParam.add(new Vector2Int(x, y), new Vector2Int(1,1), (byte)tile.getHexElement().ordinal(), (byte)tile.getHeight());
                     initParam = true;
@@ -105,13 +105,14 @@ public class ChunkControl extends AbstractControl {
     /**
      * @return SubChunk local grid position, relative to Chunk grid position.
      */
-    Vector2Int getSubChunkLocalGridPos(HexCoordinate.Offset tilePos){
-        Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.q)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize), 
-                              (int) ((FastMath.abs(tilePos.r)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize));
+    Vector2Int getSubChunkLocalGridPos(HexCoordinate tile){
+        Vector2Int tilePos = tile.getAsOffset();
+        Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.x)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize), 
+                              (int) ((FastMath.abs(tilePos.y)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize));
         return result;
     }
     
-    Offset getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
-        return new HexCoordinate().new Offset(subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
+    HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
+        return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
     }
 }

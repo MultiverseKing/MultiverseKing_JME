@@ -42,7 +42,7 @@ class ChunkSpatial {
                 geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
                 geo[x][y].setMaterial(hexMat);
                 rootChunk.attachChild(geo[x][y]);
-                chunkControl.updateChunk(new HexCoordinate().new Offset(x*subChunkSize, y*subChunkSize));
+                chunkControl.updateChunk(new HexCoordinate(HexCoordinate.OFFSET, x*subChunkSize, y*subChunkSize));
                 
             }
         }

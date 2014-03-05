@@ -5,6 +5,7 @@
 package utility;
 
 import com.jme3.math.Vector2f;
+import utility.HexCoordinate.Offset;
 
 /**
  * I don't like to use 2 int or Vector2f for some variable, fully subjective thing nothing more.
@@ -36,5 +37,13 @@ public class Vector2Int {
     public Vector2Int(int x, int y){
         this.x = x;
         this.y = y;
+    }
+
+    public boolean equalsCoord(Offset tilePos) {
+        if(tilePos.q == this.x && tilePos.r == this.y){
+            return true;
+        } else {
+            return false;
+        }
     }
 }

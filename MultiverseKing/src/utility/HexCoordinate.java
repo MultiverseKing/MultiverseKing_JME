@@ -4,6 +4,8 @@
  */
 package utility;
 
+import com.jme3.math.Vector2f;
+
 /**
  *
  * @author Roah with the help of : ArtemisArt => http://artemis.art.free.fr/ &&
@@ -96,6 +98,18 @@ public final class HexCoordinate {
         @Override
         public String toString() {
             return q+"|"+r;
+        }
+
+        public Vector2Int toVector2Int() {
+            return new Vector2Int(this.q, this.r);
+        }
+
+        public boolean equalsCoord(Offset tilePos) {
+            if(tilePos.q == this.q && tilePos.r == this.r){
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

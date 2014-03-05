@@ -15,7 +15,6 @@ import hexsystem.HexTile;
 import hexsystem.MapData;
 import utility.HexCoordinate;
 import utility.HexCoordinate.Offset;
-import utility.MeshParameter;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -69,7 +68,7 @@ public class ChunkControl extends AbstractControl {
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         Offset subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
 //        ArrayList<MeshParameter> meshParam = new ArrayList<MeshParameter>();
-        MeshParameter meshParam = new MeshParameter(mapData);
+        MeshParameter meshParam = new MeshParameter(mapData, subChunkWorldGridPos);
         
         int i = 0;
         boolean initParam = false;
@@ -94,7 +93,7 @@ public class ChunkControl extends AbstractControl {
                 }
             }
         }
-        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam, subChunkSize, mapData.getHexSettings());
+        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam);
     }
     
     /**
@@ -106,7 +105,7 @@ public class ChunkControl extends AbstractControl {
         return result;
     }
     
-    HexCoordinate.Offset getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
+    Offset getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
         return new HexCoordinate().new Offset(subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
     }
 }

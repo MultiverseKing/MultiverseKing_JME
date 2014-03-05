@@ -2,11 +2,9 @@ package hexsystem;
 
 import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
-import com.jme3.app.state.AbstractAppState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
-import jme3tools.navigation.Coordinate;
 import utility.HexCoordinate;
 import utility.HexCoordinate.Axial;
 import utility.HexCoordinate.Offset;
@@ -17,7 +15,7 @@ import utility.attribut.ElementalAttribut;
  * This class holds the data of the map.
  * @author Eike Foede, Roah
  */
-public final class MapData extends AbstractAppState {
+public final class MapData {
     private ChunkData chunkData = new ChunkData();
     private HexSettings hexSettings;
     private ArrayList<TileChangeListener> listeners = new ArrayList<TileChangeListener>();
@@ -126,7 +124,7 @@ public final class MapData extends AbstractAppState {
      * @param pos position to convert.
      * @return converted grid position.
      */
-    public HexCoordinate.Offset convertWorldToGridPosition(Vector3f pos) {
+    public Offset convertWorldToGridPosition(Vector3f pos) {
         float x = pos.x;
         float z = pos.z+hexSettings.getHEX_RADIUS();
         x = x / hexSettings.getHEX_WIDTH();

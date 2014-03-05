@@ -11,8 +11,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
 import hexsystem.HexSettings;
-import java.util.ArrayList;
-import utility.MeshParameter;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -65,7 +63,7 @@ class ChunkSpatial {
         }
     }
 
-    void updateSubChunk(Vector2Int subChunkLocalGridPos, MeshParameter meshParam, int subChunkSize, HexSettings hexSettings) {
+    void updateSubChunk(Vector2Int subChunkLocalGridPos, MeshParameter meshParam) {
         this.geo[subChunkLocalGridPos.x][subChunkLocalGridPos.y].setMesh(meshManager.getMergedMesh(meshParam));
     }
 

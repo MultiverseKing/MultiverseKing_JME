@@ -1,7 +1,7 @@
 package test;
 
-import gamestate.EditorAppState;
-import gamestate.gui.EditorGUI;
+import gamestate.Editor.EditorAppState;
+import gamestate.Editor.GUI;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
@@ -36,7 +36,7 @@ public class MapEditorTest extends AbstractAppState {
     private MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial hexCursor;          //@todo see HexCursor script.
     private Spatial mark;
-    private AppState hexGUI;            //Current GUI used. Maybe pointless ?
+    private AppState hexGUI;            //Current EditorGUI used. Maybe pointless ?
     private MapData mapData;
     private EditorAppState editorAppState;
     private final float offset = 0.15f;               //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -62,7 +62,7 @@ public class MapEditorTest extends AbstractAppState {
 ////        hexCursor.setCullHint(Spatial.CullHint.Always);
         
         if (main.getGameState() == GameMode.EDITOR) {
-            EditorGUI editorGUI = new EditorGUI();
+            GUI editorGUI = new GUI();
             hexGUI = editorGUI;
 
             main.getStateManager().attach(hexGUI);

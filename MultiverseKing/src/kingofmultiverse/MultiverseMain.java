@@ -1,10 +1,8 @@
 package kingofmultiverse;
 
-import gamestate.gui.MainGUI;
 import hexsystem.MapData;
-import gamestate.EditorAppState;
+import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
-import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -13,7 +11,6 @@ import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Node;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import hexsystem.HexSettings;
 import java.util.logging.Level;
@@ -32,7 +29,6 @@ public class MultiverseMain extends SimpleApplication {
     public static void main(String[] args) {
         MultiverseMain app = new MultiverseMain();
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
-        
         app.start();
     }
     
@@ -93,14 +89,7 @@ public class MultiverseMain extends SimpleApplication {
         rootNode.addLight(ambient);
     }
 
-    private void cameraSettup(Node target) {
-        // Enable a chase cam for this target (typically the player).
-        ChaseCamera chaseCam = new ChaseCamera(cam, target, this.inputManager);
-        chaseCam.setMaxDistance(30);
-        chaseCam.setMinDistance(5);
-        chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
-        chaseCam.setSmoothMotion(true);
-    }
+    
 
     /**
      * Use to generate a character who can move on the field, this will be used
@@ -138,11 +127,11 @@ public class MultiverseMain extends SimpleApplication {
 
     public void generateHexMap() {
         MapData mapData = new MapData(new HexSettings());
-        stateManager.attach(mapData);
         EditorAppState editorAppState = new EditorAppState(mapData, ElementalAttribut.ICE, this);
         stateManager.attach(editorAppState);
+        instanciatePlayer();
         
-        cameraSettup((Node) instanciatePlayer());
+//        chaseCameraSettup((Node) instanciatePlayer());
         stateManager.detach(stateManager.getState(MainGUI.class));
     }
 }

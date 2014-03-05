@@ -13,10 +13,11 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import java.util.ArrayList;
 import utility.HexCoordinate;
 import utility.HexCoordinate.Offset;
+import utility.MeshParameter;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -27,9 +28,9 @@ public class ChunkControl extends AbstractControl {
     private ChunkSpatial chunkSpatial;      //Contain the spatial for the chunk to work with
     private final int subChunkSize = 16;    //how much tile in a subchunk, must be power of two, /!\ chunk contain 32 tiles /!\
     
-    public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat) {
+    public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat, ElementalAttribut mapElement) {
         this.mapData = mapData;
-        chunkSpatial = new ChunkSpatial(meshManager, hexMat);
+        chunkSpatial = new ChunkSpatial(meshManager, hexMat, mapElement);
     }
     
     @Override
@@ -37,7 +38,7 @@ public class ChunkControl extends AbstractControl {
         super.setSpatial(spatial); //To change body of generated methods, choose Tools | Templates.
         if (spatial != null){
             // initialize
-            chunkSpatial.initialize((Node)spatial, mapData.getHexSettings(), subChunkSize, mapData.getMapElement());
+            chunkSpatial.initialize((Node)spatial, mapData.getHexSettings(), subChunkSize);
         } else {
             // cleanup
         }
@@ -67,7 +68,8 @@ public class ChunkControl extends AbstractControl {
     public void updateChunk(HexCoordinate.Offset tilePos){
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         Offset subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
-        ArrayList<Vector2Int[]> meshParam = new ArrayList<Vector2Int[]>();        ArrayList<Byte[]> meshParamNeighbors = new ArrayList<Byte[]>();
+//        ArrayList<MeshParameter> meshParam = new ArrayList<MeshParameter>();
+        MeshParameter meshParam = new MeshParameter(mapData);
         
         int i = 0;
         boolean initParam = false;
@@ -80,21 +82,15 @@ public class ChunkControl extends AbstractControl {
                 HexTile tile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x, subChunkWorldGridPos.r+y));
                 HexTile nearTile = mapData.getTile(new HexCoordinate().new Offset(subChunkWorldGridPos.q+x+1, subChunkWorldGridPos.r+y));
                 if(!initParam) {
-                    meshParam.add(new Vector2Int[3]);
-                    meshParam.get(i)[0] = new Vector2Int(x, y);     //Start Position for the mesh
-                    meshParam.get(i)[1] = new Vector2Int(1, 1);     //End Position for the mesh
-                    meshParam.get(i)[2] = new Vector2Int(tile.getHexElement().ordinal(), tile.getHeight()); //Element to put on the mesh / height of the mesh
+                    meshParam.add(new Vector2Int(x, y), new Vector2Int(1,1), (byte)tile.getHexElement().ordinal(), (byte)tile.getHeight());
                     initParam = true;
                 } 
                 if (nearTile.getHexElement() == tile.getHexElement() && 
                            nearTile.getHeight() == tile.getHeight() ) {
-                    meshParam.get(i)[1].x++;
+                    meshParam.extendsSizeX(i);
                 } else {
                     i++;
-                    meshParam.add(new Vector2Int[3]);
-                    meshParam.get(i)[0] = new Vector2Int(x+1, y);     //Start Position for the mesh
-                    meshParam.get(i)[1] = new Vector2Int(1, 1);       //End Position for the mesh
-                    meshParam.get(i)[2] = new Vector2Int(nearTile.getHexElement().ordinal(), nearTile.getHeight()); //Element to put on the mesh / height of the mesh
+                    meshParam.add(new Vector2Int(x+1, y), new Vector2Int(1,1), (byte)nearTile.getHexElement().ordinal(), (byte)nearTile.getHeight());
                 }
             }
         }

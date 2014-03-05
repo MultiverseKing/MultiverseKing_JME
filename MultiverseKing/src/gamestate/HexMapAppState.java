@@ -13,7 +13,6 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -40,7 +39,7 @@ import utility.attribut.ElementalAttribut;
  *
  * @author roah
  */
-abstract class AbstractHexMap extends AbstractAppState {
+abstract class HexMapAppState extends AbstractAppState {
     protected final MeshManager meshManager;
     protected final MultiverseMain main;
     protected final MapData mapData;
@@ -50,7 +49,7 @@ abstract class AbstractHexMap extends AbstractAppState {
     private final MouseRay mouseRay;    //@see utility/MouseRay.
     private Spatial mark;
     
-    public AbstractHexMap(MultiverseMain main, MapData mapData) {
+    public HexMapAppState(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
         this.mapData = mapData;
@@ -70,7 +69,7 @@ abstract class AbstractHexMap extends AbstractAppState {
     }
     
     /**
-     * HexMap base input, it not depend on the gameMode or other thing if hexMap
+     * HexMapAppState base input, it not depend on the gameMode or other thing if hexMap
      * is instanced that mean Tiles is or will be instanced so this input too.
      */
     private void initInput() {
@@ -89,8 +88,8 @@ abstract class AbstractHexMap extends AbstractAppState {
                         mark.setLocalTranslation(closest.getContactPoint());
                         main.getRootNode().attachChild(mark);    //TODO Debug to remove.
                             
-                        main.getStateManager().getState(AbstractHexMap.class).setleftMouseActionResult(results);
-                        main.getStateManager().getState(AbstractHexMap.class).mouseLeftActionResult();
+                        main.getStateManager().getState(HexMapAppState.class).setleftMouseActionResult(results);
+                        main.getStateManager().getState(HexMapAppState.class).mouseLeftActionResult();
                     } else if (main.getRootNode().hasChild(mark)) {
                         // No hits? Then remove the red mark.
                         main.getRootNode().detachChild(mark);    //TODO Debug to remove.

@@ -11,6 +11,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import hexsystem.HexSettings;
 import java.util.ArrayList;
+import utility.MeshParameter;
 import utility.Vector2Int;
 
 /**
@@ -70,7 +71,13 @@ public class MeshManager {
         return setCollisionBound(setAllBuffer(vertices, texCoord, index));
     }
 
-    Mesh getHeight(ArrayList<Vector2Int[]> meshParameter) {
+    /**
+     * 
+     * @param meshParam
+     * @return only hex side mesh
+     * @deprecated
+     */
+    Mesh getHeight(MeshParameter meshParam) {
         ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
         ArrayList<Vector3f[]> texCoord = new ArrayList<Vector3f[]>();
         ArrayList<int[]> index = new ArrayList<int[]>();
@@ -79,11 +86,11 @@ public class MeshManager {
         int mergedtextCoordCount = 0;
         int mergedIndexCount = 0;
 
-        for (int i = 0; i < meshParameter.size(); i++) {
-            if (meshParameter.get(i)[2].y != 0) {
-                Vector3f[] vert = getSideVerticesPosition(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y);
-                Vector3f[] tex = getSideVerticestexCoord(meshParameter.get(i)[1], meshParameter.get(i)[2].y, meshParameter.get(i)[2].x);
-                int[] indice = getSideIndex(meshParameter.get(i)[1].x, mergedVerticeCount);
+        for (int i = 0; i < meshParam.size(); i++) {
+            if (meshParam.getHeight(i) != 0) {
+                Vector3f[] vert = getSideVerticesPosition(meshParam.getPosition(i), meshParam.getSize(i), meshParam.getHeight(i));
+                Vector3f[] tex = getSideVerticestexCoord(meshParam.getSize(i), meshParam.getHeight(i), meshParam.getElementType(i));
+                int[] indice = getSideIndex(meshParam.getSize(i).x, mergedVerticeCount, meshParam.getCulling(i));
 
                 vertices.add(vert);
                 texCoord.add(tex);
@@ -114,7 +121,7 @@ public class MeshManager {
 //        return null;
     }
 
-    Mesh getMergedMesh(ArrayList<Vector2Int[]> meshParameter) {
+    Mesh getMergedMesh(MeshParameter meshParam) {
         ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
         ArrayList<Vector3f[]> texCoord = new ArrayList<Vector3f[]>();
         ArrayList<int[]> index = new ArrayList<int[]>();
@@ -123,33 +130,29 @@ public class MeshManager {
         int mergedtextCoordCount = 0;
         int mergedIndexCount = 0;
 
-        for (int i = 0; i < meshParameter.size(); i++) {
-            Vector3f[] groundVert = getVerticesPosition(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y);
-            Vector3f[] groundTex = getTexCoord(meshParameter.get(i)[1], meshParameter.get(i)[2].x);
-            int[] groundIndice = getIndex(meshParameter.get(i)[1].y, mergedVerticeCount);
-
-//            vertices.add(vert);
-//            texCoord.add(tex);
-//            index.add(indice);
+        for (int i = 0; i < meshParam.size(); i++) {
+            Vector3f[] groundVert = getVerticesPosition(meshParam.getPosition(i), meshParam.getSize(i), meshParam.getHeight(i));
+            Vector3f[] groundTex = getTexCoord(meshParam.getSize(i), meshParam.getElementType(i));
+            int[] groundIndice = getIndex(meshParam.getSize(i).y, mergedVerticeCount);
 
             mergedtextCoordCount += groundTex.length;
             mergedVerticeCount += groundVert.length;
             mergedIndexCount += groundIndice.length;
 
-            if(meshParameter.get(i)[2].y != 0){
-                Vector3f[] sideVert = getSideVerticesPosition(meshParameter.get(i)[0], meshParameter.get(i)[1], meshParameter.get(i)[2].y);
+            if(meshParam.getHeight(i) != 0){
+                Vector3f[] sideVert = getSideVerticesPosition(meshParam.getPosition(i), meshParam.getSize(i), meshParam.getHeight(i));
                 Vector3f[] vertCombi = new Vector3f[sideVert.length+groundVert.length];
                 System.arraycopy(groundVert, 0, vertCombi, 0, groundVert.length);
                 System.arraycopy(sideVert, 0, vertCombi, groundVert.length, sideVert.length);
                 vertices.add(vertCombi);
                 
-                Vector3f[] sideTex = getSideVerticestexCoord(meshParameter.get(i)[1], meshParameter.get(i)[2].y, meshParameter.get(i)[2].x);
+                Vector3f[] sideTex = getSideVerticestexCoord(meshParam.getSize(i), meshParam.getHeight(i), meshParam.getElementType(i));
                 Vector3f[] texCombi = new Vector3f[sideTex.length+groundTex.length];
                 System.arraycopy(groundTex, 0, texCombi, 0, groundTex.length);
                 System.arraycopy(sideTex, 0, texCombi, groundTex.length, sideTex.length);
                 texCoord.add(texCombi);
                 
-                int[] sideIndice = getSideIndex(meshParameter.get(i)[1].x, mergedVerticeCount);
+                int[] sideIndice = getSideIndex(meshParam.getSize(i).x, mergedVerticeCount, meshParam.getCulling(i));
                 int[] indiceCombi = new int[sideIndice.length+groundIndice.length];
                 System.arraycopy(groundIndice, 0, indiceCombi, 0, groundIndice.length);
                 System.arraycopy(sideIndice, 0, indiceCombi, groundIndice.length, sideIndice.length);
@@ -172,7 +175,7 @@ public class MeshManager {
         mergedVerticeCount = 0;
         mergedtextCoordCount = 0;
         mergedIndexCount = 0;
-        for (int i = 0; i < meshParameter.size(); i++) {
+        for (int i = 0; i < meshParam.size(); i++) {
             System.arraycopy(vertices.get(i), 0, mergedVertices, mergedVerticeCount, vertices.get(i).length);
             System.arraycopy(texCoord.get(i), 0, mergedtextCoord, mergedtextCoordCount, texCoord.get(i).length);
             System.arraycopy(index.get(i), 0, mergedIndex, mergedIndexCount, index.get(i).length);
@@ -258,80 +261,94 @@ public class MeshManager {
         return index;
     }
 
-    private int[] getSideIndex(int sizeX, int offset) {
+    private int[] getSideIndex(int sizeX, int offset, Boolean[][] isNeightborsCull) {
         int[] index = new int[((sizeX * 4) + 2) * 2 * 3]; //2 tri * 3 point
 
-        index[0] = offset + 1;
-        index[1] = offset + 7;
-        index[2] = offset + 5;
+        if(isNeightborsCull[0][3]){
+            index[0] = offset + 1;
+            index[1] = offset + 7;
+            index[2] = offset + 5;
 
-        index[3] = offset + 1;
-        index[4] = offset + 3;
-        index[5] = offset + 7;
+            index[3] = offset + 1;
+            index[4] = offset + 3;
+            index[5] = offset + 7;
+        }
         
         int j = offset;
         for (int i = 0; i < sizeX; i++) {
             int r = (i * 24) + 6;
-            index[r] = j;
-            index[r + 1] = j + 1;
-            index[r + 2] = j + 4;
+            if(isNeightborsCull[i][4]){
+                index[r] = j;
+                index[r + 1] = j + 1;
+                index[r + 2] = j + 4;
 
-            index[r + 3] = j + 1;
-            index[r + 4] = j + 5;
-            index[r + 5] = j + 4;
+                index[r + 3] = j + 1;
+                index[r + 4] = j + 5;
+                index[r + 5] = j + 4;
+            }
 
-            index[r + 6] = j + 2;
-            index[r + 7] = j + 6;
-            index[r + 8] = j + 3;
+            if(isNeightborsCull[i][1]){
+                index[r + 6] = j + 2;
+                index[r + 7] = j + 6;
+                index[r + 8] = j + 3;
 
-            index[r + 9] = j + 3;
-            index[r + 10] = j + 6;
-            index[r + 11] = j + 7;
+                index[r + 9] = j + 3;
+                index[r + 10] = j + 6;
+                index[r + 11] = j + 7;
+            }
             
             if(i < sizeX-1){
-                index[r + 12] = j + 0;
-                index[r + 13] = j + 4;
-                index[r + 14] = j + 9;
+                if(isNeightborsCull[i][5]){
+                    index[r + 12] = j + 0;
+                    index[r + 13] = j + 4;
+                    index[r + 14] = j + 9;
 
-                index[r + 15] = j + 9;
-                index[r + 16] = j + 4;
-                index[r + 17] = j + 13;
+                    index[r + 15] = j + 9;
+                    index[r + 16] = j + 4;
+                    index[r + 17] = j + 13;
+                }
+                if(isNeightborsCull[i][0]){
+                    index[r + 18] = j + 11;
+                    index[r + 19] = j + 6;
+                    index[r + 20] = j + 2;
 
-                index[r + 18] = j + 11;
-                index[r + 19] = j + 6;
-                index[r + 20] = j + 2;
-
-                index[r + 21] = j + 11;
-                index[r + 22] = j + 15;
-                index[r + 23] = j + 6;
+                    index[r + 21] = j + 11;
+                    index[r + 22] = j + 15;
+                    index[r + 23] = j + 6;
+                }
             } else {
-                index[r + 12] = j + 0;
-                index[r + 13] = j + 4;
-                index[r + 14] = j + 8;
+                if(isNeightborsCull[i][5]){
+                    index[r + 12] = j + 0;
+                    index[r + 13] = j + 4;
+                    index[r + 14] = j + 8;
 
-                index[r + 15] = j + 4;
-                index[r + 16] = j + 10;
-                index[r + 17] = j + 8;
+                    index[r + 15] = j + 4;
+                    index[r + 16] = j + 10;
+                    index[r + 17] = j + 8;
+                }
 
-                index[r + 18] = j + 6;
-                index[r + 19] = j + 2;
-                index[r + 20] = offset + ((sizeX *4+3)*2)-3;
+                if(isNeightborsCull[i][0]){
+                    index[r + 18] = j + 6;
+                    index[r + 19] = j + 2;
+                    index[r + 20] = offset + ((sizeX *4+3)*2)-3;
 
-                index[r + 21] = j + 2;
-                index[r + 22] = offset + ((sizeX *4+3)*2)-5;
-                index[r + 23] = offset + ((sizeX *4+3)*2)-3;
+                    index[r + 21] = j + 2;
+                    index[r + 22] = offset + ((sizeX *4+3)*2)-5;
+                    index[r + 23] = offset + ((sizeX *4+3)*2)-3;
+                }
             }
             j += 8;
         }
 
-        index[index.length - 6] = offset + ((sizeX *4+3)*2)-6;
-        index[index.length - 5] = offset + ((sizeX *4+3)*2)-4;
-        index[index.length - 4] = offset + ((sizeX *4+3)*2)-2;
+        if(isNeightborsCull[sizeX-1][2]){
+            index[index.length - 6] = offset + ((sizeX *4+3)*2)-6;
+            index[index.length - 5] = offset + ((sizeX *4+3)*2)-4;
+            index[index.length - 4] = offset + ((sizeX *4+3)*2)-2;
 
-        index[index.length - 3] = offset + ((sizeX *4+3)*2)-4;
-        index[index.length - 2] = offset + ((sizeX *4+3)*2)-1;
-        index[index.length - 1] = offset + ((sizeX *4+3)*2)-2;
-
+            index[index.length - 3] = offset + ((sizeX *4+3)*2)-4;
+            index[index.length - 2] = offset + ((sizeX *4+3)*2)-1;
+            index[index.length - 1] = offset + ((sizeX *4+3)*2)-2;
+        }
         return index;
     }
 

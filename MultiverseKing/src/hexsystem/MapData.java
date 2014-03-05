@@ -87,7 +87,8 @@ public final class MapData {
      * @todo check if the chunk exist.
      */
     public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
-        return new Vector2Int(tilePos.q / hexSettings.getCHUNK_SIZE(), tilePos.r / hexSettings.getCHUNK_SIZE());
+        Vector2Int tileOffset = tilePos.getAsOffset();
+        return new Vector2Int(tileOffset.x / hexSettings.getCHUNK_SIZE(), tileOffset.y / hexSettings.getCHUNK_SIZE());
     }
 
     /**

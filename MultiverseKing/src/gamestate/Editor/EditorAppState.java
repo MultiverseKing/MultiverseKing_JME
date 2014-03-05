@@ -159,9 +159,10 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         camTarget.setLocalTranslation(position);
     }
 
-    private void moveCursor(HexCoordinate offsetPos) {
-        Vector3f pos = mapData.getTileWorldPosition(offsetPos);
-        cursor.setLocalTranslation(pos.x, mapData.getTile(offsetPos).getHeight()*mapData.getHexSettings().getFloorHeight()+((offsetPos.r&1) == 0 ? 0.001f : 0.002f), pos.z+cursorOffset);
+    private void moveCursor(HexCoordinate tilePos) {
+        Vector3f pos = mapData.getTileWorldPosition(tilePos);
+        Vector2Int offsetPos = tilePos.getAsOffset();
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight()*mapData.getHexSettings().getFloorHeight()+((offsetPos.y&1) == 0 ? 0.001f : 0.002f), pos.z+cursorOffset);
     }
 
     

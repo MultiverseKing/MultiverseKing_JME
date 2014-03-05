@@ -18,11 +18,11 @@ public final class HexCoordinate {
     /**
      * Axial position in Grid. q == x
      */
-    public int q;
+    private int q;
     /**
      * Axial position in Grid. r == z (or Y)
      */
-    public int r;
+    private int r;
 
     private static Vector2Int offsetToAxial(Vector2Int data) {
         return new Vector2Int(data.x - (data.y - (data.y & 1)) / 2, data.y);

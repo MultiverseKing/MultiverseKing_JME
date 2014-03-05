@@ -95,7 +95,7 @@ class EditorGUI extends AbstractAppState {
     }
     
     void openWin(HexCoordinate tile) {
-        currentTilePosition = new HexCoordinate(HexCoordinate.OFFSET, tile.q, tile.r);
+        currentTilePosition = tile;
         if(main.getScreen().getElementById("tileP") != null) {
             tilePButtonGroup.setSelected(mapData.getTile(tile).getHexElement().ordinal());
         } else {

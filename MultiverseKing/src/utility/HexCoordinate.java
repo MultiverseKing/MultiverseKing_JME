@@ -73,6 +73,10 @@ public final class HexCoordinate {
             this.r = r;
         }
 
+        public Offset(Vector2Int value) {
+            this(value.x, value.y);
+        }
+
         /**
          * Convert Odd-R Offset to Cube coordinate.
          * @return Cube coordinate.

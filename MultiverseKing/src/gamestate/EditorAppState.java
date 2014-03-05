@@ -21,14 +21,15 @@ import utility.attribut.ElementalAttribut;
  *
  * @author Eike Foede, Roah
  */
-public class EditorAppState extends AbstractHexMap implements TileChangeListener{
+public class EditorAppState extends HexMapAppState implements TileChangeListener{
     private Spatial hexCursor;                  //@todo see HexCursor script.
     private HashMap chunks = new HashMap<String, Node>();
+    private ElementalAttribut mapElement;
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
 
     public EditorAppState(MapData mapData, ElementalAttribut eAttribut, MultiverseMain main) {
         super(main, mapData);
-        mapData.setMapElement(eAttribut);
+        mapElement = eAttribut;
     }
 
     @Override
@@ -43,7 +44,6 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
     protected void mouseLeftActionResult() {
         Offset offsetPos = getLastLeftMouseCollisionGridPos();
         if(offsetPos != null){
-//            System.out.println(offsetPos.q + "|" +offsetPos.r);         //Debug to remove
             Vector3f tilePos = mapData.getTileWorldPosition(offsetPos);
             hexCursor.setLocalTranslation(new Vector3f(tilePos.x, tilePos.y, tilePos.z + cursorOffset));
             changeTileElement(offsetPos);
@@ -54,7 +54,6 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
         if (event.getNewTile().getHexElement() != event.getOldTile().getHexElement() || 
                 event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.tilePos());
-//            System.out.println(event.getChunkPos());
         }
     }
     
@@ -71,9 +70,9 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
     private void addEmptyChunk(Vector2Int position) {
         Node chunk = new Node(position.toString());
         chunk.setLocalTranslation(mapData.getChunkWorldPosition(position));
-        chunk.addControl(new ChunkControl(mapData, meshManager, hexMat));
+        chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapElement));
         chunks.put(position.toString(), chunk);
-        mapData.addEmptyChunk(position);
+        mapData.addEmptyChunk(position, mapElement);
         mapNode.attachChild(chunk);
     }
     
@@ -81,11 +80,11 @@ public class EditorAppState extends AbstractHexMap implements TileChangeListener
         HexTile tile = mapData.getTile(tilePos);
         if(tile != null){
             if (tile.getHexElement() == ElementalAttribut.NATURE) {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH));
+                mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH, (byte)-2));
             } else if (tile.getHexElement() == ElementalAttribut.EARTH) {
                 mapData.setTile(tilePos, new HexTile(ElementalAttribut.ICE));
             } else {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE));
+                mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE, (byte)3));
             }
         } else {
             System.out.println("No hex selected.");

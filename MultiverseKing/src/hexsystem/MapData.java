@@ -6,7 +6,9 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import java.util.ArrayList;
+import jme3tools.navigation.Coordinate;
 import utility.HexCoordinate;
+import utility.HexCoordinate.Axial;
 import utility.HexCoordinate.Offset;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -18,7 +20,6 @@ import utility.attribut.ElementalAttribut;
 public final class MapData extends AbstractAppState {
     private ChunkData chunkData = new ChunkData();
     private HexSettings hexSettings;
-    private ElementalAttribut mapElement;
     private ArrayList<TileChangeListener> listeners = new ArrayList<TileChangeListener>();
 
     /**
@@ -27,14 +28,6 @@ public final class MapData extends AbstractAppState {
      */
     public HexSettings getHexSettings() {
         return hexSettings;
-    }
-    
-    /**
-     * Current Map main element attribut.
-     * @return main element of the map.
-     */
-    public ElementalAttribut getMapElement() {
-        return mapElement;
     }
     
     /**
@@ -50,7 +43,7 @@ public final class MapData extends AbstractAppState {
      * @param chunkPos Where to put the chunk.
      * @todo Remove the chunkPos param ?
      */
-    public void addEmptyChunk(Vector2Int chunkPos){
+    public void addEmptyChunk(Vector2Int chunkPos, ElementalAttribut mapElement){
         HexTile[][] tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
         for(int x = 0; x < hexSettings.getCHUNK_SIZE(); x++){
             for(int y = 0; y < hexSettings.getCHUNK_SIZE(); y++){
@@ -89,7 +82,7 @@ public final class MapData extends AbstractAppState {
         Vector2Int chunkPos = getChunkGridPos(tilePos);
         TileChangeEvent tce = new TileChangeEvent(chunkPos, tilePos, chunkData.getTile(chunkPos, tilePos), tile);
         if(tce.getOldTile() != null){
-        chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
+            chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
             for (TileChangeListener l : listeners) {
                 l.tileChange(tce);
             }
@@ -100,7 +93,7 @@ public final class MapData extends AbstractAppState {
      * @todo
      */
     public void setTileHeight(Offset tilePos, byte height){
-        setTile(tilePos, hexTiles[x][y].cloneChangedHeight(height));
+        setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
     
     /**
@@ -108,15 +101,6 @@ public final class MapData extends AbstractAppState {
      */
     public void registerTileChangeListener(TileChangeListener listener) {
         listeners.add(listener);
-    }
-
-    /**
-     * Change the map main element attribut, "Should not" be used outside of Editor Mode. 
-     * @param eAttribut new Element.
-     * @todo enable this only in Editor Mode.
-     */
-    public void setMapElement(ElementalAttribut eAttribut) {
-        this.mapElement = eAttribut;
     }
 
     /**
@@ -152,5 +136,44 @@ public final class MapData extends AbstractAppState {
         float q = FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r;
 
         return new HexCoordinate().new Axial((int) q, (int) r).toOffset();
+    }
+    
+    /**
+     * Return null field for inexisting hex.
+     * @todo not fully functional.
+     * @param position
+     * @param range
+     * @return 
+     */
+    public HexTile[] getTileRange(Offset position, int range){
+        Axial axial = position.toAxial();
+        HexTile[] result = new HexTile[range*6];
+        int i = 0;
+        for(int x = -range; x <= range; x++) {
+            for(int y = Math.max(-range, -x-range); y <= Math.min(range, range-y); y++){
+                result[i] = getTile(new HexCoordinate().new Axial(x + axial.q, y+axial.r).toOffset());
+                i++;
+            }
+        }
+        return result;
+    }
+    
+    public HexTile[] getNeightbors(Offset position){
+       HexCoordinate coordinate = new HexCoordinate();
+        return ((position.r&1) == 0 ? 
+        new HexTile[] { 
+            getTile(coordinate.new Offset(position.q, position.r - 1)), 
+            getTile(coordinate.new Offset(position.q - 1, position.r - 1)),
+            getTile(coordinate.new Offset(position.q + 1, position.r)), 
+            getTile(coordinate.new Offset(position.q - 1, position.r)), 
+            getTile(coordinate.new Offset(position.q - 1, position.r + 1)), 
+            getTile(coordinate.new Offset(position.q, position.r + 1)) }
+        : new HexTile[]{ 
+            getTile(coordinate.new Offset(position.q + 1, position.r - 1)), 
+            getTile(coordinate.new Offset(position.q, position.r - 1)),
+            getTile(coordinate.new Offset(position.q + 1, position.r)), 
+            getTile(coordinate.new Offset(position.q - 1, position.r)), 
+            getTile(coordinate.new Offset(position.q, position.r + 1)), 
+            getTile(coordinate.new Offset(position.q + 1, position.r + 1))});
     }
 }

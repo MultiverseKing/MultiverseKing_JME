@@ -44,7 +44,7 @@ public class Dijkstra implements Pathfinder {
                                     way.add(0, point.thisPoint);
                                     point = point.lastPoint;
                                 }
-                                return null;
+                                return way;
                             }
                             WayPoint newPoint = new WayPoint(next, point);
                             nextPoints.add(newPoint);

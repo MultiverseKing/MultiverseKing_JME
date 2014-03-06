@@ -19,6 +19,14 @@ public class Dijkstra implements Pathfinder {
         this.mapData = mapData;
     }
 
+    /**
+     * Returns a shortest path between the two given HexCoordinates, if there is
+     * any. Else returns null
+     *
+     * @param from
+     * @param to
+     * @return shortest path or null, if no path found
+     */
     public List<HexCoordinate> getPath(HexCoordinate from, HexCoordinate to) {
 
         HashSet<HexCoordinate> visitedFields = new HashSet<HexCoordinate>();
@@ -55,7 +63,7 @@ public class Dijkstra implements Pathfinder {
             }
             actualPoints = nextPoints;
         }
-        return null;
+        return null;//If no way is found
     }
 
     private boolean isPassable(HexCoordinate from, HexCoordinate to) {
@@ -66,7 +74,7 @@ public class Dijkstra implements Pathfinder {
         HexTile a = mapData.getTile(from);
         HexTile b = mapData.getTile(to);
         if (a != null && b != null) {
-            if (Math.abs(a.getHeight() - b.getHeight()) > 2) {
+            if (Math.abs(a.getHeight() - b.getHeight()) > 1) {
                 passable = false;
             }
         } else {

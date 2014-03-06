@@ -18,7 +18,7 @@ public class HexTile {
     }
 
     public HexTile(ElementalAttribut hexElement, byte height) {
-        this.hexElement = (byte)hexElement.ordinal();
+        this.hexElement = (byte) hexElement.ordinal();
         this.height = height;
     }
 
@@ -38,5 +38,15 @@ public class HexTile {
      */
     public HexTile cloneChangedHeight(byte height) {
         return new HexTile(ElementalAttribut.convert(hexElement), (byte) (height));
+    }
+
+    /**
+     * Returns a clone of this tile with changed Element
+     *
+     * @param element
+     * @return
+     */
+    public HexTile cloneChangedElement(ElementalAttribut element) {
+        return new HexTile(element, (height));
     }
 }

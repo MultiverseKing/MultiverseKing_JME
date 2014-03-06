@@ -9,29 +9,19 @@ import utility.Vector2Int;
  */
 public class ChunkChangeEvent {
 
-    private Vector2Int chunkPos;
-    private final HexTile[][] oldTiles;
+    private final Vector2Int chunkPos;
     private final HexTile[][] newTiles;
 
-    public ChunkChangeEvent(Vector2Int chunkPos, HexTile[][] oldTiles, HexTile[][] newTiles) {
+    public ChunkChangeEvent(Vector2Int chunkPos, HexTile[][] hexTiles) {
         this.chunkPos = chunkPos;
-        this.oldTiles = oldTiles;
-        this.newTiles = newTiles;
+        this.newTiles = hexTiles;
     }
 
     public Vector2Int getChunkPos(){
         return chunkPos;
     }
 
-    public HexTile[][] getOldTiles() {
-        return oldTiles;
-    }
-
     public HexTile[][] getNewTiles() {
         return newTiles;
-    }
-
-    public ChunkChangeEvent setNewTile(HexTile[][] hexTile) {
-        return new ChunkChangeEvent(chunkPos, oldTiles, hexTile);
     }
 }

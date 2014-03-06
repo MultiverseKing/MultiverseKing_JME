@@ -64,6 +64,14 @@ public class ChunkControl extends AbstractControl {
         
     }
     
+    public void updateChunk(Vector2Int INFINITY) {
+        for(byte x = 0; x < mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize; x++){
+            for(byte y = 0; y < mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize; y++){
+                updateChunk(getSubChunkWorldGridPos(new Vector2Int(x, y)));
+            }
+        }
+    }
+    
     /**
      * @todo updata height
      * @todo wrapper for meshparameter
@@ -115,4 +123,6 @@ public class ChunkControl extends AbstractControl {
     HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
         return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
     }
+
+    
 }

@@ -28,6 +28,10 @@ public class MeshParameter {
         this.subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
     }
 
+    MeshParameter(MapData mapData) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public void add(Vector2Int position, Vector2Int size, byte elementType, byte height) {
         this.position.add(position);
         this.size.add(size);

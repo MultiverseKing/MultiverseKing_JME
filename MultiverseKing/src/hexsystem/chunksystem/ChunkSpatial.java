@@ -7,14 +7,12 @@ package hexsystem.chunksystem;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.Spatial.CullHint;
 import hexsystem.HexSettings;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -23,7 +21,6 @@ import utility.attribut.ElementalAttribut;
 class ChunkSpatial {
     private final MeshManager meshManager;
     private final Material hexMat;
-    private Node rootChunk;
     private Geometry[][] geo;
 
     

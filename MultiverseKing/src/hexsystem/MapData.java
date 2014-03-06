@@ -55,12 +55,15 @@ public final class MapData {
             }
         }
         chunkData.add(chunkPos, tiles);
-        chunkEvent(new ChunkChangeEvent(chunkPos, null, tiles));
+        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos, tiles);
+        chunkEvent(cce);
     }
 
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
     public void setMapElement(ElementalAttribut eAttribut) {
-        chunkData.setAllTile(eAttribut);
+        mapElement = eAttribut;
+        chunkData.setAllTile(mapElement);
+        chunkEvent(new ChunkChangeEvent(Vector2Int.INFINITY, null));
     }
 
     private void chunkEvent(ChunkChangeEvent cce) {

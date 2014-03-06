@@ -16,6 +16,7 @@ import com.jme3.math.Vector2f;
 public class Vector2Int {
 
     public static final Vector2Int ZERO = new Vector2Int(0, 0);
+    public static final Vector2Int INFINITY = new Vector2Int(0, 0);
     public int x;
     public int y;
 

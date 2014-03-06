@@ -19,6 +19,7 @@ import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
+import java.util.Iterator;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
@@ -47,7 +48,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         super.initialize(stateManager, app);
         main.getStateManager().attach(editorGUI);
         mapData.registerChunkChangeListener(this);
-        mapData.addEmptyChunk(Vector2Int.ZERO);
+        mapData.addEmptyChunk(new Vector2Int(0, 0));
         //addEmptyChunk(new Vector2Int(0,0));
         initCursor();
         initCamera();
@@ -98,12 +99,17 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
     }
 
     public void chunkChange(ChunkChangeEvent event) {
-        if(event.getOldTiles() == null){
+        if(!chunkNode.containsKey(event.getChunkPos().toString())){
             Node chunk = new Node(event.getChunkPos().toString());
             chunkNode.put(event.getChunkPos().toString(), chunk);
             chunk.setLocalTranslation(mapData.getChunkWorldPosition(event.getChunkPos()));
             chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
             mapNode.attachChild(chunk);
+        } else if (event.getChunkPos() == Vector2Int.INFINITY){
+            for (Iterator it = chunkNode.values().iterator(); it.hasNext();) {
+                Node value = (Node) it.next();
+                value.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
+            }
         }
     }
     

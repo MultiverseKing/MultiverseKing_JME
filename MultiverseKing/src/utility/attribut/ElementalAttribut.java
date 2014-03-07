@@ -9,15 +9,19 @@ package utility.attribut;
  * @author roah
  */
 public enum ElementalAttribut {
+
     EARTH,
     NATURE,
     ICE;
-    
     private static final byte SIZE = (byte) ElementalAttribut.values().length;
-    public static int getSize(){return SIZE;}
-    public static ElementalAttribut convert(byte x){
+
+    public static int getSize() {
+        return SIZE;
+    }
+
+    public static ElementalAttribut convert(int x) {
         ElementalAttribut result = null;
-        switch(x){
+        switch (x) {
             case 0:
                 result = ElementalAttribut.EARTH;
                 break;
@@ -30,7 +34,6 @@ public enum ElementalAttribut {
         }
         return result;
     }
-    
 //    @Override
 //    public String toString(){
 //        String result = null;

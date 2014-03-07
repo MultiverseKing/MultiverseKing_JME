@@ -13,6 +13,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import hexsystem.HexSettings;
+import hexsystem.MapDataLoader;
 import java.util.logging.Level;
 import utility.attribut.GameMode;
 import tonegod.gui.core.Screen;
@@ -31,26 +32,35 @@ public class MultiverseMain extends SimpleApplication {
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
         app.start();
     }
-    
     private Screen screen;
     private GameMode currentMode;
+
     public Screen getScreen() {
         return screen;
     }
+
     public GameMode getCurrentMode() {
         return currentMode;
     }
+
     public void setCurrentMode(GameMode newMode) {
         this.currentMode = newMode;
     }
 
     @Override
     public void simpleInitApp() {
-        if(!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)){
+        if (!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)) {
             throw new UnsupportedOperationException("Your hardware does not support TextureArray");
         }
+
+        String userHome = System.getProperty("user.dir") + "/assets/SavedZone/";
+//        System.out.println(userHome);
+        assetManager.registerLocator(userHome, MapDataLoader.class);
+        assetManager.registerLoader(MapDataLoader.class, "area");
+
         // Disable the default flyby cam
         flyCam.setEnabled(false);
+
         initGUI();
         lightSettup();
         generateHexMap();
@@ -89,11 +99,10 @@ public class MultiverseMain extends SimpleApplication {
         rootNode.addLight(ambient);
     }
 
-    
-
     /**
      * Use to generate a character who can move on the field, this will be used
      * for Exploration mode configuration, jme terrain is called with it.
+     *
      * @deprecated No need for the physic system.
      */
     private void initPlayer() {
@@ -109,7 +118,7 @@ public class MultiverseMain extends SimpleApplication {
 //        int x = FastMath.nextRandomInt(2,9);
 //        int y = FastMath.nextRandomInt(2, 9);
 
-        player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT()*hexSettings.getFloorHeight(), 0));
+        player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT() * hexSettings.getFloorHeight(), 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -130,7 +139,7 @@ public class MultiverseMain extends SimpleApplication {
         EditorAppState editorAppState = new EditorAppState(mapData, this);
         stateManager.attach(editorAppState);
         instanciatePlayer(mapData.getHexSettings());
-        
+
 //        chaseCameraSettup((Node) instanciatePlayer());
         stateManager.detach(stateManager.getState(MainGUI.class));
     }

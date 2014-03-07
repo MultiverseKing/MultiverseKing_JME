@@ -22,27 +22,27 @@ import utility.attribut.ElementalAttribut;
  * @author roah
  */
 public class ChunkControl extends AbstractControl {
+
+    private static final int subChunkSize = 16;    //how much tile in a subchunk, must be power of two, /!\ chunk contain 32 tiles /!\
     private final MapData mapData;
-    private ChunkSpatial chunkSpatial;      //Contain the spatial for the chunk to work with
-    private final int subChunkSize = 16;    //how much tile in a subchunk, must be power of two, /!\ chunk contain 32 tiles /!\
-    
+    private final ChunkSpatial chunkSpatial;      //Contain the spatial for the chunk to work with
+
+    public ChunkControl() {
+        mapData = null;
+        chunkSpatial = null;
+    }
+
     public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat, ElementalAttribut mapElement) {
         this.mapData = mapData;
         chunkSpatial = new ChunkSpatial(meshManager, hexMat);
     }
-    
+
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial); //To change body of generated methods, choose Tools | Templates.
-        if (spatial != null){
+        if (spatial != null) {
             // initialize
-            chunkSpatial.initialize((Node)spatial, mapData.getHexSettings(), subChunkSize, this);
-//            int i = mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize;
-//            for(int j = 0; j < i; j++){
-//                for(int k = 0; k < i; k++){
-//                    updateChunk(new HexCoordinate().new Offset(j,k));
-//                }
-//            }
+            chunkSpatial.initialize((Node) spatial, mapData.getHexSettings(), subChunkSize, this);
         } else {
             // cleanup
         }
@@ -53,76 +53,72 @@ public class ChunkControl extends AbstractControl {
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates..
         chunkSpatial.setEnabled(enabled);
     }
-    
+
     @Override
     protected void controlUpdate(float tpf) {
-        
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        
     }
-    
+
     public void updateChunk(Vector2Int INFINITY) {
-        for(byte x = 0; x < mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize; x++){
-            for(byte y = 0; y < mapData.getHexSettings().getCHUNK_SIZE()/subChunkSize; y++){
-                updateChunk(getSubChunkWorldGridPos(new Vector2Int(x, y)));
+        for (byte x = 0; x < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; x++) {
+            for (byte y = 0; y < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; y++) {
+                updateTile(getSubChunkWorldGridPos(new Vector2Int(x, y)));
             }
         }
     }
-    
+
     /**
      * @todo updata height
      * @todo wrapper for meshparameter
-     * @param tilePos 
+     * @param tilePos
      */
-    public void updateChunk(HexCoordinate tilePos){
+    public void updateTile(HexCoordinate tilePos) {
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         HexCoordinate subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
         Vector2Int subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
 //        ArrayList<MeshParameter> meshParam = new ArrayList<MeshParameter>();
         MeshParameter meshParam = new MeshParameter(mapData, subChunkWorldGridPos);
-        
+
         int i = 0;
         boolean initParam = false;
-        for(int y = 0; y < subChunkSize; y++){
-            if(initParam){
+        for (int y = 0; y < subChunkSize; y++) {
+            if (initParam) {
                 initParam = false;
                 i++;
             }
-            for(int x = 0; x < subChunkSize-1; x++){
-                HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET,subChunkWorldGridPosOffset.x+x, subChunkWorldGridPosOffset.y+y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x+x+1, subChunkWorldGridPosOffset.y+y));
-                if(!initParam) {
-                    meshParam.add(new Vector2Int(x, y), new Vector2Int(1,1), (byte)tile.getHexElement().ordinal(), (byte)tile.getHeight());
+            for (int x = 0; x < subChunkSize - 1; x++) {
+                HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x, subChunkWorldGridPosOffset.y + y));
+                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x + 1, subChunkWorldGridPosOffset.y + y));
+                if (!initParam) {
+                    meshParam.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) tile.getElement().ordinal(), (byte) tile.getHeight());
                     initParam = true;
-                } 
-                if (nearTile.getHexElement() == tile.getHexElement() && 
-                           nearTile.getHeight() == tile.getHeight() ) {
+                }
+                if (nearTile.getElement() == tile.getElement()
+                        && nearTile.getHeight() == tile.getHeight()) {
                     meshParam.extendsSizeX(i);
                 } else {
                     i++;
-                    meshParam.add(new Vector2Int(x+1, y), new Vector2Int(1,1), (byte)nearTile.getHexElement().ordinal(), (byte)nearTile.getHeight());
+                    meshParam.add(new Vector2Int(x + 1, y), new Vector2Int(1, 1), (byte) nearTile.getElement().ordinal(), (byte) nearTile.getHeight());
                 }
             }
         }
         chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam);
     }
-    
+
     /**
      * @return SubChunk local grid position, relative to Chunk grid position.
      */
-    Vector2Int getSubChunkLocalGridPos(HexCoordinate tile){
+    Vector2Int getSubChunkLocalGridPos(HexCoordinate tile) {
         Vector2Int tilePos = tile.getAsOffset();
-        Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.x)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize), 
-                              (int) ((FastMath.abs(tilePos.y)%mapData.getHexSettings().getCHUNK_SIZE())/subChunkSize));
+        Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.x) % mapData.getHexSettings().getCHUNK_SIZE()) / subChunkSize),
+                (int) ((FastMath.abs(tilePos.y) % mapData.getHexSettings().getCHUNK_SIZE()) / subChunkSize));
         return result;
     }
-    
-    HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
-        return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x*subChunkSize, subChunkLocalGridPos.y*subChunkSize);
-    }
 
-    
+    HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
+        return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x * subChunkSize, subChunkLocalGridPos.y * subChunkSize);
+    }
 }

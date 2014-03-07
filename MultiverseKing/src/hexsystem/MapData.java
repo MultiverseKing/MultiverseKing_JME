@@ -1,12 +1,20 @@
 package hexsystem;
 
+import com.jme3.asset.AssetKey;
+import com.jme3.asset.AssetManager;
+import com.jme3.export.binary.BinaryExporter;
 import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.ChunkChangeListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -21,17 +29,10 @@ public final class MapData {
     private ChunkData chunkData;
     private HexSettings hexSettings;
     private ElementalAttribut mapElement;
+    private ArrayList<Vector2Int> addedChunkPos = new ArrayList<Vector2Int>();
     private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
-
-    /**
-     * Global Settings for hex.
-     *
-     * @return parameters.
-     */
-    public HexSettings getHexSettings() {
-        return hexSettings;
-    }
+    private String mapName = "IceLand";
 
     /**
      * Base constructor.
@@ -43,20 +44,20 @@ public final class MapData {
     }
 
     /**
-     * Add a specifiate chunk in mapData at choosen position.
+     * Global Settings for hex.
      *
-     * @param chunkPos Where to put the chunk.
+     * @return parameters.
      */
-    public void addEmptyChunk(Vector2Int chunkPos) {
-        HexTile[][] tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
-        for (int x = 0; x < hexSettings.getCHUNK_SIZE(); x++) {
-            for (int y = 0; y < hexSettings.getCHUNK_SIZE(); y++) {
-                tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT());
-            }
-        }
-        chunkData.add(chunkPos, tiles);
-        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos, tiles);
-        chunkEvent(cce);
+    public HexSettings getHexSettings() {
+        return hexSettings;
+    }
+
+    public ElementalAttribut getMapElement() {
+        return mapElement;
+    }
+
+    public String getMapName() {
+        return this.mapName;
     }
 
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
@@ -66,10 +67,29 @@ public final class MapData {
         chunkEvent(new ChunkChangeEvent(Vector2Int.INFINITY, null));
     }
 
-    private void chunkEvent(ChunkChangeEvent cce) {
-        for (ChunkChangeListener l : chunkListeners) {
-            l.chunkChange(cce);
+    /**
+     * Add a specifiate chunk in mapData at choosen position.
+     *
+     * @param chunkPos Where to put the chunk.
+     */
+    public void addChunk(Vector2Int chunkPos, HexTile[][] tiles) {
+        if (tiles == null) {
+            tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
+            for (int x = 0; x < hexSettings.getCHUNK_SIZE(); x++) {
+                for (int y = 0; y < hexSettings.getCHUNK_SIZE(); y++) {
+                    tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT());
+                }
+            }
         }
+
+        chunkData.add(chunkPos, tiles);
+        addedChunkPos.add(chunkPos);
+        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos, tiles);
+        chunkEvent(cce);
+    }
+
+    public HexTile[][] getChunkTiles(Vector2Int chunkPos) {
+        return chunkData.getChunkTiles(chunkPos);
     }
 
     /**
@@ -80,18 +100,6 @@ public final class MapData {
      */
     public HexTile getTile(HexCoordinate tilePos) {
         return chunkData.getTile(getChunkGridPos(tilePos), tilePos);
-    }
-
-    /**
-     * Get chunk grid position of a tile.
-     *
-     * @param tilePos Offset coordinate of the tile.
-     * @return Position of the chunk in mapData.
-     * @todo check if the chunk exist.
-     */
-    public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
-        Vector2Int tileOffset = tilePos.getAsOffset();
-        return new Vector2Int(tileOffset.x / hexSettings.getCHUNK_SIZE(), tileOffset.y / hexSettings.getCHUNK_SIZE());
     }
 
     /**
@@ -118,6 +126,37 @@ public final class MapData {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
 
+    /**
+     * Return null field for inexisting hex.
+     *
+     * @todo not fully functional.
+     * @param position
+     * @param range
+     * @return
+     */
+    public HexTile[] getTileRange(HexCoordinate position, int range) {
+        Vector2Int axial = position.getAsAxial();
+        HexTile[] result = new HexTile[range * 6];
+        int i = 0;
+        for (int x = -range; x <= range; x++) {
+            for (int y = Math.max(-range, -x - range); y <= Math.min(range, range - y); y++) {
+                result[i] = getTile(new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int(x + axial.x, y + axial.y)));
+                i++;
+            }
+        }
+        return result;
+    }
+
+    public HexTile[] getNeightbors(HexCoordinate position) {
+        HexCoordinate[] coords = position.getNeighbours();
+        HexTile[] neighbours = new HexTile[coords.length];
+        for (int i = 0; i < neighbours.length; i++) {
+            neighbours[i] = getTile(coords[i]);
+
+        }
+        return neighbours;
+    }
+
     public void registerChunkChangeListener(ChunkChangeListener listener) {
         chunkListeners.add(listener);
         if (listener instanceof TileChangeListener) {
@@ -130,6 +169,24 @@ public final class MapData {
      */
     public void registerTileChangeListener(TileChangeListener listener) {
         tileListeners.add(listener);
+    }
+
+    private void chunkEvent(ChunkChangeEvent cce) {
+        for (ChunkChangeListener l : chunkListeners) {
+            l.chunkUpdate(cce);
+        }
+    }
+
+    /**
+     * Get chunk grid position of a tile.
+     *
+     * @param tilePos Offset coordinate of the tile.
+     * @return Position of the chunk in mapData.
+     * @todo check if the chunk exist.
+     */
+    public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
+        Vector2Int tileOffset = tilePos.getAsOffset();
+        return new Vector2Int(tileOffset.x / hexSettings.getCHUNK_SIZE(), tileOffset.y / hexSettings.getCHUNK_SIZE());
     }
 
     /**
@@ -172,38 +229,26 @@ public final class MapData {
         return new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int((int) q, (int) r));
     }
 
-    /**
-     * Return null field for inexisting hex.
-     *
-     * @todo not fully functional.
-     * @param position
-     * @param range
-     * @return
-     */
-    public HexTile[] getTileRange(HexCoordinate position, int range) {
-        Vector2Int axial = position.getAsAxial();
-        HexTile[] result = new HexTile[range * 6];
-        int i = 0;
-        for (int x = -range; x <= range; x++) {
-            for (int y = Math.max(-range, -x - range); y <= Math.min(range, range - y); y++) {
-                result[i] = getTile(new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int(x + axial.x, y + axial.y)));
-                i++;
-            }
+    public void saveMap() {
+        String userHome = System.getProperty("user.dir") + "/assets";
+        BinaryExporter exporter = BinaryExporter.getInstance();
+        MapDataLoader mdex = new MapDataLoader();
+
+        mdex.setMapName("adadasdasa");
+        for (Vector2Int pos : addedChunkPos) {
+            mdex.addChunk(getChunkTiles(pos), pos);
         }
-        return result;
+
+        try {
+            File file = new File(userHome + "/SavedZone/" + "IceLand" + ".area"); //to change by value.getMapName
+            exporter.save(mdex, file);
+        } catch (IOException ex) {
+            Logger.getLogger(MultiverseMain.class.getName()).log(Level.SEVERE, "Error: Failed to save game!", ex);
+        }
     }
 
-    public HexTile[] getNeightbors(HexCoordinate position) {
-        HexCoordinate[] coords = position.getNeighbours();
-        HexTile[] neighbours = new HexTile[coords.length];
-        for (int i = 0; i < neighbours.length; i++) {
-            neighbours[i] = getTile(coords[i]);
-
-        }
-        return neighbours;
-    }
-
-    public ElementalAttribut getMapElement() {
-        return mapElement;
+    public void loadMap(AssetManager assetManager) {
+        
+        MapDataLoader mdLoader = assetManager.loadAsset(new AssetKey<MapDataLoader>("SavedZone/IceLand.area"));
     }
 }

@@ -9,5 +9,5 @@ package hexsystem.events;
  * @author roah
  */
 public interface ChunkChangeListener {
-    public void chunkChange(ChunkChangeEvent event);
+    public void chunkUpdate(ChunkChangeEvent event);
 }

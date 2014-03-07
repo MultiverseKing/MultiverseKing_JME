@@ -66,7 +66,7 @@ public final class HexCoordinate {
     public HexCoordinate(int type, int x, int y) {
         this(type, new Vector2Int(x, y));
     }
-
+    
     public HexCoordinate(int type, Vector3Int pos) {
         if (type != CUBIC) {
             throw new UnsupportedOperationException("Only TYPE_CUBIC expects a Vector3Int!");

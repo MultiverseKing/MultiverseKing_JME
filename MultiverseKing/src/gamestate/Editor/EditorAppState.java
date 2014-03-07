@@ -3,6 +3,8 @@ package gamestate.Editor;
 import hexsystem.events.ChunkChangeListener;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.plugins.FileLocator;
+import com.jme3.export.binary.BinaryExporter;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
@@ -18,8 +20,13 @@ import hexsystem.chunksystem.ChunkControl;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
@@ -30,7 +37,6 @@ import utility.attribut.ElementalAttribut;
  * @author Eike Foede, Roah
  */
 public class EditorAppState extends HexMapAppState implements TileChangeListener, ChunkChangeListener {
-//    private EditorCursor cursor;                  //@todo see HexCursor script.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private final EditorGUI editorGUI;
     private HashMap chunkNode = new HashMap<String, Node>();
@@ -48,8 +54,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         super.initialize(stateManager, app);
         main.getStateManager().attach(editorGUI);
         mapData.registerChunkChangeListener(this);
-        mapData.addEmptyChunk(new Vector2Int(0, 0));
-        //addEmptyChunk(new Vector2Int(0,0));
+        mapData.addChunk(new Vector2Int(0, 0), null);
         initCursor();
         initCamera();
         initInput();
@@ -98,7 +103,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         }
     }
 
-    public void chunkChange(ChunkChangeEvent event) {
+    public void chunkUpdate(ChunkChangeEvent event) {
         if(!chunkNode.containsKey(event.getChunkPos().toString())){
             Node chunk = new Node(event.getChunkPos().toString());
             chunkNode.put(event.getChunkPos().toString(), chunk);
@@ -114,9 +119,9 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
     }
     
     public void tileChange(TileChangeEvent event) {
-        if (event.getNewTile().getHexElement() != event.getOldTile().getHexElement() || 
+        if (event.getNewTile().getElement() != event.getOldTile().getElement() || 
                 event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
-            mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateChunk(event.getTilePos());
+            mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateTile(event.getTilePos());
         }
         if(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())){
             cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight()*mapData.getHexSettings().getFloorHeight(), cursor.getLocalTranslation().z);
@@ -130,9 +135,9 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
     private void changeTile(HexCoordinate tilePos) {
         HexTile tile = mapData.getTile(tilePos);
         if(tile != null){
-            if (tile.getHexElement() == ElementalAttribut.NATURE) {
+            if (tile.getElement() == ElementalAttribut.NATURE) {
                 mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH, (byte)-2));
-            } else if (tile.getHexElement() == ElementalAttribut.EARTH) {
+            } else if (tile.getElement() == ElementalAttribut.EARTH) {
                 mapData.setTile(tilePos, new HexTile(ElementalAttribut.ICE));
             } else {
                 mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE, (byte)5));
@@ -151,7 +156,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         chunk.setLocalTranslation(mapData.getChunkWorldPosition(position));
         chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
         chunkNode.put(position.toString(), chunk);
-        mapData.addEmptyChunk(position);
+        mapData.addChunk(position, null);
         mapNode.attachChild(chunk);
     }
     
@@ -171,5 +176,19 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight()*mapData.getHexSettings().getFloorHeight()+((offsetPos.y&1) == 0 ? 0.001f : 0.002f), pos.z+cursorOffset);
     }
 
+    public void saveArea() {
+        ArrayList<String> chunkNames = new ArrayList<String>();
+        for (Iterator it = chunkNode.values().iterator(); it.hasNext();) {
+            Node value = (Node) it.next();
+            chunkNames.add(value.getName());
+        }
+        mapData.save(chunkNames);
+        
+    }
     
+    public void loadArea(String name){
+        String userHome = System.getProperty("user.dir")+"/assets";
+         main.getAssetManager().registerLocator(userHome, FileLocator.class);
+         Node loadedNode = (Node)main.getAssetManager().loadModel("/SavedZone/"+name+".j3o");
+    }
 }

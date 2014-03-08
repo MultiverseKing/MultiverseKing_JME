@@ -237,8 +237,8 @@ public final class MapData {
         BinaryExporter exporter = BinaryExporter.getInstance();
         ChunkDataLoader mdex = new ChunkDataLoader();
 
-        mdex.setMapName(mapName);
-        mdex.setMapElement(mapElement);
+//        mdex.setMapName(mapName);
+//        mdex.setMapElement(mapElement);
         for (Vector2Int pos : chunkPos) {
             mdex.setChunk(getChunkTiles(pos), pos);
         }
@@ -257,9 +257,9 @@ public final class MapData {
     }
 
     private void overrideMap(ChunkDataLoader data) {
-        this.mapName = data.getMapName();
-        this.mapElement = data.getMapElement();
-        this.chunkPos = data.getChunkPos();
-        ChunkChangeEvent cce = new ChunkChangeEvent(Vector2Int.NEG_INFINITY);
+//        this.mapName = data.getMapName();
+//        this.mapElement = data.getMapElement();
+//        this.chunkPos = data.getChunkPos();
+//        ChunkChangeEvent cce = new ChunkChangeEvent(Vector2Int.NEG_INFINITY);
     }
 }

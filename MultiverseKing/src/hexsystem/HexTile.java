@@ -25,7 +25,7 @@ public class HexTile implements Savable {
     }
 
     public HexTile(ElementalAttribut hexElement, byte height) {
-        this.hexElement = (byte) hexElement.ordinal();
+        this.element = (byte) hexElement.ordinal();
         this.height = height;
     }
 

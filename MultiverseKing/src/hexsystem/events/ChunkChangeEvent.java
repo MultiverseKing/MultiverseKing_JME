@@ -1,6 +1,7 @@
 package hexsystem.events;
 
 import hexsystem.HexTile;
+import java.util.ArrayList;
 import utility.Vector2Int;
 
 /**
@@ -9,19 +10,13 @@ import utility.Vector2Int;
  */
 public class ChunkChangeEvent {
 
-    private final Vector2Int chunkPos;
-    private final HexTile[][] newTiles;
+    private Vector2Int chunkPos;
 
-    public ChunkChangeEvent(Vector2Int chunkPos, HexTile[][] hexTiles) {
+    public ChunkChangeEvent(Vector2Int chunkPos) {
         this.chunkPos = chunkPos;
-        this.newTiles = hexTiles;
     }
-
+    
     public Vector2Int getChunkPos(){
         return chunkPos;
-    }
-
-    public HexTile[][] getNewTiles() {
-        return newTiles;
     }
 }

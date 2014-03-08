@@ -22,7 +22,8 @@ import java.io.IOException;
 public class Vector2Int implements Savable {
 
     public static final Vector2Int ZERO = new Vector2Int(0, 0);
-    public static final Vector2Int INFINITY = new Vector2Int(0, 0);
+    public static final Vector2Int INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public static final Vector2Int NEG_INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
     public int x;
     public int y;
 
@@ -50,6 +51,11 @@ public class Vector2Int implements Savable {
         this.x = x;
         this.y = y;
     }
+    
+    public Vector2Int(Vector2Int value){
+        this.x = value.x;
+        this.y = value.y;
+    }
 
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
@@ -61,5 +67,9 @@ public class Vector2Int implements Savable {
         InputCapsule capsule = im.getCapsule(this);
         capsule.readInt("x", this.x);
         capsule.readInt("y", this.y);
+    }
+
+    public Vector2Int multiply(int i) {
+        return new Vector2Int(x*i, y*i);
     }
 }

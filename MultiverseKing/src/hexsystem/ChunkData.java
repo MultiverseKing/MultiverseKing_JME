@@ -5,6 +5,7 @@
 package hexsystem;
 
 import com.jme3.math.FastMath;
+import hexsystem.events.ChunkChangeEvent;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;

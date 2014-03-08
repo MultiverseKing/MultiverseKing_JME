@@ -60,7 +60,7 @@ class EditorGUI extends AbstractAppState {
                     mapData.saveMap();
                     setSelected(0);
                 } else if (index == 3) {
-                    mapData.loadMap(main.getAssetManager());
+                    mapData.loadMap("IceLand");
                     setSelected(0);
                 }
             }

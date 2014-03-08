@@ -13,7 +13,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import hexsystem.HexSettings;
-import hexsystem.MapDataLoader;
+import hexsystem.loader.ChunkDataLoader;
+import hexsystem.loader.MapDataLoader;
 import java.util.logging.Level;
 import utility.attribut.GameMode;
 import tonegod.gui.core.Screen;
@@ -55,8 +56,10 @@ public class MultiverseMain extends SimpleApplication {
 
         String userHome = System.getProperty("user.dir") + "/assets/SavedZone/";
 //        System.out.println(userHome);
+        assetManager.registerLocator(userHome, ChunkDataLoader.class);
+        assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
-        assetManager.registerLoader(MapDataLoader.class, "area");
+        assetManager.registerLoader(MapDataLoader.class, "map");
 
         // Disable the default flyby cam
         flyCam.setEnabled(false);
@@ -135,7 +138,7 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     public void generateHexMap() {
-        MapData mapData = new MapData(ElementalAttribut.ICE);
+        MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
         EditorAppState editorAppState = new EditorAppState(mapData, this);
         stateManager.attach(editorAppState);
         instanciatePlayer(mapData.getHexSettings());

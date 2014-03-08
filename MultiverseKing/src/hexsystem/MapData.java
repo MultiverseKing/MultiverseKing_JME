@@ -1,5 +1,6 @@
 package hexsystem;
 
+import hexsystem.loader.ChunkDataLoader;
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
 import com.jme3.export.binary.BinaryExporter;
@@ -26,10 +27,11 @@ import utility.attribut.ElementalAttribut;
  */
 public final class MapData {
 
+    private final AssetManager assetManager;
     private ChunkData chunkData;
     private HexSettings hexSettings;
     private ElementalAttribut mapElement;
-    private ArrayList<Vector2Int> addedChunkPos = new ArrayList<Vector2Int>();
+    private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
     private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
     private String mapName = "IceLand";
@@ -37,8 +39,9 @@ public final class MapData {
     /**
      * Base constructor.
      */
-    public MapData(ElementalAttribut eAttribut) {
+    public MapData(ElementalAttribut eAttribut, AssetManager assetManager) {
         this.hexSettings = new HexSettings();
+        this.assetManager = assetManager;
         mapElement = eAttribut;
         chunkData = new ChunkData(hexSettings.getCHUNK_DATA_LIMIT());
     }
@@ -64,7 +67,7 @@ public final class MapData {
     public void setMapElement(ElementalAttribut eAttribut) {
         mapElement = eAttribut;
         chunkData.setAllTile(mapElement);
-        chunkEvent(new ChunkChangeEvent(Vector2Int.INFINITY, null));
+        chunkEvent(new ChunkChangeEvent(Vector2Int.INFINITY));
     }
 
     /**
@@ -83,8 +86,8 @@ public final class MapData {
         }
 
         chunkData.add(chunkPos, tiles);
-        addedChunkPos.add(chunkPos);
-        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos, tiles);
+        this.chunkPos.add(chunkPos);
+        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos);
         chunkEvent(cce);
     }
 
@@ -232,23 +235,31 @@ public final class MapData {
     public void saveMap() {
         String userHome = System.getProperty("user.dir") + "/assets";
         BinaryExporter exporter = BinaryExporter.getInstance();
-        MapDataLoader mdex = new MapDataLoader();
+        ChunkDataLoader mdex = new ChunkDataLoader();
 
-        mdex.setMapName("adadasdasa");
-        for (Vector2Int pos : addedChunkPos) {
-            mdex.addChunk(getChunkTiles(pos), pos);
+        mdex.setMapName(mapName);
+        mdex.setMapElement(mapElement);
+        for (Vector2Int pos : chunkPos) {
+            mdex.setChunk(getChunkTiles(pos), pos);
         }
 
         try {
-            File file = new File(userHome + "/SavedZone/" + "IceLand" + ".area"); //to change by value.getMapName
+            File file = new File(userHome + "/SavedZone/" + mapName + ".area"); //to change by value.getMapName
             exporter.save(mdex, file);
         } catch (IOException ex) {
             Logger.getLogger(MultiverseMain.class.getName()).log(Level.SEVERE, "Error: Failed to save game!", ex);
         }
     }
 
-    public void loadMap(AssetManager assetManager) {
-        
-        MapDataLoader mdLoader = assetManager.loadAsset(new AssetKey<MapDataLoader>("SavedZone/IceLand.area"));
+    public void loadMap(String name) {
+        ChunkDataLoader dataLoaded = (ChunkDataLoader) assetManager.loadAsset(new AssetKey("SavedZone/"+name+".root"));
+        overrideMap(dataLoaded);
+    }
+
+    private void overrideMap(ChunkDataLoader data) {
+        this.mapName = data.getMapName();
+        this.mapElement = data.getMapElement();
+        this.chunkPos = data.getChunkPos();
+        ChunkChangeEvent cce = new ChunkChangeEvent(Vector2Int.NEG_INFINITY);
     }
 }

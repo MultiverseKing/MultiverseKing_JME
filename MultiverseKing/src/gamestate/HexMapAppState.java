@@ -38,6 +38,7 @@ import utility.attribut.ElementalAttribut;
  * @author roah
  */
 public abstract class HexMapAppState extends AbstractAppState {
+
     private final MouseRay mouseRay;    //@see utility/MouseRay.
     protected final MeshManager meshManager;
     protected final MultiverseMain main;
@@ -46,7 +47,7 @@ public abstract class HexMapAppState extends AbstractAppState {
     protected Material hexMat;
     protected CollisionResults lastRayResults;
     private Spatial mark;
-    
+
     public HexMapAppState(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
@@ -64,10 +65,10 @@ public abstract class HexMapAppState extends AbstractAppState {
         initMarkDebug();
         initInput();
     }
-    
+
     /**
-     * Base input, it not depend on the gameMode or other thing if hexMap
-     * is instanced that mean Tiles is or will be instanced so this input too.
+     * Base input, it not depend on the gameMode or other thing if hexMap is
+     * instanced that mean Tiles is or will be instanced so this input too.
      */
     private void initInput() {
         main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
@@ -82,10 +83,10 @@ public abstract class HexMapAppState extends AbstractAppState {
                 if (results.size() != 0) {
                     if (results.size() > 0) {
                         CollisionResult closest = results.getClosestCollision();
-                        
+
                         mark.setLocalTranslation(closest.getContactPoint());
                         main.getRootNode().attachChild(mark);    //TODO Debug to remove.
-                            
+
                         main.getStateManager().getState(HexMapAppState.class).setleftMouseActionResult(results);
                         main.getStateManager().getState(HexMapAppState.class).mouseLeftActionResult();
                     } else if (main.getRootNode().hasChild(mark)) {
@@ -101,7 +102,7 @@ public abstract class HexMapAppState extends AbstractAppState {
             }
         }
     };
-    
+
     private void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
         mark = new Geometry("BOOM!", sphere);
@@ -109,35 +110,35 @@ public abstract class HexMapAppState extends AbstractAppState {
         mark_mat.setColor("Color", ColorRGBA.Red);
         mark.setMaterial(mark_mat);
     }
-    
+
     private void setleftMouseActionResult(CollisionResults results) {
         this.lastRayResults = results;
     }
-    
-    protected final HexCoordinate getLastLeftMouseCollisionGridPos(){
+
+    protected final HexCoordinate getLastLeftMouseCollisionGridPos() {
         HexCoordinate tilePos;
         Vector3f pos;
         Iterator<CollisionResult> i = lastRayResults.iterator();
-        
-        do{
+
+        do {
             pos = i.next().getContactPoint();
             tilePos = mapData.convertWorldToGridPosition(pos);
-            if(mapData.getTile(tilePos) == null){
+            if (mapData.getTile(tilePos) == null) {
                 break;
             } else {
-              return tilePos;  
+                return tilePos;
             }/*else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
-              return tilePos;
-            }*/
-        }while(i.hasNext());
-        
+             return tilePos;
+             }*/
+        } while (i.hasNext());
+
         return null;
     }
-    
+
     protected void addAllElement() {
         List<Image> hexImages = new ArrayList<Image>();
-        for(ElementalAttribut e : ElementalAttribut.values()){
-            Texture text = (Texture) main.getAssetManager().loadTexture("Textures/Test/"+ e.name() +"Center.png");
+        for (ElementalAttribut e : ElementalAttribut.values()) {
+            Texture text = (Texture) main.getAssetManager().loadTexture("Textures/Test/" + e.name() + "Center.png");
             hexImages.add(text.getImage());
         }
         TextureArray hexText = new TextureArray(hexImages);
@@ -147,6 +148,6 @@ public abstract class HexMapAppState extends AbstractAppState {
         hexMat.getAdditionalRenderState().setAlphaTest(true);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
-    
+
     abstract protected void mouseLeftActionResult();
 }

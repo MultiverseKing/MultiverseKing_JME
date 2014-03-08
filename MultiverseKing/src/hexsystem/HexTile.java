@@ -25,7 +25,7 @@ public class HexTile implements Savable {
     }
 
     public HexTile(ElementalAttribut hexElement, byte height) {
-        this.element = (byte)hexElement.ordinal();
+        this.hexElement = (byte) hexElement.ordinal();
         this.height = height;
     }
 
@@ -59,5 +59,15 @@ public class HexTile implements Savable {
 //        capsule.readByte("element", element);
         capsule.readInt("height", height);
         capsule.readInt("element", element);
+    }
+
+    /**
+     * Returns a clone of this tile with changed Element
+     *
+     * @param element
+     * @return
+     */
+    public HexTile cloneChangedElement(ElementalAttribut element) {
+        return new HexTile(element, (height));
     }
 }

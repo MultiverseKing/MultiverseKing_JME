@@ -18,8 +18,10 @@ import hexsystem.chunksystem.ChunkControl;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
+import hexsystem.pathfinding.Dijkstra;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
@@ -86,6 +88,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
         chaseCam.setSmoothMotion(true);
     }
+//    HexCoordinate last = new HexCoordinate(HexCoordinate.AXIAL, 0, 0);
 
     @Override
     protected void mouseLeftActionResult() {
@@ -94,6 +97,18 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
 //            changeTile(offsetPos);
             moveCursor(offsetPos);
             editorGUI.openWin(offsetPos);
+//            Dijkstra da = new Dijkstra();
+//            da.setMapData(mapData);
+//            List<HexCoordinate> way = da.getPath(last, offsetPos);
+//            if (way != null) {
+//                for (int i = 0; i < way.size(); i++) {
+//                    HexTile hf = mapData.getTile(way.get(i));
+//                    HexTile newTile = hf.cloneChangedElement(ElementalAttribut.EARTH);
+//                    mapData.setTile(way.get(i), newTile);
+//                }
+//            }
+//            last = offsetPos;
+
         }
     }
 

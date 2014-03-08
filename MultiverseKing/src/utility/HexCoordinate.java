@@ -98,16 +98,31 @@ public final class HexCoordinate {
         return neighbours;
     }
 
+    public int distanceTo(HexCoordinate other) {
+        return (Math.abs(q - other.q) + Math.abs(r - other.r)
+                + Math.abs(q + r - other.q - other.r)) / 2;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof HexCoordinate){
+        if (obj instanceof HexCoordinate) {
             HexCoordinate coord = (HexCoordinate) obj;
             Vector2Int axial = coord.getAsAxial();
-            if(axial.x == q && axial.y == r){
+            if (axial.x == q && axial.y == r) {
                 return true;
             }
         }
         return false;
     }
-    
+
+    /**
+     * It's important for use in HashMaps etc that equal HexCoordinates have the
+     * same hash value.
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        return q * 2 ^ 16 + r;
+    }
 }

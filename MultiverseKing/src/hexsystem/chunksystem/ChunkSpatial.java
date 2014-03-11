@@ -33,14 +33,13 @@ class ChunkSpatial {
         int subChunkCount = hexSettings.getCHUNK_SIZE() / subChunkSize;
         geo = new Geometry[subChunkCount][subChunkCount];
 
-        for (int x = 0; x < subChunkCount; x++) {
-            for (int y = 0; y < subChunkCount; y++) {
+        for (int y = 0; y < subChunkCount; y++) {
+            for (int x = 0; x < subChunkCount; x++) {
                 geo[x][y] = new Geometry(Integer.toString(x) + "|" + Integer.toString(y), meshManager.getMesh(Vector2Int.ZERO, new Vector2Int(subChunkSize, subChunkSize), 0));
                 geo[x][y].setLocalTranslation(getSubChunkLocalWorldPosition(x, y, hexSettings, subChunkSize));
                 geo[x][y].setMaterial(hexMat);
                 rootChunk.attachChild(geo[x][y]);
                 chunkControl.updateTile(new HexCoordinate(HexCoordinate.OFFSET, x * subChunkSize, y * subChunkSize));
-
             }
         }
     }

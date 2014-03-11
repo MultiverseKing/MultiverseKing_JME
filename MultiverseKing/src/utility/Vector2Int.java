@@ -21,11 +21,39 @@ import java.io.IOException;
  */
 public class Vector2Int implements Savable {
 
+    public static final int X = 0;
+    public static final int Y = 1;
     public static final Vector2Int ZERO = new Vector2Int(0, 0);
     public static final Vector2Int INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    public static final Vector2Int NEG_INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public static final Vector2Int NEG_INFINITY = new Vector2Int(Integer.MIN_VALUE, Integer.MIN_VALUE);
     public int x;
     public int y;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + this.x;
+        hash = 31 * hash + this.y;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Vector2Int other = (Vector2Int) obj;
+        if (this.x != other.x) {
+            return false;
+        }
+        if (this.y != other.y) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Convert the vector2Int to string, formated as : x|y.
@@ -35,6 +63,11 @@ public class Vector2Int implements Savable {
     @Override
     public String toString() {
         return Integer.toString(this.x) + "|" + Integer.toString(this.y);
+    }
+    
+    public Vector2Int(){
+        this.x = 0;
+        this.y = 0;
     }
 
     public Vector2Int(String input) {
@@ -72,4 +105,8 @@ public class Vector2Int implements Savable {
     public Vector2Int multiply(int i) {
         return new Vector2Int(x*i, y*i);
     }
-}
+    
+    public Vector2Int add(Vector2Int value) {
+        return new Vector2Int(x+value.x, y+value.y);
+    }
+}   

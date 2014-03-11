@@ -49,16 +49,18 @@ public class HexTile implements Savable {
 
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
-        capsule.write(height, "height", height);
-        capsule.write(element, "element", element);
+        capsule.write(height, "height", 0);
+        capsule.write(element, "element", 0);
+//        System.out.println(height + " "+element);
     }
 
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
 //        capsule.readByte("height", height);
 //        capsule.readByte("element", element);
-        capsule.readInt("height", height);
-        capsule.readInt("element", element);
+        height = (byte) capsule.readInt("height", height);
+        element = (byte) capsule.readInt("element", element);
+//        System.out.println(height + " "+element);
     }
 
     /**

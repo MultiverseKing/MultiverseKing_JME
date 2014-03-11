@@ -15,6 +15,7 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
 import com.jme3.export.binary.BinaryImporter;
+import hexsystem.MapData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -66,14 +67,14 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(mapName, "mapName", "null");
         capsule.write(mapElement, "mapElement", ElementalAttribut.ICE);
-        capsule.writeSavableArrayList(chunkPos, "chunkPos", chunkPos);
+        capsule.writeSavableArrayList(chunkPos, "chunkPos", new ArrayList<Vector2Int>());
     }
 
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
         mapName = capsule.readString("mapName", "null");
         mapElement = capsule.readEnum("mapElement", ElementalAttribut.class, ElementalAttribut.ICE);
-        chunkPos = capsule.readSavableArrayList("chunkPos", chunkPos);
+        chunkPos = capsule.readSavableArrayList("chunkPos", new ArrayList<Vector2Int>());
     }
 
     public Object load(AssetInfo assetInfo) throws IOException {

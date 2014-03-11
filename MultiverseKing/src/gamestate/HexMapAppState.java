@@ -16,10 +16,12 @@ import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.shader.VarType;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.TextureArray;
@@ -39,15 +41,41 @@ import utility.attribut.ElementalAttribut;
  */
 public abstract class HexMapAppState extends AbstractAppState {
 
+    /**
+     * Mouse raycast.
+     */
     private final MouseRay mouseRay;    //@see utility/MouseRay.
+    /**
+     * Mesh generator.
+     */
     protected final MeshManager meshManager;
+    /**
+     * Main application.
+     */
     protected final MultiverseMain main;
+    /**
+     * Tiles data manager.
+     */
     protected final MapData mapData;
+    /**
+     * Node containing all Tile related geometry.
+     */
     protected final Node mapNode;
+    /**
+     *
+     */
     protected Material hexMat;
+    /**
+     *
+     */
     protected CollisionResults lastRayResults;
     private Spatial mark;
 
+    /**
+     *
+     * @param main
+     * @param mapData
+     */
     public HexMapAppState(MultiverseMain main, MapData mapData) {
         this.main = main;
         this.mouseRay = new MouseRay();
@@ -56,11 +84,17 @@ public abstract class HexMapAppState extends AbstractAppState {
         mapNode = new Node("mapNode");
     }
 
+    /**
+     *
+     * @param stateManager
+     * @param app
+     */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
         main.getRootNode().attachChild(mapNode);
+        mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         addAllElement();
         initMarkDebug();
         initInput();
@@ -115,6 +149,10 @@ public abstract class HexMapAppState extends AbstractAppState {
         this.lastRayResults = results;
     }
 
+    /**
+     *
+     * @return
+     */
     protected final HexCoordinate getLastLeftMouseCollisionGridPos() {
         HexCoordinate tilePos;
         Vector3f pos;
@@ -135,6 +173,9 @@ public abstract class HexMapAppState extends AbstractAppState {
         return null;
     }
 
+    /**
+     *
+     */
     protected void addAllElement() {
         List<Image> hexImages = new ArrayList<Image>();
         for (ElementalAttribut e : ElementalAttribut.values()) {
@@ -146,8 +187,12 @@ public abstract class HexMapAppState extends AbstractAppState {
         hexMat.setTexture("ColorMap", hexText);
         hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         hexMat.getAdditionalRenderState().setAlphaTest(true);
+        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
 
+    /**
+     *
+     */
     abstract protected void mouseLeftActionResult();
 }

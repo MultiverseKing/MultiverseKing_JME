@@ -5,7 +5,6 @@
 package hexsystem;
 
 import com.jme3.math.FastMath;
-import hexsystem.events.ChunkChangeEvent;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -23,6 +22,7 @@ class ChunkData {
 
     ChunkData(byte limit) {
         this.limit = limit;
+        this.lastAddedID = limit;
         chunkKey = new Vector2Int[limit];
         chunkValue = new HexTile[limit][][];
     }
@@ -58,7 +58,7 @@ class ChunkData {
                 System.err.println("Hex index out of bounds");
             }
         } else {
-            System.err.println("Chunk doesn't Exist");
+            System.err.println("Chunk doesn't Exist in memory");
         }
         return null;
     }
@@ -82,7 +82,7 @@ class ChunkData {
                 System.err.println("Hex index out of bounds");
             }
         } else {
-            System.err.println("Chunk Doesn't Exist");
+            System.err.println("Chunk Doesn't Exist in memory");
         }
         return false;
     }
@@ -94,17 +94,17 @@ class ChunkData {
                 return result;
             }
         }
-        return result = limit;
+        return limit;
     }
 
     private byte removeChunk(Vector2Int chunkPos) {
         byte resultID;
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (chunkKey[resultID] != new Vector2Int(chunkPos.x + 1, chunkPos.y + 1) && chunkKey[resultID] != new Vector2Int(chunkPos.x - 1, chunkPos.y - 1)
-                        && chunkKey[resultID] != new Vector2Int(chunkPos.x + 1, chunkPos.y - 1) && chunkKey[resultID] != new Vector2Int(chunkPos.x - 1, chunkPos.y + 1)
-                        && chunkKey[resultID] != new Vector2Int(chunkPos.x + 1, chunkPos.y) && chunkKey[resultID] != new Vector2Int(chunkPos.x - 1, chunkPos.y)
-                        && chunkKey[resultID] != new Vector2Int(chunkPos.x, chunkPos.y + 1) && chunkKey[resultID] != new Vector2Int(chunkPos.x, chunkPos.y - 1)) {
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;
                     return resultID;
@@ -114,8 +114,8 @@ class ChunkData {
 
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (chunkKey[resultID] != new Vector2Int(chunkPos.x + 1, chunkPos.y) && chunkKey[resultID] != new Vector2Int(chunkPos.x - 1, chunkPos.y)
-                        && chunkKey[resultID] != new Vector2Int(chunkPos.x, chunkPos.y + 1) && chunkKey[resultID] != new Vector2Int(chunkPos.x, chunkPos.y - 1)) {
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;
                     return resultID;
@@ -133,7 +133,7 @@ class ChunkData {
     private byte getChunkID(Vector2Int chunk) {
         byte result;
         for (result = 0; result < limit; result++) {
-            if (chunkKey[result] != null && chunkKey[result].x == chunk.x && chunkKey[result].y == chunk.y) {
+            if (chunkKey[result] != null && chunkKey[result].equals(chunk)) {
                 return result;
             }
         }
@@ -158,5 +158,11 @@ class ChunkData {
             return this.chunkValue[chunkID];
         }
         return null;
+    }
+
+    void purge() {
+        chunkKey = new Vector2Int[limit];
+        chunkValue = new HexTile[limit][][];
+        lastAddedID = limit;
     }
 }

@@ -12,20 +12,16 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import gamestate.HexMapAppState;
-import hexsystem.HexTile;
 import hexsystem.MapData;
 import hexsystem.chunksystem.ChunkControl;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
-import hexsystem.pathfinding.Dijkstra;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -43,7 +39,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         super(main, mapData);
         this.editorGUI = new EditorGUI(mapData);
     }
-
+    
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -59,6 +55,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         main.getInputManager().addMapping("ChangeCamFocus", new KeyTrigger(KeyInput.KEY_F));
         main.getInputManager().addListener(editorActionListener, new String[]{"ChangeCamFocus"});
     }
+    
     private final ActionListener editorActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("ChangeCamFocus") && isPressed) {
@@ -90,6 +87,9 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
     }
 //    HexCoordinate last = new HexCoordinate(HexCoordinate.AXIAL, 0, 0);
 
+    /**
+     * Method called each time a left mouse action is done.
+     */
     @Override
     protected void mouseLeftActionResult() {
         HexCoordinate offsetPos = super.getLastLeftMouseCollisionGridPos();
@@ -112,12 +112,19 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         }
     }
 
+    /**
+     * Make change to chunk according to the event.
+     * @param event contain information of the last chunk event.
+     */
     public void chunkUpdate(ChunkChangeEvent event) {
-        if (event.getChunkPos() == Vector2Int.INFINITY) {
+        if (!event.purge() && event.getChunkPos() == Vector2Int.INFINITY) {
             for (Iterator it = chunkNode.values().iterator(); it.hasNext();) {
-                Node value = (Node) it.next();
-                value.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
+                Node chunk = (Node) it.next();
+                chunk.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
             }
+        } else if(event.purge() && event.getChunkPos() == null){
+            mapNode.detachAllChildren();
+            chunkNode.clear();
         } else {
             Node chunk = new Node(event.getChunkPos().toString());
             chunkNode.put(event.getChunkPos().toString(), chunk);
@@ -127,6 +134,10 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         }
     }
 
+    /**
+     * Make change to tile according to the event.
+     * @param event contain information on the last tile event.
+     */
     public void tileChange(TileChangeEvent event) {
         if (event.getNewTile().getElement() != event.getOldTile().getElement()
                 || event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
@@ -137,44 +148,16 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         }
     }
 
-    /**
-     * @param tilePos
-     * @deprecated
-     */
-    private void changeTile(HexCoordinate tilePos) {
-        HexTile tile = mapData.getTile(tilePos);
-        if (tile != null) {
-            if (tile.getElement() == ElementalAttribut.NATURE) {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.EARTH, (byte) -2));
-            } else if (tile.getElement() == ElementalAttribut.EARTH) {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.ICE));
-            } else {
-                mapData.setTile(tilePos, new HexTile(ElementalAttribut.NATURE, (byte) 5));
-            }
-        } else {
-            System.out.println("No hex selected.");
-        }
-    }
-
-    /**
-     * @param position
-     * @deprecated
-     */
-    private void addEmptyChunk(Vector2Int position) {
-        Node chunk = new Node(position.toString());
-        chunk.setLocalTranslation(mapData.getChunkWorldPosition(position));
-        chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
-        chunkNode.put(position.toString(), chunk);
-        mapData.addChunk(position, null);
-        mapNode.attachChild(chunk);
-    }
-
     @Override
     public void update(float tpf) {
         super.update(tpf); //To change body of generated methods, choose Tools | Templates.
 
     }
 
+    /**
+     * Change the camera focus to the selected position.
+     * @param position where the focus should be.
+     */
     public void moveCameraFocus(Vector3f position) {
         camTarget.setLocalTranslation(position);
     }

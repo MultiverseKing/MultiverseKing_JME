@@ -11,6 +11,9 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import hexsystem.HexTile;
 import hexsystem.MapData;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kingofmultiverse.MultiverseMain;
 import utility.attribut.ElementalAttribut;
 import tonegod.gui.controls.buttons.Button;
@@ -29,6 +32,7 @@ class EditorGUI extends AbstractAppState {
     private MultiverseMain main;
     private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
+    private Window eWin;
 
     EditorGUI(MapData mapData) {
         this.mapData = mapData;
@@ -39,56 +43,71 @@ class EditorGUI extends AbstractAppState {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         main = (MultiverseMain) app;
 
-        Window win = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(150, 20 + 40 * 4));
+        Window win = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
         win.setWindowTitle("Main Windows");
 //        win.setMinDimensions(new Vector2f(130, 130));
-        win.setResizeS(true);
+        win.setResizeS(false);
         win.setResizeN(false);
         win.setResizeW(false);
         win.setResizeE(false);
+        win.getDragBar().setIsMovable(false);
 //        win.setWidth(new Float(50));
         main.getScreen().addElement(win);
 
-        RadioButtonGroup mainButton = new RadioButtonGroup(main.getScreen(), "mainButton") {
+        Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)){
             @Override
-            public void onSelect(int index, Button value) {
-//                System.out.println(index);
-                if (index == 1) {
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                if(eWin == null){
                     elementalWindow();
-                    setSelected(0);
-                } else if (index == 2) {
-                    mapData.saveMap();
-                    setSelected(0);
-                } else if (index == 3) {
-                    mapData.loadMap("IceLand");
-                    setSelected(0);
                 }
             }
         };
-
-        ButtonAdapter reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(120, 40), new Vector2f(15, 40 * 2 - 10));
-        mainButton.addButton(reset);
-
-        ButtonAdapter mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40));
         mapElement.setText("Change Map Elements");
-        mainButton.addButton(mapElement);
+        win.addChild(mapElement);
 
-        ButtonAdapter save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2));
+        Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                try {
+                    mapData.saveMap();
+                } catch (IOException ex) {
+                    Logger.getLogger(EditorGUI.class.getName()).log(Level.SEVERE, "Couldn't save the map.", ex);
+                }
+            }
+        };
         save.setText("Save");
-        mainButton.addButton(save);
+        win.addChild(save);
 
-        ButtonAdapter load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3));
+        Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                mapData.loadMap("IceLand");
+            }
+        };
         load.setText("Load");
-        mainButton.addButton(load);
+        win.addChild(load);
+        
+        Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                mapData.loadMap("Reset");
+            }
+        };
+        reset.setText("Reset");
+        win.addChild(reset);
 
-        mainButton.setDisplayElement(win);
+//        mainButton.setDisplayElement(win);
 
         // Add it to out initial window
 //        win.addChild(makeWindow);
     }
 
     public final void elementalWindow() {
-        Window eWin =
+        eWin =
                 new Window(main.getScreen(), "EWindows",
                 new Vector2f((main.getScreen().getWidth() / 2) - 175, (main.getScreen().getHeight() / 2) - 100));
         eWin.setWindowTitle("Elemental Windows");
@@ -99,6 +118,7 @@ class EditorGUI extends AbstractAppState {
                     changeMapElement(ElementalAttribut.convert((byte) index));
                 } else {
                     main.getScreen().removeElement(main.getScreen().getElementById("EWindows"));
+                    eWin = null;
                 }
             }
 
@@ -130,7 +150,7 @@ class EditorGUI extends AbstractAppState {
     }
 
     private void tilePropertiesWin() {
-        Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 200, 20), new Vector2f(185f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
+        Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 170, 20), new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
         tileWin.setWindowTitle("Tile Properties");
         tilePButtonGroup = new RadioButtonGroup(main.getScreen(), "tilePButtonGroup") {
             @Override
@@ -151,7 +171,7 @@ class EditorGUI extends AbstractAppState {
         closeButton.setText("CLOSE");
         tilePButtonGroup.addButton(closeButton);
 
-        Button upButton = new ButtonAdapter(main.getScreen(), "UP", new Vector2f(120, 40), new Vector2f(50, 50)) {
+        Button upButton = new ButtonAdapter(main.getScreen(), "UP", new Vector2f(120, 40), new Vector2f(25, 50)) {
             @Override
             public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftDown(evt, toggled); //To change body of generated methods, choose Tools | Templates.
@@ -161,19 +181,22 @@ class EditorGUI extends AbstractAppState {
         closeButton.setText("UP");
         tileWin.addChild(upButton);
 
-        Button downButton = new ButtonAdapter(main.getScreen(), "Down", new Vector2f(120, (20 + (40 * ElementalAttribut.getSize()))), new Vector2f(50, 50)) {
+        Button downButton = new ButtonAdapter(main.getScreen(), "Down", new Vector2f(120, (20 + (40 * ElementalAttribut.getSize()))), new Vector2f(25, 50)) {
             @Override
             public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftDown(evt, toggled); //To change body of generated methods, choose Tools | Templates.
                 mapData.setTileHeight(currentTilePosition, (byte) (mapData.getTile(currentTilePosition).getHeight() - 1));
             }
         };
-        closeButton.setText("DOWN");
+        closeButton.setText("CLOSE");
         tileWin.addChild(downButton);
 
         tilePButtonGroup.setDisplayElement(tileWin); // null adds the button list to the screen layer
         tilePButtonGroup.setSelected(mapData.getTile(currentTilePosition).getElement().ordinal());
 
+        tileWin.setIsResizable(false);
+        tileWin.getDragBar().setIsMovable(false);
+        
         main.getScreen().addElement(tileWin);
     }
 }

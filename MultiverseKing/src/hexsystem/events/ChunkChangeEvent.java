@@ -1,22 +1,29 @@
 package hexsystem.events;
 
-import hexsystem.HexTile;
-import java.util.ArrayList;
 import utility.Vector2Int;
 
 /**
  *
- * @author Eike Foede
+ * @author roah
  */
 public class ChunkChangeEvent {
 
-    private Vector2Int chunkPos;
+    private boolean purge = false;
+    private Vector2Int chunkPos = null;
 
     public ChunkChangeEvent(Vector2Int chunkPos) {
         this.chunkPos = chunkPos;
     }
+
+    public ChunkChangeEvent(boolean b) {
+        this.purge = true;
+    }
     
     public Vector2Int getChunkPos(){
         return chunkPos;
+    }
+
+    public boolean purge() {
+        return purge;
     }
 }

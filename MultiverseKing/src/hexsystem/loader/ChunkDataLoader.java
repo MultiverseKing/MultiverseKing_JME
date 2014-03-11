@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -32,16 +31,11 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     private String rootPath;
     private HexTile[][] tiles;
-    private Vector2Int chunkPos;
 
     public ChunkDataLoader() {
     }
-
-    public Vector2Int getChunkPos() {
-        return chunkPos;
-    }
     
-    public HexTile[][] getTile(){
+    public HexTile[][] getTiles(){
         return tiles;
     }
     
@@ -49,21 +43,25 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
         return rootPath;
     }
 
-    public void setChunk(HexTile[][] tiles, Vector2Int chunkPos) {
+    public void setChunk(HexTile[][] tiles) {
         this.tiles = tiles;
-        this.chunkPos = chunkPos;
     }
 
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(tiles, "tiles", null);
-        capsule.write(chunkPos, "chunkPos", null);
     }
 
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
-        tiles = (HexTile[][]) capsule.readSavableArray2D("tiles", null);
-        chunkPos = (Vector2Int) capsule.readSavable("chunkPos", null);
+        Savable[][] t = capsule.readSavableArray2D("tiles", null);
+        tiles = new HexTile[t.length][t.length];
+        for(int y = 0; y < t.length; y++){
+            for(int x = 0; x < t[y].length; x++){
+                HexTile tile = (HexTile) t[x][y];
+                tiles[x][y] = new HexTile(tile.getElement(), tile.getHeight());
+            }
+        }
     }
 
     public Object load(AssetInfo assetInfo) throws IOException {

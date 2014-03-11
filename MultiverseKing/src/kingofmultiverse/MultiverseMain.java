@@ -7,16 +7,17 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
 import java.util.logging.Level;
-import utility.attribut.GameMode;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.attribut.ElementalAttribut;
@@ -34,18 +35,9 @@ public class MultiverseMain extends SimpleApplication {
         app.start();
     }
     private Screen screen;
-    private GameMode currentMode;
 
     public Screen getScreen() {
         return screen;
-    }
-
-    public GameMode getCurrentMode() {
-        return currentMode;
-    }
-
-    public void setCurrentMode(GameMode newMode) {
-        this.currentMode = newMode;
     }
 
     @Override
@@ -54,7 +46,7 @@ public class MultiverseMain extends SimpleApplication {
             throw new UnsupportedOperationException("Your hardware does not support TextureArray");
         }
 
-        String userHome = System.getProperty("user.dir") + "/assets/SavedZone/";
+        String userHome = System.getProperty("user.dir") + "/assets/MapData/";
 //        System.out.println(userHome);
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
@@ -87,12 +79,19 @@ public class MultiverseMain extends SimpleApplication {
         sun.setDirection((new Vector3f(-0.5f, -0.5f, 0.5f)).normalizeLocal());
         sun.setColor(ColorRGBA.White);
         rootNode.addLight(sun);
+        
+        /* this shadow needs a directional light */
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 1024, 2);
+        dlsf.setLight(sun);
+        fpp.addFilter(dlsf);
+        viewPort.addProcessor(fpp); 
 
         /* Drop shadows */
-        final int SHADOWMAP_SIZE = 1024;
-        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
-        dlsr.setLight(sun);
-        viewPort.addProcessor(dlsr);
+//        final int SHADOWMAP_SIZE = 1024;
+//        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
+//        dlsr.setLight(sun);
+//        viewPort.addProcessor(dlsr);
 
         /**
          * A white ambient light source.

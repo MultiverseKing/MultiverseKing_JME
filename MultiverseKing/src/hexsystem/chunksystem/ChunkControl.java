@@ -71,15 +71,12 @@ public class ChunkControl extends AbstractControl {
     }
 
     /**
-     * @todo updata height
-     * @todo wrapper for meshparameter
      * @param tilePos
      */
     public void updateTile(HexCoordinate tilePos) {
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
         HexCoordinate subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
         Vector2Int subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
-//        ArrayList<MeshParameter> meshParam = new ArrayList<MeshParameter>();
         MeshParameter meshParam = new MeshParameter(mapData, subChunkWorldGridPos);
 
         int i = 0;
@@ -89,9 +86,9 @@ public class ChunkControl extends AbstractControl {
                 initParam = false;
                 i++;
             }
-            for (int x = 0; x < subChunkSize - 1; x++) {
+            for (int x = 0; x < subChunkSize - 1 ; x++) {
                 HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x, subChunkWorldGridPosOffset.y + y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x + 1, subChunkWorldGridPosOffset.y + y));
+                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x +1, subChunkWorldGridPosOffset.y + y));
                 if (!initParam) {
                     meshParam.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) tile.getElement().ordinal(), (byte) tile.getHeight());
                     initParam = true;

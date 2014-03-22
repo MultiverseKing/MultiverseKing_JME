@@ -37,7 +37,7 @@ public class ExampleStartup extends SimpleApplication {
         //GaugeSystem
         //MovementSystem
         //AnimationSystem (maybe rather handled by RenderSystem)
-        //
+        
 
         //Example: Initialise new character entity.
         EntityId characterId = entityData.createEntity();

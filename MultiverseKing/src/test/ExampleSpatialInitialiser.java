@@ -1,4 +1,4 @@
-package entitysystem.example;
+package test;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;
@@ -12,11 +12,12 @@ public class ExampleSpatialInitialiser implements SpatialInitializer {
 
     AssetManager assetManager;
 
-    public ExampleSpatialInitialiser(AssetManager assetManager) {
-        this.assetManager = assetManager;
-    }
-
     public Spatial initialize(String spatial) {
         return assetManager.loadModel(spatial);
+    }
+
+    public void setAssetManager(AssetManager assetManager) {
+
+        this.assetManager = assetManager;
     }
 }

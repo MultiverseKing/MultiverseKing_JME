@@ -5,46 +5,36 @@
 package gamestate;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.collision.CollisionResult;
-import com.jme3.collision.CollisionResults;
-import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Sphere;
-import com.jme3.shader.VarType;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.TextureArray;
 import hexsystem.MapData;
+import hexsystem.chunksystem.ChunkControl;
 import hexsystem.chunksystem.MeshManager;
+import hexsystem.events.ChunkChangeEvent;
+import hexsystem.events.ChunkChangeListener;
+import hexsystem.events.TileChangeEvent;
+import hexsystem.events.TileChangeListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import kingofmultiverse.MultiverseMain;
-import utility.HexCoordinate;
-import utility.MouseRay;
+import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
  *
  * @author roah
  */
-public abstract class HexMapAppState extends AbstractAppState {
+public class HexMapAppState extends AbstractAppState implements ChunkChangeListener, TileChangeListener {
 
-    /**
-     * Mouse raycast.
-     */
-    private final MouseRay mouseRay;    //@see utility/MouseRay.
+    private HashMap chunkNode = new HashMap<String, Node>();
     /**
      * Mesh generator.
      */
@@ -52,7 +42,7 @@ public abstract class HexMapAppState extends AbstractAppState {
     /**
      * Main application.
      */
-    protected final MultiverseMain main;
+    protected final SimpleApplication main;
     /**
      * Tiles data manager.
      */
@@ -65,20 +55,14 @@ public abstract class HexMapAppState extends AbstractAppState {
      *
      */
     protected Material hexMat;
-    /**
-     *
-     */
-    protected CollisionResults lastRayResults;
-    private Spatial mark;
 
     /**
      *
      * @param main
      * @param mapData
      */
-    public HexMapAppState(MultiverseMain main, MapData mapData) {
+    public HexMapAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
-        this.mouseRay = new MouseRay();
         this.mapData = mapData;
         this.meshManager = new MeshManager(mapData.getHexSettings());
         mapNode = new Node("mapNode");
@@ -93,86 +77,14 @@ public abstract class HexMapAppState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+        mapData.registerChunkChangeListener(this);
 //        this.hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
         main.getRootNode().attachChild(mapNode);
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         addAllElement();
-        initMarkDebug();
-        initInput();
     }
 
-    /**
-     * Base input, it not depend on the gameMode or other thing if hexMap is
-     * instanced that mean Tiles is or will be instanced so this input too.
-     */
-    private void initInput() {
-        main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        main.getInputManager().addListener(tileActionListener, new String[]{"LeftMouse"});
-    }
-    
-    private final ActionListener tileActionListener = new ActionListener() {
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("LeftMouse") && isPressed) {
-                CollisionResults results = new CollisionResults();
-                main.getRootNode().getChild("mapNode").collideWith(mouseRay.get3DRay(main), results);
-                if (results.size() != 0) {
-                    if (results.size() > 0) {
-                        CollisionResult closest = results.getClosestCollision();
 
-                        mark.setLocalTranslation(closest.getContactPoint());
-                        main.getRootNode().attachChild(mark);    //TODO Debug to remove.
-
-                        main.getStateManager().getState(HexMapAppState.class).setleftMouseActionResult(results);
-                        main.getStateManager().getState(HexMapAppState.class).mouseLeftActionResult();
-                    } else if (main.getRootNode().hasChild(mark)) {
-                        // No hits? Then remove the red mark.
-                        main.getRootNode().detachChild(mark);    //TODO Debug to remove.
-                    } else {
-                        System.out.println("no  mark");
-                    }
-                } else {
-                    //Error catching.
-                    System.out.println("null raycast");
-                }
-            }
-        }
-    };
-
-    private void initMarkDebug() {
-        Sphere sphere = new Sphere(30, 30, 0.2f);
-        mark = new Geometry("BOOM!", sphere);
-        Material mark_mat = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        mark_mat.setColor("Color", ColorRGBA.Red);
-        mark.setMaterial(mark_mat);
-    }
-
-    private void setleftMouseActionResult(CollisionResults results) {
-        this.lastRayResults = results;
-    }
-
-    /**
-     *
-     * @return
-     */
-    protected final HexCoordinate getLastLeftMouseCollisionGridPos() {
-        HexCoordinate tilePos;
-        Vector3f pos;
-        Iterator<CollisionResult> i = lastRayResults.iterator();
-
-        do {
-            pos = i.next().getContactPoint();
-            tilePos = mapData.convertWorldToGridPosition(pos);
-            if (mapData.getTile(tilePos) == null) {
-                break;
-            } else {
-                return tilePos;
-            }/*else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
-             return tilePos;
-             }*/
-        } while (i.hasNext());
-
-        return null;
-    }
 
     /**
      *
@@ -191,9 +103,40 @@ public abstract class HexMapAppState extends AbstractAppState {
 //        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
+   /**
+     * Make change to chunk according to the event.
+     * @param event contain information of the last chunk event.
+     */
+    public void chunkUpdate(ChunkChangeEvent event) {
+        if (!event.purge() && event.getChunkPos() == Vector2Int.INFINITY) {
+            for (Iterator it = chunkNode.values().iterator(); it.hasNext();) {
+                Node chunk = (Node) it.next();
+                chunk.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
+            }
+        } else if(event.purge() && event.getChunkPos() == null){
+            mapNode.detachAllChildren();
+            chunkNode.clear();
+        } else {
+            Node chunk = new Node(event.getChunkPos().toString());
+            chunkNode.put(event.getChunkPos().toString(), chunk);
+            chunk.setLocalTranslation(mapData.getChunkWorldPosition(event.getChunkPos()));
+            chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
+            mapNode.attachChild(chunk);
+        }
+    }
+    
+    /**
+     * Make change to tile according to the event.
+     * @param event contain information on the last tile event.
+     */
+    public void tileChange(TileChangeEvent event) {
+        if (event.getNewTile().getElement() != event.getOldTile().getElement()
+                || event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
+            mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateTile(event.getTilePos());
+        }
 
+    }
     /**
      *
      */
-    abstract protected void mouseLeftActionResult();
 }

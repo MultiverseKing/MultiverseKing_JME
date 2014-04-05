@@ -5,16 +5,14 @@ import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.shadow.DirectionalLightShadowFilter;
-import com.jme3.shadow.DirectionalLightShadowRenderer;
+import gamestate.HexMapAppState;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -65,6 +63,8 @@ public class MultiverseMain extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
+        System.out.println(this.getCamera().getLocation()
+                );
     }
 
     @Override
@@ -142,6 +142,7 @@ public class MultiverseMain extends SimpleApplication {
     public void generateHexMap() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
         EditorAppState editorAppState = new EditorAppState(mapData, this);
+        stateManager.attach(new HexMapAppState(this,mapData));
         stateManager.attach(editorAppState);
         instanciatePlayer(mapData.getHexSettings());
 

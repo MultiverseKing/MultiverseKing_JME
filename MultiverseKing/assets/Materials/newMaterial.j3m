@@ -1,9 +1,14 @@
 Material My Material : MatDefs/UnshadedArray.j3md {
      MaterialParameters {
+        SeparateTexCoord : false
      }
     AdditionalRenderState {
       Blend Alpha
       FaceCull Back
       ColorWrite On
+      AlphaTestFalloff 0.0
+      PolyOffset 0
+      Wireframe Off
+      DepthTest Off
     }
 }

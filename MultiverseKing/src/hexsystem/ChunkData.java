@@ -160,7 +160,7 @@ class ChunkData {
         return null;
     }
 
-    void purge() {
+    void clear() {
         chunkKey = new Vector2Int[limit];
         chunkValue = new HexTile[limit][][];
         lastAddedID = limit;

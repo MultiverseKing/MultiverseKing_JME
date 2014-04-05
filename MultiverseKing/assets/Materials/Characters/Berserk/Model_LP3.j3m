@@ -1,0 +1,14 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        UseAlpha : false
+        Diffuse : 1.0 1.0 1.0 1.0
+        NormalMap : Textures/Characters/Berserk/bakenormal.png
+        SpecularMap : Textures/Characters/Berserk/spec.png
+     }
+    AdditionalRenderState {
+      ColorWrite On
+      PointSprite Off
+      Wireframe Off
+      DepthWrite Off
+    }
+}

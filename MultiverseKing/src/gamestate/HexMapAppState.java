@@ -93,6 +93,7 @@ public abstract class HexMapAppState extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+//        this.hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
         main.getRootNode().attachChild(mapNode);
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         addAllElement();
@@ -185,9 +186,9 @@ public abstract class HexMapAppState extends AbstractAppState {
         TextureArray hexText = new TextureArray(hexImages);
         hexText.setWrap(Texture.WrapMode.Repeat);
         hexMat.setTexture("ColorMap", hexText);
-        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+//        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         hexMat.getAdditionalRenderState().setAlphaTest(true);
-        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
+//        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
 

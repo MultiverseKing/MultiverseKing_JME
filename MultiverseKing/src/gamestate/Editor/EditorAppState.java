@@ -81,7 +81,7 @@ public class EditorAppState extends HexMapAppState implements TileChangeListener
         main.getRootNode().attachChild(camTarget);
         ChaseCamera chaseCam = new ChaseCamera(main.getCamera(), camTarget, main.getInputManager());
         chaseCam.setMaxDistance(30);
-        chaseCam.setMinDistance(5);
+        chaseCam.setMinDistance(2);
         chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
         chaseCam.setSmoothMotion(true);
     }

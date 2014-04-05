@@ -5,6 +5,7 @@ import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -76,7 +77,7 @@ public class MultiverseMain extends SimpleApplication {
          * A white, directional light source
          */
         DirectionalLight sun = new DirectionalLight();
-        sun.setDirection((new Vector3f(-0.5f, -0.5f, 0.5f)).normalizeLocal());
+        sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
         sun.setColor(ColorRGBA.White);
         rootNode.addLight(sun);
         
@@ -97,7 +98,7 @@ public class MultiverseMain extends SimpleApplication {
          * A white ambient light source.
          */
         AmbientLight ambient = new AmbientLight();
-        ambient.setColor(ColorRGBA.Yellow);
+        ambient.setColor(ColorRGBA.White);
         rootNode.addLight(ambient);
     }
 
@@ -113,9 +114,11 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     private Spatial instanciatePlayer(HexSettings hexSettings) {
-        Spatial player = assetManager.loadModel("Models/Characters/Model21.j3o");
+        Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
+//        Material mat = assetManager.loadMaterial("Materials/Characters/Berserk/Model_LP3.j3m");
+//        player.setMaterial(mat);
         player.setName("Player");
-        player.setShadowMode(RenderQueue.ShadowMode.Cast);
+//        player.setShadowMode(RenderQueue.ShadowMode.Cast);
 
 //        int x = FastMath.nextRandomInt(2,9);
 //        int y = FastMath.nextRandomInt(2, 9);

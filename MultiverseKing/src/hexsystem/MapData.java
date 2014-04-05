@@ -268,7 +268,7 @@ public final class MapData {
         this.mapName = mdLoaded.getMapName();
         this.mapElement = mdLoaded.getMapElement();
         this.chunkPos = mdLoaded.getChunkPos();
-        chunkData.purge();
+        chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
         for(byte i = 0; i < chunkPos.size(); i++){
             loadChunk(chunkPos.get(i));

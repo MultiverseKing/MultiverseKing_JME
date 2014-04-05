@@ -5,6 +5,9 @@
 package hexsystem;
 
 import com.jme3.math.FastMath;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -15,30 +18,18 @@ import utility.attribut.ElementalAttribut;
  */
 class ChunkData {
 
-    private final byte limit;
+    HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
     private byte lastAddedID;
-    private Vector2Int[] chunkKey;      //chunkKey[resultID] == chunkPos
-    private HexTile[][][] chunkValue;   //chunkValue[chunkID][tileX][tileY]
 
     ChunkData(byte limit) {
-        this.limit = limit;
-        this.lastAddedID = limit;
-        chunkKey = new Vector2Int[limit];
-        chunkValue = new HexTile[limit][][];
+//        this.limit = limit;
+//        this.lastAddedID = limit;
+//        chunkKey = new Vector2Int[limit];
+//        chunkValue = new HexTile[limit][][];
     }
 
     void add(Vector2Int chunkPos, HexTile[][] tiles) {
-        byte slotID = getEmptySlotID();
-        if (slotID != limit) { //limit == null
-            chunkKey[slotID] = chunkPos;
-            chunkValue[slotID] = tiles;
-            lastAddedID = slotID;
-        } else {
-            slotID = removeChunk(chunkPos);
-            chunkKey[slotID] = chunkPos;
-            chunkValue[slotID] = tiles;
-            lastAddedID = slotID;
-        }
+        chunks.put(chunkPos, tiles);
     }
 
     /**
@@ -50,10 +41,10 @@ class ChunkData {
      */
     HexTile getTile(Vector2Int chunk, HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
-        byte chunkID = getChunkID(chunk);
-        if (chunkID != limit) {
+        HexTile[][] tiles = chunks.get(chunk);
+        if (tiles != null) {
             try {
-                return chunkValue[chunkID][tileOffset.x][tileOffset.y];
+                return tiles[tileOffset.x][tileOffset.y];
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.err.println("Hex index out of bounds");
             }
@@ -73,10 +64,10 @@ class ChunkData {
      */
     boolean setTile(Vector2Int chunk, HexCoordinate tilePos, HexTile t) {
         Vector2Int tileOffset = tilePos.getAsOffset();
-        byte chunkID = getChunkID(chunk);
-        if (chunkID != limit) {
+        HexTile[][] tiles = chunks.get(chunk);
+        if (tiles != null) {
             try {
-                chunkValue[chunkID][tileOffset.x][tileOffset.y] = t;
+                tiles[tileOffset.x][tileOffset.y] = t;
                 return true;
             } catch (ArrayIndexOutOfBoundsException e) {
                 System.err.println("Hex index out of bounds");
@@ -86,83 +77,61 @@ class ChunkData {
         }
         return false;
     }
-
-    private byte getEmptySlotID() {
-        byte result;
-        for (result = 0; result < limit; result++) {
-            if (chunkKey[result] == null) {
-                return result;
-            }
-        }
-        return limit;
-    }
-
-    private byte removeChunk(Vector2Int chunkPos) {
-        byte resultID;
-        for (resultID = 0; resultID < limit; resultID++) {
-            if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
-                    chunkKey[resultID] = null;
-                    chunkValue[resultID] = null;
-                    return resultID;
-                }
-            }
-        }
-
-        for (resultID = 0; resultID < limit; resultID++) {
-            if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
-                    chunkKey[resultID] = null;
-                    chunkValue[resultID] = null;
-                    return resultID;
-                }
-            }
-        }
-
-        do {
-            resultID = (byte) FastMath.nextRandomInt(0, limit - 1);
-        } while (resultID == lastAddedID);
-
-        return resultID;
-    }
-
-    private byte getChunkID(Vector2Int chunk) {
-        byte result;
-        for (result = 0; result < limit; result++) {
-            if (chunkKey[result] != null && chunkKey[result].equals(chunk)) {
-                return result;
-            }
-        }
-        return limit;
-    }
+//
+//    private byte removeChunk(Vector2Int chunkPos) {
+//        byte resultID;
+//        for (resultID = 0; resultID < limit; resultID++) {
+//            if (resultID != lastAddedID) {
+//                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
+//                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
+//                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+//                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
+//                    chunkKey[resultID] = null;
+//                    chunkValue[resultID] = null;
+//                    return resultID;
+//                }
+//            }
+//        }
+//
+//        for (resultID = 0; resultID < limit; resultID++) {
+//            if (resultID != lastAddedID) {
+//                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+//                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
+//                    chunkKey[resultID] = null;
+//                    chunkValue[resultID] = null;
+//                    return resultID;
+//                }
+//            }
+//        }
+//
+//        do {
+//            resultID = (byte) FastMath.nextRandomInt(0, limit - 1);
+//        } while (resultID == lastAddedID);
+//
+//        return resultID;
+//    }
 
     void setAllTile(ElementalAttribut eAttribut) {
-        for (byte i = 0; i < chunkValue.length; i++) {
-            if (chunkKey[i] != null && chunkValue[i] != null) {
-                for (int j = 0; j < chunkValue[i].length; j++) {
-                    for (int k = 0; k < chunkValue[i][j].length; k++) {
-                        chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+        Set<Entry<Vector2Int, HexTile[][]>> chunks = getAllChunks();
+        for(Entry<Vector2Int, HexTile[][]> chunk : chunks){
+            HexTile[][] tiles = chunk.getValue();
+                for (int j = 0; j < tiles.length; j++) {
+                    for (int k = 0; k < tiles[j].length; k++) {
+                        tiles[j][k] = tiles[j][k].cloneChangedElement(eAttribut);
                     }
                 }
-            }
         }
     }
 
     HexTile[][] getChunkTiles(Vector2Int chunkPos) {
-        byte chunkID = getChunkID(chunkPos);
-        if (chunkID != limit) {
-            return this.chunkValue[chunkID];
-        }
-        return null;
+        return chunks.get(chunkPos);
     }
 
     void clear() {
-        chunkKey = new Vector2Int[limit];
-        chunkValue = new HexTile[limit][][];
-        lastAddedID = limit;
+        chunks.clear();
+    }
+    public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks(){
+        return chunks.entrySet();
+        
     }
 }

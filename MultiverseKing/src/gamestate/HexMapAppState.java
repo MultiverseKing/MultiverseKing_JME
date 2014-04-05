@@ -78,13 +78,13 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
         mapData.registerChunkChangeListener(this);
+        mapData.registerTileChangeListener(this);
 //        this.hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
         main.getRootNode().attachChild(mapNode);
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         addAllElement();
+
     }
-
-
 
     /**
      *
@@ -103,8 +103,10 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
 //        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
-   /**
+
+    /**
      * Make change to chunk according to the event.
+     *
      * @param event contain information of the last chunk event.
      */
     public void chunkUpdate(ChunkChangeEvent event) {
@@ -113,7 +115,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
                 Node chunk = (Node) it.next();
                 chunk.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
             }
-        } else if(event.purge() && event.getChunkPos() == null){
+        } else if (event.purge() && event.getChunkPos() == null) {
             mapNode.detachAllChildren();
             chunkNode.clear();
         } else {
@@ -124,9 +126,10 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
             mapNode.attachChild(chunk);
         }
     }
-    
+
     /**
      * Make change to tile according to the event.
+     *
      * @param event contain information on the last tile event.
      */
     public void tileChange(TileChangeEvent event) {
@@ -136,7 +139,4 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         }
 
     }
-    /**
-     *
-     */
 }

@@ -63,8 +63,6 @@ public class MultiverseMain extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
-        System.out.println(this.getCamera().getLocation()
-                );
     }
 
     @Override

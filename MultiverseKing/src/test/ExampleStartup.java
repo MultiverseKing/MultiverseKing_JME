@@ -40,6 +40,7 @@ public class ExampleStartup extends SimpleApplication {
 
         stateManager.attach(new HexMapAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
+        
         //Initialise render Systems
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));
         stateManager.attach(new EntityRenderSystem());

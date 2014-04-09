@@ -56,12 +56,16 @@ public class MovementSystem extends EntitySystemAppState {
             System.out.println("No Path found!");
             entityData.removeComponent(e.getId(), MoveToComponent.class);
         }
+        movement.goal = moveTo.getPosition();
         movements.put(e.getId(), movement);
     }
 
     @Override
     protected void updateEntity(Entity e) {
-        //TODO: What if MoveToComponent is updated?
+        MoveToComponent moveTo = e.get(MoveToComponent.class);
+        if (!moveTo.getPosition().equals(movements.get(e.getId()).goal)) {
+            addEntity(e);
+        }
     }
 
     @Override
@@ -78,5 +82,6 @@ public class MovementSystem extends EntitySystemAppState {
         float distanceMoved = 0;//Distance already moved since last tile
         int actualPosition = 1; //index of point in list
         List<HexCoordinate> path;
+        HexCoordinate goal;
     }
 }

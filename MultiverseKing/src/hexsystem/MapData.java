@@ -264,14 +264,14 @@ public final class MapData {
     }
 
     public void loadMap(String name) {
-        MapDataLoader mdLoaded = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/"+name + "/" + name +".map"));
-        this.mapName = mdLoaded.getMapName();
-        this.mapElement = mdLoaded.getMapElement();
-        this.chunkPos = mdLoaded.getChunkPos();
+        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/"+name + "/" + name +".map"));
+        this.mapName = mdLoader.getMapName();
+        this.mapElement = mdLoader.getMapElement();
+        this.chunkPos = mdLoader.getChunkPos();
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
         for(byte i = 0; i < chunkPos.size(); i++){
-            loadChunk(chunkPos.get(i));
+            loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
         }
     }
@@ -309,22 +309,19 @@ public final class MapData {
         }
     }
 
-    private void loadChunk(Vector2Int position) {
-        String userHome = System.getProperty("user.dir") + "/assets";
-        String chunkPath = "/MapData/Temp/" + position.toString() + ".chk";
-        File file = new File(userHome + chunkPath);
+    private void loadChunk(Vector2Int position, String folder) {
+        String chunkPath;
+        if(folder == null){
+            chunkPath = "/MapData/Temp/" + position.toString() + ".chk";
+        } else {
+            chunkPath = "/MapData/"+ folder+ "/" + position.toString() + ".chk";
+        }
+        File file = new File(System.getProperty("user.dir") + "/assets" + chunkPath);
         if(file.exists() && !file.isDirectory()){
             ChunkDataLoader cdLoaded = (ChunkDataLoader) assetManager.loadAsset(new AssetKey(chunkPath));
             chunkData.add(position, cdLoaded.getTiles());
         } else {
-            chunkPath = "/MapData/"+ mapName +"/" + position.toString() + ".chk";
-            file = new File(userHome + chunkPath); //to change by value.getMapName
-            if(file.exists() && !file.isDirectory()){
-                ChunkDataLoader cdLoaded = (ChunkDataLoader) assetManager.loadAsset(new AssetKey(chunkPath));
-                chunkData.add(position, cdLoaded.getTiles());
-            } else {
-                System.err.println(chunkPath + " can't be load, missing data.");
-            }
+            System.err.println(chunkPath + " can't be load, missing data.");
         }
     }
 }

@@ -145,6 +145,6 @@ public class MultiverseMain extends SimpleApplication {
         instanciatePlayer(mapData.getHexSettings());
 
 //        chaseCameraSettup((Node) instanciatePlayer());
-        stateManager.detach(stateManager.getState(MainGUI.class));
+//        stateManager.detach(stateManager.getState(MainGUI.class));
     }
 }

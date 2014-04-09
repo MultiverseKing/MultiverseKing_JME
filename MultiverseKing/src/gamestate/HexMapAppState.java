@@ -98,9 +98,11 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         TextureArray hexText = new TextureArray(hexImages);
         hexText.setWrap(Texture.WrapMode.Repeat);
         hexMat.setTexture("ColorMap", hexText);
+//        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
+//        hexMat.getAdditionalRenderState().setDepthTest(true);
+//        hexMat.getAdditionalRenderState().setDepthWrite(true);
 //        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         hexMat.getAdditionalRenderState().setAlphaTest(true);
-//        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
 //        hexMat.getAdditionalRenderState().setWireframe(true);
     }
 

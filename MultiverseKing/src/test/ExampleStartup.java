@@ -8,7 +8,7 @@ import com.jme3.math.Vector3f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
-import de.tsajar.es.render.EntityRenderSystem;
+import entitysystem.render.EntityRenderSystem;
 import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;

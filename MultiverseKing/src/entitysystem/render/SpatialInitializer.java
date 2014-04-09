@@ -1,4 +1,4 @@
-package de.tsajar.es.render;
+package entitysystem.render;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;

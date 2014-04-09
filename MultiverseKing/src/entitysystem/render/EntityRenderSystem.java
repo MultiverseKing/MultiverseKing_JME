@@ -1,4 +1,4 @@
-package de.tsajar.es.render;
+package entitysystem.render;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -11,7 +11,6 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.render.RenderComponent;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import test.CubeSpatialInitializer;

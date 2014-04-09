@@ -6,7 +6,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import de.tsajar.es.render.SpatialInitializer;
+import entitysystem.render.SpatialInitializer;
 
 /**
  *

@@ -14,6 +14,7 @@ import com.jme3.scene.Node;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.TextureArray;
+import hexsystem.HexTile;
 import hexsystem.MapData;
 import hexsystem.chunksystem.ChunkControl;
 import hexsystem.chunksystem.MeshManager;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
@@ -83,7 +86,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         main.getRootNode().attachChild(mapNode);
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         addAllElement();
-
+        addAllChunks();
     }
 
     /**
@@ -121,12 +124,16 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
             mapNode.detachAllChildren();
             chunkNode.clear();
         } else {
-            Node chunk = new Node(event.getChunkPos().toString());
-            chunkNode.put(event.getChunkPos().toString(), chunk);
-            chunk.setLocalTranslation(mapData.getChunkWorldPosition(event.getChunkPos()));
-            chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
-            mapNode.attachChild(chunk);
+            insertNewChunk(event.getChunkPos());
         }
+    }
+
+    private void insertNewChunk(Vector2Int pos) {
+        Node chunk = new Node(pos.toString());
+        chunkNode.put(pos.toString(), chunk);
+        chunk.setLocalTranslation(mapData.getChunkWorldPosition(pos));
+        chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
+        mapNode.attachChild(chunk);
     }
 
     /**
@@ -140,5 +147,12 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).updateTile(event.getTilePos());
         }
 
+    }
+
+    private void addAllChunks() {
+        Set<Entry<Vector2Int, HexTile[][]>> chunks = mapData.getAllChunks();
+        for (Entry<Vector2Int, HexTile[][]> e : chunks) {
+            insertNewChunk(e.getKey());
+        }
     }
 }

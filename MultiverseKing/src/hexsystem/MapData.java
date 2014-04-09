@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -100,6 +102,7 @@ public final class MapData {
 
     /**
      * Get a tile properties.
+     *
      * @todo
      * @param tilePos Offset position of the tile.
      * @return null if the tile doesn't exist.
@@ -107,10 +110,11 @@ public final class MapData {
     public HexTile getTile(HexCoordinate tilePos) {
 //        return chunkData.getTile(getChunkGridPos(tilePos), tilePos);
         Vector2Int chunkPosition = getChunkGridPos(tilePos);
-        for(Vector2Int pos : chunkPos ){
-            if(pos.equals(chunkPosition)){
+        tilePos = getChunkTilePos(tilePos);
+        for (Vector2Int pos : chunkPos) {
+            if (pos.equals(chunkPosition)) {
                 HexTile tile = chunkData.getTile(chunkPosition, tilePos);
-                if(tile != null){
+                if (tile != null) {
                     return tile;
                 } else {
                     //todo
@@ -130,6 +134,7 @@ public final class MapData {
      */
     public void setTile(HexCoordinate tilePos, HexTile tile) {
         Vector2Int chunkPosition = getChunkGridPos(tilePos);
+        tilePos = getChunkTilePos(tilePos);
         TileChangeEvent tce = new TileChangeEvent(chunkPosition, tilePos, chunkData.getTile(chunkPosition, tilePos), tile);
         if (tce.getOldTile() != null) {
             chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
@@ -206,7 +211,23 @@ public final class MapData {
      */
     public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
-        return new Vector2Int(tileOffset.x / hexSettings.getCHUNK_SIZE(), tileOffset.y / hexSettings.getCHUNK_SIZE());
+        int x = tileOffset.x / hexSettings.getCHUNK_SIZE();
+        int y = tileOffset.y / hexSettings.getCHUNK_SIZE();
+        x = tileOffset.x < 0 ? x - 1 : x;
+        y = tileOffset.y < 0 ? y - 1 : y;
+        return new Vector2Int(x,y);
+    }
+
+    /**
+     * Convert tile position from relative to world grid to relative to chunk
+     *
+     * @param tilePos
+     * @return
+     */
+    public HexCoordinate getChunkTilePos(HexCoordinate tilePos) {
+        Vector2Int chunk = getChunkGridPos(tilePos);
+        Vector2Int tileOffset = tilePos.getAsOffset();
+        return new HexCoordinate(HexCoordinate.OFFSET, tileOffset.x - chunk.x * hexSettings.getCHUNK_SIZE(), tileOffset.y - chunk.y * hexSettings.getCHUNK_SIZE());
     }
 
     /**
@@ -258,19 +279,19 @@ public final class MapData {
         mdLoader.setMapElement(mapElement);
         mdLoader.setChunkPos(chunkPos);
 
-        File file = new File(userHome + "/MapData/" + mapName + "/" + mapName+ ".map");
+        File file = new File(userHome + "/MapData/" + mapName + "/" + mapName + ".map");
         exporter.save(mdLoader, file);
         saveChunk(Vector2Int.INFINITY);
     }
 
     public void loadMap(String name) {
-        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/"+name + "/" + name +".map"));
+        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/" + name + "/" + name + ".map"));
         this.mapName = mdLoader.getMapName();
         this.mapElement = mdLoader.getMapElement();
         this.chunkPos = mdLoader.getChunkPos();
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
-        for(byte i = 0; i < chunkPos.size(); i++){
+        for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
         }
@@ -280,27 +301,27 @@ public final class MapData {
         String userHome = System.getProperty("user.dir") + "/assets";
         BinaryExporter exporter = BinaryExporter.getInstance();
         ChunkDataLoader cdLoader = new ChunkDataLoader();
-        
-        if(position == Vector2Int.INFINITY){
-            for(Vector2Int pos : chunkPos){
+
+        if (position == Vector2Int.INFINITY) {
+            for (Vector2Int pos : chunkPos) {
                 Path file = Paths.get(userHome + "/MapData/" + mapName + "/" + pos.toString() + ".chk");
                 HexTile[][] tiles = getChunkTiles(pos);
-                if(tiles == null){
-                    Path f = Paths.get(userHome + "/MapData/Temp/"+pos.toString()+".chk");
-                    if(f.toFile().exists() && !f.toFile().isDirectory()) { 
+                if (tiles == null) {
+                    Path f = Paths.get(userHome + "/MapData/Temp/" + pos.toString() + ".chk");
+                    if (f.toFile().exists() && !f.toFile().isDirectory()) {
                         CopyOption[] options = new CopyOption[]{
                             StandardCopyOption.REPLACE_EXISTING,
                             StandardCopyOption.COPY_ATTRIBUTES
-                        }; 
+                        };
                         Files.copy(f, file, options);
                     } else {
-                        System.err.println(userHome + "/MapData/Temp/"+pos.toString()+".chk" + " can't be save, missing data.");
+                        System.err.println(userHome + "/MapData/Temp/" + pos.toString() + ".chk" + " can't be save, missing data.");
                     }
                 } else {
                     cdLoader.setChunk(tiles);
                     exporter.save(cdLoader, file.toFile());
                 }
-                
+
             }
         } else {
             File file = new File(userHome + "/SavedZone/Temp/" + position.toString() + ".chk");
@@ -311,17 +332,20 @@ public final class MapData {
 
     private void loadChunk(Vector2Int position, String folder) {
         String chunkPath;
-        if(folder == null){
+        if (folder == null) {
             chunkPath = "/MapData/Temp/" + position.toString() + ".chk";
         } else {
-            chunkPath = "/MapData/"+ folder+ "/" + position.toString() + ".chk";
+            chunkPath = "/MapData/" + folder + "/" + position.toString() + ".chk";
         }
         File file = new File(System.getProperty("user.dir") + "/assets" + chunkPath);
-        if(file.exists() && !file.isDirectory()){
+        if (file.exists() && !file.isDirectory()) {
             ChunkDataLoader cdLoaded = (ChunkDataLoader) assetManager.loadAsset(new AssetKey(chunkPath));
             chunkData.add(position, cdLoaded.getTiles());
         } else {
             System.err.println(chunkPath + " can't be load, missing data.");
         }
+    }
+    public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks(){
+        return chunkData.getAllChunks();
     }
 }

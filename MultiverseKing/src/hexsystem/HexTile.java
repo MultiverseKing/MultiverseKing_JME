@@ -14,7 +14,7 @@ import utility.attribut.ElementalAttribut;
  */
 public class HexTile implements Savable {
     private byte element;
-    private byte height;
+    private int height;
 
     public HexTile(){
     }
@@ -24,7 +24,7 @@ public class HexTile implements Savable {
         this.height = 0;
     }
 
-    public HexTile(ElementalAttribut hexElement, byte height) {
+    public HexTile(ElementalAttribut hexElement, int height) {
         this.element = (byte) hexElement.ordinal();
         this.height = height;
     }
@@ -33,19 +33,11 @@ public class HexTile implements Savable {
         return ElementalAttribut.convert(element);
     }
 
-    public byte getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    /**
-     * Returns a clone of this tile with changed height
-     *
-     * @param height
-     * @return
-     */
-    public HexTile cloneChangedHeight(byte height) {
-        return new HexTile(ElementalAttribut.convert(element), (byte) (height));
-    }
+
 
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
@@ -71,5 +63,14 @@ public class HexTile implements Savable {
      */
     public HexTile cloneChangedElement(ElementalAttribut element) {
         return new HexTile(element, (height));
+    }
+        /**
+     * Returns a clone of this tile with changed height
+     *
+     * @param height
+     * @return
+     */
+    public HexTile cloneChangedHeight(int height) {
+        return new HexTile(ElementalAttribut.convert(element),(height));
     }
 }

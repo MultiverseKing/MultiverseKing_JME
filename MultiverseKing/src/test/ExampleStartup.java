@@ -1,13 +1,10 @@
 package test;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.input.ChaseCamera;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
-import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
@@ -18,6 +15,7 @@ import entitysystem.render.RenderComponent;
 import gamestate.HexMapAppState;
 import hexsystem.MapData;
 import hexsystem.MapDataAppState;
+import hexsystem.events.ChunkChangeEvent;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -30,6 +28,8 @@ public class ExampleStartup extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        
+        HexCoordinate point = new HexCoordinate(HexCoordinate.OFFSET,-1,0);
         this.getCamera().lookAt(new Vector3f(0f, 1.5f, 0f), Vector3f.UNIT_Y);
         this.getCamera().setLocation(new Vector3f(0, 21.51f, 17.17051f));
         EntityData entityData = new DefaultEntityData();
@@ -40,10 +40,12 @@ public class ExampleStartup extends SimpleApplication {
 
         stateManager.attach(new HexMapAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
-        
+        mapData.addChunk(new Vector2Int(-1, 0), null);
+        mapData.setTile(point, mapData.getTile(point).cloneChangedHeight(0));
         //Initialise render Systems
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));
         stateManager.attach(new EntityRenderSystem());
+        stateManager.getState(HexMapAppState.class).chunkUpdate(new ChunkChangeEvent(Vector2Int.INFINITY));
         //TODO: Initialise visual representation of Map
 
         //TODO: Initialise functional systems

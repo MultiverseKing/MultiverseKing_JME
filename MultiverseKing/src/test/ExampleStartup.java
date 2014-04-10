@@ -1,5 +1,6 @@
 package test;
 
+import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
@@ -18,6 +19,8 @@ import gamestate.HexMapAppState;
 import hexsystem.MapData;
 import hexsystem.MapDataAppState;
 import hexsystem.events.ChunkChangeEvent;
+import hexsystem.loader.ChunkDataLoader;
+import hexsystem.loader.MapDataLoader;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
@@ -42,7 +45,15 @@ public class ExampleStartup extends SimpleApplication {
         stateManager.attach(new HexMapAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
         mapData.addChunk(new Vector2Int(-1, 0), null);
-        mapData.setTile(point, mapData.getTile(point).cloneChangedHeight(0));
+        
+        String userHome = System.getProperty("user.dir") + "/assets/MapData/";
+//        System.out.println(userHome);
+        assetManager.registerLocator(userHome, ChunkDataLoader.class);
+        assetManager.registerLoader(ChunkDataLoader.class, "chk");
+        assetManager.registerLocator(userHome, MapDataLoader.class);
+        assetManager.registerLoader(MapDataLoader.class, "map");
+        mapData.loadMap("IceLand");
+//        mapData.setTile(point, mapData.getTile(point).cloneChangedHeight(0));
         //Initialise render Systems
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));
         stateManager.attach(new MovementSystem());
@@ -65,6 +76,7 @@ public class ExampleStartup extends SimpleApplication {
         entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
         entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 20, 20)));
         lightSettup();
+        setupCamera();
     }
 
     @Override
@@ -77,6 +89,11 @@ public class ExampleStartup extends SimpleApplication {
         app.start();
     }
 
+    private void setupCamera(){
+        FlyCamAppState fcs=stateManager.getState(FlyCamAppState.class);
+        fcs.getCamera().setMoveSpeed(20f);
+    }
+    
     private void lightSettup() {
         /**
          * A white, directional light source

@@ -5,7 +5,6 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.PositionComponent;
 import hexsystem.pathfinding.Dijkstra;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ public class MovementSystem extends EntitySystemAppState {
 
     private Pathfinder pathfinder = new Dijkstra();
     private HashMap<EntityId, Movement> movements;
-    private float secondsPerStep = 1f;
+    private float secondsPerStep = 2f;
 
     @Override
     protected EntitySet initialiseSystem() {

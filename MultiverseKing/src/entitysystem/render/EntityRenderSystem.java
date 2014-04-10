@@ -28,62 +28,49 @@ import test.CubeSpatialInitializer;
  */
 public class EntityRenderSystem extends EntitySystemAppState {
 
-    private EntitySet hexPositionEntities;
-    //private EntitySet spatialPositionEntities;
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private SpatialInitializer spatialInitializer = new CubeSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
 
     @Override
-    public void initialize(AppStateManager stateManager, Application app) {
-        super.initialize(stateManager, app);
-        hexPositionEntities = entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
-        //spatialPositionEntities = entityData.getEntities(SpatialPositionComponent.class, RenderComponent.class);
+    protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
-        ((SimpleApplication) app).getRootNode().attachChild(renderSystemNode);
+        app.getRootNode().attachChild(renderSystemNode);
+        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
 
-        //If there are already entities in the EntitySet
-        for (Entity e : hexPositionEntities) {
-            addEntity(e);
-        }
     }
 
     @Override
-    public void update(float tpf) {
-        if (hexPositionEntities.applyChanges()) {
-            //Add Entities
-            for (Entity e : hexPositionEntities.getAddedEntities()) {
-                addEntity(e);
-            }
-            //Change Entities
-            for (Entity e : hexPositionEntities.getChangedEntities()) {
-                changeEntity(e);
-            }
-            //Remove Entities
-            for (Entity e : hexPositionEntities.getRemovedEntities()) {
-                removeEntity(e);
-            }
-        }
+    protected void updateSystem(float tpf) {
     }
 
+    @Override
     //TODO: Handle if spatial is already generated (shouldn't happen, but in the case it does, this should be handled))
-    private void addEntity(Entity e) {
+    public void addEntity(Entity e) {
         Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getModelName());
         spatials.put(e.getId(), s);
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
         renderSystemNode.attachChild(s);
     }
 
-    //TODO: Check if spatial was found
-    private void changeEntity(Entity e) {
+    @Override
+    //TODO: Check if spatial is found
+    protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
     }
 
-    private void removeEntity(Entity e) {
+    @Override
+    public void removeEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         renderSystemNode.detachChild(s);
         spatials.remove(s);
+    }
+
+    @Override
+    protected void cleanupSystem() {
+        spatials.clear();
+        renderSystemNode.removeFromParent();
     }
 
     private Vector3f hexPositionToSpatialPosition(HexPositionComponent hex) {
@@ -91,17 +78,5 @@ public class EntityRenderSystem extends EntitySystemAppState {
         int height = mapData.getTile(hex.getPosition()).getHeight();
         Vector3f spat = mapData.getTileWorldPosition(hex.getPosition());
         return new Vector3f(spat.x, height, spat.z);
-    }
-
-    @Override
-    public void cleanup() {
-        super.cleanup();
-        hexPositionEntities.release();
-        //spatialPositionEntities.release();
-        for (Entry<EntityId, Spatial> e : spatials.entrySet()) {
-            renderSystemNode.detachChild(e.getValue());
-        }
-        spatials.clear();
-        renderSystemNode.removeFromParent();
     }
 }

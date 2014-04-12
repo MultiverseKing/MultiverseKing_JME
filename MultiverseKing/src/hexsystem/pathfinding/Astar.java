@@ -8,10 +8,10 @@ import java.util.List;
 import utility.HexCoordinate;
 
 /**
- * Dijkstra algorithm
+ * A* algorithm, should be faster than Dijkstra.
  * @author Eike Foede
  */
-public class Dijkstra implements Pathfinder {
+public class Astar implements Pathfinder {
 
     private MapData mapData;
 
@@ -30,16 +30,23 @@ public class Dijkstra implements Pathfinder {
     public List<HexCoordinate> getPath(HexCoordinate from, HexCoordinate to) {
 //        long time = System.nanoTime();
         HashSet<HexCoordinate> visitedFields = new HashSet<HexCoordinate>();
-        ArrayList<WayPoint> actualPoints = new ArrayList<WayPoint>();
+        ArrayList<WayPoint> actualPoints[] = new ArrayList[3];
+        for (int i = 0; i < actualPoints.length; i++) {
+            actualPoints[i] = new ArrayList<WayPoint>();
 
+        }
         WayPoint first = new WayPoint(from, null);
 
-        actualPoints.add(first);
+        actualPoints[0].add(first);
         visitedFields.add(from);
 
-        while (!actualPoints.isEmpty()) {
-            ArrayList<WayPoint> nextPoints = new ArrayList<WayPoint>();
-            for (WayPoint point : actualPoints) {
+        while (!(actualPoints[0].isEmpty() && actualPoints[1].isEmpty() && actualPoints[2].isEmpty())) {
+
+            ArrayList<WayPoint> tmp = actualPoints[0];
+            actualPoints[0] = actualPoints[1];
+            actualPoints[1] = actualPoints[2];
+            actualPoints[2] = new ArrayList<WayPoint>();
+            for (WayPoint point : tmp) {
                 HexCoordinate[] neighbours = point.thisPoint.getNeighbours();
                 for (HexCoordinate next : neighbours) {
                     if (!visitedFields.contains(next)) {
@@ -56,13 +63,19 @@ public class Dijkstra implements Pathfinder {
                                 return way;
                             }
                             WayPoint newPoint = new WayPoint(next, point);
-                            nextPoints.add(newPoint);
+                            int diff = next.distanceTo(to) - point.thisPoint.distanceTo(to);
+                            if (diff < 0) {
+                                actualPoints[0].add(newPoint);
+                            } else if (diff == 0) {
+                                actualPoints[1].add(newPoint);
+                            } else {
+                                actualPoints[2].add(newPoint);
+                            }
                             visitedFields.add(next);
                         }
                     }
                 }
             }
-            actualPoints = nextPoints;
         }
         return null;//If no way is found
     }

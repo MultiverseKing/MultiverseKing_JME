@@ -13,6 +13,7 @@ import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import test.CharacterSpatialInitializer;
 import test.CubeSpatialInitializer;
 
 /**
@@ -29,7 +30,7 @@ import test.CubeSpatialInitializer;
 public class EntityRenderSystem extends EntitySystemAppState {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
-    private SpatialInitializer spatialInitializer = new CubeSpatialInitializer();
+    private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
 
     @Override

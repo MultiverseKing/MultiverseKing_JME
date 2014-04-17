@@ -12,13 +12,24 @@ import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import com.simsilica.es.base.DefaultEntityData;
+import entitysystem.EntityDataAppState;
+import entitysystem.movement.MoveToComponent;
+import entitysystem.movement.MovementSystem;
+import entitysystem.position.HexPositionComponent;
+import entitysystem.render.EntityRenderSystem;
+import entitysystem.render.RenderComponent;
 import gamestate.HexMapAppState;
 import hexsystem.HexSettings;
+import hexsystem.MapDataAppState;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
 import java.util.logging.Level;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
+import utility.HexCoordinate;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -144,6 +155,20 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attach(editorAppState);
         instanciatePlayer(mapData.getHexSettings());
 
+        EntityData entityData = new DefaultEntityData();
+        stateManager.attach(new MapDataAppState(mapData));
+        stateManager.attach(new EntityDataAppState(entityData));
+        stateManager.attach(new MovementSystem());
+        stateManager.attach(new EntityRenderSystem());
+        
+        //Example: Initialise new character entity.
+        EntityId characterId = entityData.createEntity();
+//        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
+//        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
+        entityData.setComponent(characterId, new RenderComponent("Berserk"));
+        entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
+        entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+        
 //        chaseCameraSettup((Node) instanciatePlayer());
 //        stateManager.detach(stateManager.getState(MainGUI.class));
     }

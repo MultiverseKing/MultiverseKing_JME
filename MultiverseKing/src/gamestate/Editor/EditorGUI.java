@@ -9,7 +9,11 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import entitysystem.EntityDataAppState;
 import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.card.CardRenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.io.IOException;
@@ -33,7 +37,7 @@ class EditorGUI extends AbstractAppState {
     private MultiverseMain main;
     private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
-    private boolean activeCardEditor;
+    
     private Window eWin;
 //    private Window mainWin;
 
@@ -104,27 +108,42 @@ class EditorGUI extends AbstractAppState {
         reset.setText("Reset");
         mainWin.addChild(reset);
 
-        Window cardWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f+40f*5), new Vector2f(180, 40));
-        cardWin.getDragBar().setIsVisible(false);
-        main.getScreen().addElement(cardWin);
+        /**
+         * Card system initialisation.
+         * Add a card when adding the Card system.
+         */
+        Window cardButtonWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f+40f*5), new Vector2f(180, 40));
+        cardButtonWin.getDragBar().setIsVisible(false);
+        main.getScreen().addElement(cardButtonWin);
         
         Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
+            CardEntityRenderSystem testCardSystem = new CardEntityRenderSystem();
+            EntityId cardId = null;
+            private boolean activeCardEditor = false;
+            
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if(!activeCardEditor){
-                    app.getStateManager().attach(new CardEntityRenderSystem());
+                    //to delete, testing purpose
+                    if(cardId == null ){
+                        EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                        cardId = ed.createEntity();
+                        ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                    }
+                    
+                    app.getStateManager().attach(testCardSystem);
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
                     activeCardEditor = !activeCardEditor;
                 } else {
-                    app.getStateManager().detach(new CardEntityRenderSystem());
+                    app.getStateManager().detach(testCardSystem);
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: OFF");
                     activeCardEditor = !activeCardEditor;
                 }
             }
         };
         cardEditor.setText("Card Editor: OFF");
-        cardWin.addChild(cardEditor);
+        cardButtonWin.addChild(cardEditor);
     }
 
     public final void elementalWindow() {

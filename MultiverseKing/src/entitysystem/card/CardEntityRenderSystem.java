@@ -4,11 +4,14 @@
  */
 package entitysystem.card;
 
+import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
+import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.windows.Window;
+import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
 /**
@@ -18,15 +21,14 @@ import tonegod.gui.core.Screen;
 public class CardEntityRenderSystem extends EntitySystemAppState{
 
     private HashMap<String, Window> cards = new HashMap<String, Window>();
-    private CardInitializer spatialInitializer = new CardInitializer();
+    private CardInitializer cardInitializer = new CardInitializer();
+    private Screen screen;
 
     @Override
     protected EntitySet initialiseSystem() {
-        spatialInitializer.setAssetManager(app.getAssetManager());
-
-        //Create a new screen to be used as a container for all card in the hand of the player
-        //todo a screen killer ?
-        
+        this.screen = new Screen(app);
+        app.getGuiNode().addControl(screen);
+        cardInitializer.Init(app.getAssetManager(), screen);
         //We check for entity who got the CardRenderComponent
         return entityData.getEntities(CardRenderComponent.class);
     }
@@ -38,9 +40,9 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
     @Override
     protected void addEntity(Entity e) {
         Window card;
-        card = spatialInitializer.initialize(e.get(CardRenderComponent.class).getCardName());
+        card = cardInitializer.initialize(e.get(CardRenderComponent.class).getCardName());
         cards.put(e.get(CardRenderComponent.class).getCardName(), card);
-        handCardScreen.addElement(card);
+        screen.addElement(card);
     }
 
     @Override
@@ -58,10 +60,20 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 //        }
     }
 
+//    @Override
+//    public void stateDetached(AppStateManager stateManager) {
+//        super.stateDetached(stateManager);
+//        for (Window card : cards.values()) {
+//            screen.removeElement(card);
+//        }
+//    }
+
     @Override
     protected void cleanupSystem() {
+        for(Window card : cards.values()){
+            screen.removeElement(card);
+        }
         cards.clear();
-        handCardScreen.
-        app.getGuiNode().removeControl(handCardScreen);
+        app.getGuiNode().removeControl(screen);
     }
 }

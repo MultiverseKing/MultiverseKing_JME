@@ -155,7 +155,7 @@ public class MultiverseMain extends SimpleApplication {
         EditorAppState editorAppState = new EditorAppState(mapData, this);
         stateManager.attach(new HexMapAppState(this,mapData));
         stateManager.attach(editorAppState);
-        instanciatePlayer(mapData.getHexSettings());
+//        instanciatePlayer(mapData.getHexSettings());
 
         EntityData entityData = new DefaultEntityData();
         stateManager.attach(new MapDataAppState(mapData));

@@ -65,6 +65,9 @@ public class MultiverseMain extends SimpleApplication {
 
         // Disable the default flyby cam
         flyCam.setEnabled(false);
+        
+        //Create a new screen for tonegodGUI to work with.
+        screen = new Screen(this);
 
         initGUI();
         lightSettup();
@@ -138,7 +141,6 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     private void initGUI() {
-        screen = new Screen(this);
         this.getGuiNode().addControl(screen);
         MainGUI mainGUI = new MainGUI(this);
         stateManager.attach(mainGUI);
@@ -160,6 +162,7 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attach(new EntityDataAppState(entityData));
         stateManager.attach(new MovementSystem());
         stateManager.attach(new EntityRenderSystem());
+        
         
         //Example: Initialise new character entity.
         EntityId characterId = entityData.createEntity();

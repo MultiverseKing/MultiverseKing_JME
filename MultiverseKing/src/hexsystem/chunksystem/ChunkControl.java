@@ -18,7 +18,7 @@ import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
- *
+ * control the chunk geometry, all tiles geometry.
  * @author roah
  */
 public class ChunkControl extends AbstractControl {
@@ -62,7 +62,10 @@ public class ChunkControl extends AbstractControl {
     protected void controlRender(RenderManager rm, ViewPort vp) {
     }
 
-    public void updateChunk(Vector2Int INFINITY) {
+    /**
+     * Update all tile inside this chunk.
+     */
+    public void updateChunk() {
         for (byte x = 0; x < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; x++) {
             for (byte y = 0; y < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; y++) {
                 updateTile(getSubChunkWorldGridPos(new Vector2Int(x, y)));
@@ -71,7 +74,8 @@ public class ChunkControl extends AbstractControl {
     }
 
     /**
-     * @param tilePos
+     * update the speciate tile geometry.
+     * @param tilePos tile geometry to update.
      */
     public void updateTile(HexCoordinate tilePos) {
         Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
@@ -106,7 +110,7 @@ public class ChunkControl extends AbstractControl {
     }
 
     /**
-     * @return SubChunk local grid position, relative to Chunk grid position.
+     * @return SubChunk local chunk position.
      */
     Vector2Int getSubChunkLocalGridPos(HexCoordinate tile) {
         Vector2Int tilePos = tile.getAsOffset();
@@ -115,6 +119,9 @@ public class ChunkControl extends AbstractControl {
         return result;
     }
 
+    /**
+     * @return Subchunk position in hexMap.
+     */
     HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
         return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x * subChunkSize, subChunkLocalGridPos.y * subChunkSize);
     }

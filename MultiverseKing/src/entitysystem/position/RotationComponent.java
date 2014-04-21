@@ -1,7 +1,6 @@
 package entitysystem.position;
 
 import com.jme3.math.Quaternion;
-import com.simsilica.es.EntityComponent;
 import com.simsilica.es.PersistentComponent;
 
 /**

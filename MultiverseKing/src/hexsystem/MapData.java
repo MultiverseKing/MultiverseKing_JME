@@ -26,8 +26,8 @@ import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
- * This class holds the data of the map.
- *
+ * This class holds the hex data of the map.
+ * @todo move all converter to another class this will clean MapData.
  * @author Eike Foede, Roah
  */
 public final class MapData {
@@ -53,17 +53,22 @@ public final class MapData {
 
     /**
      * Global Settings for hex.
-     *
      * @return parameters.
      */
     public HexSettings getHexSettings() {
         return hexSettings;
     }
 
+    /**
+     * @return current map element.
+     */
     public ElementalAttribut getMapElement() {
         return mapElement;
     }
 
+    /**
+     * @return current map name.
+     */
     public String getMapName() {
         return this.mapName;
     }
@@ -77,7 +82,6 @@ public final class MapData {
 
     /**
      * Add a specifiate chunk in mapData at choosen position.
-     *
      * @param chunkPos Where to put the chunk.
      */
     public void addChunk(Vector2Int chunkPos, HexTile[][] tiles) {
@@ -96,14 +100,16 @@ public final class MapData {
         chunkEvent(cce);
     }
 
+    /**
+     * @return All tiles of the requested chunk.
+     */
     public HexTile[][] getChunkTiles(Vector2Int chunkPos) {
         return chunkData.getChunkTiles(chunkPos);
     }
 
     /**
      * Get a tile properties.
-     *
-     * @todo
+     * @todo see below.
      * @param tilePos Offset position of the tile.
      * @return null if the tile doesn't exist.
      */
@@ -128,7 +134,6 @@ public final class MapData {
 
     /**
      * Change the designed tile properties.
-     *
      * @param tilePos position of the tile to change.
      * @param tile tile to change.
      */
@@ -153,11 +158,10 @@ public final class MapData {
 
     /**
      * Return null field for inexisting hex.
-     *
      * @todo not fully functional.
      * @param position
      * @param range
-     * @return
+     * @return 
      */
     public HexTile[] getTileRange(HexCoordinate position, int range) {
         Vector2Int axial = position.getAsAxial();
@@ -172,6 +176,10 @@ public final class MapData {
         return result;
     }
 
+    /**
+     * @param position of the center tile.
+     * @return All tile arround the needed tile.
+     */
     public HexTile[] getNeightbors(HexCoordinate position) {
         HexCoordinate[] coords = position.getNeighbours();
         HexTile[] neighbours = new HexTile[coords.length];
@@ -182,6 +190,10 @@ public final class MapData {
         return neighbours;
     }
 
+    /**
+     * Register a listener to respond to chunk Event.
+     * @param listener to register.
+     */
     public void registerChunkChangeListener(ChunkChangeListener listener) {
         chunkListeners.add(listener);
         if (listener instanceof TileChangeListener) {
@@ -190,12 +202,17 @@ public final class MapData {
     }
 
     /**
-     * @todo javadoc (Eike)
+     * Register a listener to respond to Tile Event.
+     * @param listener to register.
      */
     public void registerTileChangeListener(TileChangeListener listener) {
         tileListeners.add(listener);
     }
 
+    /**
+     * call/Update all registered Chunk listener with the last chunk event.
+     * @param cce Last event.
+     */
     private void chunkEvent(ChunkChangeEvent cce) {
         for (ChunkChangeListener l : chunkListeners) {
             l.chunkUpdate(cce);
@@ -203,38 +220,41 @@ public final class MapData {
     }
 
     /**
-     * Get chunk grid position of a tile.
-     *
-     * @param tilePos Offset coordinate of the tile.
-     * @return Position of the chunk in mapData.
-     * @todo check if the chunk exist.
+     * Return the chunk who hold the specifiated tile.
+     * @param tilePos hexMap coordinate of the tile.
+     * @return Position of the chunk in mapData if exist, else null.
      */
     public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
         int x = tileOffset.x / hexSettings.getCHUNK_SIZE();
         int y = tileOffset.y / hexSettings.getCHUNK_SIZE();
-        x = tileOffset.x < 0 ? x - 1 : x;
-        y = tileOffset.y < 0 ? y - 1 : y;
-        return new Vector2Int(x,y);
+        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? x - 1 : x), ((tileOffset.y < 0) ? y - 1 : y));
+        if(this.chunkPos.contains(result)){
+            return result;
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Convert tile position from relative to world grid to relative to chunk
-     *
-     * @param tilePos
-     * @return
+     * Convert tile hexMap position to chunk position, return null if the chunk didn't exist.
+     * @param tilePos tile hexMap position to convert.
+     * @return tile chunk position.
      */
     public HexCoordinate getChunkTilePos(HexCoordinate tilePos) {
         Vector2Int chunk = getChunkGridPos(tilePos);
-        Vector2Int tileOffset = tilePos.getAsOffset();
-        return new HexCoordinate(HexCoordinate.OFFSET, tileOffset.x - chunk.x * hexSettings.getCHUNK_SIZE(), tileOffset.y - chunk.y * hexSettings.getCHUNK_SIZE());
+        if(chunk != null) {
+            Vector2Int tileOffset = tilePos.getAsOffset();
+            return new HexCoordinate(HexCoordinate.OFFSET, tileOffset.x - chunk.x * hexSettings.getCHUNK_SIZE(), tileOffset.y - chunk.y * hexSettings.getCHUNK_SIZE());
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Convert chunk grid position to world position, the position returned ==
-     * getTileWorldPosition(getChunk(position).getTiles(position)).
-     *
-     * @return chunk world position.
+     * Convert chunk position in hexMap to world unit.
+     * @hint chunk world unit position is the same than the chunk node.
+     * @return chunk world unit position.
      */
     public Vector3f getChunkWorldPosition(Vector2Int position) {
         return new Vector3f((position.x * hexSettings.getCHUNK_SIZE()) * hexSettings.getHEX_WIDTH() - (hexSettings.getHEX_WIDTH() / 2), 0,
@@ -242,10 +262,9 @@ public final class MapData {
     }
 
     /**
-     * Convert Odd-R Offset tile grid position to world position.
-     *
+     * Convert Odd-R Offset tile hexMap position to world unit.
      * @param offsetPos position to convert.
-     * @return world position.
+     * @return tile world unit position.
      */
     public Vector3f getTileWorldPosition(HexCoordinate tilePos) {
         Vector2Int offsetPos = tilePos.getAsOffset();
@@ -254,7 +273,6 @@ public final class MapData {
 
     /**
      * Convert World Position to Odd-R Offset grid position.
-     *
      * @param pos position to convert.
      * @return converted grid position.
      */
@@ -270,6 +288,10 @@ public final class MapData {
         return new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int((int) q, (int) r));
     }
 
+    /**
+     * Save the current map in a folder of the same name of the map.
+     * @throws IOException 
+     */
     public void saveMap() throws IOException {
         String userHome = System.getProperty("user.dir") + "/assets";
         BinaryExporter exporter = BinaryExporter.getInstance();
@@ -284,6 +306,9 @@ public final class MapData {
         saveChunk(Vector2Int.INFINITY);
     }
 
+    /**
+     * @param name of the map to load.
+     */
     public void loadMap(String name) {
         MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/" + name + "/" + name + ".map"));
         this.mapName = mdLoader.getMapName();
@@ -297,6 +322,11 @@ public final class MapData {
         }
     }
 
+    /**
+     * Save the selected chunk, two main use as : when saving the map, when removing data from the memory.
+     * @param position the chunk to save.
+     * @throws IOException
+     */
     public void saveChunk(Vector2Int position) throws IOException {
         String userHome = System.getProperty("user.dir") + "/assets";
         BinaryExporter exporter = BinaryExporter.getInstance();
@@ -330,6 +360,9 @@ public final class MapData {
         }
     }
 
+    /**
+     * load the chunk from speciate folder, internal use.
+     */
     private void loadChunk(Vector2Int position, String folder) {
         String chunkPath;
         if (folder == null) {

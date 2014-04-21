@@ -9,6 +9,11 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import entitysystem.EntityDataAppState;
+import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.card.CardRenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.io.IOException;
@@ -23,7 +28,7 @@ import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
 
 /**
- * @todo User should not be able to move the main windows.
+ * 
  * @author roah
  */
 class EditorGUI extends AbstractAppState {
@@ -32,7 +37,9 @@ class EditorGUI extends AbstractAppState {
     private MultiverseMain main;
     private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
+    
     private Window eWin;
+//    private Window mainWin;
 
     EditorGUI(MapData mapData) {
         this.mapData = mapData;
@@ -43,17 +50,17 @@ class EditorGUI extends AbstractAppState {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         main = (MultiverseMain) app;
 
-        Window win = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
-        win.setWindowTitle("Main Windows");
+        Window mainWin = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
+        mainWin.setWindowTitle("Main Windows");
 //        win.setMinDimensions(new Vector2f(130, 130));
-        win.setResizeS(false);
-        win.setResizeN(false);
-        win.setResizeW(false);
-        win.setResizeE(false);
-        win.getDragBar().setIsMovable(false);
-//        win.setWidth(new Float(50));
-        main.getScreen().addElement(win);
+        mainWin.setResizeS(false);
+        mainWin.setResizeN(false);
+        mainWin.setResizeW(false);
+        mainWin.setResizeE(false);
+        mainWin.getDragBar().setIsMovable(false);
+        main.getScreen().addElement(mainWin);
 
+        
         Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -64,7 +71,7 @@ class EditorGUI extends AbstractAppState {
             }
         };
         mapElement.setText("Change Map Elements");
-        win.addChild(mapElement);
+        mainWin.addChild(mapElement);
 
         Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)){
             @Override
@@ -78,7 +85,7 @@ class EditorGUI extends AbstractAppState {
             }
         };
         save.setText("Save");
-        win.addChild(save);
+        mainWin.addChild(save);
 
         Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)){
             @Override
@@ -88,7 +95,7 @@ class EditorGUI extends AbstractAppState {
             }
         };
         load.setText("Load");
-        win.addChild(load);
+        mainWin.addChild(load);
         
         Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)){
             @Override
@@ -98,17 +105,48 @@ class EditorGUI extends AbstractAppState {
             }
         };
         reset.setText("Reset");
-        win.addChild(reset);
+        mainWin.addChild(reset);
 
-//        mainButton.setDisplayElement(win);
-
-        // Add it to out initial window
-//        win.addChild(makeWindow);
+        /**
+         * Card system initialisation.
+         * Add a card when adding the Card system.
+         */
+        Window cardButtonWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f+40f*5), new Vector2f(180, 40));
+        cardButtonWin.getDragBar().setIsVisible(false);
+        main.getScreen().addElement(cardButtonWin);
+        
+        Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
+            CardEntityRenderSystem testCardSystem = new CardEntityRenderSystem();
+            EntityId cardId = null;
+            private boolean activeCardEditor = false;
+            
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                if(!activeCardEditor){
+                    //to delete, testing purpose
+                    if(cardId == null ){
+                        EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                        cardId = ed.createEntity();
+                        ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                    }
+                    
+                    app.getStateManager().attach(testCardSystem);
+                    main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
+                    activeCardEditor = !activeCardEditor;
+                } else {
+                    app.getStateManager().detach(testCardSystem);
+                    main.getScreen().getElementById("cardEditor").setText("Card Editor: OFF");
+                    activeCardEditor = !activeCardEditor;
+                }
+            }
+        };
+        cardEditor.setText("Card Editor: OFF");
+        cardButtonWin.addChild(cardEditor);
     }
 
     public final void elementalWindow() {
-        eWin =
-                new Window(main.getScreen(), "EWindows",
+        eWin =  new Window(main.getScreen(), "EWindows",
                 new Vector2f((main.getScreen().getWidth() / 2) - 175, (main.getScreen().getHeight() / 2) - 100));
         eWin.setWindowTitle("Elemental Windows");
         RadioButtonGroup elementG = new RadioButtonGroup(main.getScreen(), "EButtonGroup") {

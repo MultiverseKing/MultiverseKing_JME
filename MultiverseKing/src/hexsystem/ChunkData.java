@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem;
 
-import com.jme3.math.FastMath;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,11 +8,14 @@ import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
- *
+ * @todo Set a memory limit to avoid to much data. See ChunkDataOld removeChunk();
  * @author roah
  */
 class ChunkData {
 
+    /**
+     * Map holding all chunk on the current memory.
+     */
     HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
 
     ChunkData(byte limit) {

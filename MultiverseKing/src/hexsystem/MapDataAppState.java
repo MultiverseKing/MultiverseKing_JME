@@ -3,8 +3,6 @@ package hexsystem;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.simsilica.es.EntityData;
-import com.simsilica.es.base.DefaultEntityData;
 
 /**
  * The MapData of the game is stored in this AppState to allow other

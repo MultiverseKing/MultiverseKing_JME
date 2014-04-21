@@ -29,6 +29,13 @@ class ChunkSpatial {
         this.hexMat = hexMat;
     }
 
+    /**
+     * Generate all geometry of chunk with default parameter.
+     * @param rootChunk root Node
+     * @param hexSettings settings to use.
+     * @param subChunkSize size of a subChunk.
+     * @param chunkControl root control.
+     */
     void initialize(Node rootChunk, HexSettings hexSettings, int subChunkSize, ChunkControl chunkControl) {
         int subChunkCount = hexSettings.getCHUNK_SIZE() / subChunkSize;
         geo = new Geometry[subChunkCount][subChunkCount];
@@ -66,7 +73,6 @@ class ChunkSpatial {
 
     /**
      * Convert subChunk local grid position to world position.
-     *
      * @param subChunklocalGridPos
      * @return world position of this subChunk.
      * @deprecated no use of it
@@ -76,12 +82,11 @@ class ChunkSpatial {
     }
 
     /**
-     * Convert SubChunk local grid position to local world position, relative to
+     * Convert SubChunk local chunk position to local world unit position, relative to
      * chunkNode.
-     *
      * @param subChunkLocaGridPosX
      * @param subChunkLocalGridPosY
-     * @return
+     * @return world unit position of the subchunk relative to his parent.
      */
     private Vector3f getSubChunkLocalWorldPosition(int subChunkLocaGridPosX, int subChunkLocalGridPosY, HexSettings hexSettings, int subChunkSize) {
         float resultX = (subChunkLocaGridPosX * subChunkSize) * hexSettings.getHEX_WIDTH() + (hexSettings.getHEX_WIDTH() / 2);

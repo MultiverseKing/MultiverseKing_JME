@@ -4,14 +4,12 @@
  */
 package entitysystem.card;
 
-import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
-import kingofmultiverse.MultiverseMain;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
 /**
@@ -20,7 +18,7 @@ import tonegod.gui.core.Screen;
  */
 public class CardEntityRenderSystem extends EntitySystemAppState{
 
-    private HashMap<String, Window> cards = new HashMap<String, Window>();
+    private HashMap<String, ButtonAdapter> cards = new HashMap<String, ButtonAdapter>();
     private CardInitializer cardInitializer = new CardInitializer();
     private Screen screen;
 
@@ -39,8 +37,7 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 
     @Override
     protected void addEntity(Entity e) {
-        Window card;
-        card = cardInitializer.initialize(e.get(CardRenderComponent.class).getCardName());
+        ButtonAdapter card = cardInitializer.initialize(e.get(CardRenderComponent.class).getCardName());
         cards.put(e.get(CardRenderComponent.class).getCardName(), card);
         screen.addElement(card);
     }
@@ -52,28 +49,20 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 
     @Override
     protected void removeEntity(Entity e) {
-//        if(spatials.containsKey(e.getId())){
-//            cardRenderSystemNode.detachChildNamed(e.get(CardRenderComponent.class).getCardName());
-//            spatials.remove(e.getId());
-//        } else {
-//            System.err.println(e.get(CardRenderComponent.class).getCardName()+" does not exist in the Render System Node.");
-//        }
+        ButtonAdapter card = cards.get(e.get(CardRenderComponent.class).getCardName());
+        screen.removeElement(card);
+        cards.remove(e.get(CardRenderComponent.class).getCardName());
     }
-
-//    @Override
-//    public void stateDetached(AppStateManager stateManager) {
-//        super.stateDetached(stateManager);
-//        for (Window card : cards.values()) {
-//            screen.removeElement(card);
-//        }
-//    }
-
+    
     @Override
     protected void cleanupSystem() {
-        for(Window card : cards.values()){
+        cardInitializer.cleanup();
+        cardInitializer = null;
+        for(ButtonAdapter card : cards.values()){
             screen.removeElement(card);
         }
         cards.clear();
         app.getGuiNode().removeControl(screen);
+        screen = null;
     }
 }

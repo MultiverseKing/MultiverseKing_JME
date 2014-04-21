@@ -14,27 +14,25 @@ import java.util.ArrayList;
 import utility.Vector2Int;
 
 /**
- *
+ * Generate the mesh of the hexMap, this work with unshaded array shader.
+ * @todo improve MeshManagerV1 && MeshManagerV2 to generate the mesh without needing of unshaded array shader.
  * @author roah
  */
 public class MeshManager {
 
-    private final float hexSize;    //hex radius.
-    private final float hexWidth;   //Make life easier.
-    private final float floorHeight;             //how much the result should be upped
-//    private final byte groundHeight;
+    private final float hexSize;        //hex radius.
+    private final float hexWidth;       //Make life easier.
+    private final float floorHeight;    //how much the result should be upped.
 
     public MeshManager(HexSettings settings) {
         this.hexSize = settings.getHEX_RADIUS();
         this.hexWidth = FastMath.sqrt(3) * hexSize;
         this.floorHeight = settings.getFloorHeight();
-//        this.groundHeight = settings.getGROUND_HEIGHT();
     }
 
     /**
      * Create a flat grid at specifiate position, specifiate size and specifiate
      * attribut.
-     *
      * @param position grid position to start the mesh.
      * @param size number of tile to put in mesh.
      * @param eAttribut texture to use.
@@ -46,7 +44,6 @@ public class MeshManager {
 
     /**
      * Create a flat mesh of 1 tile at specifiate position.
-     *
      * @param position grid position where the tile need to be.
      * @return newly created tile mesh.
      */
@@ -57,7 +54,6 @@ public class MeshManager {
     /**
      * Create a grid at specifiate position, size, height and texture
      * coordinate.
-     *
      * @param position where to start the mesh.
      * @param size number of tile inside the mesh.
      * @param height height of the mesh.
@@ -72,55 +68,55 @@ public class MeshManager {
         return setCollisionBound(setAllBuffer(vertices, texCoord, index));
     }
 
-    /**
-     * 
-     * @param meshParam
-     * @return only hex side mesh
-     * @deprecated
-     */
-    Mesh getHeight(MeshParameter meshParam) {
-        ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
-        ArrayList<Vector3f[]> texCoord = new ArrayList<Vector3f[]>();
-        ArrayList<int[]> index = new ArrayList<int[]>();
-
-        int mergedVerticeCount = 0;
-        int mergedtextCoordCount = 0;
-        int mergedIndexCount = 0;
-
-        for (int i = 0; i < meshParam.size(); i++) {
-            if (meshParam.getHeight(i) != 0) {
-                Vector3f[] vert = getSideVerticesPosition(meshParam.getPosition(i), meshParam.getSize(i), meshParam.getHeight(i));
-                Vector3f[] tex = getSideVerticestexCoord(meshParam.getSize(i), meshParam.getHeight(i), meshParam.getElementType(i));
-                int[] indice = getSideIndex(meshParam.getSize(i).x, mergedVerticeCount, meshParam.getCulling(i));
-
-                vertices.add(vert);
-                texCoord.add(tex);
-                index.add(indice);
-
-                mergedVerticeCount += vert.length;
-                mergedtextCoordCount += tex.length;
-                mergedIndexCount += indice.length;
-            }
-        }
-        Vector3f[] mergedVertices = new Vector3f[mergedVerticeCount];
-        Vector3f[] mergedtextCoord = new Vector3f[mergedtextCoordCount];
-        int[] mergedIndex = new int[mergedIndexCount];
-
-        mergedVerticeCount = 0;
-        mergedtextCoordCount = 0;
-        mergedIndexCount = 0;
-        for (int i = 0; i < vertices.size(); i++) {
-            System.arraycopy(vertices.get(i), 0, mergedVertices, mergedVerticeCount, vertices.get(i).length);
-            System.arraycopy(texCoord.get(i), 0, mergedtextCoord, mergedtextCoordCount, texCoord.get(i).length);
-            System.arraycopy(index.get(i), 0, mergedIndex, mergedIndexCount, index.get(i).length);
-
-            mergedVerticeCount += vertices.get(i).length;
-            mergedtextCoordCount += texCoord.get(i).length;
-            mergedIndexCount += index.get(i).length;
-        }
-        return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
-//        return null;
-    }
+//    /**
+//     * 
+//     * @param meshParam
+//     * @return only hex side mesh
+//     * @deprecated
+//     */
+//    Mesh getHeight(MeshParameter meshParam) {
+//        ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
+//        ArrayList<Vector3f[]> texCoord = new ArrayList<Vector3f[]>();
+//        ArrayList<int[]> index = new ArrayList<int[]>();
+//
+//        int mergedVerticeCount = 0;
+//        int mergedtextCoordCount = 0;
+//        int mergedIndexCount = 0;
+//
+//        for (int i = 0; i < meshParam.size(); i++) {
+//            if (meshParam.getHeight(i) != 0) {
+//                Vector3f[] vert = getSideVerticesPosition(meshParam.getPosition(i), meshParam.getSize(i), meshParam.getHeight(i));
+//                Vector3f[] tex = getSideVerticestexCoord(meshParam.getSize(i), meshParam.getHeight(i), meshParam.getElementType(i));
+//                int[] indice = getSideIndex(meshParam.getSize(i).x, mergedVerticeCount, meshParam.getCulling(i));
+//
+//                vertices.add(vert);
+//                texCoord.add(tex);
+//                index.add(indice);
+//
+//                mergedVerticeCount += vert.length;
+//                mergedtextCoordCount += tex.length;
+//                mergedIndexCount += indice.length;
+//            }
+//        }
+//        Vector3f[] mergedVertices = new Vector3f[mergedVerticeCount];
+//        Vector3f[] mergedtextCoord = new Vector3f[mergedtextCoordCount];
+//        int[] mergedIndex = new int[mergedIndexCount];
+//
+//        mergedVerticeCount = 0;
+//        mergedtextCoordCount = 0;
+//        mergedIndexCount = 0;
+//        for (int i = 0; i < vertices.size(); i++) {
+//            System.arraycopy(vertices.get(i), 0, mergedVertices, mergedVerticeCount, vertices.get(i).length);
+//            System.arraycopy(texCoord.get(i), 0, mergedtextCoord, mergedtextCoordCount, texCoord.get(i).length);
+//            System.arraycopy(index.get(i), 0, mergedIndex, mergedIndexCount, index.get(i).length);
+//
+//            mergedVerticeCount += vertices.get(i).length;
+//            mergedtextCoordCount += texCoord.get(i).length;
+//            mergedIndexCount += index.get(i).length;
+//        }
+//        return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
+////        return null;
+//    }
 
     Mesh getMergedMesh(MeshParameter meshParam) {
         ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();

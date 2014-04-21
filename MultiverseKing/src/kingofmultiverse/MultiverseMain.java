@@ -3,6 +3,7 @@ package kingofmultiverse;
 import hexsystem.MapData;
 import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.export.binary.BinaryExporter;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -10,6 +11,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
@@ -26,7 +28,10 @@ import hexsystem.HexSettings;
 import hexsystem.MapDataAppState;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.HexCoordinate;
@@ -68,7 +73,7 @@ public class MultiverseMain extends SimpleApplication {
         
         //Create a new screen for tonegodGUI to work with.
         screen = new Screen(this);
-
+        
         initGUI();
         lightSettup();
         generateHexMap();

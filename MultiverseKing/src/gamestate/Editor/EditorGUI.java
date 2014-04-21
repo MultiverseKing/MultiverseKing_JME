@@ -28,7 +28,7 @@ import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
 
 /**
- * @todo User should not be able to move the main windows.
+ * 
  * @author roah
  */
 class EditorGUI extends AbstractAppState {
@@ -58,7 +58,6 @@ class EditorGUI extends AbstractAppState {
         mainWin.setResizeW(false);
         mainWin.setResizeE(false);
         mainWin.getDragBar().setIsMovable(false);
-//        win.setWidth(new Float(50));
         main.getScreen().addElement(mainWin);
 
         

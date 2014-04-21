@@ -12,19 +12,17 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import hexsystem.MapData;
-import hexsystem.chunksystem.MeshManager;
 import java.util.Iterator;
 import utility.HexCoordinate;
 import utility.MouseRay;
 
 /**
  * TODO: JUST temporarily, has to be better designed!!
+ * @Idea : Switch it to hexMapMouseInput, but the dependency to mapData is an issue.
  * @author Eike Foede
  */
 public abstract class TmpCleanupState extends AbstractAppState {

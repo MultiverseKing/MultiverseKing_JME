@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package entitysystem.card;
 
-import entitysystem.card.attribut.CardRarity;
 import com.simsilica.es.PersistentComponent;
 
 /**

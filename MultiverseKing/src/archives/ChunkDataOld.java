@@ -2,9 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package hexsystem;
+package archives;
 
 import com.jme3.math.FastMath;
+import hexsystem.HexTile;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;

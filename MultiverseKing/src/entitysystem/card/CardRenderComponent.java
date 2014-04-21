@@ -3,8 +3,8 @@ package entitysystem.card;
 import com.simsilica.es.PersistentComponent;
 
 /**
- *TODO: Comments
- * @author Eike Foede
+ * 
+ * @author Eike Foede, Roah
  */
 public class CardRenderComponent implements PersistentComponent {
 

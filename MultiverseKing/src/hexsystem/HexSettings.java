@@ -7,7 +7,7 @@ package hexsystem;
 import com.jme3.math.FastMath;
 
 /**
- *
+ * Chunk size should not be changed during runtime without changing the way the loader work.
  * @author roah
  */
 public final class HexSettings {
@@ -35,18 +35,33 @@ public final class HexSettings {
         return HEX_WIDTH;
     }
 
+    /**
+     * @return number of hex contain in a chunk.
+     */
     public int getCHUNK_SIZE() {
         return CHUNK_SIZE;
     }
 
+    /**
+     * @return WU distance between two hex of different height.
+     */
     public float getFloorHeight() {
         return FLOOR_HEIGHT;
     }
     
+    /**
+     * Offset value used to put the ground,
+     * to have underground without having to handle negative value, mainly help with the meshManager and how geometry is handle, generated.
+     * @return Ground Offset.
+     */
     public byte getGROUND_HEIGHT() {
         return GROUND_HEIGHT;
     }
     
+    /**
+     * Used by the OldChunkData to know how many chunk to keep in memory before start deleting.
+     * @return 
+     */
     public byte getCHUNK_DATA_LIMIT() {
         return CHUNK_DATA_LIMIT;
     }

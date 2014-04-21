@@ -19,7 +19,7 @@ import jme3tools.optimize.GeometryBatchFactory;
  * V.01 of GridGenerator, Handle hex mesh generation.
  * At the current stage to get the maximum power of this mesh generation chunk have to be generated on the X axis.
  * @todo Algorithm have to be improve.
- * @todo Mesh update, modification of the mesh even after it hav been instanced. 
+ * @todo Mesh update, modification of the mesh even after it have been instanced. 
  * @todo Maybe make this as a custom control with some adjustement would work better than the current stage ?
  * @see http://www.redblobgames.com/grids/hexagons/#basics as hex algorithm starter guide.
  * @see http://0fps.wordpress.com/2012/06/30/meshing-in-a-minecraft-game/ as the chunk system idea came from there.

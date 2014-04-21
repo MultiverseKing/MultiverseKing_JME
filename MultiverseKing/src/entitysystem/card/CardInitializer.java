@@ -4,18 +4,10 @@
  */
 package entitysystem.card;
 
-import com.jme3.asset.AssetManager;
-import com.jme3.input.event.MouseButtonEvent;
-import com.jme3.input.event.MouseMotionEvent;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import com.jme3.texture.Texture2D;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import tonegod.gui.effects.Effect;
 
@@ -25,7 +17,6 @@ import tonegod.gui.effects.Effect;
  * @author roah
  */
 public class CardInitializer {
-    private AssetManager assetManager = null;
     private Screen screen = null;
     Window cardHover;
 
@@ -59,8 +50,7 @@ public class CardInitializer {
         return card;
     }
 
-    public void Init(AssetManager am, Screen screen) {
-        this.assetManager = am;
+    public void Init(Screen screen) {
         this.screen = screen;
         
         cardHover = new Window(screen, "cardHover", new Vector2f(300f, 250f), new Vector2f(200f, 300f), Vector4f.ZERO , "Textures/Cards/cardHover.png");

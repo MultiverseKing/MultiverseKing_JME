@@ -1,8 +1,6 @@
 package entitysystem.card;
 
 import com.simsilica.es.PersistentComponent;
-import entitysystem.card.attribut.CardMainType;
-import entitysystem.card.attribut.CardSubType;
 
 /**
  * Used to regroup all card type entity.

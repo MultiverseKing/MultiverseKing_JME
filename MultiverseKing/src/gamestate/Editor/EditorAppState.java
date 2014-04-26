@@ -89,7 +89,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         if (offsetPos != null) {
 //            changeTile(offsetPos);
             moveCursor(offsetPos);
-            editorGUI.openWin(offsetPos);
+            editorGUI.openHexPropertiesWin(offsetPos);
 //            Dijkstra da = new Dijkstra();
 //            da.setMapData(mapData);
 //            List<HexCoordinate> way = da.getPath(last, offsetPos);

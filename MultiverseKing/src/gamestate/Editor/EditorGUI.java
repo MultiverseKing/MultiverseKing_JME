@@ -52,15 +52,14 @@ class EditorGUI extends AbstractAppState {
 
         Window mainWin = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
         mainWin.setWindowTitle("Main Windows");
-//        win.setMinDimensions(new Vector2f(130, 130));
-        mainWin.setResizeS(false);
-        mainWin.setResizeN(false);
-        mainWin.setResizeW(false);
-        mainWin.setResizeE(false);
+        mainWin.setMinDimensions(new Vector2f(130, 130));
+        mainWin.setIsResizable(false);
         mainWin.getDragBar().setIsMovable(false);
         main.getScreen().addElement(mainWin);
 
-        
+        /**
+         * Button used to change the current map elemental attribut.
+         */
         Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -73,6 +72,9 @@ class EditorGUI extends AbstractAppState {
         mapElement.setText("Change Map Elements");
         mainWin.addChild(mapElement);
 
+        /**
+         * Button used to save the map in a folder/file of his name.
+         */
         Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -87,6 +89,10 @@ class EditorGUI extends AbstractAppState {
         save.setText("Save");
         mainWin.addChild(save);
 
+        /**
+         * Button to load a predifinned map.
+         * @todo add a context menu where you will be able to set the name of the map to load.
+         */
         Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -97,6 +103,9 @@ class EditorGUI extends AbstractAppState {
         load.setText("Load");
         mainWin.addChild(load);
         
+        /**
+         * Load a predefined void map from a File(same as the starting one).
+         */
         Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -117,17 +126,17 @@ class EditorGUI extends AbstractAppState {
         
         Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
             CardEntityRenderSystem testCardSystem = new CardEntityRenderSystem();
-            EntityId cardId = null;
             private boolean activeCardEditor = false;
             
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if(!activeCardEditor){
-                    //to delete, testing purpose
-                    if(cardId == null ){
+                    //to change, testing purpose
+                    
+                    if(testCardSystem.getCards().isEmpty()){
                         EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                        cardId = ed.createEntity();
+                        EntityId cardId = ed.createEntity();
                         ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
                     }
                     
@@ -143,8 +152,16 @@ class EditorGUI extends AbstractAppState {
         };
         cardEditor.setText("Card Editor: OFF");
         cardButtonWin.addChild(cardEditor);
+        
+        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 25f+40f*6), new Vector2f(180, 40));
+        addRemoveCard.getDragBar().setIsVisible(false);
+        addRemoveCard.setIgnoreMouse(true);
+        main.getScreen().addElement(addRemoveCard);
     }
 
+    /**
+     * Context menu used to let you chose the element for map to change to.
+     */
     public final void elementalWindow() {
         eWin =  new Window(main.getScreen(), "EWindows",
                 new Vector2f((main.getScreen().getWidth() / 2) - 175, (main.getScreen().getHeight() / 2) - 100));
@@ -178,7 +195,11 @@ class EditorGUI extends AbstractAppState {
         main.getScreen().addElement(eWin);
     }
 
-    void openWin(HexCoordinate tile) {
+    /**
+     * Method used to open a window related to the selected hex.
+     * @param tile selected one.
+     */
+    void openHexPropertiesWin(HexCoordinate tile) {
         currentTilePosition = tile;
         if (main.getScreen().getElementById("tileP") != null) {
             tilePButtonGroup.setSelected(mapData.getTile(tile).getElement().ordinal());
@@ -187,6 +208,9 @@ class EditorGUI extends AbstractAppState {
         }
     }
 
+    /**
+     * Context menu used to show the tile properties.
+     */
     private void tilePropertiesWin() {
         Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 170, 20), new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
         tileWin.setWindowTitle("Tile Properties");
@@ -237,4 +261,5 @@ class EditorGUI extends AbstractAppState {
         
         main.getScreen().addElement(tileWin);
     }
+    
 }

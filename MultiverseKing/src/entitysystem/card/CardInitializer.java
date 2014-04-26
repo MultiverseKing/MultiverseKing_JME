@@ -6,10 +6,8 @@ package entitysystem.card;
 
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
-import tonegod.gui.effects.Effect;
 
 /**
  * Load the card geometry, card material, needed card and return the card completely generated.
@@ -17,51 +15,17 @@ import tonegod.gui.effects.Effect;
  * @author roah
  */
 public class CardInitializer {
-    private Screen screen = null;
-    Window cardHover;
 
-    public ButtonAdapter initialize(String cardName) {
-        
-        ButtonAdapter card = new ButtonAdapter(screen, cardName, new Vector2f(300f, 250f), new Vector2f(200f, 300f), Vector4f.ZERO , "Textures/Cards/"+cardName+"_256px.png"){
-
-            @Override
-            public void setHasFocus(boolean hasFocus) {
-                super.setHasFocus(hasFocus);
-                if(hasFocus){
-                    cardHover.show();
-                } else {
-                    cardHover.hide();
-                }
-            }
-            
-        };
-
-        card.removeEffect(Effect.EffectEvent.Hover);
-        card.removeEffect(Effect.EffectEvent.Press);
-        card.setIsResizable(false);
-        card.setIsMovable(true);
-        card.centerToParent();
-        
-        card.addChild(cardHover);
-        cardHover.centerToParent();
-        cardHover.hide();
-
-        
+    public Card initialize(Screen screen, String cardName, int handPosition) {
+        Card card = new Card(screen, true, cardName, handPosition);
+        card.resetHandPosition();
         return card;
     }
 
-    public void Init(Screen screen) {
-        this.screen = screen;
-        
-        cardHover = new Window(screen, "cardHover", new Vector2f(300f, 250f), new Vector2f(200f, 300f), Vector4f.ZERO , "Textures/Cards/cardHover.png");
-        cardHover.setIsResizable(false);
-        cardHover.getDragBar().setIsVisible(false);
-        cardHover.setIsMovable(false);
-        cardHover.setIgnoreMouse(true);
-    }
-
-    void cleanup() {
-        screen.removeElement(cardHover);
-        cardHover = null;
+    public Window getHover(Screen screen) {
+        Window hover = new Window(screen, "hover", new Vector2f(300f, 250f), Vector2f.ZERO, Vector4f.ZERO , "Textures/Cards/cardHover.png");
+        hover.getDragBar().setIsVisible(false);
+        hover.setIgnoreMouse(true);
+        return hover;
     }
 }

@@ -8,6 +8,7 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -125,7 +126,6 @@ class EditorGUI extends AbstractAppState {
         main.getScreen().addElement(cardButtonWin);
         
         Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
-            CardEntityRenderSystem testCardSystem = new CardEntityRenderSystem();
             private boolean activeCardEditor = false;
             
             @Override
@@ -133,19 +133,20 @@ class EditorGUI extends AbstractAppState {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if(!activeCardEditor){
                     //to change, testing purpose
-                    
-                    if(testCardSystem.getCards().isEmpty()){
+                    CardEntityRenderSystem cardSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
+                    if(cardSystem.gotCardsIsEmpty()){
                         EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                         EntityId cardId = ed.createEntity();
                         ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
                     }
                     
-                    app.getStateManager().attach(testCardSystem);
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
+                    main.getScreen().getElementById("addRemoveCard").show();
                     activeCardEditor = !activeCardEditor;
                 } else {
-                    app.getStateManager().detach(testCardSystem);
+                    //@todo put the card system to pause
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: OFF");
+                    main.getScreen().getElementById("addRemoveCard").hide();
                     activeCardEditor = !activeCardEditor;
                 }
             }
@@ -153,10 +154,36 @@ class EditorGUI extends AbstractAppState {
         cardEditor.setText("Card Editor: OFF");
         cardButtonWin.addChild(cardEditor);
         
-        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 25f+40f*6), new Vector2f(180, 40));
+        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 55f+40f*6), new Vector2f(180, 20));
         addRemoveCard.getDragBar().setIsVisible(false);
         addRemoveCard.setIgnoreMouse(true);
         main.getScreen().addElement(addRemoveCard);
+        
+        Button addCard = new ButtonAdapter(main.getScreen(), "addCard", new Vector2f(15, 10), new Vector2f(75, 30)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                EntityId cardId = ed.createEntity();
+                ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+            }
+        };
+        addCard.setText("Add");
+        addRemoveCard.addChild(addCard);
+        
+        Button removeCard = new ButtonAdapter(main.getScreen(), "removeCard", new Vector2f(100, 10), new Vector2f(75, 30)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                Object[] cards = app.getStateManager().getState(CardEntityRenderSystem.class).getCardsKeyset().toArray();
+                EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length-1)];
+                ed.removeComponent(id, CardRenderComponent.class);
+            }
+        };
+        removeCard.setText("Del");
+        addRemoveCard.addChild(removeCard);
+        addRemoveCard.hide();
     }
 
     /**

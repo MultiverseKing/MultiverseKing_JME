@@ -16,6 +16,7 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
 import entitysystem.EntityDataAppState;
+import entitysystem.card.CardEntityRenderSystem;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
@@ -154,6 +155,7 @@ public class MultiverseMain extends SimpleApplication {
 //        instanciatePlayer(mapData.getHexSettings());
 
         EntityData entityData = new DefaultEntityData();
+        stateManager.attach(new CardEntityRenderSystem());
         stateManager.attach(new MapDataAppState(mapData));
         stateManager.attach(new EntityDataAppState(entityData));
         stateManager.attach(new MovementSystem());

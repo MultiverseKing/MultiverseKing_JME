@@ -5,9 +5,11 @@
 package entitysystem.card;
 
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
+import java.util.Set;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
@@ -15,22 +17,32 @@ import tonegod.gui.core.Screen;
 /**
  * System used to render all card on the screen.
  * @todo Render the deck.
- * @todo Current position of the card in the hand.
- * @todo Render card on a better way, more structured.
+ * @todo Render card on a better way.
  * @todo Render the opponent hand, show how many card the opponent got in hand(opposite side).
+ * @todo When set in pause hide all cards.
  * @author roah
  */
 public class CardEntityRenderSystem extends EntitySystemAppState{
 
-    private HashMap<String, Card> cards = new HashMap<String, Card>();
+    /**
+     * All card on the current hand.
+     */
+    private HashMap<EntityId, Card> cards = new HashMap<EntityId, Card>();
+    /**
+     * list used to know wich card is duplicated.
+     */
     private CardInitializer cardInitializer = new CardInitializer();
     private Screen screen;
     private Window hover;
-    
-    public HashMap<String, Card> getCards() {
-        return cards;
+
+    public boolean gotCardsIsEmpty() {
+        return cards.isEmpty();
     }
 
+    public Set<EntityId> getCardsKeyset(){
+        return cards.keySet();
+    }
+    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -50,8 +62,10 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 
     @Override
     protected void addEntity(Entity e) {
-        Card card = cardInitializer.initialize(screen, e.get(CardRenderComponent.class).getCardName(), cards.size()-1);
-        cards.put(e.get(CardRenderComponent.class).getCardName(), card);
+        String cardName = e.get(CardRenderComponent.class).getCardName();
+        Card card;
+        card = cardInitializer.initialize(screen, cardName, cards.size()-1, e.getId().toString());
+        cards.put(e.getId(), card);
         screen.addElement(card);
         card.resetHandPosition();
     }
@@ -64,9 +78,9 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 
     @Override
     protected void removeEntity(Entity e) {
-        Card card = cards.get(e.get(CardRenderComponent.class).getCardName());
+        Card card = cards.get(e.getId());
         screen.removeElement(card);
-        cards.remove(e.get(CardRenderComponent.class).getCardName());
+        cards.remove(e.getId()); //to move
     }
     
     @Override

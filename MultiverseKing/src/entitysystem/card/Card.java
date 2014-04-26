@@ -8,7 +8,6 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import tonegod.gui.effects.Effect;
@@ -22,14 +21,15 @@ public class Card extends ButtonAdapter {
     private final Vector2f cardSize;
     private int isRescale = 1;
     private int handPosition;
-    private Window cardHover;
+    private String cardName;
 
-    public Card(ElementManager screen, boolean rescale, String cardName, int handPosition) {
-        super(screen, cardName, Vector2f.ZERO, new Vector2f(200f/(2.5f*(rescale ? 1:0)), 300f/(2.5f*(rescale ? 1:0))), Vector4f.ZERO, "Textures/Cards/"+cardName+"_256px.png");
+    public Card(ElementManager screen, boolean rescale, String cardName, int handPosition, String UID) {
+        super(screen, UID, Vector2f.ZERO, new Vector2f(200f/(2.5f*(rescale ? 1:0)), 300f/(2.5f*(rescale ? 1:0))), Vector4f.ZERO, "Textures/Cards/"+cardName+"_256px.png");
         this.isRescale = (rescale ? 1:0);
         this.rescaleValue = 2.5f; //if you change this change it in the super constructor.
         this.cardSize = new Vector2f(200f/(rescaleValue*isRescale), 300f/(rescaleValue*isRescale));
         this.handPosition = handPosition;
+        this.cardName = cardName;
         this.init();
     }
 
@@ -70,5 +70,8 @@ public class Card extends ButtonAdapter {
         child.setDimensions(cardSize);
         child.centerToParent();
     }
-    
+
+    String getCardName() {
+        return cardName;
+    }
 }

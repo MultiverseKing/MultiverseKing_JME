@@ -16,8 +16,8 @@ import tonegod.gui.core.Screen;
  */
 public class CardInitializer {
 
-    public Card initialize(Screen screen, String cardName, int handPosition) {
-        Card card = new Card(screen, true, cardName, handPosition);
+    public Card initialize(Screen screen, String cardName, int handPosition, String UID) {
+        Card card = new Card(screen, true, cardName, handPosition, UID);
         card.resetHandPosition();
         return card;
     }

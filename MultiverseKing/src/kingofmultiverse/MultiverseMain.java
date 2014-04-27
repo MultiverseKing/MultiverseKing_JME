@@ -63,7 +63,7 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
-
+        
         // Disable the default flyby cam
         flyCam.setEnabled(false);
         

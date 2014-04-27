@@ -1,10 +1,10 @@
-package entitysystem.card;
+package utility.attribut;
 
 /**
  * @todo must be change to be handled by a module system ?
  * @author roah
  */
-public enum CardRarity {
+public enum Rarity {
     COMMON,     // 4 duplicate card limit by deck, 50 equipped card limit by world.
     RARE,       // 4 duplicate card limit by deck, 12 equipped card limit by world.
     ULTRA_RARE, // 3 duplicate card limit by deck, 9 equipped card limit by world.

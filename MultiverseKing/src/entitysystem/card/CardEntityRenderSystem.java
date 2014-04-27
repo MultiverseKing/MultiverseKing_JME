@@ -4,13 +4,14 @@
  */
 package entitysystem.card;
 
+import com.jme3.input.Input;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
 import java.util.Set;
-import tonegod.gui.controls.windows.Window;
+import org.apache.log4j.chainsaw.Main;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
@@ -19,21 +20,18 @@ import tonegod.gui.core.Screen;
  * @todo Render the deck.
  * @todo Render card on a better way.
  * @todo Render the opponent hand, show how many card the opponent got in hand(opposite side).
- * @todo When set in pause hide all cards.
+ * @todo When set in pause hide all cards. (editor only)
  * @author roah
  */
 public class CardEntityRenderSystem extends EntitySystemAppState{
 
     /**
-     * All card on the current hand.
+     * Mainly manage all card on the current hand.
      */
     private HashMap<EntityId, Card> cards = new HashMap<EntityId, Card>();
-    /**
-     * list used to know wich card is duplicated.
-     */
-    private CardInitializer cardInitializer = new CardInitializer();
     private Screen screen;
-    private Window hover;
+    private Hover hover;
+    private float zOrder;
 
     public boolean gotCardsIsEmpty() {
         return cards.isEmpty();
@@ -41,6 +39,10 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
 
     public Set<EntityId> getCardsKeyset(){
         return cards.keySet();
+    }
+
+    Hover getHover() {
+        return hover;
     }
     
     @Override
@@ -51,9 +53,9 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
             screen.removeElement(e);
         }
         screen.getElementsAsMap().clear();
-        hover = cardInitializer.getHover(screen);
+        hover = new Hover(screen);
         //We check for entity who got the CardRenderComponent
-        return entityData.getEntities(CardRenderComponent.class);
+        return entityData.getEntities(CardRenderComponent.class, CardPropertiesComponent.class);
     }
     
     @Override
@@ -64,28 +66,31 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
     protected void addEntity(Entity e) {
         String cardName = e.get(CardRenderComponent.class).getCardName();
         Card card;
-        card = cardInitializer.initialize(screen, cardName, cards.size()-1, e.getId().toString());
+        card = new Card(screen, true, cardName, cards.size()-1, e.getId());
         cards.put(e.getId(), card);
         screen.addElement(card);
         card.resetHandPosition();
+        for(Card c : cards.values()){
+            c.setZOrder(c.getZOrder());
+        }
     }
 
     //used ??
     @Override
     protected void updateEntity(Entity e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     protected void removeEntity(Entity e) {
         Card card = cards.get(e.getId());
         screen.removeElement(card);
-        cards.remove(e.getId()); //to move
+        cards.remove(e.getId());
     }
     
     @Override
     protected void cleanupSystem() {
-        cardInitializer = null;
+        hover.removeAllChildren();
         hover = null;
         for(Card card : cards.values()){
             screen.removeElement(card);
@@ -94,16 +99,17 @@ public class CardEntityRenderSystem extends EntitySystemAppState{
         app.getGuiNode().removeControl(screen);
         screen = null;
     }
-
-    void lastAffectedCard(Card card) {
-        card.resetHandPosition();
-    }
-
+    
     void hasFocus(Card card) {
+        zOrder = card.getZOrder();
+        screen.updateZOrder(card);
+        hover.setProperties(entityData.getComponent(card.getCardEntityUID(), CardPropertiesComponent.class), card.getCardName());
         card.addChild(hover);
     }
 
     void lostFocus(Card card) {
+        hover.removeAllChildren();
         card.removeChild(hover);
+        card.setZOrder(zOrder);
     }
 }

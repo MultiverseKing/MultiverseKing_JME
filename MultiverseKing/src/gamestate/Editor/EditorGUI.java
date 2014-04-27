@@ -14,6 +14,7 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import entitysystem.EntityDataAppState;
 import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.card.CardPropertiesComponent;
 import entitysystem.card.CardRenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
@@ -27,9 +28,13 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
+import utility.attribut.CardSubType;
+import utility.attribut.CardType;
+import utility.attribut.Faction;
+import utility.attribut.Rarity;
 
 /**
- * 
+ * @todo The geometry count is too high it have to be reduced by merging windows.
  * @author roah
  */
 class EditorGUI extends AbstractAppState {
@@ -138,6 +143,8 @@ class EditorGUI extends AbstractAppState {
                         EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                         EntityId cardId = ed.createEntity();
                         ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                        ed.setComponent(cardId, properties);
                     }
                     
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
@@ -166,6 +173,8 @@ class EditorGUI extends AbstractAppState {
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
                 ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                ed.setComponent(cardId, properties);
             }
         };
         addCard.setText("Add");

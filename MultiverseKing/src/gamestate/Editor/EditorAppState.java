@@ -1,6 +1,5 @@
 package gamestate.Editor;
 
-import hexsystem.events.ChunkChangeListener;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.ChaseCamera;
@@ -13,18 +12,14 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import gamestate.TmpCleanupState;
 import hexsystem.MapData;
-import hexsystem.chunksystem.ChunkControl;
-import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
-import java.util.HashMap;
-import java.util.Iterator;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 
 /**
- *
+ * @todo change the way the camera work, make it more rts style to fit the new design.
  * @author Eike Foede, Roah
  */
 public class EditorAppState extends TmpCleanupState implements TileChangeListener {
@@ -94,7 +89,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         if (offsetPos != null) {
 //            changeTile(offsetPos);
             moveCursor(offsetPos);
-            editorGUI.openWin(offsetPos);
+            editorGUI.openHexPropertiesWin(offsetPos);
 //            Dijkstra da = new Dijkstra();
 //            da.setMapData(mapData);
 //            List<HexCoordinate> way = da.getPath(last, offsetPos);

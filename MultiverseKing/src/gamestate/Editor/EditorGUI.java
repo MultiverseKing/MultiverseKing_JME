@@ -8,7 +8,14 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import entitysystem.EntityDataAppState;
+import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.card.CardPropertiesComponent;
+import entitysystem.card.CardRenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.io.IOException;
@@ -21,9 +28,13 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
+import utility.attribut.CardSubType;
+import utility.attribut.CardType;
+import utility.attribut.Faction;
+import utility.attribut.Rarity;
 
 /**
- * @todo User should not be able to move the main windows.
+ * @todo The geometry count is too high it have to be reduced by merging windows.
  * @author roah
  */
 class EditorGUI extends AbstractAppState {
@@ -32,7 +43,9 @@ class EditorGUI extends AbstractAppState {
     private MultiverseMain main;
     private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
+    
     private Window eWin;
+//    private Window mainWin;
 
     EditorGUI(MapData mapData) {
         this.mapData = mapData;
@@ -43,17 +56,16 @@ class EditorGUI extends AbstractAppState {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
         main = (MultiverseMain) app;
 
-        Window win = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
-        win.setWindowTitle("Main Windows");
-//        win.setMinDimensions(new Vector2f(130, 130));
-        win.setResizeS(false);
-        win.setResizeN(false);
-        win.setResizeW(false);
-        win.setResizeE(false);
-        win.getDragBar().setIsMovable(false);
-//        win.setWidth(new Float(50));
-        main.getScreen().addElement(win);
+        Window mainWin = new Window(main.getScreen(), "EditorMain", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
+        mainWin.setWindowTitle("Main Windows");
+        mainWin.setMinDimensions(new Vector2f(130, 130));
+        mainWin.setIsResizable(false);
+        mainWin.getDragBar().setIsMovable(false);
+        main.getScreen().addElement(mainWin);
 
+        /**
+         * Button used to change the current map elemental attribut.
+         */
         Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -64,8 +76,11 @@ class EditorGUI extends AbstractAppState {
             }
         };
         mapElement.setText("Change Map Elements");
-        win.addChild(mapElement);
+        mainWin.addChild(mapElement);
 
+        /**
+         * Button used to save the map in a folder/file of his name.
+         */
         Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -78,8 +93,12 @@ class EditorGUI extends AbstractAppState {
             }
         };
         save.setText("Save");
-        win.addChild(save);
+        mainWin.addChild(save);
 
+        /**
+         * Button to load a predifinned map.
+         * @todo add a context menu where you will be able to set the name of the map to load.
+         */
         Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -88,8 +107,11 @@ class EditorGUI extends AbstractAppState {
             }
         };
         load.setText("Load");
-        win.addChild(load);
+        mainWin.addChild(load);
         
+        /**
+         * Load a predefined void map from a File(same as the starting one).
+         */
         Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -98,17 +120,86 @@ class EditorGUI extends AbstractAppState {
             }
         };
         reset.setText("Reset");
-        win.addChild(reset);
+        mainWin.addChild(reset);
 
-//        mainButton.setDisplayElement(win);
-
-        // Add it to out initial window
-//        win.addChild(makeWindow);
+        /**
+         * Card system initialisation.
+         * Add a card when adding the Card system.
+         */
+        Window cardButtonWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f+40f*5), new Vector2f(180, 40));
+        cardButtonWin.getDragBar().setIsVisible(false);
+        main.getScreen().addElement(cardButtonWin);
+        
+        Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
+            private boolean activeCardEditor = false;
+            
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                if(!activeCardEditor){
+                    //to change, testing purpose
+                    CardEntityRenderSystem cardSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
+                    if(cardSystem.gotCardsIsEmpty()){
+                        EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                        EntityId cardId = ed.createEntity();
+                        ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                        ed.setComponent(cardId, properties);
+                    }
+                    
+                    main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
+                    main.getScreen().getElementById("addRemoveCard").show();
+                    activeCardEditor = !activeCardEditor;
+                } else {
+                    //@todo put the card system to pause
+                    main.getScreen().getElementById("cardEditor").setText("Card Editor: OFF");
+                    main.getScreen().getElementById("addRemoveCard").hide();
+                    activeCardEditor = !activeCardEditor;
+                }
+            }
+        };
+        cardEditor.setText("Card Editor: OFF");
+        cardButtonWin.addChild(cardEditor);
+        
+        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 55f+40f*6), new Vector2f(180, 20));
+        addRemoveCard.getDragBar().setIsVisible(false);
+        addRemoveCard.setIgnoreMouse(true);
+        main.getScreen().addElement(addRemoveCard);
+        
+        Button addCard = new ButtonAdapter(main.getScreen(), "addCard", new Vector2f(15, 10), new Vector2f(75, 30)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                EntityId cardId = ed.createEntity();
+                ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                ed.setComponent(cardId, properties);
+            }
+        };
+        addCard.setText("Add");
+        addRemoveCard.addChild(addCard);
+        
+        Button removeCard = new ButtonAdapter(main.getScreen(), "removeCard", new Vector2f(100, 10), new Vector2f(75, 30)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                Object[] cards = app.getStateManager().getState(CardEntityRenderSystem.class).getCardsKeyset().toArray();
+                EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length-1)];
+                ed.removeComponent(id, CardRenderComponent.class);
+            }
+        };
+        removeCard.setText("Del");
+        addRemoveCard.addChild(removeCard);
+        addRemoveCard.hide();
     }
 
+    /**
+     * Context menu used to let you chose the element for map to change to.
+     */
     public final void elementalWindow() {
-        eWin =
-                new Window(main.getScreen(), "EWindows",
+        eWin =  new Window(main.getScreen(), "EWindows",
                 new Vector2f((main.getScreen().getWidth() / 2) - 175, (main.getScreen().getHeight() / 2) - 100));
         eWin.setWindowTitle("Elemental Windows");
         RadioButtonGroup elementG = new RadioButtonGroup(main.getScreen(), "EButtonGroup") {
@@ -140,7 +231,11 @@ class EditorGUI extends AbstractAppState {
         main.getScreen().addElement(eWin);
     }
 
-    void openWin(HexCoordinate tile) {
+    /**
+     * Method used to open a window related to the selected hex.
+     * @param tile selected one.
+     */
+    void openHexPropertiesWin(HexCoordinate tile) {
         currentTilePosition = tile;
         if (main.getScreen().getElementById("tileP") != null) {
             tilePButtonGroup.setSelected(mapData.getTile(tile).getElement().ordinal());
@@ -149,6 +244,9 @@ class EditorGUI extends AbstractAppState {
         }
     }
 
+    /**
+     * Context menu used to show the tile properties.
+     */
     private void tilePropertiesWin() {
         Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 170, 20), new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
         tileWin.setWindowTitle("Tile Properties");
@@ -199,4 +297,5 @@ class EditorGUI extends AbstractAppState {
         
         main.getScreen().addElement(tileWin);
     }
+    
 }

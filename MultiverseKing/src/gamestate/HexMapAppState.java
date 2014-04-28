@@ -60,7 +60,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     protected Material hexMat;
 
     /**
-     *
+     * Settup the base param for the hexMap, create a new mapNode to hold the hexMap.
      * @param main
      * @param mapData
      */
@@ -72,7 +72,8 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     }
 
     /**
-     *
+     * Load the shader used by the hexMap to render all tile.
+     * @todo AddAllChunks method should be cleaned, it didn't follow the main pattern.
      * @param stateManager
      * @param app
      */
@@ -101,24 +102,18 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         TextureArray hexText = new TextureArray(hexImages);
         hexText.setWrap(Texture.WrapMode.Repeat);
         hexMat.setTexture("ColorMap", hexText);
-//        hexMat.getAdditionalRenderState().setAlphaFallOff(0.1f);
-//        hexMat.getAdditionalRenderState().setDepthTest(true);
-//        hexMat.getAdditionalRenderState().setDepthWrite(true);
-//        hexMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         hexMat.getAdditionalRenderState().setAlphaTest(true);
-//        hexMat.getAdditionalRenderState().setWireframe(true);
     }
 
     /**
      * Make change to chunk according to the event.
-     *
      * @param event contain information of the last chunk event.
      */
     public void chunkUpdate(ChunkChangeEvent event) {
         if (!event.purge() && event.getChunkPos() == Vector2Int.INFINITY) {
             for (Iterator it = chunkNode.values().iterator(); it.hasNext();) {
                 Node chunk = (Node) it.next();
-                chunk.getControl(ChunkControl.class).updateChunk(Vector2Int.INFINITY);
+                chunk.getControl(ChunkControl.class).updateChunk();
             }
         } else if (event.purge() && event.getChunkPos() == null) {
             mapNode.detachAllChildren();

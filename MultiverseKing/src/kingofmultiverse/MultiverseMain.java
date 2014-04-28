@@ -12,13 +12,26 @@ import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import com.simsilica.es.base.DefaultEntityData;
+import entitysystem.EntityDataAppState;
+import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.movement.MoveToComponent;
+import entitysystem.movement.MovementSystem;
+import entitysystem.position.HexPositionComponent;
+import entitysystem.render.EntityRenderSystem;
+import entitysystem.render.RenderComponent;
 import gamestate.HexMapAppState;
 import hexsystem.HexSettings;
+import hexsystem.MapDataAppState;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
 import java.util.logging.Level;
+import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
+import utility.HexCoordinate;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -46,16 +59,17 @@ public class MultiverseMain extends SimpleApplication {
         }
 
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
-//        System.out.println(userHome);
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
-
+        
         // Disable the default flyby cam
         flyCam.setEnabled(false);
-
-        initGUI();
+        
+        //Create a new screen for tonegodGUI to work with.
+        initScreen();
+        
         lightSettup();
         generateHexMap();
     }
@@ -113,24 +127,20 @@ public class MultiverseMain extends SimpleApplication {
 
     private Spatial instanciatePlayer(HexSettings hexSettings) {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
-//        Material mat = assetManager.loadMaterial("Materials/Characters/Berserk/Model_LP3.j3m");
-//        player.setMaterial(mat);
         player.setName("Player");
-//        player.setShadowMode(RenderQueue.ShadowMode.Cast);
-
-//        int x = FastMath.nextRandomInt(2,9);
-//        int y = FastMath.nextRandomInt(2, 9);
 
         player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT() * hexSettings.getFloorHeight(), 0));
         rootNode.attachChild(player);
         return player;
     }
 
-    private void initGUI() {
+    private void initScreen() {
         screen = new Screen(this);
-        this.getGuiNode().addControl(screen);
-        MainGUI mainGUI = new MainGUI(this);
-        stateManager.attach(mainGUI);
+        this.guiNode.addControl(screen);
+        for(Element e : screen.getElementsAsMap().values()){
+            screen.removeElement(e);
+        }
+        screen.getElementsAsMap().clear();
     }
 
     private void initDebug() {
@@ -142,9 +152,22 @@ public class MultiverseMain extends SimpleApplication {
         EditorAppState editorAppState = new EditorAppState(mapData, this);
         stateManager.attach(new HexMapAppState(this,mapData));
         stateManager.attach(editorAppState);
-        instanciatePlayer(mapData.getHexSettings());
+//        instanciatePlayer(mapData.getHexSettings());
 
-//        chaseCameraSettup((Node) instanciatePlayer());
-//        stateManager.detach(stateManager.getState(MainGUI.class));
+        EntityData entityData = new DefaultEntityData();
+        stateManager.attach(new CardEntityRenderSystem());
+        stateManager.attach(new MapDataAppState(mapData));
+        stateManager.attach(new EntityDataAppState(entityData));
+        stateManager.attach(new MovementSystem());
+        stateManager.attach(new EntityRenderSystem());
+        
+        
+        //Example: Initialise new character entity.
+        EntityId characterId = entityData.createEntity();
+//        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
+//        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
+        entityData.setComponent(characterId, new RenderComponent("Berserk"));
+        entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
+        entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
     }
 }

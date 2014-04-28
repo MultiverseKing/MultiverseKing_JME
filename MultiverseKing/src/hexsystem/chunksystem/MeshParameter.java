@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.chunksystem;
 
 import hexsystem.HexTile;
@@ -26,10 +22,6 @@ public class MeshParameter {
     public MeshParameter(MapData mapData, HexCoordinate subChunkWorldGridPos) {
         this.mapData = mapData;
         this.subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
-    }
-
-    MeshParameter(MapData mapData) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public void add(Vector2Int position, Vector2Int size, byte elementType, byte height) {

@@ -1,8 +1,5 @@
 package entitysystem.render;
 
-import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -12,8 +9,7 @@ import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import test.CubeSpatialInitializer;
+import test.CharacterSpatialInitializer;
 
 /**
  * TODO: Rotation/Orientation; Picking/Raycasting; Comments
@@ -29,7 +25,8 @@ import test.CubeSpatialInitializer;
 public class EntityRenderSystem extends EntitySystemAppState {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
-    private SpatialInitializer spatialInitializer = new CubeSpatialInitializer();
+    private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
+//    private CubeSpatialInitializer spatialInitializer = new CubeSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
 
     @Override

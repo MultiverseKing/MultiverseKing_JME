@@ -1,0 +1,14 @@
+
+###############################################################################
+
+	Platformer Graphics (GUI Text) by Arsonide
+
+	------------------------------
+
+		License (CC0)
+	http://creativecommons.org/publicdomain/zero/1.0/
+
+	You may use these graphics in personal and commercial projects.
+	Credit Arsonide would be nice but is not mandatory.
+
+###############################################################################

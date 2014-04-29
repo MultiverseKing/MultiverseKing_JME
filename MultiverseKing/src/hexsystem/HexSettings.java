@@ -15,7 +15,7 @@ public final class HexSettings {
     private final float HEX_WIDTH;
     private final int CHUNK_SIZE = 32; //must be power of two
     private final float FLOOR_HEIGHT = 1f;
-    private final byte GROUND_HEIGHT = 10;
+    private final byte GROUND_HEIGHT = 0;
     private final byte CHUNK_DATA_LIMIT = 4;
 
     /**

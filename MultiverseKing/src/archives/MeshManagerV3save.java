@@ -21,18 +21,17 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public class MeshManagerV2 {
+public class MeshManagerV3save {
     
 //    final float sqrt = FastMath.sqrt(3);        //Make life easier.
     final float hexSize;// = 1f;                   //hex radius.
     final float hexWidth;// = sqrt * hexSize;      //Make life easier.
     final float floorHeight;// = 0.5f;             //ho much the result should be upped
-    private Hashtable generatedMesh = new Hashtable();
 
     public float getHexSize() {return hexSize;}
     public float getHexWidth() {return hexWidth;}
     
-    public MeshManagerV2(HexSettings settings) {
+    public MeshManagerV3save(HexSettings settings) {
         this.hexSize = settings.getHEX_RADIUS();
         this.hexWidth = FastMath.sqrt(3) * hexSize;
         this.floorHeight = settings.getFloorHeight();
@@ -106,6 +105,7 @@ public class MeshManagerV2 {
     private Vector3f[] getQuadVerticesPosition(Vector2Int size, int height){
         Vector3f[] vertices = new Vector3f[(4*size.y)+((size.y-1)*2)];
         int index = 0;
+        //generate the last quad
         vertices[index] = new Vector3f(-(hexWidth/2), height*floorHeight, -(hexSize/2));
         vertices[index+1] = new Vector3f((size.x * hexWidth)-(hexWidth/2), height*floorHeight, -(hexSize/2));
         vertices[index+2] = new Vector3f(-(hexWidth/2), height*floorHeight, (hexSize/2));
@@ -182,15 +182,15 @@ public class MeshManagerV2 {
         for(int i = 1; i < size.y; i++){
         
         if((i&1)==0){
-            texCoord[index] = new Vector2f(0.5f, 0.001f);
-            texCoord[index+1] = new Vector2f(size.x+0.5f, 0.001f);
+            texCoord[index] = new Vector2f(0.5f, 0.002f);
+            texCoord[index+1] = new Vector2f(size.x+0.5f, 0.002f);
             texCoord[index+2] = new Vector2f(0f, 0.25f);
             texCoord[index+3] = new Vector2f(size.x, 0.25f);
             texCoord[index+4] = new Vector2f(0f, 0.75f);
             texCoord[index+5] = new Vector2f(size.x, 0.75f);
         } else {
-            texCoord[index] = new Vector2f(-0.5f, 0.001f);
-            texCoord[index+1] = new Vector2f(-(size.x+0.5f), 0.001f);
+            texCoord[index] = new Vector2f(-0.5f, 0.002f);
+            texCoord[index+1] = new Vector2f(-(size.x+0.5f), 0.002f);
             texCoord[index+2] = new Vector2f(-1f, 0.25f);
             texCoord[index+3] = new Vector2f(-(size.x+1f), 0.25f);
             texCoord[index+4] = new Vector2f(-1f, 0.75f);

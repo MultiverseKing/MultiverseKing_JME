@@ -4,6 +4,7 @@
  */
 package gamestate;
 
+import archives.MeshManagerV2;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -17,7 +18,8 @@ import com.jme3.texture.TextureArray;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import hexsystem.chunksystem.ChunkControl;
-import hexsystem.chunksystem.MeshManager;
+import archives.MeshManager;
+import archives.MeshManagerV3;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.ChunkChangeListener;
 import hexsystem.events.TileChangeEvent;
@@ -41,7 +43,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     /**
      * Mesh generator.
      */
-    protected final MeshManager meshManager;
+    protected final MeshManagerV3 meshManager;
     /**
      * Main application.
      */
@@ -67,7 +69,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     public HexMapAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
         this.mapData = mapData;
-        this.meshManager = new MeshManager(mapData.getHexSettings());
+        this.meshManager = new MeshManagerV3(mapData.getHexSettings());
         mapNode = new Node("mapNode");
     }
 
@@ -80,13 +82,14 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app); //To change body of generated methods, choose Tools | Templates.
-        this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+//        this.hexMat = new Material(main.getAssetManager(), "MatDefs/UnshadedArray.j3md");
+        this.hexMat = main.getAssetManager().loadMaterial("Materials/hexMat.j3m");
         mapData.registerChunkChangeListener(this);
         mapData.registerTileChangeListener(this);
 //        this.hexMat = main.getAssetManager().loadMaterial("Materials/newMaterial.j3m");
         main.getRootNode().attachChild(mapNode);
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        addAllElement();
+//        addAllElement();
         addAllChunks();
     }
 
@@ -127,7 +130,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
         Node chunk = new Node(pos.toString());
         chunkNode.put(pos.toString(), chunk);
         chunk.setLocalTranslation(mapData.getChunkWorldPosition(pos));
-        chunk.addControl(new ChunkControl(mapData, meshManager, hexMat, mapData.getMapElement()));
+        chunk.addControl(new ChunkControl(mapData, meshManager, main.getAssetManager(), mapData.getMapElement()));
         mapNode.attachChild(chunk);
     }
 

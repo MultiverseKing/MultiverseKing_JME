@@ -4,14 +4,14 @@
  */
 package hexsystem.chunksystem;
 
-import com.jme3.material.Material;
+import archives.MeshManagerV3;
+import com.jme3.asset.AssetManager;
 import com.jme3.math.FastMath;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
-import hexsystem.HexTile;
 import hexsystem.MapData;
 import utility.HexCoordinate;
 import utility.Vector2Int;
@@ -19,6 +19,7 @@ import utility.attribut.ElementalAttribut;
 
 /**
  * control the chunk geometry, all tiles geometry.
+ *
  * @author roah
  */
 public class ChunkControl extends AbstractControl {
@@ -32,9 +33,9 @@ public class ChunkControl extends AbstractControl {
         chunkSpatial = null;
     }
 
-    public ChunkControl(MapData mapData, MeshManager meshManager, Material hexMat, ElementalAttribut mapElement) {
+    public ChunkControl(MapData mapData, MeshManagerV3 meshManager, AssetManager assetManager, ElementalAttribut mapElement) {
         this.mapData = mapData;
-        chunkSpatial = new ChunkSpatial(meshManager, hexMat);
+        chunkSpatial = new ChunkSpatial(meshManager, assetManager);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class ChunkControl extends AbstractControl {
         super.setSpatial(spatial); //To change body of generated methods, choose Tools | Templates.
         if (spatial != null) {
             // initialize
-            chunkSpatial.initialize((Node) spatial, mapData.getHexSettings(), subChunkSize, this);
+            chunkSpatial.initialize((Node) spatial, mapData.getHexSettings(), subChunkSize, new MeshParameter(mapData));
         } else {
             // cleanup
         }
@@ -68,63 +69,32 @@ public class ChunkControl extends AbstractControl {
     public void updateChunk() {
         for (byte x = 0; x < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; x++) {
             for (byte y = 0; y < mapData.getHexSettings().getCHUNK_SIZE() / subChunkSize; y++) {
-                updateTile(getSubChunkWorldGridPos(new Vector2Int(x, y)));
+                updateTile(chunkSpatial.getSubChunkHexWorldPos(new Vector2Int(x, y), subChunkSize));
             }
         }
     }
 
     /**
      * update the speciate tile geometry.
+     *
      * @param tilePos tile geometry to update.
      */
     public void updateTile(HexCoordinate tilePos) {
-        Vector2Int subChunkLocalGridPos = getSubChunkLocalGridPos(tilePos);
-        HexCoordinate subChunkWorldGridPos = getSubChunkWorldGridPos(subChunkLocalGridPos);
-        Vector2Int subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
-        MeshParameter meshParam = new MeshParameter(mapData, subChunkWorldGridPos);
+        Vector2Int subChunkLocalChunkPos = getSubChunkLocalChunkPos(tilePos);
+        HexCoordinate subChunkHexWorldPos = chunkSpatial.getSubChunkHexWorldPos(subChunkLocalChunkPos, subChunkSize);
+        MeshParameter meshParam = new MeshParameter(mapData);
+        meshParam.initialize(subChunkSize, subChunkHexWorldPos, false);
 
-        int i = 0;
-        boolean initParam = false;
-        for (int y = 0; y < subChunkSize; y++) {
-            if (initParam) {
-                initParam = false;
-                i++;
-            }
-            for (int x = 0; x < subChunkSize - 1 ; x++) {
-                HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x, subChunkWorldGridPosOffset.y + y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x +1, subChunkWorldGridPosOffset.y + y));
-                if (!initParam) {
-                    meshParam.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) tile.getElement().ordinal(), (byte) tile.getHeight());
-                    initParam = true;
-                }
-                if (nearTile.getElement() == tile.getElement()
-                        && nearTile.getHeight() == tile.getHeight()) {
-                    meshParam.extendsSizeX(i);
-                } else {
-                    i++;
-                    meshParam.add(new Vector2Int(x + 1, y), new Vector2Int(1, 1), (byte) nearTile.getElement().ordinal(), (byte) nearTile.getHeight());
-                }
-            }
-        }
-        chunkSpatial.updateSubChunk(subChunkLocalGridPos, meshParam);
+        chunkSpatial.updateSubChunk(subChunkLocalChunkPos, meshParam);
     }
 
     /**
      * @return SubChunk local chunk position.
      */
-    Vector2Int getSubChunkLocalGridPos(HexCoordinate tile) {
+    Vector2Int getSubChunkLocalChunkPos(HexCoordinate tile) {
         Vector2Int tilePos = tile.getAsOffset();
         Vector2Int result = new Vector2Int((int) ((FastMath.abs(tilePos.x) % mapData.getHexSettings().getCHUNK_SIZE()) / subChunkSize),
                 (int) ((FastMath.abs(tilePos.y) % mapData.getHexSettings().getCHUNK_SIZE()) / subChunkSize));
         return result;
     }
-
-    /**
-     * @return Subchunk position in hexMap.
-     */
-    HexCoordinate getSubChunkWorldGridPos(Vector2Int subChunkLocalGridPos) {
-        return new HexCoordinate(HexCoordinate.OFFSET, subChunkLocalGridPos.x * subChunkSize, subChunkLocalGridPos.y * subChunkSize);
-    }
-    
-    
 }

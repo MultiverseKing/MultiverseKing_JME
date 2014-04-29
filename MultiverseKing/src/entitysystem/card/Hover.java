@@ -17,7 +17,8 @@ public class Hover extends Window {
 
     public Hover(ElementManager screen) {
         super(screen, "hover", new Vector2f(300f, 250f), Vector2f.ZERO, Vector4f.ZERO , "Textures/Cards/cardHover.png");
-        this.getDragBar().setIsVisible(false);
+        this.removeAllChildren();
+//        this.removeChild(dragBar);//.getDragBar().setIsVisible(false);
         this.setIgnoreMouse(true);
     }
 
@@ -27,14 +28,19 @@ public class Hover extends Window {
     void setProperties(CardPropertiesComponent component, String cardName) {
 //        float posY = this.getPosition().y-this.getHeight()-20;
         Window level = new Window(this.screen, Vector2f.ZERO, new Vector2f(11,17), Vector4f.ZERO, "Textures/PlatformerGUIText/Individual/"+component.getLevel()+".png");
+        level.removeAllChildren();
         this.addChild(level);
         level.setPosition(new Vector2f(5, 99));
-        level.getDragBar().hide();
-        
-//        Window name = new Window(this.screen, Vector2f.ZERO, new Vector2f(11,17), Vector4f.ZERO, "Textures/Cards/"+cardName+"NameImg.png");
-//        this.addChild(level);
-//        level.centerToParent();
-//        level.setPosition(new Vector2f(level.getPosition().x, 20));
 //        level.getDragBar().hide();
+        
+        Window name = new Window(this.screen, Vector2f.ZERO, new Vector2f(this.getDimensions().x, 15));
+        name.removeAllChildren();
+        this.addChild(name);
+        name.centerToParent();
+        name.setPosition(new Vector2f(level.getPosition().x, 20));
+        name.setText(cardName);
+        name.hideWindow();
+        screen.updateZOrder(name);
+//        name.getDragBar().hide();
     }    
 }

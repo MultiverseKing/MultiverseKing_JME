@@ -42,6 +42,9 @@ import utility.attribut.ElementalAttribut;
 public class MultiverseMain extends SimpleApplication {
 
     public static void main(String[] args) {
+
+
+
         MultiverseMain app = new MultiverseMain();
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
         app.start();

@@ -3,8 +3,11 @@ package hexsystem.chunksystem;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
+import utility.attribut.ElementalAttribut;
 
 /**
  *
@@ -12,13 +15,29 @@ import utility.Vector2Int;
  */
 public class MeshParameter {
 
+    /**
+     * Reference used to generate the parameter.
+     */
     private final MapData mapData;
-    private Vector2Int subChunkWorldGridPosOffset;
+    /**
+     * Mesh parameter needed to generate the mesh.
+     */
     private ArrayList<Vector2Int> position = new ArrayList<Vector2Int>();
     private ArrayList<Vector2Int> size = new ArrayList<Vector2Int>();
-    private ArrayList<Byte> elementType = new ArrayList<Byte>();
     private ArrayList<Byte> height = new ArrayList<Byte>();
+    /**
+     * Contain all list of parameter for a specifate element.
+     */
+    private HashMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new HashMap<ElementalAttribut, ArrayList<Integer>>();
+    /**
+     * Used to define which algorithm to use with meshmanager.
+     */
     private boolean onlyGround;
+    /**
+     * Current element param returned.
+     */
+    private ElementalAttribut currentElement;
+    private int currentIndex;
 
     /**
      * Need to be initialized before use.
@@ -32,32 +51,32 @@ public class MeshParameter {
     /**
      * Call This before sending the param else it will fail.
      *
-     * @param subChunkSize
+     * @param chunkSize
      * @param subChunkWorldGridPos
      * @param onlyGround
      */
-    public void initialize(int subChunkSize, HexCoordinate subChunkWorldGridPos, boolean onlyGround) {
-        this.subChunkWorldGridPosOffset = subChunkWorldGridPos.getAsOffset();
-        int i = 0;
-        boolean initParam = false;
-        for (int y = 0; y < subChunkSize; y++) {
-            if (initParam) {
-                initParam = false;
-                i++;
+    public void initialize(int chunkSize, boolean onlyGround) {
+        this.onlyGround = onlyGround;
+        boolean[][] isVisited = new boolean[chunkSize][chunkSize];
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
+                isVisited[x][y] = false;
             }
-            for (int x = 0; x < subChunkSize - 1; x++) {
-                HexTile tile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x, subChunkWorldGridPosOffset.y + y));
-                HexTile nearTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, subChunkWorldGridPosOffset.x + x + 1, subChunkWorldGridPosOffset.y + y));
-                if (!initParam) {
-                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) tile.getElement().ordinal(), (byte) tile.getHeight());
-                    initParam = true;
-                }
-                if (nearTile.getElement() == tile.getElement()
-                        && nearTile.getHeight() == tile.getHeight()) {
-                    this.extendsSizeX(i);
-                } else {
-                    i++;
-                    this.add(new Vector2Int(x + 1, y), new Vector2Int(1, 1), (byte) nearTile.getElement().ordinal(), (byte) nearTile.getHeight());
+        }
+
+        int posInList = 0;
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
+                if (!isVisited[x][y]) {
+                    HexTile currentTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x, y));
+                    if (!elementTypeRef.containsKey(currentTile.getElement())) {
+                        ArrayList<Integer> list = new ArrayList<Integer>();
+                        elementTypeRef.put(currentTile.getElement(), list);
+                    }
+                    elementTypeRef.get(currentTile.getElement()).add(posInList);
+                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) currentTile.getElement().ordinal(), (byte) currentTile.getHeight());
+                    setSize(chunkSize, posInList, isVisited, currentTile);
+                    posInList++;
                 }
             }
         }
@@ -66,41 +85,99 @@ public class MeshParameter {
     private void add(Vector2Int position, Vector2Int size, byte elementType, byte height) {
         this.position.add(position);
         this.size.add(size);
-        this.elementType.add(elementType);
+//        this.elementType.add(elementType);
         this.height.add(height);
     }
 
-    private void extendsSizeX(int i) {
-        size.get(i).x++;
+    private void setSize(int chunksize, int posInList, boolean[][] isVisited, HexTile currentTile) {
+        for (int x = 1; x < chunksize - position.get(posInList).x; x++) {
+            HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
+            if (nextTile.getElement() == currentTile.getElement()
+                    && nextTile.getHeight() == currentTile.getHeight()) {
+                this.size.get(posInList).x++;
+                isVisited[x + position.get(posInList).x][position.get(posInList).y] = true;
+            } else {
+                setSizeY(posInList, isVisited, currentTile);
+                return;
+            }
+        }
+        //todo
+        setSizeY(posInList, isVisited, currentTile);
     }
 
-    public Vector2Int getPosition(int i) {
-        return position.get(i);
+    private void setSizeY(int posInList, boolean[][] isVisited, HexTile currentTile) {
+        for (int y = 1; y < size.get(posInList).y; y++) {
+            //We check if the next Y line got the same properties
+            for (int x = 0; x < size.get(posInList).x; x++) {
+                HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
+                if (nextTile.getElement() != currentTile.getElement()
+                        || nextTile.getHeight() != currentTile.getHeight()) {
+                    //if one tile didn't match the requirement we stop the search
+                    return;
+                }
+            }
+            //all tile meet the requirement we increase the size Y
+            size.get(posInList).y++;
+            //we set that line as visited so we don't do any operation later for them
+            for (int x = 0; x < size.get(posInList).x; x++) {
+                isVisited[position.get(posInList).x + x][position.get(posInList).y + y] = true;
+            }
+        }
     }
 
-    public Vector2Int getSize(int i) {
-        return size.get(i);
+    /**
+     * @return index list of all mesh of the current element.
+     */
+    public ArrayList<Integer> getElementMeshIndex() {
+        return this.elementTypeRef.get(currentElement);
     }
 
-    public byte getElementType(int i) {
-        return elementType.get(i);
+    /**
+     * @return a list of all element.
+     */
+    public Set<ElementalAttribut> getAllElementInList() {
+        return this.elementTypeRef.keySet();
     }
 
-    public byte getHeight(int i) {
-        return height.get(i);
+    /**
+     * @return position in chunk of the current element mesh visited.
+     */
+    public Vector2Int getPositionParam() {
+        return position.get(elementTypeRef.get(currentElement).get(currentIndex));
     }
 
-    public int size() {
-        return this.size.size();
+    /**
+     * @return the size of the current element mesh visited.
+     */
+    public Vector2Int getSizeParam() {
+        return size.get(elementTypeRef.get(currentElement).get(currentIndex));
     }
 
-    public Boolean[][] getCulling(int i) {
-        Boolean[][] neightborsCull = new Boolean[size.get(i).x][6];
-        for (int j = 0; j < size.get(i).x; j++) {
-            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, position.get(i).x + subChunkWorldGridPosOffset.x + j, position.get(i).y + subChunkWorldGridPosOffset.y));
+    /**
+     * @return height of the current element mesh visited.
+     */
+    public byte getHeightParam() {
+        return height.get(elementTypeRef.get(currentElement).get(currentIndex));
+    }
+
+    /**
+     * set to true if the depth isn't needed.
+     */
+    public boolean onlyGround() {
+        return onlyGround;
+    }
+
+    /**
+     * wish side of the mesh should be rendered on other term.
+     */
+    public Boolean[][] getCulling() {
+        int current = elementTypeRef.get(currentElement).get(currentIndex);
+        Boolean[][] neightborsCull = new Boolean[size.get(current).x][6];
+        for (int j = 0; j < size.get(current).x; j++) {
+            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, position.get(current).x + j, position.get(current).y));
             for (byte k = 0; k < 6; k++) {
                 if (neightbors[k] != null) {
-                    if (neightbors[k].getHeight() >= height.get(i)) {
+                    if (neightbors[k].getHeight() >= height.get(current)) {
                         neightborsCull[j][k] = false;
                     } else {
                         neightborsCull[j][k] = true;
@@ -113,7 +190,34 @@ public class MeshParameter {
         return neightborsCull;
     }
 
-    public boolean onlyGround() {
-        return onlyGround;
+    /**
+     * Set the current element you looking for to be initialized.
+     *
+     * @param e current element.
+     * @return current instance of meshParameter, (less typing ^_^)
+     */
+    public MeshParameter setElement(ElementalAttribut e) {
+        this.currentElement = e;
+        this.currentIndex = -1;
+        return this;
+    }
+
+    /**
+     * How many mesh param this element have.
+     */
+    public int getElementMeshCount() {
+        return elementTypeRef.get(currentElement).size();
+    }
+
+    /**
+     * Return true if there is another mesh to generate for the current element.
+     */
+    public boolean hasNext() {
+        currentIndex++;
+        if (elementTypeRef.get(currentElement).size() > currentIndex) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

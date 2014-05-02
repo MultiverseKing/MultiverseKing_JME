@@ -33,14 +33,22 @@ public class Hover extends Window {
         level.setPosition(new Vector2f(5, 99));
 //        level.getDragBar().hide();
         
-        Window name = new Window(this.screen, Vector2f.ZERO, new Vector2f(this.getDimensions().x, 15));
-        name.removeAllChildren();
-        this.addChild(name);
-        name.centerToParent();
-        name.setPosition(new Vector2f(level.getPosition().x, 20));
-        name.setText(cardName);
-        name.hideWindow();
-        screen.updateZOrder(name);
-//        name.getDragBar().hide();
-    }    
+//        Window name = new Window(this.screen, Vector2f.ZERO, new Vector2f(this.getDimensions().x, 15));
+//        name.removeAllChildren();
+//        this.addChild(name);
+//        name.centerToParent();
+//        name.setPosition(new Vector2f(level.getPosition().x, 20));
+//        name.setText(cardName);
+//        name.hideWindow();
+//        screen.updateZOrder(name);
+////        name.getDragBar().hide();
+        
+//        setGlowing();
+    }
+
+    private void setGlowing(float tpf) {
+        Window glow = new Window(this.screen, Vector2f.ZERO, new Vector2f(11,17), Vector4f.ZERO, "Textures/Cards/cardHoverTest.png");
+        glow.removeAllChildren();
+        this.addChild(glow);
+    }
 }

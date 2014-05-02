@@ -257,7 +257,7 @@ public final class MapData {
      * @return chunk world unit position.
      */
     public Vector3f getChunkWorldPosition(Vector2Int position) {
-        return new Vector3f((position.x * hexSettings.getCHUNK_SIZE()) * hexSettings.getHEX_WIDTH() - (hexSettings.getHEX_WIDTH() / 2), 0,
+        return new Vector3f((position.x * hexSettings.getCHUNK_SIZE()) * hexSettings.getHEX_WIDTH(), 0,
                 (position.y * hexSettings.getCHUNK_SIZE()) * (float) (hexSettings.getHEX_RADIUS() * 1.5));
     }
 

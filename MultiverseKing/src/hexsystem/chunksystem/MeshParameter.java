@@ -176,14 +176,26 @@ public class MeshParameter {
         for (int j = 0; j < size.get(current).x; j++) {
             HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, position.get(current).x + j, position.get(current).y));
             for (byte k = 0; k < 6; k++) {
-                if (neightbors[k] != null) {
-                    if (neightbors[k].getHeight() >= height.get(current)) {
+                if(height.get(current) >= 0){
+                    if (neightbors[k] != null) {
+                        if (neightbors[k].getHeight() >= height.get(current)) {
+                            neightborsCull[j][k] = false;
+                        } else {
+                            neightborsCull[j][k] = true;
+                        }
+                    } else {
                         neightborsCull[j][k] = false;
+                    }
+                } else {
+                    if (neightbors[k] != null) {
+                        if (neightbors[k].getHeight() >= height.get(current)) {
+                            neightborsCull[j][k] = true;
+                        } else {
+                            neightborsCull[j][k] = false;
+                        }
                     } else {
                         neightborsCull[j][k] = true;
                     }
-                } else {
-                    neightborsCull[j][k] = false;
                 }
             }
         }

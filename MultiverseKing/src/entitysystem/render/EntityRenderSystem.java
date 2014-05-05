@@ -8,8 +8,11 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
+import entitysystem.position.RotationComponent;
 import java.util.HashMap;
 import test.CharacterSpatialInitializer;
+import utility.Rotation;
+import utility.Rotation;
 
 /**
  * TODO: Rotation/Orientation; Picking/Raycasting; Comments
@@ -33,7 +36,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
-        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class, RotationComponent.class);
 
     }
 
@@ -47,6 +50,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
         Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getModelName());
         spatials.put(e.getId(), s);
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
+        s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
         renderSystemNode.attachChild(s);
     }
 
@@ -55,6 +59,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
+        s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
     }
 
     @Override

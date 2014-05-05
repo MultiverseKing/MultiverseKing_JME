@@ -11,6 +11,8 @@ import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
 import java.util.List;
 import utility.HexCoordinate;
+import utility.Rotation;
+import utility.Vector3Int;
 
 /**
  *
@@ -26,7 +28,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         pathfinder.setMapData(mapData);
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class);//, RotationComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RotationComponent.class);//, RotationComponent.class);
     }
 
     @Override
@@ -36,6 +38,13 @@ public class MovementSystem extends EntitySystemAppState {
             movement.distanceMoved += tpf;
             while (movement.distanceMoved > secondsPerStep) {
                 movement.distanceMoved -= secondsPerStep;
+                if(movement.actualPosition+1 < movement.path.size()){
+                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), movement.path.get(movement.actualPosition+1).getAsCubic());
+                    if(!e.get(RotationComponent.class).getRotation().equals(dir)){
+                        System.out.println(dir);
+                        e.set(new RotationComponent(dir));
+                    }
+                }
                 e.set(new HexPositionComponent(movement.path.get(movement.actualPosition)));
                 movement.actualPosition++;
                 if (movement.actualPosition == movement.path.size()) {
@@ -77,6 +86,24 @@ public class MovementSystem extends EntitySystemAppState {
     protected void cleanupSystem() {
     }
 
+    private Rotation getDirection(Vector3Int currentPos, Vector3Int nextPos) {
+        Vector3Int result = new Vector3Int(currentPos.x - nextPos.x, currentPos.y - nextPos.y, currentPos.z - nextPos.z);
+        if(result.z == 0 && result.x > 0){
+            return Rotation.D;
+        } else if(result.z == 0 && result.x < 0){
+            return Rotation.A;
+        } else if(result.y == 0 && result.x > 0){
+            return Rotation.C;
+        } else if(result.y == 0 && result.x < 0){
+            return Rotation.F;
+        } else if(result.x == 0 && result.y > 0){
+            return Rotation.B;
+        } else if(result.x == 0 && result.y < 0){
+            return Rotation.E;
+        }
+        return null;
+    }
+    
     private class Movement {
 
         float distanceMoved = 0;//Distance already moved since last tile

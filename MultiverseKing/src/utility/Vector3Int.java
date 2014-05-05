@@ -23,7 +23,7 @@ public class Vector3Int {
      */
     @Override
     public String toString() {
-        return Integer.toString(this.x)+"|"+Integer.toString(this.y);
+        return Integer.toString(this.x)+"|"+Integer.toString(this.y)+"|"+Integer.toString(this.z);
     }
     
     public Vector3Int(){

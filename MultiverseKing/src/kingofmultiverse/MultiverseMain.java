@@ -21,6 +21,7 @@ import entitysystem.card.CardEntityRenderSystem;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
+import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
 import gamestate.HexMapAppState;
@@ -33,6 +34,7 @@ import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.HexCoordinate;
+import utility.Rotation;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -182,6 +184,7 @@ public class MultiverseMain extends SimpleApplication {
 //        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
 //        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
         entityData.setComponent(characterId, new RenderComponent("Berserk"));
+        entityData.setComponent(characterId, new RotationComponent(Rotation.A));
         entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
         entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
     }

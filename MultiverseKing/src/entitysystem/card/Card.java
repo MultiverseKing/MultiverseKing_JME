@@ -65,15 +65,23 @@ public class Card extends ButtonAdapter {
             app.getStateManager().getState(CardEntityRenderSystem.class).lostFocus(this);
         }
     }
-
     @Override
     public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftDown(evt, toggled);
     }
 
     @Override
+    public void update(float tpf) {
+        super.update(tpf); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
+    
+    @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftUp(evt, toggled);
+        CardEntityRenderSystem renderSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
+        renderSystem.isInCastArea(this);
         resetHandPosition();
     }
 

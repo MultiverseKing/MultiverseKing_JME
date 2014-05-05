@@ -311,9 +311,9 @@ public final class MapData {
      */
     public void loadMap(String name) {
         MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("MapData/" + name + "/" + name + ".map"));
-        this.mapName = mdLoader.getMapName();
-        this.mapElement = mdLoader.getMapElement();
-        this.chunkPos = mdLoader.getChunkPos();
+        mapName = mdLoader.getMapName();
+        mapElement = mdLoader.getMapElement();
+        chunkPos = mdLoader.getChunkPos();
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
         for (byte i = 0; i < chunkPos.size(); i++) {

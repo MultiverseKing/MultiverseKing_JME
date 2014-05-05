@@ -5,6 +5,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
+import entitysystem.position.RotationComponent;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         pathfinder.setMapData(mapData);
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class);//, RotationComponent.class);
     }
 
     @Override

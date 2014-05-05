@@ -4,7 +4,7 @@ import com.jme3.math.Quaternion;
 import com.simsilica.es.PersistentComponent;
 
 /**
- *TODO: Comments
+ * TODO: Comments
  * @author Eike Foede
  */
 public class RotationComponent implements PersistentComponent {

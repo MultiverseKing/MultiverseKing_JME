@@ -27,7 +27,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private final EditorGUI editorGUI;
     private Spatial cursor;
-    private Node camTarget = new Node("camFocus");
+    private Node camTarget = new Node("camFocus");      //for chase cam
 
     public EditorAppState(MapData mapData, MultiverseMain main) {
         super(main, mapData);
@@ -41,8 +41,8 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         mapData.registerTileChangeListener(this);
         mapData.addChunk(new Vector2Int(0, 0), null);
         initCursor();
-        initCamera();
-        initInput();
+//        initChaseCamera();
+//        initInput();
     }
 
     private void initInput() {
@@ -69,7 +69,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         cursor.setLocalTranslation(new Vector3f(0f, mapData.getHexSettings().getGROUND_HEIGHT() + 0.01f, cursorOffset)); //Remove offset and set it to zero if hex_void_anim.png is not used
     }
 
-    private void initCamera() {
+    private void initChaseCamera() {
         camTarget.setLocalTranslation(cursor.getLocalTranslation());
         main.getRootNode().attachChild(camTarget);
         ChaseCamera chaseCam = new ChaseCamera(main.getCamera(), camTarget, main.getInputManager());
@@ -79,7 +79,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         chaseCam.setSmoothMotion(true);
     }
 //    HexCoordinate last = new HexCoordinate(HexCoordinate.AXIAL, 0, 0);
-
+    
     /**
      * Method called each time a left mouse action is done.
      */

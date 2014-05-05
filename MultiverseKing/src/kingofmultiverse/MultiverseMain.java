@@ -6,6 +6,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Caps;
@@ -68,7 +69,7 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLoader(MapDataLoader.class, "map");
         
         // Disable the default flyby cam
-        flyCam.setEnabled(false);
+        cameraInit();
         
         //Create a new screen for tonegodGUI to work with.
         initScreen();
@@ -116,7 +117,18 @@ public class MultiverseMain extends SimpleApplication {
         ambient.setColor(ColorRGBA.White);
         rootNode.addLight(ambient);
     }
+        RTSCamera rtsCam;
 
+    private void cameraInit(){
+        flyCam.setEnabled(false);
+        rtsCam = new RTSCamera(RTSCamera.UpVector.Y_UP);
+        rtsCam.setCenter(new Vector3f(8,15f,8));
+        rtsCam.setRot(120);
+        stateManager.attach(rtsCam);
+//        flyCam.setMoveSpeed(10);
+//        cam.setLocation(new Vector3f(10f, 18f, -5f));
+    }
+    
     /**
      * Use to generate a character who can move on the field, this will be used
      * for Exploration mode configuration, jme terrain is called with it.

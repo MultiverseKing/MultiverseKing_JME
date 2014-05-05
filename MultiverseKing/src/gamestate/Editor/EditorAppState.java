@@ -28,6 +28,12 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
     private final EditorGUI editorGUI;
     private Spatial cursor;
     private Node camTarget = new Node("camFocus");      //for chase cam
+    private boolean activeCursor;
+    private HexCoordinate offsetPos;
+
+    public HexCoordinate getOffsetPos() {
+        return offsetPos;
+    }
 
     public EditorAppState(MapData mapData, MultiverseMain main) {
         super(main, mapData);
@@ -88,6 +94,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         HexCoordinate offsetPos = super.getLastLeftMouseCollisionGridPos();
         if (offsetPos != null) {
 //            changeTile(offsetPos);
+            this.offsetPos = offsetPos;
             moveCursor(offsetPos);
             editorGUI.openHexPropertiesWin(offsetPos);
 //            Dijkstra da = new Dijkstra();
@@ -114,7 +121,9 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
     @Override
     public void update(float tpf) {
         super.update(tpf); //To change body of generated methods, choose Tools | Templates.
-
+        if(activeCursor){
+            castRay();
+        }
     }
 
     /**
@@ -130,5 +139,10 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         Vector3f pos = mapData.getTileWorldPosition(tilePos);
         Vector2Int offsetPos = tilePos.getAsOffset();
         cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * mapData.getHexSettings().getFloorHeight() + ((offsetPos.y & 1) == 0 ? 0.001f : 0.002f), pos.z + cursorOffset);
+    }
+
+    public void setActivecursor(boolean isActive) {
+        super.pauseInput(isActive);
+        activeCursor = isActive;
     }
 }

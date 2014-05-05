@@ -12,7 +12,6 @@ import entitysystem.position.RotationComponent;
 import java.util.HashMap;
 import test.CharacterSpatialInitializer;
 import utility.Rotation;
-import utility.Rotation;
 
 /**
  * TODO: Rotation/Orientation; Picking/Raycasting; Comments
@@ -36,7 +35,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
-        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class, RotationComponent.class);
+        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class, RotationComponent.class);
 
     }
 
@@ -47,7 +46,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     @Override
     //TODO: Handle if spatial is already generated (shouldn't happen, but in the case it does, this should be handled))
     public void addEntity(Entity e) {
-        Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getModelName());
+        Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
         s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
@@ -66,7 +65,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     public void removeEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         renderSystemNode.detachChild(s);
-        spatials.remove(s);
+        spatials.remove(e.getId());
     }
 
     @Override

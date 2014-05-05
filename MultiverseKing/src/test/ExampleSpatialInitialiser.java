@@ -12,8 +12,8 @@ public class ExampleSpatialInitialiser implements SpatialInitializer {
 
     AssetManager assetManager;
 
-    public Spatial initialize(String spatial) {
-        return assetManager.loadModel(spatial);
+    public Spatial initialize(String name) {
+        return assetManager.loadModel(name);
     }
 
     public void setAssetManager(AssetManager assetManager) {

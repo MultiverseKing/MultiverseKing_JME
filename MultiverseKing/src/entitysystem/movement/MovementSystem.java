@@ -28,7 +28,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         pathfinder.setMapData(mapData);
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RotationComponent.class);//, RotationComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RotationComponent.class);
     }
 
     @Override
@@ -41,7 +41,6 @@ public class MovementSystem extends EntitySystemAppState {
                 if(movement.actualPosition+1 < movement.path.size()){
                     Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), movement.path.get(movement.actualPosition+1).getAsCubic());
                     if(!e.get(RotationComponent.class).getRotation().equals(dir)){
-                        System.out.println(dir);
                         e.set(new RotationComponent(dir));
                     }
                 }

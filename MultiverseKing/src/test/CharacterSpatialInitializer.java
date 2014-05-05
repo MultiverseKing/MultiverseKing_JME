@@ -16,8 +16,8 @@ public class CharacterSpatialInitializer implements SpatialInitializer {
 
     private AssetManager assetManager = null;
 
-    public Spatial initialize(String spatial) {
-        return assetManager.loadModel("Models/Characters/"+spatial+"/"+spatial+".j3o");
+    public Spatial initialize(String name) {
+        return assetManager.loadModel("Models/Units/"+name+".j3o");
     }
 
     public void setAssetManager(AssetManager am) {

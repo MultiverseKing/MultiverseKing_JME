@@ -15,7 +15,8 @@ import com.simsilica.es.EntityId;
 import entitysystem.EntityDataAppState;
 import entitysystem.card.CardEntityRenderSystem;
 import entitysystem.card.CardPropertiesComponent;
-import entitysystem.card.CardRenderComponent;
+import entitysystem.card.CardPositionComponent;
+import entitysystem.render.RenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
+import utility.attribut.CardPosition;
 import utility.attribut.CardSubType;
 import utility.attribut.CardType;
 import utility.attribut.Faction;
@@ -142,7 +144,8 @@ class EditorGUI extends AbstractAppState {
                     if(cardSystem.gotCardsIsEmpty()){
                         EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                         EntityId cardId = ed.createEntity();
-                        ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                        ed.setComponent(cardId, new RenderComponent("Cendrea"));
+                        ed.setComponent(cardId, new CardPositionComponent(CardPosition.HAND));
                         CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
                         ed.setComponent(cardId, properties);
                     }
@@ -172,7 +175,8 @@ class EditorGUI extends AbstractAppState {
                 super.onButtonMouseLeftUp(evt, toggled);
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
-                ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
+                ed.setComponent(cardId, new RenderComponent("Cendrea"));
+                ed.setComponent(cardId, new CardPositionComponent(CardPosition.HAND));
                 CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
                 ed.setComponent(cardId, properties);
             }
@@ -187,7 +191,7 @@ class EditorGUI extends AbstractAppState {
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 Object[] cards = app.getStateManager().getState(CardEntityRenderSystem.class).getCardsKeyset().toArray();
                 EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length-1)];
-                ed.removeComponent(id, CardRenderComponent.class);
+                ed.removeComponent(id, CardPositionComponent.class);
             }
         };
         removeCard.setText("Del");

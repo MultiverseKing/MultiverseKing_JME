@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package kingofmultiverse;
 
 import com.jme3.app.Application;
@@ -24,20 +20,25 @@ import com.jme3.scene.Node;
  * @author roah
  */
 public class Player extends AbstractAppState implements ActionListener {
-    
+
     private MultiverseMain main;
     private BulletAppState bulletAppState;
     private BetterCharacterControl player_phys;
     // track directional input, so we can walk left-forward etc
     private boolean left = false, right = false, up = false, down = false, run = false;
-    private Vector3f walkDirection = new Vector3f(0,0,0); // stop
+    private Vector3f walkDirection = new Vector3f(0, 0, 0); // stop
     private float airTime = 0;
     private float speed;
-    
+
+    /**
+     *
+     * @param stateManager
+     * @param app
+     */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
-        this.main = (MultiverseMain)app;
+        this.main = (MultiverseMain) app;
         bulletAppState = new BulletAppState();
         main.getStateManager().attach(bulletAppState);
         //TODO: initialize your AppState, e.g. attach spatials to rootNode
@@ -50,20 +51,20 @@ public class Player extends AbstractAppState implements ActionListener {
         player_phys = new BetterCharacterControl((float) 1.5, 3, (float) 0.1);
         // Attach physical properties to model and PhysicsSpace
         player.addControl(player_phys);
-        
+
         Node terrain = (Node) main.getAssetManager().loadModel("Scenes/testMap.j3o");
         terrain.addControl(new RigidBodyControl(0));
-        
+
         main.getRootNode().attachChild(player);
         main.getRootNode().attachChild(terrain);
-        
+
         bulletAppState.getPhysicsSpace().add(player_phys);
         bulletAppState.getPhysicsSpace().add(terrain);
         bulletAppState.setDebugEnabled(true);
         cameraSettup(player);
         setInput();
     }
-    
+
     @Override
     public void update(float tpf) {
         //TODO: implement behavior during runtime
@@ -73,27 +74,35 @@ public class Player extends AbstractAppState implements ActionListener {
         camDir.y = 0;
         camLeft.y = 0;
         walkDirection.set(0, 0, 0);
-        
-        if (left)  walkDirection.addLocal(camLeft);
-        if (right) walkDirection.addLocal(camLeft.negate());
-        if (up) walkDirection.addLocal(camDir);
-        if (down) walkDirection.addLocal(camDir.negate());
-        
+
+        if (left) {
+            walkDirection.addLocal(camLeft);
+        }
+        if (right) {
+            walkDirection.addLocal(camLeft.negate());
+        }
+        if (up) {
+            walkDirection.addLocal(camDir);
+        }
+        if (down) {
+            walkDirection.addLocal(camDir.negate());
+        }
+
         if (!player_phys.isOnGround()) {
-          airTime = airTime + tpf;
+            airTime = airTime + tpf;
         } else {
-          airTime = 0;
+            airTime = 0;
         }
         player_phys.setWalkDirection(walkDirection); // THIS IS WHERE THE WALKING HAPPENS
     }
-    
+
     private void cameraSettup(Node target) {
         // Enable a chase cam for this target (typically the player).
         ChaseCamera chaseCam = new ChaseCamera(main.getCamera(), target, main.getInputManager());
         chaseCam.setLookAtOffset(new Vector3f(0f, 1.5f, 0f));
         chaseCam.setSmoothMotion(true);
     }
-    
+
     private void setInput() {
         // configure mappings, e.g. the WASD keys
         main.getInputManager().addMapping("CharLeft", new KeyTrigger(KeyInput.KEY_Q));
@@ -108,36 +117,54 @@ public class Player extends AbstractAppState implements ActionListener {
         main.getInputManager().addListener(this, "CharForward", "CharBackward");
         main.getInputManager().addListener(this, "CharJump", "CharAttack", "CharRun", "GetPosition");
     }
-    
+
     public void onAction(String binding, boolean value, float tpf) {
         if (binding.equals("CharLeft")) {
-            if (value) left = true;
-            else left = false;
+            if (value) {
+                left = true;
+            } else {
+                left = false;
+            }
         } else if (binding.equals("CharRight")) {
-            if (value) right = true;
-            else right = false;
+            if (value) {
+                right = true;
+            } else {
+                right = false;
+            }
         } else if (binding.equals("CharForward")) {
-            if (value) up = true;
-            else up = false;
+            if (value) {
+                up = true;
+            } else {
+                up = false;
+            }
         } else if (binding.equals("CharBackward")) {
-            if (value) down = true;
-            else down = false;
-        } else if (binding.equals("CharJump"))
+            if (value) {
+                down = true;
+            } else {
+                down = false;
+            }
+        } else if (binding.equals("CharJump")) {
             player_phys.jump();
-        if (binding.equals("CharAttack"))
+        }
+        if (binding.equals("CharAttack")) {
             attack();
-        if (binding.equals("GetPosition"))
+        }
+        if (binding.equals("GetPosition")) {
             getPlayerPosition();
+        }
         if (binding.equals("CharRun")) {
-            if (value) run = true;
-            else run = false;
+            if (value) {
+                run = true;
+            } else {
+                run = false;
+            }
         }
     }
 
     private void attack() {
         System.out.println("Attack");
     }
-    
+
     @Override
     public void cleanup() {
         super.cleanup();
@@ -147,8 +174,8 @@ public class Player extends AbstractAppState implements ActionListener {
     }
 
     private void getPlayerPosition() {
-        System.out.print((int)main.getRootNode().getChild("Player").getLocalTranslation().x + " + ");
-        System.out.print((int)main.getRootNode().getChild("Player").getLocalTranslation().y + " + ");
-        System.out.println((int)main.getRootNode().getChild("Player").getLocalTranslation().z);
+        System.out.print((int) main.getRootNode().getChild("Player").getLocalTranslation().x + " + ");
+        System.out.print((int) main.getRootNode().getChild("Player").getLocalTranslation().y + " + ");
+        System.out.println((int) main.getRootNode().getChild("Player").getLocalTranslation().z);
     }
 }

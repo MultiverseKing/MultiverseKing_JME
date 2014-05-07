@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package archives;
 
 import com.jme3.math.FastMath;
@@ -11,7 +7,7 @@ import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
- *
+ * test
  * @author roah
  */
 class ChunkDataOld {

@@ -11,10 +11,18 @@ import hexsystem.events.TileChangeListener;
  */
 public class TestListener implements ChunkChangeListener, TileChangeListener{
 
+    /**
+     *
+     * @param event
+     */
     public void chunkUpdate(ChunkChangeEvent event) {
         System.out.println("chunkUpdate with pos " + event.getChunkPos().toString());
     }
 
+    /**
+     *
+     * @param event
+     */
     public void tileChange(TileChangeEvent event) {
         System.out.println("tileChange with tilepos " + event.getTilePos().getAsOffset().toString());
     }

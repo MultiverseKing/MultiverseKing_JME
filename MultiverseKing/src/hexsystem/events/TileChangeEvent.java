@@ -15,6 +15,13 @@ public class TileChangeEvent {
     private HexTile oldTile;
     private HexTile newTile;
 
+    /**
+     *
+     * @param chunkPos
+     * @param tilePos
+     * @param oldTile
+     * @param newTile
+     */
     public TileChangeEvent(Vector2Int chunkPos, HexCoordinate tilePos, HexTile oldTile, HexTile newTile) {
         this.tilePos = tilePos;
         this.oldTile = oldTile;
@@ -22,10 +29,14 @@ public class TileChangeEvent {
         this.chunkPos = chunkPos;
     }
 
-    public Vector2Int getChunkPos(){
+    /**
+     *
+     * @return
+     */
+    public Vector2Int getChunkPos() {
         return chunkPos;
     }
-    
+
     /**
      * @return Odd-R Offset coordinate of the tile relative to mapGrid
      */
@@ -33,10 +44,18 @@ public class TileChangeEvent {
         return tilePos;
     }
 
+    /**
+     *
+     * @return
+     */
     public HexTile getOldTile() {
         return oldTile;
     }
 
+    /**
+     *
+     * @return
+     */
     public HexTile getNewTile() {
         return newTile;
     }

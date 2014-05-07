@@ -12,17 +12,34 @@ public class SpatialPositionComponent implements PersistentComponent {
 
     private Vector3f position;
 
+    /**
+     *
+     */
     public SpatialPositionComponent() {
     }
 
+    /**
+     *
+     * @param position
+     */
     public SpatialPositionComponent(Vector3f position) {
         this.position = position;
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     */
     public SpatialPositionComponent(float x, float y, float z) {
         this.position = new Vector3f(x, y, z);
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3f getPosition() {
         return position;
     }

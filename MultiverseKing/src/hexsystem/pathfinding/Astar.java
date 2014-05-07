@@ -9,12 +9,17 @@ import utility.HexCoordinate;
 
 /**
  * A* algorithm, should be faster than Dijkstra.
+ *
  * @author Eike Foede
  */
 public class Astar implements Pathfinder {
 
     private MapData mapData;
 
+    /**
+     *
+     * @param mapData
+     */
     public void setMapData(MapData mapData) {
         this.mapData = mapData;
     }

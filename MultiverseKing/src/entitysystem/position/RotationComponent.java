@@ -1,24 +1,35 @@
 package entitysystem.position;
 
-import com.jme3.math.Quaternion;
 import com.simsilica.es.PersistentComponent;
+import utility.Rotation;
 
 /**
- *TODO: Comments
+ * TODO: Comments
  * @author Eike Foede
  */
 public class RotationComponent implements PersistentComponent {
 
-    private Quaternion rotation;
+    private Rotation rotation;
 
+    /**
+     *
+     */
     public RotationComponent() {
     }
 
-    public RotationComponent(Quaternion rotation) {
+    /**
+     *
+     * @param rotation
+     */
+    public RotationComponent(Rotation rotation) {
         this.rotation = rotation;
     }
 
-    public Quaternion getRotation() {
+    /**
+     *
+     * @return
+     */
+    public Rotation getRotation() {
         return rotation;
     }
 }

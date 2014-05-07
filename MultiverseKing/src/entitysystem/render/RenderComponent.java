@@ -3,21 +3,33 @@ package entitysystem.render;
 import com.simsilica.es.PersistentComponent;
 
 /**
- *TODO: Comments
- * @author Eike Foede
+ * TODO: Comments Used by the card system and the render system.
+ *
+ * @author Eike Foede, roah
  */
 public class RenderComponent implements PersistentComponent {
 
-    private String modelName;
+    private String name;
 
+    /**
+     *
+     */
     public RenderComponent() {
     }
 
-    public RenderComponent(String modelName) {
-        this.modelName = modelName;
+    /**
+     *
+     * @param name
+     */
+    public RenderComponent(String name) {
+        this.name = name;
     }
 
-    public String getModelName() {
-        return modelName;
+    /**
+     *
+     * @return
+     */
+    public String getName() {
+        return name;
     }
 }

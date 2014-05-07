@@ -5,15 +5,21 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
+import entitysystem.position.RotationComponent;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
 import java.util.List;
 import utility.HexCoordinate;
+import utility.Rotation;
+import utility.Vector3Int;
 
 /**
- *
- * @author Eike Foede
+ * Todo : behavior when unit got an obstacle appearing when moving 
+ * (stop it and remove the component 
+ * or put the move on pause until the obstacle is gone (2nd idea best)).
+ * 
+ * @author Eike Foede, roah
  */
 public class MovementSystem extends EntitySystemAppState {
 
@@ -21,13 +27,21 @@ public class MovementSystem extends EntitySystemAppState {
     private HashMap<EntityId, Movement> movements;
     private float secondsPerStep = 1.5f;
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected EntitySet initialiseSystem() {
-        pathfinder.setMapData(mapData);
+        pathfinder.setMapData(getMapData());
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RotationComponent.class);
     }
 
+    /**
+     *
+     * @param tpf
+     */
     @Override
     protected void updateSystem(float tpf) {
         for (Entity e : entities) {
@@ -35,6 +49,13 @@ public class MovementSystem extends EntitySystemAppState {
             movement.distanceMoved += tpf;
             while (movement.distanceMoved > secondsPerStep) {
                 movement.distanceMoved -= secondsPerStep;
+                if (movement.actualPosition + 1 < movement.path.size()) {
+                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), movement.path.get(movement.actualPosition + 1).getAsCubic());
+                    getMapData().setTileIsWalkable(movement.path.get(movement.actualPosition + 1), false);
+                    if (!e.get(RotationComponent.class).getRotation().equals(dir)) {
+                        e.set(new RotationComponent(dir));
+                    }
+                }
                 e.set(new HexPositionComponent(movement.path.get(movement.actualPosition)));
                 movement.actualPosition++;
                 if (movement.actualPosition == movement.path.size()) {
@@ -45,6 +66,10 @@ public class MovementSystem extends EntitySystemAppState {
         }
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     protected void addEntity(Entity e) {
         HexPositionComponent pos = e.get(HexPositionComponent.class);
@@ -59,6 +84,10 @@ public class MovementSystem extends EntitySystemAppState {
         movements.put(e.getId(), movement);
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     protected void updateEntity(Entity e) {
         MoveToComponent moveTo = e.get(MoveToComponent.class);
@@ -67,13 +96,38 @@ public class MovementSystem extends EntitySystemAppState {
         }
     }
 
+    /**
+     *
+     * @param e
+     */
     @Override
     protected void removeEntity(Entity e) {
         movements.remove(e.getId());
     }
 
+    /**
+     *
+     */
     @Override
     protected void cleanupSystem() {
+    }
+
+    private Rotation getDirection(Vector3Int currentPos, Vector3Int nextPos) {
+        Vector3Int result = new Vector3Int(currentPos.x - nextPos.x, currentPos.y - nextPos.y, currentPos.z - nextPos.z);
+        if (result.z == 0 && result.x > 0) {
+            return Rotation.D;
+        } else if (result.z == 0 && result.x < 0) {
+            return Rotation.A;
+        } else if (result.y == 0 && result.x > 0) {
+            return Rotation.C;
+        } else if (result.y == 0 && result.x < 0) {
+            return Rotation.F;
+        } else if (result.x == 0 && result.y > 0) {
+            return Rotation.B;
+        } else if (result.x == 0 && result.y < 0) {
+            return Rotation.E;
+        }
+        return null;
     }
 
     private class Movement {

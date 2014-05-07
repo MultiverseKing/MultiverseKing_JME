@@ -16,6 +16,11 @@ public class CubeSpatialInitializer implements SpatialInitializer {
 
     private AssetManager assetManager = null;
 
+    /**
+     *
+     * @param spatial
+     * @return
+     */
     public Spatial initialize(String spatial) {
         Material mat = new Material(assetManager,
                 "Common/MatDefs/Misc/Unshaded.j3md");  // create a simple material
@@ -27,6 +32,10 @@ public class CubeSpatialInitializer implements SpatialInitializer {
         return g;
     }
 
+    /**
+     *
+     * @param am
+     */
     public void setAssetManager(AssetManager am) {
         this.assetManager = am;
     }

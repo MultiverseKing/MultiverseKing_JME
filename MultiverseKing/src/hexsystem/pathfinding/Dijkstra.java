@@ -9,12 +9,17 @@ import utility.HexCoordinate;
 
 /**
  * Dijkstra algorithm
+ *
  * @author Eike Foede
  */
 public class Dijkstra implements Pathfinder {
 
     private MapData mapData;
 
+    /**
+     *
+     * @param mapData
+     */
     public void setMapData(MapData mapData) {
         this.mapData = mapData;
     }

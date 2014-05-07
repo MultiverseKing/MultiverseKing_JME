@@ -1,19 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package utility;
 
 /**
  *
  * @author Roah with the help of : ArtemisArt => http://artemis.art.free.fr/ &&
- * http://www.redblobgames.com --Changed version by toboi-- This Class is only
+ * http://www.redblobgames.com --Changed version by Eike Foede-- This Class is only
  * used as a converter system so we can simplifie algorithm.
  */
 public final class HexCoordinate {
 
+    /**
+     *
+     */
     public static final int OFFSET = 0;
+    /**
+     *
+     */
     public static final int AXIAL = 1;
+    /**
+     *
+     */
     public static final int CUBIC = 2;
     /**
      * Axial position in Grid. q == x
@@ -32,14 +37,26 @@ public final class HexCoordinate {
         return new Vector2Int(data.x, data.z);
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3Int getAsCubic() {
         return new Vector3Int(q, -q - r, r);
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector2Int getAsOffset() {
         return new Vector2Int(q + (r - (r & 1)) / 2, r);
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector2Int getAsAxial() {
         return new Vector2Int(q, r);
     }
@@ -55,6 +72,11 @@ public final class HexCoordinate {
         this.r = r;
     }
 
+    /**
+     *
+     * @param type
+     * @param pos
+     */
     public HexCoordinate(int type, Vector2Int pos) {
         if (type == OFFSET) {
             pos = offsetToAxial(pos);
@@ -63,10 +85,21 @@ public final class HexCoordinate {
         r = pos.y;
     }
 
+    /**
+     *
+     * @param type
+     * @param x
+     * @param y
+     */
     public HexCoordinate(int type, int x, int y) {
         this(type, new Vector2Int(x, y));
     }
-    
+
+    /**
+     *
+     * @param type
+     * @param pos
+     */
     public HexCoordinate(int type, Vector3Int pos) {
         if (type != CUBIC) {
             throw new UnsupportedOperationException("Only TYPE_CUBIC expects a Vector3Int!");
@@ -84,6 +117,10 @@ public final class HexCoordinate {
         return q + "|" + r;
     }
 
+    /**
+     *
+     * @return
+     */
     public HexCoordinate[] getNeighbours() {
         Class c = HexCoordinate.class;
 
@@ -98,6 +135,11 @@ public final class HexCoordinate {
         return neighbours;
     }
 
+    /**
+     *
+     * @param other
+     * @return
+     */
     public int distanceTo(HexCoordinate other) {
         return (Math.abs(q - other.q) + Math.abs(r - other.r)
                 + Math.abs(q + r - other.q - other.r)) / 2;

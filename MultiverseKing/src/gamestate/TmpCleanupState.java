@@ -22,11 +22,13 @@ import utility.MouseRay;
 
 /**
  * TODO: JUST temporarily, has to be better designed!!
- * @Idea : Switch it to hexMapMouseInput, but the dependency to mapData is an issue.
+ *
+ * @Idea : Switch it to hexMapMouseInput, but the dependency to mapData is an
+ * issue.
  * @author Eike Foede
  */
 public abstract class TmpCleanupState extends AbstractAppState {
-    
+
     /**
      * Mouse raycast.
      */
@@ -44,7 +46,7 @@ public abstract class TmpCleanupState extends AbstractAppState {
      */
     protected CollisionResults lastRayResults;
     private Spatial mark;
-    
+
     /**
      *
      * @param main
@@ -55,7 +57,8 @@ public abstract class TmpCleanupState extends AbstractAppState {
         this.mouseRay = new MouseRay();
         this.mapData = mapData;
     }
-        /**
+
+    /**
      *
      * @param stateManager
      * @param app
@@ -66,7 +69,7 @@ public abstract class TmpCleanupState extends AbstractAppState {
         initMarkDebug();
         initInput();
     }
-    
+
     /**
      * Base input, it not depend on the gameMode or other thing if hexMap is
      * instanced that mean Tiles is or will be instanced so this input too.
@@ -75,33 +78,52 @@ public abstract class TmpCleanupState extends AbstractAppState {
         main.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         main.getInputManager().addListener(tileActionListener, new String[]{"LeftMouse"});
     }
-        private final ActionListener tileActionListener = new ActionListener() {
+
+    /**
+     *
+     * @param pause
+     */
+    public void pauseInput(boolean pause) {
+        if (pause) {
+            main.getInputManager().removeListener(tileActionListener);
+        } else {
+            main.getInputManager().addListener(tileActionListener, new String[]{"LeftMouse"});
+        }
+    }
+    private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("LeftMouse") && isPressed) {
-                CollisionResults results = new CollisionResults();
-                main.getRootNode().getChild("mapNode").collideWith(mouseRay.get3DRay(main), results);
-                if (results.size() != 0) {
-                    if (results.size() > 0) {
-                        CollisionResult closest = results.getClosestCollision();
-
-                        mark.setLocalTranslation(closest.getContactPoint());
-                        main.getRootNode().attachChild(mark);    //TODO Debug to remove.
-
-                        main.getStateManager().getState(TmpCleanupState.class).setleftMouseActionResult(results);
-                        main.getStateManager().getState(TmpCleanupState.class).mouseLeftActionResult();
-                    } else if (main.getRootNode().hasChild(mark)) {
-                        // No hits? Then remove the red mark.
-                        main.getRootNode().detachChild(mark);    //TODO Debug to remove.
-                    } else {
-                        System.out.println("no  mark");
-                    }
-                } else {
-                    //Error catching.
-                    System.out.println("null raycast");
-                }
+                castRay();
             }
         }
     };
+
+    /**
+     *
+     */
+    protected void castRay() {
+        CollisionResults results = new CollisionResults();
+        main.getRootNode().getChild("mapNode").collideWith(mouseRay.get3DRay(main), results);
+        if (results.size() != 0) {
+            if (results.size() > 0) {
+                CollisionResult closest = results.getClosestCollision();
+
+                mark.setLocalTranslation(closest.getContactPoint());
+                main.getRootNode().attachChild(mark);    //TODO Debug to remove.
+
+                main.getStateManager().getState(TmpCleanupState.class).setleftMouseActionResult(results);
+                main.getStateManager().getState(TmpCleanupState.class).mouseLeftActionResult();
+            } else if (main.getRootNode().hasChild(mark)) {
+                // No hits? Then remove the red mark.
+                main.getRootNode().detachChild(mark);    //TODO Debug to remove.
+            } else {
+                System.out.println("no  mark");
+            }
+        } else {
+            //Error catching.
+            System.out.println("null raycast");
+        }
+    }
 
     private void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -110,7 +132,6 @@ public abstract class TmpCleanupState extends AbstractAppState {
         mark_mat.setColor("Color", ColorRGBA.Red);
         mark.setMaterial(mark_mat);
     }
-    
 
     private void setleftMouseActionResult(CollisionResults results) {
         this.lastRayResults = results;
@@ -140,5 +161,9 @@ public abstract class TmpCleanupState extends AbstractAppState {
 
         return null;
     }
+
+    /**
+     *
+     */
     abstract protected void mouseLeftActionResult();
 }

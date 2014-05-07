@@ -16,10 +16,9 @@ import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
-import utility.Vector2Int;
 
 /**
- * @todo change the way the camera work, make it more rts style to fit the new design.
+ *
  * @author Eike Foede, Roah
  */
 public class EditorAppState extends TmpCleanupState implements TileChangeListener {
@@ -27,8 +26,23 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private final EditorGUI editorGUI;
     private Spatial cursor;
-    private Node camTarget = new Node("camFocus");
+    private Node camTarget = new Node("camFocus");      //for chase cam
+    private boolean activeCursor;
+    private HexCoordinate offsetPos;
 
+    /**
+     *
+     * @return
+     */
+    public HexCoordinate getOffsetPos() {
+        return offsetPos;
+    }
+
+    /**
+     *
+     * @param mapData
+     * @param main
+     */
     public EditorAppState(MapData mapData, MultiverseMain main) {
         super(main, mapData);
         this.editorGUI = new EditorGUI(mapData);
@@ -39,10 +53,10 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         super.initialize(stateManager, app);
         main.getStateManager().attach(editorGUI);
         mapData.registerTileChangeListener(this);
-        mapData.addChunk(new Vector2Int(0, 0), null);
-        initCursor();
-        initCamera();
-        initInput();
+//        mapData.addChunk(new Vector2Int(0, 0), null);
+//        initChaseCamera();
+//        initInput();
+//        initCursor();
     }
 
     private void initInput() {
@@ -69,7 +83,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         cursor.setLocalTranslation(new Vector3f(0f, mapData.getHexSettings().getGROUND_HEIGHT() + 0.01f, cursorOffset)); //Remove offset and set it to zero if hex_void_anim.png is not used
     }
 
-    private void initCamera() {
+    private void initChaseCamera() {
         camTarget.setLocalTranslation(cursor.getLocalTranslation());
         main.getRootNode().attachChild(camTarget);
         ChaseCamera chaseCam = new ChaseCamera(main.getCamera(), camTarget, main.getInputManager());
@@ -88,6 +102,7 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         HexCoordinate offsetPos = super.getLastLeftMouseCollisionGridPos();
         if (offsetPos != null) {
 //            changeTile(offsetPos);
+            this.offsetPos = offsetPos;
             moveCursor(offsetPos);
             editorGUI.openHexPropertiesWin(offsetPos);
 //            Dijkstra da = new Dijkstra();
@@ -105,16 +120,25 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
         }
     }
 
+    /**
+     *
+     * @param event
+     */
     public void tileChange(TileChangeEvent event) {
+        if (cursor == null) {
+            initCursor();
+        }
         if (mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
-            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() * mapData.getHexSettings().getFloorHeight(), cursor.getLocalTranslation().z);
+            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() * mapData.getHexSettings().getFloorHeight() + 0.1f, cursor.getLocalTranslation().z);
         }
     }
 
     @Override
     public void update(float tpf) {
         super.update(tpf); //To change body of generated methods, choose Tools | Templates.
-
+        if (activeCursor) {
+            castRay();
+        }
     }
 
     /**
@@ -128,7 +152,24 @@ public class EditorAppState extends TmpCleanupState implements TileChangeListene
 
     private void moveCursor(HexCoordinate tilePos) {
         Vector3f pos = mapData.getTileWorldPosition(tilePos);
-        Vector2Int offsetPos = tilePos.getAsOffset();
-        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * mapData.getHexSettings().getFloorHeight() + ((offsetPos.y & 1) == 0 ? 0.001f : 0.002f), pos.z + cursorOffset);
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * mapData.getHexSettings().getFloorHeight() + ((offsetPos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+    }
+
+    /**
+     *
+     * @param isActive
+     */
+    public void setActivecursor(boolean isActive) {
+        super.pauseInput(isActive);
+        activeCursor = isActive;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public HexCoordinate pulseCursor() {
+        castRay();
+        return offsetPos;
     }
 }

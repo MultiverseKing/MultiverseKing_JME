@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.events;
 
 /**
@@ -9,5 +5,10 @@ package hexsystem.events;
  * @author roah
  */
 public interface ChunkChangeListener {
+
+    /**
+     *
+     * @param event
+     */
     public void chunkUpdate(ChunkChangeEvent event);
 }

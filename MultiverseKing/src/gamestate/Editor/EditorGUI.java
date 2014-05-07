@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gamestate.Editor;
 
 import com.jme3.app.Application;
@@ -12,10 +8,11 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import entitysystem.EntityDataAppState;
-import entitysystem.card.CardEntityRenderSystem;
+import gamestate.GameDataAppState;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.card.CardPropertiesComponent;
 import entitysystem.card.CardRenderComponent;
+import entitysystem.render.RenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.io.IOException;
@@ -28,13 +25,14 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
+import utility.attribut.CardRenderPosition;
 import utility.attribut.CardSubType;
-import utility.attribut.CardType;
 import utility.attribut.Faction;
 import utility.attribut.Rarity;
 
 /**
- * @todo The geometry count is too high it have to be reduced by merging windows.
+ * @todo The geometry count is too high it have to be reduced by merging
+ * windows.
  * @author roah
  */
 class EditorGUI extends AbstractAppState {
@@ -43,7 +41,6 @@ class EditorGUI extends AbstractAppState {
     private MultiverseMain main;
     private HexCoordinate currentTilePosition;
     private RadioButtonGroup tilePButtonGroup;
-    
     private Window eWin;
 //    private Window mainWin;
 
@@ -61,16 +58,17 @@ class EditorGUI extends AbstractAppState {
         mainWin.setMinDimensions(new Vector2f(130, 130));
         mainWin.setIsResizable(false);
         mainWin.getDragBar().setIsMovable(false);
+        mainWin.setIsVisible(); //used to resolve the dragbar issue with tonegodGUI
         main.getScreen().addElement(mainWin);
 
         /**
          * Button used to change the current map elemental attribut.
          */
-        Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)){
+        Button mapElement = new ButtonAdapter(main.getScreen(), "mapElement", new Vector2f(15, 40)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if(eWin == null){
+                if (eWin == null) {
                     elementalWindow();
                 }
             }
@@ -81,7 +79,7 @@ class EditorGUI extends AbstractAppState {
         /**
          * Button used to save the map in a folder/file of his name.
          */
-        Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)){
+        Button save = new ButtonAdapter(main.getScreen(), "save", new Vector2f(15, 40 * 2)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -97,9 +95,11 @@ class EditorGUI extends AbstractAppState {
 
         /**
          * Button to load a predifinned map.
-         * @todo add a context menu where you will be able to set the name of the map to load.
+         *
+         * @todo add a context menu where you will be able to set the name of
+         * the map to load.
          */
-        Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)){
+        Button load = new ButtonAdapter(main.getScreen(), "load", new Vector2f(15, 40 * 3)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -108,11 +108,11 @@ class EditorGUI extends AbstractAppState {
         };
         load.setText("Load");
         mainWin.addChild(load);
-        
+
         /**
          * Load a predefined void map from a File(same as the starting one).
          */
-        Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)){
+        Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -123,30 +123,30 @@ class EditorGUI extends AbstractAppState {
         mainWin.addChild(reset);
 
         /**
-         * Card system initialisation.
-         * Add a card when adding the Card system.
+         * Card system initialisation. Add a card when adding the Card system.
          */
-        Window cardButtonWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f+40f*5), new Vector2f(180, 40));
+        Window cardButtonWin = new Window(main.getScreen(), "cardMain", new Vector2f(15f, 25f + 40f * 5), new Vector2f(180, 40));
         cardButtonWin.getDragBar().setIsVisible(false);
         main.getScreen().addElement(cardButtonWin);
-        
-        Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)){
+
+        Button cardEditor = new ButtonAdapter(main.getScreen(), "cardEditor", new Vector2f(15, 10), new Vector2f(150, 30)) {
             private boolean activeCardEditor = false;
-            
+
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if(!activeCardEditor){
+                if (!activeCardEditor) {
                     //to change, testing purpose
-                    CardEntityRenderSystem cardSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
-                    if(cardSystem.gotCardsIsEmpty()){
-                        EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                    CardRenderSystem cardSystem = app.getStateManager().getState(CardRenderSystem.class);
+                    if (!cardSystem.gotCardInHand()) {
+                        EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
                         EntityId cardId = ed.createEntity();
-                        ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
-                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                        ed.setComponent(cardId, new RenderComponent("Cendrea"));
+                        ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardSubType.SUMMON, Rarity.COMMON);
                         ed.setComponent(cardId, properties);
                     }
-                    
+
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
                     main.getScreen().getElementById("addRemoveCard").show();
                     activeCardEditor = !activeCardEditor;
@@ -160,33 +160,34 @@ class EditorGUI extends AbstractAppState {
         };
         cardEditor.setText("Card Editor: OFF");
         cardButtonWin.addChild(cardEditor);
-        
-        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 55f+40f*6), new Vector2f(180, 20));
+
+        Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(15f, 55f + 40f * 6), new Vector2f(180, 20));
         addRemoveCard.getDragBar().setIsVisible(false);
         addRemoveCard.setIgnoreMouse(true);
         main.getScreen().addElement(addRemoveCard);
-        
-        Button addCard = new ButtonAdapter(main.getScreen(), "addCard", new Vector2f(15, 10), new Vector2f(75, 30)){
+
+        Button addCard = new ButtonAdapter(main.getScreen(), "addCard", new Vector2f(15, 10), new Vector2f(75, 30)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
-                ed.setComponent(cardId, new CardRenderComponent("Cendrea"));
-                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                ed.setComponent(cardId, new RenderComponent("Cendrea"));
+                ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardSubType.SUMMON, Rarity.COMMON);
                 ed.setComponent(cardId, properties);
             }
         };
         addCard.setText("Add");
         addRemoveCard.addChild(addCard);
-        
-        Button removeCard = new ButtonAdapter(main.getScreen(), "removeCard", new Vector2f(100, 10), new Vector2f(75, 30)){
+
+        Button removeCard = new ButtonAdapter(main.getScreen(), "removeCard", new Vector2f(100, 10), new Vector2f(75, 30)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                Object[] cards = app.getStateManager().getState(CardEntityRenderSystem.class).getCardsKeyset().toArray();
-                EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length-1)];
+                EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
+                Object[] cards = app.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
+                EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
                 ed.removeComponent(id, CardRenderComponent.class);
             }
         };
@@ -199,7 +200,7 @@ class EditorGUI extends AbstractAppState {
      * Context menu used to let you chose the element for map to change to.
      */
     public final void elementalWindow() {
-        eWin =  new Window(main.getScreen(), "EWindows",
+        eWin = new Window(main.getScreen(), "EWindows",
                 new Vector2f((main.getScreen().getWidth() / 2) - 175, (main.getScreen().getHeight() / 2) - 100));
         eWin.setWindowTitle("Elemental Windows");
         RadioButtonGroup elementG = new RadioButtonGroup(main.getScreen(), "EButtonGroup") {
@@ -233,6 +234,7 @@ class EditorGUI extends AbstractAppState {
 
     /**
      * Method used to open a window related to the selected hex.
+     *
      * @param tile selected one.
      */
     void openHexPropertiesWin(HexCoordinate tile) {
@@ -294,8 +296,7 @@ class EditorGUI extends AbstractAppState {
 
         tileWin.setIsResizable(false);
         tileWin.getDragBar().setIsMovable(false);
-        
+
         main.getScreen().addElement(tileWin);
     }
-    
 }

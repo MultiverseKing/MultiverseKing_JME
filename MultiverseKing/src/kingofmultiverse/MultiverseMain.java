@@ -8,30 +8,35 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import com.simsilica.es.base.DefaultEntityData;
-import entitysystem.EntityDataAppState;
-import entitysystem.card.CardEntityRenderSystem;
+import gamestate.GameDataAppState;
+import entitysystem.ExtendedEntityData;
+import entitysystem.animation.AnimationSystem;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
+import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
+import entitysytem.Units.UnitsSystem;
 import gamestate.HexMapAppState;
 import hexsystem.HexSettings;
-import hexsystem.MapDataAppState;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.HexCoordinate;
+import utility.Rotation;
+import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
@@ -41,47 +46,59 @@ import utility.attribut.ElementalAttribut;
  */
 public class MultiverseMain extends SimpleApplication {
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
-
-
-
         MultiverseMain app = new MultiverseMain();
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
         app.start();
     }
     private Screen screen;
 
+    /**
+     *
+     * @return
+     */
     public Screen getScreen() {
         return screen;
     }
 
+    /**
+     *
+     */
     @Override
     public void simpleInitApp() {
-        if (!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)) {
-            throw new UnsupportedOperationException("Your hardware does not support TextureArray");
-        }
-
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
-        
+
         // Disable the default flyby cam
-        flyCam.setEnabled(false);
-        
+        cameraInit();
+
         //Create a new screen for tonegodGUI to work with.
         initScreen();
-        
+
         lightSettup();
         generateHexMap();
     }
 
+    /**
+     *
+     * @param tpf
+     */
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
     }
 
+    /**
+     *
+     * @param rm
+     */
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
@@ -95,13 +112,13 @@ public class MultiverseMain extends SimpleApplication {
         sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
         sun.setColor(ColorRGBA.White);
         rootNode.addLight(sun);
-        
+
         /* this shadow needs a directional light */
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 1024, 2);
         dlsf.setLight(sun);
         fpp.addFilter(dlsf);
-        viewPort.addProcessor(fpp); 
+        viewPort.addProcessor(fpp);
 
         /* Drop shadows */
 //        final int SHADOWMAP_SIZE = 1024;
@@ -115,6 +132,17 @@ public class MultiverseMain extends SimpleApplication {
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(ColorRGBA.White);
         rootNode.addLight(ambient);
+    }
+    RTSCamera rtsCam;
+
+    private void cameraInit() {
+        flyCam.setEnabled(false);
+        rtsCam = new RTSCamera(RTSCamera.UpVector.Y_UP);
+        rtsCam.setCenter(new Vector3f(8, 15f, 8));
+        rtsCam.setRot(120);
+        stateManager.attach(rtsCam);
+//        flyCam.setMoveSpeed(10);
+//        cam.setLocation(new Vector3f(10f, 18f, -5f));
     }
 
     /**
@@ -140,7 +168,7 @@ public class MultiverseMain extends SimpleApplication {
     private void initScreen() {
         screen = new Screen(this);
         this.guiNode.addControl(screen);
-        for(Element e : screen.getElementsAsMap().values()){
+        for (Element e : screen.getElementsAsMap().values()) {
             screen.removeElement(e);
         }
         screen.getElementsAsMap().clear();
@@ -150,27 +178,57 @@ public class MultiverseMain extends SimpleApplication {
         ArrowShape arrowShape = new ArrowShape(assetManager, rootNode, new Vector3f(0f, 0f, 0f));
     }
 
+    /**
+     *
+     */
     public void generateHexMap() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
-        EditorAppState editorAppState = new EditorAppState(mapData, this);
-        stateManager.attach(new HexMapAppState(this,mapData));
-        stateManager.attach(editorAppState);
-//        instanciatePlayer(mapData.getHexSettings());
+        EntityData entityData = new ExtendedEntityData(mapData);
 
-        EntityData entityData = new DefaultEntityData();
-        stateManager.attach(new CardEntityRenderSystem());
-        stateManager.attach(new MapDataAppState(mapData));
-        stateManager.attach(new EntityDataAppState(entityData));
-        stateManager.attach(new MovementSystem());
-        stateManager.attach(new EntityRenderSystem());
-        
-        
-        //Example: Initialise new character entity.
-        EntityId characterId = entityData.createEntity();
-//        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
-//        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
-        entityData.setComponent(characterId, new RenderComponent("Berserk"));
-        entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
-        entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+        stateManager.attachAll(
+                new GameDataAppState(entityData),
+                new HexMapAppState(this, mapData),
+                new EntityRenderSystem(),
+                new MovementSystem(),
+                new CardRenderSystem(),
+                new AnimationSystem(),
+                new UnitsSystem(),
+                new EditorAppState(mapData, this));
+    }
+    private boolean exemple = true;
+
+    @Override
+    public void update() {
+        super.update();
+        if (exemple) {
+            MapData md = stateManager.getState(GameDataAppState.class).getMapData();
+            md.addChunk(Vector2Int.ZERO, null);
+            EntityData ed = stateManager.getState(GameDataAppState.class).getEntityData();
+            //Example: Initialise new character entity.
+            EntityId characterId = ed.createEntity();
+            ed.setComponent(characterId, new RenderComponent("Berserk"));
+            ed.setComponent(characterId, new RotationComponent(Rotation.A));
+            ed.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
+            ed.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+
+            exemple = false;
+        }
+    }
+
+    /**
+     *
+     * @param <T>
+     * @param <E>
+     * @param map
+     * @param value
+     * @return
+     */
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Entry<T, E> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }

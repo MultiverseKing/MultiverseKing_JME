@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.loader;
 
 import com.jme3.asset.AssetInfo;
@@ -15,7 +11,6 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
 import com.jme3.export.binary.BinaryImporter;
-import hexsystem.MapData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,40 +24,72 @@ import utility.attribut.ElementalAttribut;
  *
  * @author roah
  */
-public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
+public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
 
     private String rootPath;
     private String mapName;
     private ElementalAttribut mapElement;
     private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
 
+    /**
+     *
+     */
     public MapDataLoader() {
     }
 
+    /**
+     *
+     * @param eAttribut
+     */
     public void setMapElement(ElementalAttribut eAttribut) {
         this.mapElement = eAttribut;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setMapName(String name) {
         this.mapName = name;
     }
-    
-    public void setChunkPos(ArrayList<Vector2Int> chunkPos){
+
+    /**
+     *
+     * @param chunkPos
+     */
+    public void setChunkPos(ArrayList<Vector2Int> chunkPos) {
         this.chunkPos = chunkPos;
     }
-    
+
+    /**
+     *
+     * @return
+     */
     public String getMapName() {
         return mapName;
     }
 
+    /**
+     *
+     * @return
+     */
     public ElementalAttribut getMapElement() {
         return mapElement;
     }
-    
-    public ArrayList<Vector2Int> getChunkPos(){
+
+    /**
+     *
+     * @return
+     */
+    public ArrayList<Vector2Int> getChunkPos() {
         return chunkPos;
     }
-    
+
+    /**
+     *
+     * @param ex
+     * @throws IOException
+     */
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(mapName, "mapName", "null");
@@ -70,6 +97,11 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
         capsule.writeSavableArrayList(chunkPos, "chunkPos", new ArrayList<Vector2Int>());
     }
 
+    /**
+     *
+     * @param im
+     * @throws IOException
+     */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
         mapName = capsule.readString("mapName", "null");
@@ -77,6 +109,12 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
         chunkPos = capsule.readSavableArrayList("chunkPos", new ArrayList<Vector2Int>());
     }
 
+    /**
+     *
+     * @param assetInfo
+     * @return
+     * @throws IOException
+     */
     public Object load(AssetInfo assetInfo) throws IOException {
         BinaryImporter importer = BinaryImporter.getInstance();
         return importer.load(assetInfo.openStream());
@@ -86,6 +124,12 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
         this.rootPath = rootPath;
     }
 
+    /**
+     *
+     * @param manager
+     * @param key
+     * @return
+     */
     public AssetInfo locate(AssetManager manager, AssetKey key) {
         return new AssetInfo(manager, key) {
             @Override
@@ -111,5 +155,4 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator{
             }
         };
     }
-    
 }

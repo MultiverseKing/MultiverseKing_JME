@@ -10,14 +10,13 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
 import entitysystem.render.EntityRenderSystem;
-import entitysystem.EntityDataAppState;
+import gamestate.GameDataAppState;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
 import gamestate.HexMapAppState;
 import hexsystem.MapData;
-import hexsystem.MapDataAppState;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -31,6 +30,9 @@ import utility.attribut.ElementalAttribut;
  */
 public class ExampleStartup extends SimpleApplication {
 
+    /**
+     *
+     */
     @Override
     public void simpleInitApp() {
 
@@ -40,12 +42,12 @@ public class ExampleStartup extends SimpleApplication {
         EntityData entityData = new DefaultEntityData();
         MapData mapData = new MapData(ElementalAttribut.EARTH, assetManager);
         //Initialise data management
-        stateManager.attach(new EntityDataAppState(entityData));
-        stateManager.attach(new MapDataAppState(mapData));
+        stateManager.attach(new GameDataAppState(entityData));
+//        stateManager.attach(new MapDataAppState(mapData));
         stateManager.attach(new HexMapAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
         mapData.addChunk(new Vector2Int(-1, 0), null);
-        
+
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
 //        System.out.println(userHome);
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
@@ -79,21 +81,29 @@ public class ExampleStartup extends SimpleApplication {
         setupCamera();
     }
 
+    /**
+     *
+     * @param tpf
+     */
     @Override
     public void simpleUpdate(float tpf) {
         //Nothing to do here that far, everything is handled by external AppStates, mainly EntitySystems
     }
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         ExampleStartup app = new ExampleStartup();
         app.start();
     }
 
-    private void setupCamera(){
-        FlyCamAppState fcs=stateManager.getState(FlyCamAppState.class);
+    private void setupCamera() {
+        FlyCamAppState fcs = stateManager.getState(FlyCamAppState.class);
         fcs.getCamera().setMoveSpeed(20f);
     }
-    
+
     private void lightSettup() {
         /**
          * A white, directional light source

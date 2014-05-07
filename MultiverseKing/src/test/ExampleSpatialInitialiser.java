@@ -12,10 +12,19 @@ public class ExampleSpatialInitialiser implements SpatialInitializer {
 
     AssetManager assetManager;
 
-    public Spatial initialize(String spatial) {
-        return assetManager.loadModel(spatial);
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public Spatial initialize(String name) {
+        return assetManager.loadModel(name);
     }
 
+    /**
+     *
+     * @param assetManager
+     */
     public void setAssetManager(AssetManager assetManager) {
 
         this.assetManager = assetManager;

@@ -1,5 +1,6 @@
 package entitysystem.render;
 
+import com.jme3.animation.AnimControl;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -9,8 +10,11 @@ import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.position.RotationComponent;
+import hexsystem.HexTile;
+import hexsystem.events.TileChangeEvent;
+import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
-import test.CharacterSpatialInitializer;
+import java.util.Set;
 import utility.Rotation;
 
 /**
@@ -24,19 +28,23 @@ import utility.Rotation;
  * should be handled seperately. Else there could be double data for the
  * position with inconsistencies between the different data.
  */
-public class EntityRenderSystem extends EntitySystemAppState {
+public class EntityRenderSystem extends EntitySystemAppState implements TileChangeListener {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
 //    private CubeSpatialInitializer spatialInitializer = new CubeSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
 
+    public AnimControl getAnimControl(EntityId id) {
+        return spatials.get(id).getControl(AnimControl.class);
+    }
+    
     @Override
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
+        mapData.registerTileChangeListener(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class, RotationComponent.class);
-
     }
 
     @Override
@@ -45,6 +53,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
 
     @Override
     //TODO: Handle if spatial is already generated (shouldn't happen, but in the case it does, this should be handled))
+    //some spatial can be generated multiple time...
     public void addEntity(Entity e) {
         Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
@@ -58,6 +67,7 @@ public class EntityRenderSystem extends EntitySystemAppState {
     protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
+        mapData.setLogicTileInUse(e.get(HexPositionComponent.class).getPosition(), true);
         s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
     }
 
@@ -75,9 +85,24 @@ public class EntityRenderSystem extends EntitySystemAppState {
     }
 
     private Vector3f hexPositionToSpatialPosition(HexPositionComponent hex) {
-        //TODO: Catch empty tile!!
-        int height = mapData.getTile(hex.getPosition()).getHeight();
-        Vector3f spat = mapData.getTileWorldPosition(hex.getPosition());
-        return new Vector3f(spat.x, height, spat.z);
+        HexTile tile = mapData.getTile(hex.getPosition());
+        if(tile != null){
+            int height = tile.getHeight();
+            Vector3f spat = mapData.getTileWorldPosition(hex.getPosition());
+            return new Vector3f(spat.x, height, spat.z);
+        } else {
+            System.err.println("There is no Tile on the position " + hex.toString());
+            return null;
+        }
+    }
+
+    public void tileChange(TileChangeEvent event) {
+        Set<EntityId> key = spatials.keySet();
+        for(EntityId id : key){
+            if(entityData.getComponent(id, HexPositionComponent.class).getPosition().equals(event.getTilePos())){
+                Vector3f currentLoc = spatials.get(id).getLocalTranslation();
+                spatials.get(id).setLocalTranslation(currentLoc.x, event.getNewTile().getHeight(), currentLoc.z);
+            }
+        }
     }
 }

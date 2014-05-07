@@ -6,7 +6,6 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Caps;
@@ -16,8 +15,10 @@ import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
+import com.sun.media.sound.JARSoundbankReader;
 import entitysystem.EntityDataAppState;
-import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.animation.AnimationSystem;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
@@ -29,7 +30,10 @@ import hexsystem.HexSettings;
 import hexsystem.MapDataAppState;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
+import sun.org.mozilla.javascript.internal.json.JsonParser;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
@@ -60,10 +64,6 @@ public class MultiverseMain extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        if (!renderManager.getRenderer().getCaps().contains(Caps.TextureArray)) {
-            throw new UnsupportedOperationException("Your hardware does not support TextureArray");
-        }
-
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
@@ -172,20 +172,28 @@ public class MultiverseMain extends SimpleApplication {
 //        instanciatePlayer(mapData.getHexSettings());
 
         EntityData entityData = new DefaultEntityData();
-        stateManager.attach(new CardEntityRenderSystem());
+        stateManager.attach(new CardRenderSystem());
         stateManager.attach(new MapDataAppState(mapData));
         stateManager.attach(new EntityDataAppState(entityData));
         stateManager.attach(new MovementSystem());
         stateManager.attach(new EntityRenderSystem());
+        stateManager.attach(new AnimationSystem());
         
         
         //Example: Initialise new character entity.
         EntityId characterId = entityData.createEntity();
-//        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
-//        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
         entityData.setComponent(characterId, new RenderComponent("Berserk"));
         entityData.setComponent(characterId, new RotationComponent(Rotation.A));
         entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
         entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+    }
+    
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Entry<T, E> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }

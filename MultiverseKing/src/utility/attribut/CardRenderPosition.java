@@ -4,9 +4,9 @@ package utility.attribut;
  * Define where card is on the screen.
  * @author roah
  */
-public enum CardPosition {
+public enum CardRenderPosition {
     HAND,
     DECK,
     FIELD,
-    UNDERWORLD,
+    OUTERWORLD,
 }

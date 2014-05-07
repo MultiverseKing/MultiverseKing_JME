@@ -13,9 +13,9 @@ import com.jme3.math.Vector2f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import entitysystem.EntityDataAppState;
-import entitysystem.card.CardEntityRenderSystem;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.card.CardPropertiesComponent;
-import entitysystem.card.CardPositionComponent;
+import entitysystem.card.CardRenderComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexTile;
 import hexsystem.MapData;
@@ -29,7 +29,7 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
-import utility.attribut.CardPosition;
+import utility.attribut.CardRenderPosition;
 import utility.attribut.CardSubType;
 import utility.attribut.CardType;
 import utility.attribut.Faction;
@@ -63,6 +63,7 @@ class EditorGUI extends AbstractAppState {
         mainWin.setMinDimensions(new Vector2f(130, 130));
         mainWin.setIsResizable(false);
         mainWin.getDragBar().setIsMovable(false);
+        mainWin.setIsVisible();
         main.getScreen().addElement(mainWin);
 
         /**
@@ -140,13 +141,13 @@ class EditorGUI extends AbstractAppState {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if(!activeCardEditor){
                     //to change, testing purpose
-                    CardEntityRenderSystem cardSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
-                    if(cardSystem.gotCardsIsEmpty()){
+                    CardRenderSystem cardSystem = app.getStateManager().getState(CardRenderSystem.class);
+                    if(!cardSystem.gotCardInHand()){
                         EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                         EntityId cardId = ed.createEntity();
                         ed.setComponent(cardId, new RenderComponent("Cendrea"));
-                        ed.setComponent(cardId, new CardPositionComponent(CardPosition.HAND));
-                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                        ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardSubType.AI, Rarity.COMMON);
                         ed.setComponent(cardId, properties);
                     }
                     
@@ -176,8 +177,8 @@ class EditorGUI extends AbstractAppState {
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
                 ed.setComponent(cardId, new RenderComponent("Cendrea"));
-                ed.setComponent(cardId, new CardPositionComponent(CardPosition.HAND));
-                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardType.TITAN, CardSubType.AI, Rarity.COMMON);
+                ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardSubType.AI, Rarity.COMMON);
                 ed.setComponent(cardId, properties);
             }
         };
@@ -189,9 +190,9 @@ class EditorGUI extends AbstractAppState {
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                Object[] cards = app.getStateManager().getState(CardEntityRenderSystem.class).getCardsKeyset().toArray();
+                Object[] cards = app.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
                 EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length-1)];
-                ed.removeComponent(id, CardPositionComponent.class);
+                ed.removeComponent(id, CardRenderComponent.class);
             }
         };
         removeCard.setText("Del");

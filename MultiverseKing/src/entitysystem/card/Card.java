@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package entitysystem.card;
 
 import com.jme3.input.event.MouseButtonEvent;
@@ -14,30 +10,46 @@ import tonegod.gui.core.ElementManager;
 import tonegod.gui.effects.Effect;
 
 /**
- *
+ * Card show on the screen.
  * @author roah
  */
 public class Card extends ButtonAdapter {
 
+    private final String cardName;
+    private final EntityId UID;
     private final float rescaleValue;
     private final Vector2f cardSize;
     private int isRescale = 1;
     private int handPosition;
-    private String cardName;
-    private EntityId UID;
 
+    /**
+     * The name of this cards.
+     */
     String getCardName() {
         return cardName;
     }
 
+    /**
+     * EntityId this card belong to.
+     */
     EntityId getCardEntityUID() {
         return this.UID;
     }
 
+    /**
+     * Create a new card for the specifiate entity, rescaled down if rescale ==
+     * true, scale factor == 2.5f.
+     *
+     * @param screen used to render the card (tonegodGUI)
+     * @param rescale should this cards rescaled down.
+     * @param cardName Name to use for the card.
+     * @param handPosition position to put the card in the player hand.
+     * @param UID Entity this card belong to.
+     */
     public Card(ElementManager screen, boolean rescale, String cardName, int handPosition, EntityId UID) {
         super(screen, UID.toString(), Vector2f.ZERO, new Vector2f(200f / (2.5f * (rescale ? 1 : 0)), 300f / (2.5f * (rescale ? 1 : 0))), Vector4f.ZERO, "Textures/Cards/" + cardName + "_256px.png");
+        this.rescaleValue = 2.5f; //if you change this change it in the super constructor above.
         this.isRescale = (rescale ? 1 : 0);
-        this.rescaleValue = 2.5f; //if you change this change it in the super constructor.
         this.cardSize = new Vector2f(200f / (rescaleValue * isRescale), 300f / (rescaleValue * isRescale));
         this.handPosition = handPosition;
         this.cardName = cardName;
@@ -52,19 +64,23 @@ public class Card extends ButtonAdapter {
         this.setIsMovable(true);
     }
 
-    final void resetHandPosition() {
-        this.setPosition(new Vector2f(220f + ((cardSize.x - 20) * handPosition), screen.getHeight() - this.getHeight() - 20));
+    /**
+     * Put the card to his initiale position in the hand.
+     */
+    void resetHandPosition() {
+        setPosition(new Vector2f(220f + ((cardSize.x - 20) * handPosition), screen.getHeight() - this.getHeight() - 20));
     }
 
     @Override
     public void setHasFocus(boolean hasFocus) {
         super.setHasFocus(hasFocus);
         if (hasFocus) {
-            app.getStateManager().getState(CardEntityRenderSystem.class).hasFocus(this);
+            app.getStateManager().getState(CardRenderSystem.class).hasFocus(this);
         } else {
-            app.getStateManager().getState(CardEntityRenderSystem.class).lostFocus(this);
+            app.getStateManager().getState(CardRenderSystem.class).lostFocus(this);
         }
     }
+
     @Override
     public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftDown(evt, toggled);
@@ -75,18 +91,28 @@ public class Card extends ButtonAdapter {
         super.update(tpf); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
-    
     @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftUp(evt, toggled);
-        CardEntityRenderSystem renderSystem = app.getStateManager().getState(CardEntityRenderSystem.class);
+        CardRenderSystem renderSystem = app.getStateManager().getState(CardRenderSystem.class);
         renderSystem.isInCastArea(this);
         resetHandPosition();
     }
 
+    /**
+     * 
+     * @return current hand position of the card.
+     */
     int getHandPosition() {
         return this.handPosition;
+    }
+    
+    /**
+     * Change the current player handPosition of the card.
+     * @param handPosition 
+     */
+    void sethandPosition(int handPosition){
+        this.handPosition = handPosition;
     }
 
     @Override

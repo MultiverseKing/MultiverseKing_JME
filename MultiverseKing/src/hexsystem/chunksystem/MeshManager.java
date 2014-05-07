@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.chunksystem;
 
 import com.jme3.math.FastMath;
@@ -24,6 +20,10 @@ public class MeshManager {
     final float hexWidth;// = sqrt * hexSize;      //Make life easier.
     final float floorHeight;// = 0.5f;             //ho much the result should be upped
 
+    /**
+     *
+     * @param settings
+     */
     public MeshManager(HexSettings settings) {
         this.hexSize = settings.getHEX_RADIUS();
         this.hexWidth = FastMath.sqrt(3) * hexSize;

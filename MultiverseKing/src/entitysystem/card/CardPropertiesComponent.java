@@ -7,9 +7,9 @@ import utility.attribut.Rarity;
 import utility.attribut.Faction;
 
 /**
- * Contain the properties of the card to show up when used by the CardRendersystem,
- * @param cardSubType is used to know what to do when activated.
- * @param supply is used to know if the card can be activated.
+ * Contain the properties of the card to show up when used by the
+ * CardRendersystem,
+ *
  * @author roah
  */
 public class CardPropertiesComponent implements PersistentComponent {
@@ -44,22 +44,46 @@ public class CardPropertiesComponent implements PersistentComponent {
         this.rarity = rarity;
     }
 
-    public int getLevel() {
+    /**
+     * SupplyRequirement is needed to use card.
+     * @return SupplyRequirement needed for this card.
+     */
+    public int getSupplyRequirement() {
         return supply;
     }
 
+    /**
+     * Faction restriction must be meet to use the card.
+     * @return Faction restriction to use this card.
+     */
     public Faction getFaction() {
         return faction;
     }
 
+    /**
+     * Titan card type can only be used on "Titan",
+     * World card type can only be used on "Field".
+     * Currently only two type are supported.
+     * @return CardType the card belong too.
+     */
     public CardType getCardMainType() {
         return cardMainType;
     }
 
+    /**
+     * Card subType properties.
+     * @see CardSubType
+     * @return
+     */
     public CardSubType getCardSubType() {
         return cardSubType;
     }
 
+    /**
+     * card Rarity.
+     * @see Rarity
+     * @return
+     */
     public Rarity getRarity() {
         return rarity;
     }

@@ -1,35 +1,49 @@
 package entitysystem;
 
+import gamestate.GameDataAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
-import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
 import hexsystem.MapData;
-import hexsystem.MapDataAppState;
 
 /**
- * An abstract AppState to allow EntitySystems to easily use the Entity- and
+ * An abstract AppState to allow EntitySystems to easily use Entity and
  * MapData.
  *
- * @author Eike Foede
+ * @author Eike Foede, roah
  */
 public abstract class EntitySystemAppState extends AbstractAppState {
 
-    protected EntityData entityData;
-    protected MapData mapData;
+    /**
+     * entity System data and bridge to mapData.
+     */
+    protected ExtendedEntityData entityData;
+    /**
+     * Entity bounded to this system.
+     */
     protected EntitySet entities;
+    /**
+     * main.
+     */
     protected SimpleApplication app;
 
+    /**
+     * Hex system Data handler.
+     * @return 
+     */
+    public MapData getMapData() {
+        return entityData.getMapData();
+    }
+    
     @Override
     public final void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
 
         this.app = (SimpleApplication) app;
-        this.entityData = stateManager.getState(EntityDataAppState.class).getEntityData();
-        this.mapData = stateManager.getState(MapDataAppState.class).getMapData();
+        this.entityData = (ExtendedEntityData) stateManager.getState(GameDataAppState.class).getEntityData();
 
         entities = initialiseSystem();
         for (Entity e : entities) {
@@ -63,15 +77,38 @@ public abstract class EntitySystemAppState extends AbstractAppState {
         super.cleanup();
     }
 
+    /**
+     * Activate the system.
+     * @return entity used with this system.
+     */
     protected abstract EntitySet initialiseSystem();
 
+    /**
+     * Called each frame.
+     * @param tpf
+     */
     protected abstract void updateSystem(float tpf);
 
+    /**
+     * Called when an entity is added.
+     * @param e entity to add.
+     */
     protected abstract void addEntity(Entity e);
 
+    /**
+     * Called when an entity got an update.
+     * @param e updated entity.
+     */
     protected abstract void updateEntity(Entity e);
 
+    /**
+     * Called when an entity is removed.
+     * @param e removed entity.
+     */
     protected abstract void removeEntity(Entity e);
 
+    /**
+     * Called when the system is removed, used to clean his mess.
+     */
     protected abstract void cleanupSystem();
 }

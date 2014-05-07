@@ -10,6 +10,10 @@ import utility.HexCoordinate;
  */
 public interface Pathfinder {
 
+    /**
+     *
+     * @param mapData
+     */
     public void setMapData(MapData mapData);
 
     /**

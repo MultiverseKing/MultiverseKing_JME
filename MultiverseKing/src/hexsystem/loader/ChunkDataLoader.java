@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.loader;
 
 import com.jme3.asset.AssetInfo;
@@ -23,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 
+ *
  * @author roah
  */
 public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
@@ -31,38 +27,69 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     private String rootPath;
     private HexTile[][] tiles;
 
+    /**
+     *
+     */
     public ChunkDataLoader() {
     }
-    
-    public HexTile[][] getTiles(){
+
+    /**
+     *
+     * @return
+     */
+    public HexTile[][] getTiles() {
         return tiles;
     }
-    
+
+    /**
+     *
+     * @return
+     */
     public String getRootPath() {
         return rootPath;
     }
 
+    /**
+     *
+     * @param tiles
+     */
     public void setChunk(HexTile[][] tiles) {
         this.tiles = tiles;
     }
 
+    /**
+     *
+     * @param ex
+     * @throws IOException
+     */
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(tiles, "tiles", null);
     }
 
+    /**
+     *
+     * @param im
+     * @throws IOException
+     */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
         Savable[][] t = capsule.readSavableArray2D("tiles", null);
         tiles = new HexTile[t.length][t.length];
-        for(int y = 0; y < t.length; y++){
-            for(int x = 0; x < t[y].length; x++){
+        for (int y = 0; y < t.length; y++) {
+            for (int x = 0; x < t[y].length; x++) {
                 HexTile tile = (HexTile) t[x][y];
                 tiles[x][y] = new HexTile(tile.getElement(), tile.getHeight());
             }
         }
     }
 
+    /**
+     *
+     * @param assetInfo
+     * @return
+     * @throws IOException
+     */
     public Object load(AssetInfo assetInfo) throws IOException {
         BinaryImporter importer = BinaryImporter.getInstance();
         return importer.load(assetInfo.openStream());
@@ -72,6 +99,12 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
         this.rootPath = rootPath;
     }
 
+    /**
+     *
+     * @param manager
+     * @param key
+     * @return
+     */
     public AssetInfo locate(AssetManager manager, AssetKey key) {
         return new AssetInfo(manager, key) {
             @Override

@@ -45,6 +45,8 @@ public final class MapData {
 
     /**
      * Base constructor.
+     * @param eAttribut
+     * @param assetManager  
      */
     public MapData(ElementalAttribut eAttribut, AssetManager assetManager) {
         this.hexSettings = new HexSettings();
@@ -77,6 +79,10 @@ public final class MapData {
     }
 
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
+    /**
+     *
+     * @param eAttribut
+     */
     public void setMapElement(ElementalAttribut eAttribut) {
         mapElement = eAttribut;
         chunkData.setAllTile(mapElement);
@@ -87,13 +93,14 @@ public final class MapData {
      * Add a specifiate chunk in mapData at choosen position.
      *
      * @param chunkPos Where to put the chunk.
+     * @param tiles  
      */
     public void addChunk(Vector2Int chunkPos, HexTile[][] tiles) {
         if (tiles == null) {
             tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
             for (int y = 0; y < hexSettings.getCHUNK_SIZE(); y++) {
                 for (int x = 0; x < hexSettings.getCHUNK_SIZE(); x++) {
-                    tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT());
+                    tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT(), true);
                 }
             }
         }
@@ -105,6 +112,7 @@ public final class MapData {
     }
 
     /**
+     * @param chunkPos 
      * @return All tiles of the requested chunk.
      */
     public HexTile[][] getChunkTiles(Vector2Int chunkPos) {
@@ -119,21 +127,25 @@ public final class MapData {
      * @return null if the tile doesn't exist.
      */
     public HexTile getTile(HexCoordinate tilePos) {
-//        return chunkData.getTile(getChunkGridPos(tilePos), tilePos);
         Vector2Int chunkPosition = getChunkGridPos(tilePos);
-        tilePos = getChunkTilePos(tilePos);
-        for (Vector2Int pos : chunkPos) {
-            if (pos.equals(chunkPosition)) {
-                HexTile tile = chunkData.getTile(chunkPosition, tilePos);
-                if (tile != null) {
-                    return tile;
-                } else {
-                    //todo
-                    //Load the chunk from the file and get the tile
-                    //If still null the tile doesn't exist so return null
+        if (chunkPosition != null) {
+            tilePos = getChunkTilePos(tilePos);
+            for (Vector2Int pos : chunkPos) {
+                if (pos.equals(chunkPosition)) {
+                    HexTile tile = chunkData.getTile(chunkPosition, tilePos);
+                    if (tile != null) {
+                        return tile;
+                    } else {
+                        //todo
+                        //Load the chunk from the file and get the tile
+                        //If still null the tile doesn't exist so return null
+                        System.err.println("Chunk data to load haven't been found or tile does not exist. Requested Tile : " + tilePos);
+                    }
                 }
             }
         }
+        //Normal behavior when looking for Neightbors or hexRange
+//        System.err.println("Can't found chunk for " + tilePos); 
         return null;
     }
 
@@ -146,9 +158,10 @@ public final class MapData {
     public void setTile(HexCoordinate tilePos, HexTile tile) {
         Vector2Int chunkPosition = getChunkGridPos(tilePos);
         tilePos = getChunkTilePos(tilePos);
-        TileChangeEvent tce = new TileChangeEvent(chunkPosition, tilePos, chunkData.getTile(chunkPosition, tilePos), tile);
-        if (tce.getOldTile() != null) {
+        HexTile oldTile = chunkData.getTile(chunkPosition, tilePos);
+        if (oldTile != null) {
             chunkData.setTile(getChunkGridPos(tilePos), tilePos, tile);
+            TileChangeEvent tce = new TileChangeEvent(chunkPosition, tilePos, oldTile, tile);
             for (TileChangeListener l : tileListeners) {
                 l.tileChange(tce);
             }
@@ -156,10 +169,21 @@ public final class MapData {
     }
 
     /**
+     * @param tilePos 
+     * @param height 
      * @todo
      */
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
+    }
+
+    /**
+     *
+     * @param position
+     * @param walkable
+     */
+    public void setTileIsWalkable(HexCoordinate position, boolean walkable) {
+        setTile(position, getTile(position).cloneChangeWalkable(walkable));
     }
 
     /**
@@ -184,6 +208,9 @@ public final class MapData {
     }
 
     /**
+     * Get all tile around the defined position, return null for tile who
+     * doesn't exist.
+     *
      * @param position of the center tile.
      * @return All tile arround the needed tile.
      */
@@ -238,12 +265,14 @@ public final class MapData {
      */
     public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
-        int x = tileOffset.x / hexSettings.getCHUNK_SIZE();
-        int y = tileOffset.y / hexSettings.getCHUNK_SIZE();
-        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? x - 1 : x), ((tileOffset.y < 0) ? y - 1 : y));
-        if (this.chunkPos.contains(result)) {
+        int x = (int) (FastMath.abs(tileOffset.x) / hexSettings.getCHUNK_SIZE());
+        int y = (int) (FastMath.abs(tileOffset.y)) / hexSettings.getCHUNK_SIZE();
+        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? x * -1 : x), ((tileOffset.y < 0) ? y * -1 : y));
+        if (chunkPos.contains(result)) {
             return result;
         } else {
+            //Normal behavior when looking for Neightbors or hexRange
+//            System.err.println("Chunk does not exist in the current context. Requested tile : "+tilePos+ ". Corresponding Chunk : " + result); 
             return null;
         }
     }
@@ -259,8 +288,12 @@ public final class MapData {
         Vector2Int chunk = getChunkGridPos(tilePos);
         if (chunk != null) {
             Vector2Int tileOffset = tilePos.getAsOffset();
-            return new HexCoordinate(HexCoordinate.OFFSET, tileOffset.x - chunk.x * hexSettings.getCHUNK_SIZE(), tileOffset.y - chunk.y * hexSettings.getCHUNK_SIZE());
+            return new HexCoordinate(HexCoordinate.OFFSET,
+                    (int) (FastMath.abs(tileOffset.x) - (FastMath.abs(chunk.x) * hexSettings.getCHUNK_SIZE())),
+                    (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * hexSettings.getCHUNK_SIZE()));
         } else {
+            //Normal behavior when looking for Neightbors or hexRange
+//            System.err.println("Chunk does not exits in current context, even in Temp. Requested tile : "+tilePos);
             return null;
         }
     }
@@ -268,6 +301,7 @@ public final class MapData {
     /**
      * Convert chunk position in hexMap to world unit.
      *
+     * @param position 
      * @hint chunk world unit position is the same than the chunk node.
      * @return chunk world unit position.
      */
@@ -279,7 +313,7 @@ public final class MapData {
     /**
      * Convert Odd-R Offset tile hexMap position to world unit.
      *
-     * @param offsetPos position to convert.
+     * @param tilePos 
      * @return tile world unit position.
      */
     public Vector3f getTileWorldPosition(HexCoordinate tilePos) {
@@ -365,7 +399,7 @@ public final class MapData {
                         };
                         Files.copy(f, file, options);
                     } else {
-                        throw new FileNotFoundException(userHome + "/Data/MapData/"+mapName+"/"+pos.toString()+".chk"+" can't be saved, data missing.");
+                        throw new FileNotFoundException(userHome + "/Data/MapData/" + mapName + "/" + pos.toString() + ".chk" + " can't be saved, data missing.");
                     }
                 } else {
                     cdLoader.setChunk(tiles);
@@ -399,22 +433,18 @@ public final class MapData {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks() {
         return chunkData.getAllChunks();
     }
 
     /**
      *
-     * @param position
-     * @param inUse
      */
-    public void setLogicTileInUse(HexCoordinate position, boolean inUse) {
-        Vector2Int chunkPosition = getChunkGridPos(position);
-        HexCoordinate pos = getChunkTilePos(position);
-        chunkData.setTile(chunkPosition, pos, getTile(position).cloneChangedWalkable(inUse));
-    }
-    
-    public void Cleanup(){
+    public void Cleanup() {
         //Todo remove all file from the temps folder
     }
 }

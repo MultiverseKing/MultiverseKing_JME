@@ -3,7 +3,7 @@ package hexsystem.chunksystem;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
@@ -28,7 +28,7 @@ public class MeshParameter {
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private HashMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new HashMap<ElementalAttribut, ArrayList<Integer>>();
+    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
     /**
      * Used to define which algorithm to use with meshmanager.
      */
@@ -52,7 +52,6 @@ public class MeshParameter {
      * Call This before sending the param else it will fail.
      *
      * @param chunkSize
-     * @param subChunkWorldGridPos
      * @param onlyGround
      */
     public void initialize(int chunkSize, boolean onlyGround) {
@@ -69,12 +68,12 @@ public class MeshParameter {
             for (int x = 0; x < chunkSize; x++) {
                 if (!isVisited[x][y]) {
                     HexTile currentTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x, y));
-                    if (!elementTypeRef.containsKey(currentTile.getElement())) {
+                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(currentTile.getElement())) {
                         ArrayList<Integer> list = new ArrayList<Integer>();
                         elementTypeRef.put(currentTile.getElement(), list);
                     }
                     elementTypeRef.get(currentTile.getElement()).add(posInList);
-                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) currentTile.getElement().ordinal(), (byte) currentTile.getHeight());
+                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) currentTile.getHeight());
                     setSize(chunkSize, posInList, isVisited, currentTile);
                     posInList++;
                 }
@@ -82,10 +81,9 @@ public class MeshParameter {
         }
     }
 
-    private void add(Vector2Int position, Vector2Int size, byte elementType, byte height) {
+    private void add(Vector2Int position, Vector2Int size, byte height) {
         this.position.add(position);
         this.size.add(size);
-//        this.elementType.add(elementType);
         this.height.add(height);
     }
 
@@ -162,6 +160,7 @@ public class MeshParameter {
 
     /**
      * set to true if the depth isn't needed.
+     * @return 
      */
     public boolean onlyGround() {
         return onlyGround;
@@ -169,14 +168,22 @@ public class MeshParameter {
 
     /**
      * wish side of the mesh should be rendered on other term.
+     * @return 
      */
     public Boolean[][] getCulling() {
         int current = elementTypeRef.get(currentElement).get(currentIndex);
+
         Boolean[][] neightborsCull = new Boolean[size.get(current).x][6];
         for (int j = 0; j < size.get(current).x; j++) {
+//            HexCoordinate[] coords = new HexCoordinate(HexCoordinate.OFFSET, position.get(current)).getNeighbours();
+//            for (byte k = 0; k < 6; k++) {
+//                if(coords[k].getAsOffset().x == mapData.getHexSettings().getCHUNK_SIZE()){
+//                    
+//                }
+//            }
             HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, position.get(current).x + j, position.get(current).y));
             for (byte k = 0; k < 6; k++) {
-                if(height.get(current) >= 0){
+                if (height.get(current) >= 0) {
                     if (neightbors[k] != null) {
                         if (neightbors[k].getHeight() >= height.get(current)) {
                             neightborsCull[j][k] = false;
@@ -216,6 +223,7 @@ public class MeshParameter {
 
     /**
      * How many mesh param this element have.
+     * @return 
      */
     public int getElementMeshCount() {
         return elementTypeRef.get(currentElement).size();
@@ -223,6 +231,7 @@ public class MeshParameter {
 
     /**
      * Return true if there is another mesh to generate for the current element.
+     * @return 
      */
     public boolean hasNext() {
         currentIndex++;

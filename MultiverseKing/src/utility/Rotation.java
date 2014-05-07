@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package utility;
 
 import com.jme3.math.Quaternion;
@@ -11,6 +7,7 @@ import com.jme3.math.Quaternion;
  * @author roah
  */
 public enum Rotation {
+
     /**
      * Equivalent to X+.
      */
@@ -35,14 +32,15 @@ public enum Rotation {
      * Equivalent to X+ Y-.
      */
     F;
-    
+
     /**
      * Convert a direction as a Quaternion.
+     *
      * @param value Rotation to convert.
      * @return Quaternion corresponding to that direction.
      */
-    public static Quaternion getQuaternion(Rotation value){
-        switch(value){
+    public static Quaternion getQuaternion(Rotation value) {
+        switch (value) {
             case A:
                 return new Quaternion(new Quaternion(new float[]{0, 1.5f, 0}));
             case B:

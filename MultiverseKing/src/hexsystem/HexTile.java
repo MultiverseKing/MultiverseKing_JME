@@ -18,39 +18,77 @@ public class HexTile implements Savable {
     private int height;
     private boolean walkable;
 
+    /**
+     *
+     */
     public HexTile() {
+        this.element = (byte) ElementalAttribut.NULL.ordinal();
+        this.height = 0;
+        this.walkable = true;
     }
 
+    /**
+     *
+     * @param eAttribut
+     */
     public HexTile(ElementalAttribut eAttribut) {
         this.element = (byte) eAttribut.ordinal();
         this.height = 0;
         this.walkable = true;
     }
 
+    /**
+     *
+     * @param hexElement
+     * @param height
+     */
     public HexTile(ElementalAttribut hexElement, int height) {
         this.element = (byte) hexElement.ordinal();
         this.height = height;
         this.walkable = true;
     }
 
+    /**
+     *
+     * @param hexElement
+     * @param height
+     * @param walkable
+     */
     public HexTile(ElementalAttribut hexElement, int height, boolean walkable) {
         this.element = (byte) hexElement.ordinal();
         this.height = height;
         this.walkable = walkable;
     }
 
+    /**
+     *
+     * @return
+     */
     public ElementalAttribut getElement() {
         return ElementalAttribut.convert(element);
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getWalkable() {
         return walkable;
     }
 
+    /**
+     *
+     * @param ex
+     * @throws IOException
+     */
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(height, "height", 0);
@@ -59,6 +97,11 @@ public class HexTile implements Savable {
 //        System.out.println(height + " "+element);
     }
 
+    /**
+     *
+     * @param im
+     * @throws IOException
+     */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
 //        capsule.readByte("height", height);
@@ -72,7 +115,7 @@ public class HexTile implements Savable {
      * Returns a clone of this tile with changed Element param.
      *
      * @param element ElementalAttribut
-     * @return 
+     * @return
      */
     public HexTile cloneChangedElement(ElementalAttribut element) {
         return new HexTile(element, height, walkable);
@@ -87,14 +130,14 @@ public class HexTile implements Savable {
     public HexTile cloneChangedHeight(int height) {
         return new HexTile(ElementalAttribut.convert(element), height, walkable);
     }
-    
+
     /**
      * Returns a clone of this tile with changed walkable param.
      *
      * @param walkable
      * @return
      */
-    public HexTile cloneChangedWalkable(boolean walkable) {
+    public HexTile cloneChangeWalkable(boolean walkable) {
         return new HexTile(ElementalAttribut.convert(element), height, walkable);
     }
 }

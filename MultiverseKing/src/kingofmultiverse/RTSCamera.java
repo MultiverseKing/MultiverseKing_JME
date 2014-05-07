@@ -11,12 +11,12 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.awt.im.InputContext;
+
 /**
  *
  * <pre>
@@ -36,90 +36,104 @@ import java.awt.im.InputContext;
  * </pre>
  *
  * @author Artur Biesiadowski, Roah
- * 
+ *
  */
 public final class RTSCamera extends AbstractAppState {
 
     /**
      * Degree of Freedom
-     * 
+     *
      */
     public enum DoF {
+
+        /**
+         *
+         */
         SIDE,
+        /**
+         *
+         */
         FWD,
+        /**
+         *
+         */
         ROTATE,
+        /**
+         *
+         */
         TILT,
+        /**
+         *
+         */
         DISTANCE
     }
 
+    /**
+     *
+     */
     public enum UpVector {
 
+        /**
+         *
+         */
         Y_UP(Vector3f.UNIT_Y),
+        /**
+         *
+         */
         Z_UP(Vector3f.UNIT_Z);
-
         final Vector3f upVector;
 
         UpVector(Vector3f upVector) {
             this.upVector = upVector;
         }
-
     }
 
     interface HeightProvider {
+
         public float getHeight(Vector2f coord);
     }
-
     private InputManager inputManager;
     private Camera cam;
     private BoundingVolume centerBounds;
     private BoundingVolume cameraBounds;
-
     private final int[] direction = new int[5];
     private final float[] accelTime = new float[5];
     private final float[] offsetMoves = new float[5];
-
     private final float[] maxSpeedPerSecondOfAccell = new float[5];
     private final float[] maxAccellPeriod = new float[5];
     private final float[] decelerationFactor = new float[5];
     private final float[] minValue = new float[5];
     private final float[] maxValue = new float[5];
-
     private final Vector3f position = new Vector3f();
     private final Vector3f center = new Vector3f();
-    
     private final InternalListener listener = new InternalListener();
-
     private final UpVector up;
-
     private final Vector3f oldPosition = new Vector3f();
     private final Vector3f oldCenter = new Vector3f();
     private final Vector2f tempVec2 = new Vector2f();
     private float tilt = FastMath.PI / 4;
     private float rot = -FastMath.PI;
     private float distance = 10;
-    
     private HeightProvider heightProvider;
-
-
     private boolean wheelEnabled = true;
     private String mouseRotationButton = "BUTTON2";
     private String mouseDragButton = "BUTTON3XXX";
-
     private boolean mouseRotation;
     private boolean mouseDrag;
-
     private static final int SIDE = DoF.SIDE.ordinal();
     private static final int FWD = DoF.FWD.ordinal();
     private static final int ROTATE = DoF.ROTATE.ordinal();
     private static final int TILT = DoF.TILT.ordinal();
     private static final int DISTANCE = DoF.DISTANCE.ordinal();
-
     private static final float WHEEL_SPEED = 1f / 15;
+    private static String[] mappings = new String[]{
+        "+SIDE", "+FWD", "+ROTATE", "+TILT", "+DISTANCE", "-SIDE", "-FWD", "-ROTATE", "-TILT", "-DISTANCE", "+WHEEL", "-WHEEL", "-MOUSEX", "+MOUSEX", "-MOUSEY", "+MOUSEY",
+        "BUTTON1", "BUTTON2", "BUTTON3"};
 
-    private static String[] mappings = new String[] {
-            "+SIDE", "+FWD", "+ROTATE", "+TILT", "+DISTANCE", "-SIDE", "-FWD", "-ROTATE", "-TILT", "-DISTANCE", "+WHEEL", "-WHEEL", "-MOUSEX", "+MOUSEX", "-MOUSEY", "+MOUSEY",
-            "BUTTON1", "BUTTON2", "BUTTON3" };
-
+    /**
+     *
+     * @param up
+     */
     public RTSCamera(UpVector up) {
         this.up = up;
 
@@ -136,6 +150,11 @@ public final class RTSCamera extends AbstractAppState {
         setMaxSpeed(DoF.DISTANCE, 15f, 0.4f);
     }
 
+    /**
+     *
+     * @param stateManager
+     * @param app
+     */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -145,47 +164,49 @@ public final class RTSCamera extends AbstractAppState {
     }
 
     /**
-     * Set the maximum speed for given direction of movement. For SIDE/FWD/DISTANCE it is in units/second, for ROTATE/TILT it is in radians/second. Deceleration time is assumed to be the same
-     * as acceleration time.
-     * 
-     * @param deg
-     *            degree of freedom for which to set the maximum speed
-     * @param maxSpd
-     *            maximum speed of movement in that direction
-     * @param accelTime
-     *            amount of time which is need to accelerate to full speed in seconds (has to be bigger than zero, values over half second feel very sluggish). Defaults are 0.4
-     *            seconds
+     * Set the maximum speed for given direction of movement. For
+     * SIDE/FWD/DISTANCE it is in units/second, for ROTATE/TILT it is in
+     * radians/second. Deceleration time is assumed to be the same as
+     * acceleration time.
+     *
+     * @param deg degree of freedom for which to set the maximum speed
+     * @param maxSpd maximum speed of movement in that direction
+     * @param accelTime amount of time which is need to accelerate to full speed
+     * in seconds (has to be bigger than zero, values over half second feel very
+     * sluggish). Defaults are 0.4 seconds
      */
     public void setMaxSpeed(DoF deg, float maxSpd, float accelTime) {
-        setMaxSpeed(deg,maxSpd,accelTime,accelTime);
+        setMaxSpeed(deg, maxSpd, accelTime, accelTime);
     }
-    
+
     /**
-     * Set the maximum speed for given direction of movement. For SIDE/FWD/DISTANCE it is in units/second, for ROTATE/TILT it is in radians/second. 
-     * 
-     * @param deg
-     *            degree of freedom for which to set the maximum speed
-     * @param maxSpd
-     *            maximum speed of movement in that direction
-     * @param accelTime
-     *            amount of time which is need to accelerate to full speed in seconds (has to be bigger than zero, values over half second feel very sluggish). Defaults are 0.4
-     *            seconds
-     * @param decelerationTime
-     *            amount of time in seconds which is needed to automatically decelerate (friction-like stopping) from maxSpd to full stop.
+     * Set the maximum speed for given direction of movement. For
+     * SIDE/FWD/DISTANCE it is in units/second, for ROTATE/TILT it is in
+     * radians/second.
+     *
+     * @param deg degree of freedom for which to set the maximum speed
+     * @param maxSpd maximum speed of movement in that direction
+     * @param accelTime amount of time which is need to accelerate to full speed
+     * in seconds (has to be bigger than zero, values over half second feel very
+     * sluggish). Defaults are 0.4 seconds
+     * @param decelerationTime amount of time in seconds which is needed to
+     * automatically decelerate (friction-like stopping) from maxSpd to full
+     * stop.
      */
     public void setMaxSpeed(DoF deg, float maxSpd, float accelTime, float decelerationTime) {
         maxSpeedPerSecondOfAccell[deg.ordinal()] = maxSpd / accelTime;
         maxAccellPeriod[deg.ordinal()] = accelTime;
-        if ( decelerationTime < 0.00001) {
+        if (decelerationTime < 0.00001) {
             decelerationTime = 0.00001f;
         }
-        decelerationFactor[deg.ordinal()] = accelTime/decelerationTime; 
+        decelerationFactor[deg.ordinal()] = accelTime / decelerationTime;
     }
 
     /**
-     * Set the terrain following logic for camera. Camera position will not get under the value returned by the heightProvider. Please add some extra buffering here,
-     * so camera will not clip the actual terrain - for example
-     * 
+     * Set the terrain following logic for camera. Camera position will not get
+     * under the value returned by the heightProvider. Please add some extra
+     * buffering here, so camera will not clip the actual terrain - for example
+     *
      * <pre>
      * new HeightProvider() {
      *     &#064;Override
@@ -194,7 +215,7 @@ public final class RTSCamera extends AbstractAppState {
      *     }
      * }
      * </pre>
-     * 
+     *
      * @param heightProvider
      */
     public void setHeightProvider(HeightProvider heightProvider) {
@@ -202,8 +223,8 @@ public final class RTSCamera extends AbstractAppState {
     }
 
     /**
-     * Enables/disabled wheel-zoom behaviour
-     * Default is enabled
+     * Enables/disabled wheel-zoom behaviour Default is enabled
+     * @param wheelEnabled 
      */
     public void setWheelEnabled(boolean wheelEnabled) {
         this.wheelEnabled = wheelEnabled;
@@ -225,14 +246,14 @@ public final class RTSCamera extends AbstractAppState {
     }
 
     /**
-     * Use MouseInput.BUTTON_ constants to indicate which buttons should be used for rotation and dragging with mouse
-     * Defaults are BUTTON_MIDDLE for rotation and BUTTON_RIGHT for dragging
-     * Use -1 to disable given functionality
-     * 
-     * @param rotationButton
-     *            button to hold to control TILT/ROTATION with mouse movements
-     * @param dragButton
-     *            button to hold to drag camera position around
+     * Use MouseInput.BUTTON_ constants to indicate which buttons should be used
+     * for rotation and dragging with mouse Defaults are BUTTON_MIDDLE for
+     * rotation and BUTTON_RIGHT for dragging Use -1 to disable given
+     * functionality
+     *
+     * @param rotationButton button to hold to control TILT/ROTATION with mouse
+     * movements
+     * @param dragButton button to hold to drag camera position around
      */
     public void setMouseDragging(int rotationButton, int dragButton) {
         mouseDragButton = mouseButtonName(dragButton);
@@ -251,9 +272,9 @@ public final class RTSCamera extends AbstractAppState {
                     if (accelTime[i] != 0) {
                         double oldSpeed = accelTime[i];
                         if (accelTime[i] > 0) {
-                            accelTime[i] -= tpf*decelerationFactor[i];
+                            accelTime[i] -= tpf * decelerationFactor[i];
                         } else {
-                            accelTime[i] += tpf*decelerationFactor[i];
+                            accelTime[i] += tpf * decelerationFactor[i];
                         }
                         if (oldSpeed * accelTime[i] < 0) {
                             accelTime[i] = 0;
@@ -275,7 +296,7 @@ public final class RTSCamera extends AbstractAppState {
         rot += maxSpeedPerSecondOfAccell[ROTATE] * accelTime[ROTATE] * tpf + offsetMoves[ROTATE];
 
         distance = clamp(minValue[DISTANCE], distance, maxValue[DISTANCE]);
-        rot = clamp(minValue[ROTATE], rot%(FastMath.PI*2), maxValue[ROTATE]);
+        rot = clamp(minValue[ROTATE], rot % (FastMath.PI * 2), maxValue[ROTATE]);
         tilt = clamp(minValue[TILT], tilt, maxValue[TILT]);
 
         double offX = maxSpeedPerSecondOfAccell[SIDE] * accelTime[SIDE] * tpf + offsetMoves[SIDE];
@@ -285,8 +306,8 @@ public final class RTSCamera extends AbstractAppState {
         float cosRot = FastMath.cos(rot);
         float cosTilt = FastMath.cos(tilt);
         float sinTilt = FastMath.sin(tilt);
-        
-        
+
+
         center.x += offX * cosRot + offY * sinRot;
         if (up == UpVector.Y_UP) {
             center.z += offX * -sinRot + offY * cosRot;
@@ -303,7 +324,7 @@ public final class RTSCamera extends AbstractAppState {
             position.y = center.y + (float) (distance * sinTilt);
             position.z = center.z + (float) (distance * cosTilt * cosRot);
             if (heightProvider != null) {
-                float h = heightProvider.getHeight(tempVec2.set(position.x,position.z));
+                float h = heightProvider.getHeight(tempVec2.set(position.x, position.z));
                 if (position.y < h) {
                     position.y = h;
                 }
@@ -313,7 +334,7 @@ public final class RTSCamera extends AbstractAppState {
             position.y = center.y + (float) (distance * cosTilt * cosRot);
             position.z = center.z + (float) (distance * sinTilt);
             if (heightProvider != null) {
-                float h = heightProvider.getHeight(tempVec2.set(position.x,position.y));
+                float h = heightProvider.getHeight(tempVec2.set(position.x, position.y));
                 if (position.z < h) {
                     position.z = h;
                 }
@@ -327,7 +348,7 @@ public final class RTSCamera extends AbstractAppState {
         if (oldPosition.equals(position) && oldCenter.equals(center)) {
             return;
         }
-        
+
         if (cameraBounds != null) {
             //TODO: clamp position to bounds
         }
@@ -337,7 +358,7 @@ public final class RTSCamera extends AbstractAppState {
 
         oldPosition.set(position);
         oldCenter.set(center);
-        
+
     }
 
     private static float clamp(float min, float value, float max) {
@@ -350,21 +371,36 @@ public final class RTSCamera extends AbstractAppState {
         }
     }
 
+    /**
+     *
+     * @param dg
+     * @return
+     */
     public float getMaxSpeed(DoF dg) {
         return maxSpeedPerSecondOfAccell[dg.ordinal()];
     }
 
+    /**
+     *
+     * @param dg
+     * @return
+     */
     public float getMinValue(DoF dg) {
         return minValue[dg.ordinal()];
     }
 
+    /**
+     *
+     * @param dg
+     * @return
+     */
     public float getMaxValue(DoF dg) {
         return maxValue[dg.ordinal()];
     }
 
     /**
      * SIDE and FWD min/max values are ignored
-     * 
+     *
      * @param dg
      * @param min
      * @param max
@@ -374,42 +410,82 @@ public final class RTSCamera extends AbstractAppState {
         maxValue[dg.ordinal()] = max;
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3f getPosition() {
         return position;
     }
 
+    /**
+     *
+     * @param center
+     */
     public void setCenter(Vector3f center) {
         this.center.set(center);
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector3f getCenter() {
         return center;
     }
 
+    /**
+     *
+     * @return
+     */
     public float getDistance() {
         return distance;
     }
 
+    /**
+     *
+     * @return
+     */
     public float getRot() {
         return rot;
     }
 
+    /**
+     *
+     * @return
+     */
     public float getTilt() {
         return tilt;
     }
 
+    /**
+     *
+     * @param distance
+     */
     public void setDistance(float distance) {
         this.distance = distance;
     }
 
+    /**
+     *
+     * @param rot
+     */
     public void setRot(float rot) {
         this.rot = rot;
     }
 
+    /**
+     *
+     * @param tilt
+     */
     public void setTilt(float tilt) {
         this.tilt = tilt;
     }
 
+    /**
+     *
+     * @return
+     */
     public Camera getCamera() {
         return cam;
     }
@@ -422,14 +498,14 @@ public final class RTSCamera extends AbstractAppState {
         KeyTrigger posRot = new KeyTrigger(KeyInput.KEY_Q);
         KeyTrigger negFWD = new KeyTrigger(KeyInput.KEY_W);
         KeyTrigger negDistance = new KeyTrigger(KeyInput.KEY_Z);
-        if(local.equals("fr_FR")){
+        if (local.equals("fr_FR")) {
             negSide = new KeyTrigger(KeyInput.KEY_Q);
             posRot = new KeyTrigger(KeyInput.KEY_A);
             negFWD = new KeyTrigger(KeyInput.KEY_Z);
             negDistance = new KeyTrigger(KeyInput.KEY_W);
         }
-        
-        
+
+
         if (up == UpVector.Y_UP) {
             inputManager.addMapping("-SIDE", negSide);
             inputManager.addMapping("+SIDE", new KeyTrigger(KeyInput.KEY_D));
@@ -541,7 +617,7 @@ public final class RTSCamera extends AbstractAppState {
                     int direction;
                     if (name.endsWith("X")) {
                         direction = ROTATE;
-                        if ( up == UpVector.Z_UP ) {
+                        if (up == UpVector.Z_UP) {
                             value = -value;
                         }
                     } else {
@@ -552,7 +628,7 @@ public final class RTSCamera extends AbstractAppState {
                     int direction;
                     if (name.endsWith("X")) {
                         direction = SIDE;
-                        if ( up == UpVector.Z_UP ) {
+                        if (up == UpVector.Z_UP) {
                             value = -value;
                         }
                     } else {
@@ -565,5 +641,4 @@ public final class RTSCamera extends AbstractAppState {
 
         }
     }
-
 }

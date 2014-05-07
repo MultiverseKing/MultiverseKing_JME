@@ -11,6 +11,7 @@ import tonegod.gui.effects.Effect;
 
 /**
  * Card show on the screen.
+ *
  * @author roah
  */
 public class Card extends ButtonAdapter {
@@ -71,6 +72,10 @@ public class Card extends ButtonAdapter {
         setPosition(new Vector2f(220f + ((cardSize.x - 20) * handPosition), screen.getHeight() - this.getHeight() - 20));
     }
 
+    /**
+     * Called when the mouse is over the card.
+     * @param hasFocus true if over.
+     */
     @Override
     public void setHasFocus(boolean hasFocus) {
         super.setHasFocus(hasFocus);
@@ -81,6 +86,11 @@ public class Card extends ButtonAdapter {
         }
     }
 
+    /**
+     * Called when the left Mouse is pressed over this card.
+     * @param evt ??
+     * @param toggled ??
+     */
     @Override
     public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftDown(evt, toggled);
@@ -91,6 +101,11 @@ public class Card extends ButtonAdapter {
         super.update(tpf); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Called when the left mouse is released (over this card?).
+     * @param evt ??
+     * @param toggled ??
+     */
     @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftUp(evt, toggled);
@@ -100,21 +115,26 @@ public class Card extends ButtonAdapter {
     }
 
     /**
-     * 
+     *
      * @return current hand position of the card.
      */
     int getHandPosition() {
         return this.handPosition;
     }
-    
+
     /**
      * Change the current player handPosition of the card.
-     * @param handPosition 
+     *
+     * @param handPosition
      */
-    void sethandPosition(int handPosition){
+    void sethandPosition(int handPosition) {
         this.handPosition = handPosition;
     }
 
+    /**
+     * Used when adding the Hover so it fit the cardSize.
+     * @param child
+     */
     @Override
     public void addChild(Element child) {
         super.addChild(child);

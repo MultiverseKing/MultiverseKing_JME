@@ -8,7 +8,8 @@ import utility.Vector2Int;
 import utility.attribut.ElementalAttribut;
 
 /**
- * @todo Set a memory limit to avoid to much data. See ChunkDataOld removeChunk();
+ * @todo Set a memory limit to avoid to much data. See ChunkDataOld
+ * removeChunk();
  * @author roah
  */
 class ChunkData {
@@ -39,10 +40,10 @@ class ChunkData {
             try {
                 return tiles[tileOffset.x][tileOffset.y];
             } catch (ArrayIndexOutOfBoundsException e) {
-                System.err.println("Hex index out of bounds");
+                System.err.println("Hex index out of bounds. Requested tile : " + tilePos);
             }
         } else {
-            System.err.println("Chunk doesn't Exist in memory");
+            System.err.println("Chunk doesn't Exist in memory. Requested Chunk : " + chunk);
         }
         return null;
     }

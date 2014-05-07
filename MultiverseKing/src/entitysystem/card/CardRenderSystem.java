@@ -8,9 +8,6 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.animation.AnimationComponent;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
 import entitysystem.render.RenderComponent;
 import entitysytem.Units.UnitsSystem;
 import gamestate.Editor.EditorAppState;
@@ -21,9 +18,6 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
-import utility.Rotation;
-import utility.attribut.Animation;
-import utility.attribut.CardRenderPosition;
 import utility.attribut.CardSubType;
 
 /**
@@ -113,7 +107,7 @@ public class CardRenderSystem extends EntitySystemAppState {
     public Set<EntityId> getCardsKeyset() {
         return handCards.keySet();
     }
-
+    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -141,6 +135,7 @@ public class CardRenderSystem extends EntitySystemAppState {
     }
 
     /**
+     * @param e 
      * @todo Handle Outerworld cards, show permanently a picture of the last
      * card send to the outerworld. when mouse is over the outerworld Zone last
      * cast send to the outerworld show up his stats. When clic on the area
@@ -181,19 +176,19 @@ public class CardRenderSystem extends EntitySystemAppState {
                 break;
         }
     }
-
+    
     @Override
     protected void updateEntity(Entity e) {
         //todo//...
     }
-
+    
     @Override
     protected void removeEntity(Entity e) {
         Card card = handCards.get(e.getId());
         screen.removeElement(card);
         handCards.remove(e.getId());
     }
-
+    
     @Override
     protected void cleanupSystem() {
         hover.removeAllChildren();
@@ -206,6 +201,10 @@ public class CardRenderSystem extends EntitySystemAppState {
         screen = null;
     }
 
+    /**
+     * Called when the mouse is over a card.
+     * @param card the mouse is.
+     */
     void hasFocus(Card card) {
         zOrder = card.getZOrder();
         screen.updateZOrder(card);
@@ -213,6 +212,10 @@ public class CardRenderSystem extends EntitySystemAppState {
         card.addChild(hover);
     }
 
+    /**
+     * Called when a card lost the focus.
+     * @param card who lost the focus.
+     */
     void lostFocus(Card card) {
         hover.removeAllChildren();
         card.removeChild(hover);
@@ -226,47 +229,37 @@ public class CardRenderSystem extends EntitySystemAppState {
             castPreview(card);
         }
     }
+    
+    /**
+     * Show when a card is currenty previewed, show the cardName.
+     * @todo Render it on a better way.
+     */
+    Window casted;
 
     /**
-     * @todo Add the cast effect activation.
+     * @todo Add the cast effect activation on the field.
      * @param card
      */
     private void castPreview(Card card) {
-        Window casted = new Window(screen, "CastDebug", new Vector2f(155, 175), new Vector2f(250, 20));
-        casted.setMinDimensions(new Vector2f(200, 26));
-        casted.setIgnoreMouse(true);
-        casted.setText("        " + card.getCardName() + " preview cast !");
-        screen.addElement(casted);
-        screen.removeElement(card);
-        cardCastPreview = card;
-        setActiveCard(true);
+        if (casted == null || screen.getElementById(casted.getUID()) == null) {
+            casted = new Window(screen, "CastDebug", new Vector2f(155, 175), new Vector2f(250, 20));
+            casted.setMinDimensions(new Vector2f(200, 26));
+            casted.setIgnoreMouse(true);
+            casted.setText("        " + card.getCardName() + " preview cast !");
+            screen.addElement(casted);
+            screen.removeElement(card);
+            cardCastPreview = card;
+            setActiveCard(true);
+        }
     }
 
     private void castCanceled() {
         screen.addElement(cardCastPreview);
         setActiveCard(false);
+        cardCastPreview.setZOrder(zOrder);
     }
 
-    /**
-     * @deprecated ?
-     */
-    private void castConfirmed(HexCoordinate castPosition) {
-        /**
-         * @todo the check have to be done on another way as, when a system is
-         * removed and if this system is used by other system, these system know
-         * about the fact that system isn't there anymore.
-         */
-//        if(app.getStateManager().getState(MovementSystem.class) != null 
-//                && app.getStateManager().getState(EntityRenderSystem.class) != null){
-//            MovementSystem mSystem = app.getStateManager().getState(MovementSystem.class).getOffsetPos();
-//            EntityRenderSystem renderSystem = app.getStateManager().getState(EntityRenderSystem.class).getOffsetPos();
-//            if(!mSystem.gotUnitOn(castPosition) && mSystem.isMovingOn(castPosition)){
-        entityData.setComponent(cardCastPreview.getCardEntityUID(), new HexPositionComponent(castPosition));
-        entityData.setComponent(cardCastPreview.getCardEntityUID(), new CardRenderComponent(CardRenderPosition.FIELD));
-        entityData.setComponent(cardCastPreview.getCardEntityUID(), new RotationComponent(Rotation.A));
-        entityData.setComponent(cardCastPreview.getCardEntityUID(), new AnimationComponent(Animation.SUMMON));
-//            }
-//        }
+    private void castConfirmed() {
         cardCastPreview = null;
         setActiveCard(false);
     }
@@ -297,7 +290,11 @@ public class CardRenderSystem extends EntitySystemAppState {
                         //todo
                         break;
                     case SUMMON:
-                        app.getStateManager().getState(UnitsSystem.class).canBeSummon(castPosition, entities.getEntity(cardCastPreview.getCardEntityUID()));
+                        if (app.getStateManager().getState(UnitsSystem.class).canBeSummon(castPosition, cardCastPreview.getCardEntityUID())) {
+                            castConfirmed();
+                        } else {
+                            castCanceled();
+                        }
                         break;
                     case TRAP:
                         //todo
@@ -305,7 +302,6 @@ public class CardRenderSystem extends EntitySystemAppState {
                     default:
                         throw new UnsupportedOperationException("This type isn't implemented !");
                 }
-                castConfirmed(castPosition);
             }
         }
     };
@@ -314,7 +310,7 @@ public class CardRenderSystem extends EntitySystemAppState {
         app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive); //To change once defined correctly.
         activeCard = isActive;
         if (!isActive) {
-            screen.removeElement(screen.getElementById("CastDebug"));
+            screen.removeElement(screen.getElementById(casted.getUID()));
         }
     }
 

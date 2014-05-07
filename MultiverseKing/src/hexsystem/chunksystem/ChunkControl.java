@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hexsystem.chunksystem;
 
 import com.jme3.asset.AssetManager;
@@ -30,6 +26,13 @@ public class ChunkControl extends AbstractControl {
     private ArrayList<Geometry> geo = new ArrayList<Geometry>();
     private final MapData mapData;
 
+    /**
+     *
+     * @param mapData
+     * @param meshManager
+     * @param assetManager
+     * @param mapElement
+     */
     public ChunkControl(MapData mapData, MeshManager meshManager, AssetManager assetManager, ElementalAttribut mapElement) {
         this.mapData = mapData;
         this.meshManager = meshManager;

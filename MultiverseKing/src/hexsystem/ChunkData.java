@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * @todo Set a memory limit to avoid to much data. See ChunkDataOld

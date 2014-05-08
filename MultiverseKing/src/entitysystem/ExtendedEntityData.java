@@ -1,5 +1,6 @@
 package entitysystem;
 
+import com.jme3.asset.AssetManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;
 import com.simsilica.es.EntityId;
@@ -11,7 +12,7 @@ import utility.HexCoordinate;
 
 /**
  * Bridge between hexSystem and entitySystem.
- *
+ * 
  * @todo all method have not been fully checked to see if they update tile
  * Walkable value in mapData.
  * @author roah
@@ -19,6 +20,7 @@ import utility.HexCoordinate;
 public class ExtendedEntityData extends DefaultEntityData {
 
     private final MapData mapData;
+    private final EntityLoader entityLoader;
 
     /**
      * Hex system Data handler.
@@ -29,6 +31,14 @@ public class ExtendedEntityData extends DefaultEntityData {
     }
 
     /**
+     * Entity loader from file.
+     * @return 
+     */
+    public EntityLoader getEntityLoader() {
+        return entityLoader;
+    }
+
+    /**
      * Data handler for Hex system and for the Entity system 
      * (ES set to default param).
      *
@@ -36,6 +46,7 @@ public class ExtendedEntityData extends DefaultEntityData {
      */
     public ExtendedEntityData(MapData mapData) {
         this.mapData = mapData;
+        entityLoader = new EntityLoader();
     }
 
     /**
@@ -47,6 +58,7 @@ public class ExtendedEntityData extends DefaultEntityData {
     public ExtendedEntityData(MapData mapData, EntityIdGenerator idGenerator) {
         super(idGenerator);
         this.mapData = mapData;
+        entityLoader = new EntityLoader();
     }
 
     /**
@@ -81,7 +93,7 @@ public class ExtendedEntityData extends DefaultEntityData {
         if (type.equals(HexPositionComponent.class)) {
             HexCoordinate pos = getComponent(entityId, HexPositionComponent.class).getPosition();
 
-            System.out.println("remove Component - 003b");
+            System.out.println("remove Component - 003");
             mapData.setTileIsWalkable(pos, true);
         }
 

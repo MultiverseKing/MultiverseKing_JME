@@ -1,10 +1,10 @@
 package entitysystem.card;
 
 import com.simsilica.es.PersistentComponent;
-import utility.attribut.CardType;
-import utility.attribut.CardSubType;
-import utility.attribut.Rarity;
-import utility.attribut.Faction;
+import entitysystem.attribut.CardType;
+import entitysystem.attribut.CardSubType;
+import entitysystem.attribut.Rarity;
+import entitysystem.attribut.Faction;
 
 /**
  * Contain the properties of the card to show up when used by the
@@ -46,6 +46,7 @@ public class CardPropertiesComponent implements PersistentComponent {
 
     /**
      * SupplyRequirement is needed to use card.
+     *
      * @return SupplyRequirement needed for this card.
      */
     public int getSupplyRequirement() {
@@ -54,6 +55,7 @@ public class CardPropertiesComponent implements PersistentComponent {
 
     /**
      * Faction restriction must be meet to use the card.
+     *
      * @return Faction restriction to use this card.
      */
     public Faction getFaction() {
@@ -61,9 +63,9 @@ public class CardPropertiesComponent implements PersistentComponent {
     }
 
     /**
-     * Titan card type can only be used on "Titan",
-     * World card type can only be used on "Field".
-     * Currently only two type are supported.
+     * Titan card type can only be used on "Titan", World card type can only be
+     * used on "Field". Currently only two type are supported.
+     *
      * @return CardType the card belong too.
      */
     public CardType getCardMainType() {
@@ -72,6 +74,7 @@ public class CardPropertiesComponent implements PersistentComponent {
 
     /**
      * Card subType properties.
+     *
      * @see CardSubType
      * @return
      */
@@ -81,6 +84,7 @@ public class CardPropertiesComponent implements PersistentComponent {
 
     /**
      * card Rarity.
+     *
      * @see Rarity
      * @return
      */

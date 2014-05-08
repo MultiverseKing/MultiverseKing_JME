@@ -19,16 +19,16 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import kingofmultiverse.MultiverseMain;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
-import utility.attribut.CardRenderPosition;
-import utility.attribut.CardSubType;
-import utility.attribut.Faction;
-import utility.attribut.Rarity;
+import entitysystem.attribut.CardRenderPosition;
+import entitysystem.attribut.CardSubType;
+import entitysystem.attribut.Faction;
+import entitysystem.attribut.Rarity;
 
 /**
  * @todo The geometry count is too high it have to be reduced by merging

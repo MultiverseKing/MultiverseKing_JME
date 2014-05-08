@@ -17,17 +17,20 @@ import hexsystem.HexTile;
 import java.util.ArrayList;
 import utility.HexCoordinate;
 import utility.Rotation;
-import utility.attribut.Animation;
-import utility.attribut.CardRenderPosition;
+import entitysystem.attribut.Animation;
+import entitysystem.attribut.CardRenderPosition;
+import entitysystem.attribut.CardSubType;
 
 /**
  * Handle all units on the field.
  *
  * @author roah
  */
-public class UnitsSystem extends EntitySystemAppState {
+public class UnitsFieldSystem extends EntitySystemAppState {
 
     ArrayList<EntityId> units = new ArrayList<EntityId>();
+    ArrayList<EntityId> trap = new ArrayList<EntityId>();
+    ArrayList<EntityId> persistentSpell = new ArrayList<EntityId>();
 
     /**
      *
@@ -38,7 +41,7 @@ public class UnitsSystem extends EntitySystemAppState {
         app.getInputManager().addMapping("deleteUnit", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         app.getInputManager().addListener(actionListener, "deleteUnit");
 
-        return entityData.getEntities(StatsComponent.class, RenderComponent.class);
+        return entityData.getEntities(UnitStatsComponent.class, RenderComponent.class);
     }
 
     /**
@@ -88,25 +91,45 @@ public class UnitsSystem extends EntitySystemAppState {
     }
 
     /**
+     * Check if the card can be casted on the defined position.
      *
-     * @param castPosition
-     * @param id
-     * @return
+     * @param castPosition position where the card is cast.
+     * @param id entity this card belong to.
+     * @return true if it can, false otherwise.
      */
-    public boolean canBeSummon(HexCoordinate castPosition, EntityId id) {
+    public boolean canBeCast(HexCoordinate castPosition, EntityId id, CardSubType subType) {
         HexTile tile = getMapData().getTile(castPosition);
+
         if (tile != null) {
-            boolean summon = getMapData().getTile(castPosition).getWalkable();
-            if (summon) {
-                entityData.setComponents(id,
-                        new HexPositionComponent(castPosition),
-                        new CardRenderComponent(CardRenderPosition.FIELD),
-                        new RotationComponent(Rotation.A),
-                        new AnimationComponent(Animation.SUMMON),
-                        new StatsComponent());
-                return true;
-            } else {
-                return false;
+            boolean walkable = getMapData().getTile(castPosition).getWalkable();
+            switch (subType) {
+                case SUMMON:
+                    if (walkable) {
+                        String name = entityData.getComponent(id, RenderComponent.class).getName();
+                        UnitStatsComponent unitDataLoaded = entityData.getEntityLoader().loadUnitStats(name);
+                        if (unitDataLoaded != null) {
+                            entityData.setComponents(id,
+                                    new HexPositionComponent(castPosition),
+                                    new CardRenderComponent(CardRenderPosition.FIELD),
+                                    new RotationComponent(Rotation.A),
+                                    new AnimationComponent(Animation.SUMMON),
+                                    unitDataLoaded); //Add damage component
+                            return true;
+                        } else {
+                            System.err.println("Unit can be loaded mising data. Researched : " + name);
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                case TRAP:
+                    //todo : What kind of trap is it ? does it need a walkable tile to be put on ?
+                    break;
+                case SPELL:
+                    //todo : instant cast even if the tile isn't walkable.
+                    return true;
+                default:
+                    throw new UnsupportedOperationException(subType + " isn't a valid type for the field system.");
             }
         }
         //tile does not exist nothing to cast.

@@ -1,4 +1,4 @@
-package utility.attribut;
+package utility;
 
 /**
  * Used to configure the battlefield.

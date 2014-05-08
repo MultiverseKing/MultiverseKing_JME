@@ -1,7 +1,7 @@
 package entitysystem.animation;
 
 import com.simsilica.es.PersistentComponent;
-import utility.attribut.Animation;
+import entitysystem.attribut.Animation;
 
 /**
  * Contain the currently played animation for the entity 

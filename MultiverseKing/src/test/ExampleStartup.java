@@ -22,7 +22,7 @@ import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  *

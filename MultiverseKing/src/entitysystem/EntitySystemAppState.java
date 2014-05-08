@@ -38,6 +38,14 @@ public abstract class EntitySystemAppState extends AbstractAppState {
         return entityData.getMapData();
     }
     
+    /**
+     * Entity loader from file.
+     * @return 
+     */
+    public EntityLoader getEntityLoader() {
+        return entityData.getEntityLoader();
+    }
+    
     @Override
     public final void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);

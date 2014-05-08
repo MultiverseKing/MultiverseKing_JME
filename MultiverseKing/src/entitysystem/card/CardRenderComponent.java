@@ -1,7 +1,7 @@
 package entitysystem.card;
 
 import com.simsilica.es.PersistentComponent;
-import utility.attribut.CardRenderPosition;
+import entitysystem.attribut.CardRenderPosition;
 
 /**
  * Used by the card render system, Contain where the Card should be rendered on

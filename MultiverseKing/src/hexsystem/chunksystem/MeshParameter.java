@@ -7,7 +7,7 @@ import java.util.EnumMap;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  *

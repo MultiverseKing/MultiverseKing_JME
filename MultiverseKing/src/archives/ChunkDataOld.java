@@ -4,7 +4,7 @@ import com.jme3.math.FastMath;
 import hexsystem.HexTile;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * test

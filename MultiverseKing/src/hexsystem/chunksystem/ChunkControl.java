@@ -12,7 +12,7 @@ import com.jme3.texture.Texture;
 import hexsystem.MapData;
 import java.util.ArrayList;
 import java.util.Set;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * control the chunk geometry, all tiles geometry.

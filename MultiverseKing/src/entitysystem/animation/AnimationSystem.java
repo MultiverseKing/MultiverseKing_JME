@@ -12,7 +12,7 @@ import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
-import utility.attribut.Animation;
+import entitysystem.attribut.Animation;
 
 /**
  * Handle how animation work when they got they cycle done or under defined

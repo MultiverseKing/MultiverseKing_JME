@@ -9,7 +9,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.render.RenderComponent;
-import entitysytem.Units.UnitsSystem;
+import entitysytem.Units.UnitsFieldSystem;
 import gamestate.Editor.EditorAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
-import utility.attribut.CardSubType;
+import entitysystem.attribut.CardType;
 
 /**
  * System used to render all card on the screen.
@@ -86,10 +86,10 @@ public class CardRenderSystem extends EntitySystemAppState {
     private Vector2f minCastArea;
     private Vector2f maxCastArea;
     /**
-     * Save the card casted on preview so we can put it back if not casted, in
-     * case it casted we remove it from cards.
+     * Save the card isCastedDebug on preview so we can put it back if not
+     * isCastedDebug, in case it isCastedDebug we remove it from cards.
      */
-    private Card cardCastPreview;
+    private Card cardPreviewCast;
 
     /**
      * Check if the player got cards in is hand.
@@ -107,7 +107,7 @@ public class CardRenderSystem extends EntitySystemAppState {
     public Set<EntityId> getCardsKeyset() {
         return handCards.keySet();
     }
-    
+
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -135,7 +135,7 @@ public class CardRenderSystem extends EntitySystemAppState {
     }
 
     /**
-     * @param e 
+     * @param e
      * @todo Handle Outerworld cards, show permanently a picture of the last
      * card send to the outerworld. when mouse is over the outerworld Zone last
      * cast send to the outerworld show up his stats. When clic on the area
@@ -176,19 +176,19 @@ public class CardRenderSystem extends EntitySystemAppState {
                 break;
         }
     }
-    
+
     @Override
     protected void updateEntity(Entity e) {
         //todo//...
     }
-    
+
     @Override
     protected void removeEntity(Entity e) {
         Card card = handCards.get(e.getId());
         screen.removeElement(card);
         handCards.remove(e.getId());
     }
-    
+
     @Override
     protected void cleanupSystem() {
         hover.removeAllChildren();
@@ -203,6 +203,7 @@ public class CardRenderSystem extends EntitySystemAppState {
 
     /**
      * Called when the mouse is over a card.
+     *
      * @param card the mouse is.
      */
     void hasFocus(Card card) {
@@ -214,6 +215,7 @@ public class CardRenderSystem extends EntitySystemAppState {
 
     /**
      * Called when a card lost the focus.
+     *
      * @param card who lost the focus.
      */
     void lostFocus(Card card) {
@@ -225,92 +227,95 @@ public class CardRenderSystem extends EntitySystemAppState {
     void isInCastArea(Card card) {
         if (screen.getMouseXY().x > minCastArea.x && screen.getMouseXY().x < maxCastArea.x
                 && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y) {
-            activeCard = true;
             castPreview(card);
         }
     }
-    
     /**
      * Show when a card is currenty previewed, show the cardName.
+     *
      * @todo Render it on a better way.
      */
-    Window casted;
+    Window isCastedDebug;
 
     /**
      * @todo Add the cast effect activation on the field.
      * @param card
      */
     private void castPreview(Card card) {
-        if (casted == null || screen.getElementById(casted.getUID()) == null) {
-            casted = new Window(screen, "CastDebug", new Vector2f(155, 175), new Vector2f(250, 20));
-            casted.setMinDimensions(new Vector2f(200, 26));
-            casted.setIgnoreMouse(true);
-            casted.setText("        " + card.getCardName() + " preview cast !");
-            screen.addElement(casted);
-            screen.removeElement(card);
-            cardCastPreview = card;
-            setActiveCard(true);
+        if (isCastedDebug == null) {
+            isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 175), new Vector2f(250, 20));
+            isCastedDebug.setMinDimensions(new Vector2f(200, 26));
+            isCastedDebug.setIgnoreMouse(true);
         }
+        isCastedDebug.setText("        " + card.getCardName() + " preview cast !");
+        screen.addElement(isCastedDebug);
+        screen.removeElement(card);
+        cardPreviewCast = card;
+        CardType cardType = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardPropertiesComponent.class).getCardMainType();
+        setActiveCard(true, cardType);
     }
 
     private void castCanceled() {
-        screen.addElement(cardCastPreview);
-        setActiveCard(false);
-        cardCastPreview.setZOrder(zOrder);
+        screen.addElement(cardPreviewCast);
+        setActiveCard(false, null);
+        cardPreviewCast.setZOrder(zOrder);
     }
 
     private void castConfirmed() {
-        cardCastPreview = null;
-        setActiveCard(false);
+        cardPreviewCast = null;
+        setActiveCard(false, null);
     }
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (activeCard && name.equals("cancel") && !keyPressed) {
                 castCanceled();
             } else if (activeCard && name.equals("confirmed") && !keyPressed) {
-                CardSubType cardType = entityData.getComponent(cardCastPreview.getCardEntityUID(), CardPropertiesComponent.class).getCardSubType();
+                CardPropertiesComponent properties = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardPropertiesComponent.class);
                 HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).getOffsetPos();
                 /**
-                 * We switch over all card type and call the corresponding
+                 * We switch over all card main type and call the corresponding
                  * system for that card to be activated properly. Then we
                  * confirm the cast in this system. (the entity will be removed
                  * from this system automaticaly if he have to)
                  */
-                switch (cardType) {
-                    case AI:
-                        //todo
+                switch (properties.getCardMainType()) {
+                    case TITAN:
+                        //todo : if the player want to use the field and not fast selection menu. TITAN card
                         break;
-                    case EQUIPEMENT:
-                        //todo
-                        break;
-                    case PATHFIND:
-                        //todo
-                        break;
-                    case SPELL:
-                        //todo
-                        break;
-                    case SUMMON:
-                        if (app.getStateManager().getState(UnitsSystem.class).canBeSummon(castPosition, cardCastPreview.getCardEntityUID())) {
+                    case WORLD:
+                        if (app.getStateManager().getState(UnitsFieldSystem.class).canBeCast(castPosition, cardPreviewCast.getCardEntityUID(), properties.getCardSubType())) {
                             castConfirmed();
                         } else {
                             castCanceled();
                         }
                         break;
-                    case TRAP:
-                        //todo
-                        break;
                     default:
-                        throw new UnsupportedOperationException("This type isn't implemented !");
+                        throw new UnsupportedOperationException("This type isn't implemented or supported !");
                 }
             }
         }
     };
 
-    private void setActiveCard(boolean isActive) {
-        app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive); //To change once defined correctly.
+    private void setActiveCard(boolean isActive, CardType mainType) {
         activeCard = isActive;
-        if (!isActive) {
-            screen.removeElement(screen.getElementById(casted.getUID()));
+        if (isActive) {
+            /**
+             * We switch over all card Main type to know what preview to
+             * activate.
+             */
+            switch (mainType) {
+                case TITAN:
+                    //todo
+                    break;
+                case WORLD:
+                    app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive);//to change and but on a better place
+                    break;
+                default:
+                    throw new UnsupportedOperationException("This type isn't implemented !");
+            }
+        } else {
+            app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive);//to change and but on a better place
+            screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         }
     }
 

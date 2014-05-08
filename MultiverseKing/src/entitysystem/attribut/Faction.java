@@ -1,4 +1,4 @@
-package utility.attribut;
+package entitysystem.attribut;
 
 /**
  *

@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * This class holds the hex data of the map.
@@ -53,6 +53,10 @@ public final class MapData {
         this.assetManager = assetManager;
         mapElement = eAttribut;
         chunkData = new ChunkData(hexSettings.getCHUNK_DATA_LIMIT());
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
     }
 
     /**
@@ -383,6 +387,7 @@ public final class MapData {
      */
     public void saveChunk(Vector2Int position) throws IOException {
         String userHome = System.getProperty("user.dir") + "/assets";
+        
         BinaryExporter exporter = BinaryExporter.getInstance();
         ChunkDataLoader cdLoader = new ChunkDataLoader();
 

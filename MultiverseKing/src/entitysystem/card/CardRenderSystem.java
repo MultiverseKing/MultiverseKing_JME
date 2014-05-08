@@ -9,7 +9,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.render.RenderComponent;
-import entitysytem.Units.UnitsFieldSystem;
+import entitysytem.units.UnitsFieldSystem;
 import gamestate.Editor.EditorAppState;
 import java.util.ArrayList;
 import java.util.HashMap;

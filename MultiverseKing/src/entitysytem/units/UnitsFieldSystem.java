@@ -1,4 +1,4 @@
-package entitysytem.Units;
+package entitysytem.units;
 
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;

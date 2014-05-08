@@ -1,4 +1,4 @@
-package entitysytem.Units;
+package entitysytem.units;
 
 /**
  * Base damage an entity/unit can do without equipement.

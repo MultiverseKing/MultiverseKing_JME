@@ -1,6 +1,6 @@
 package entitysystem;
 
-import entitysytem.Units.UnitStatsComponent;
+import entitysytem.units.UnitStatsComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

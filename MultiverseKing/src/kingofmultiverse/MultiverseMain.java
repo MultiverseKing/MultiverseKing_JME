@@ -23,7 +23,7 @@ import entitysystem.position.HexPositionComponent;
 import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysytem.Units.UnitsFieldSystem;
+import entitysytem.units.UnitsFieldSystem;
 import gamestate.HexMapAppState;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;

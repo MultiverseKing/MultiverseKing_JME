@@ -1,5 +1,6 @@
 package entitysytem.units;
 
+import com.simsilica.es.PersistentComponent;
 import utility.ElementalAttribut;
 
 /**
@@ -7,7 +8,7 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-public class CoreElementalAttributComponent {
+public class EAttributComponent implements PersistentComponent {
 
     ElementalAttribut eAttribut;
 
@@ -16,7 +17,7 @@ public class CoreElementalAttributComponent {
      *
      * @param eAttribut
      */
-    public CoreElementalAttributComponent(ElementalAttribut eAttribut) {
+    public EAttributComponent(ElementalAttribut eAttribut) {
         this.eAttribut = eAttribut;
     }
 

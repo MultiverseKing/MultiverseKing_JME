@@ -1,5 +1,6 @@
 package entitysystem;
 
+import entitysystem.loader.EntityLoader;
 import com.jme3.asset.AssetManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;

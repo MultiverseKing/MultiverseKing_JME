@@ -18,7 +18,6 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
-import entitysystem.attribut.CardType;
 
 /**
  * System used to render all card on the screen.
@@ -131,7 +130,7 @@ public class CardRenderSystem extends EntitySystemAppState {
         app.getInputManager().addMapping("confirmed", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         app.getInputManager().addListener(actionListener, "confirmed");
 
-        return entityData.getEntities(CardRenderComponent.class, CardPropertiesComponent.class, RenderComponent.class);
+        return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
 
     /**
@@ -157,7 +156,7 @@ public class CardRenderSystem extends EntitySystemAppState {
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId());
+                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(), getEntityLoader().loadCard(e.get(RenderComponent.class).getName()));
                 handCards.put(e.getId(), card);
                 screen.addElement(card);
                 card.resetHandPosition();
@@ -209,7 +208,7 @@ public class CardRenderSystem extends EntitySystemAppState {
     void hasFocus(Card card) {
         zOrder = card.getZOrder();
         screen.updateZOrder(card);
-        hover.setProperties(entityData.getComponent(card.getCardEntityUID(), CardPropertiesComponent.class), card.getCardName());
+        hover.setProperties(card.getProperties(), card.getCardName());
         card.addChild(hover);
     }
 
@@ -251,26 +250,26 @@ public class CardRenderSystem extends EntitySystemAppState {
         screen.addElement(isCastedDebug);
         screen.removeElement(card);
         cardPreviewCast = card;
-        CardType cardType = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardPropertiesComponent.class).getCardMainType();
-        setActiveCard(true, cardType);
+        setActiveCard(true);
     }
 
     private void castCanceled() {
         screen.addElement(cardPreviewCast);
-        setActiveCard(false, null);
+        cardPreviewCast = null;
+        setActiveCard(false);
         cardPreviewCast.setZOrder(zOrder);
     }
 
     private void castConfirmed() {
         cardPreviewCast = null;
-        setActiveCard(false, null);
+        setActiveCard(false);
     }
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (activeCard && name.equals("cancel") && !keyPressed) {
                 castCanceled();
             } else if (activeCard && name.equals("confirmed") && !keyPressed) {
-                CardPropertiesComponent properties = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardPropertiesComponent.class);
+                CardProperties properties = cardPreviewCast.getProperties();
                 HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).getOffsetPos();
                 /**
                  * We switch over all card main type and call the corresponding
@@ -283,7 +282,7 @@ public class CardRenderSystem extends EntitySystemAppState {
                         //todo : if the player want to use the field and not fast selection menu. TITAN card
                         break;
                     case WORLD:
-                        if (app.getStateManager().getState(UnitsFieldSystem.class).canBeCast(castPosition, cardPreviewCast.getCardEntityUID(), properties.getCardSubType())) {
+                        if (app.getStateManager().getState(UnitsFieldSystem.class).canBeCast(castPosition, cardPreviewCast.getCardEntityUID(), properties)) {
                             castConfirmed();
                         } else {
                             castCanceled();
@@ -296,14 +295,14 @@ public class CardRenderSystem extends EntitySystemAppState {
         }
     };
 
-    private void setActiveCard(boolean isActive, CardType mainType) {
+    private void setActiveCard(boolean isActive) {
         activeCard = isActive;
-        if (isActive) {
+        if (isActive && cardPreviewCast != null) {
             /**
              * We switch over all card Main type to know what preview to
              * activate.
              */
-            switch (mainType) {
+            switch (cardPreviewCast.getProperties().getCardMainType()) {
                 case TITAN:
                     //todo
                     break;

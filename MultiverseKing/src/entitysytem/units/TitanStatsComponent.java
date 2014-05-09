@@ -1,28 +1,18 @@
 package entitysytem.units;
 
+import com.simsilica.es.PersistentComponent;
+
 /**
  * Entity Titan Stats.
  *
  * @author roah
  */
-public class TitanStatsComponent {
+public class TitanStatsComponent implements PersistentComponent {
 
-    /**
-     * How many equipements (weapon) slots this Titan have.
-     */
-    private byte equipementSlotsCount;
-    /**
-     * How many reduction damage the unit got.
-     */
     private int armor;
 
-    public TitanStatsComponent(byte equipementSlotsCount, int armor) {
-        this.equipementSlotsCount = equipementSlotsCount;
+    public TitanStatsComponent(int armor) {
         this.armor = armor;
-    }
-
-    public byte getEquipementSlotsCount() {
-        return equipementSlotsCount;
     }
 
     /**

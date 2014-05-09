@@ -4,7 +4,7 @@ package entitysystem.attribut;
  * 
  * @author roah
  */
-public enum CardType {
+public enum CardMainType {
     /**
      *
      */

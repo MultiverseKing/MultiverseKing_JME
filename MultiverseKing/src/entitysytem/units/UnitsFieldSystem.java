@@ -20,6 +20,8 @@ import utility.Rotation;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.attribut.CardSubType;
+import entitysystem.card.CardProperties;
+import entitysystem.loader.UnitLoader;
 
 /**
  * Handle all units on the field.
@@ -97,26 +99,28 @@ public class UnitsFieldSystem extends EntitySystemAppState {
      * @param id entity this card belong to.
      * @return true if it can, false otherwise.
      */
-    public boolean canBeCast(HexCoordinate castPosition, EntityId id, CardSubType subType) {
+    public boolean canBeCast(HexCoordinate castPosition, EntityId id, CardProperties properties) {
         HexTile tile = getMapData().getTile(castPosition);
 
         if (tile != null) {
             boolean walkable = getMapData().getTile(castPosition).getWalkable();
-            switch (subType) {
+            switch (properties.getCardSubType()) {
                 case SUMMON:
                     if (walkable) {
                         String name = entityData.getComponent(id, RenderComponent.class).getName();
-                        UnitStatsComponent unitDataLoaded = entityData.getEntityLoader().loadUnitStats(name);
-                        if (unitDataLoaded != null) {
+                        UnitLoader unitLoader = entityData.getEntityLoader().loadUnitStats(name);
+                        if (unitLoader != null) {
                             entityData.setComponents(id,
                                     new HexPositionComponent(castPosition),
                                     new CardRenderComponent(CardRenderPosition.FIELD),
                                     new RotationComponent(Rotation.A),
                                     new AnimationComponent(Animation.SUMMON),
-                                    unitDataLoaded); //Add damage component
+                                    new EAttributComponent(properties.getElement()),
+                                    unitLoader.getuLife(),
+                                    unitLoader.getuStats()); //Add damage component
                             return true;
                         } else {
-                            System.err.println("Unit can be loaded mising data. Researched : " + name);
+                            System.err.println("Unit can't be loaded mising data. Researched unit : " + name);
                             return false;
                         }
                     } else {
@@ -129,7 +133,7 @@ public class UnitsFieldSystem extends EntitySystemAppState {
                     //todo : instant cast even if the tile isn't walkable.
                     return true;
                 default:
-                    throw new UnsupportedOperationException(subType + " isn't a valid type for the field system.");
+                    throw new UnsupportedOperationException(properties.getCardSubType() + " isn't a valid type for the field system.");
             }
         }
         //tile does not exist nothing to cast.

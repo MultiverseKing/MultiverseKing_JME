@@ -3,38 +3,20 @@ package entitysytem.units;
 import com.simsilica.es.PersistentComponent;
 
 /**
- * Entity stats native unit stats.
+ * Entity unit, native stats.
  *
  * @author roah
  */
 public class UnitStatsComponent implements PersistentComponent {
 
-    /**
-     * How many life point the unit got.
-     */
-    private int life;
-    /**
-     * How fast the unit load his action.
-     */
-    private float speed;
-    /**
-     * How far the unit can travel.
-     */
-    private byte movePoint;
+    private final float speed;
+    private final byte movePoint;
+    private final String baseAbility;
 
-    public UnitStatsComponent(int life, float speed, byte movePoint) {
-        this.life = life;
+    public UnitStatsComponent(float speed, byte movePoint, String baseAbility) {
         this.speed = speed;
         this.movePoint = movePoint;
-    }
-
-    /**
-     * Life point this unit have.
-     *
-     * @return
-     */
-    public int getLife() {
-        return life;
+        this.baseAbility = baseAbility;
     }
 
     /**
@@ -53,5 +35,14 @@ public class UnitStatsComponent implements PersistentComponent {
      */
     public byte getMovePoint() {
         return movePoint;
+    }
+
+    /**
+     * Ability this unit start with.
+     *
+     * @return
+     */
+    public String getBaseAbility() {
+        return baseAbility;
     }
 }

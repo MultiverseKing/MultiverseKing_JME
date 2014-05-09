@@ -26,9 +26,9 @@ public class Hover extends Window {
     /**
      * @todo
      */
-    void setProperties(CardPropertiesComponent component, String cardName) {
+    void setProperties(CardProperties properties, String cardName) {
 //        float posY = this.getPosition().y-this.getHeight()-20;
-        Window level = new Window(this.screen, Vector2f.ZERO, new Vector2f(11, 17), Vector4f.ZERO, "Textures/PlatformerGUIText/Individual/" + component.getSupplyRequirement() + ".png");
+        Window level = new Window(this.screen, Vector2f.ZERO, new Vector2f(11, 17), Vector4f.ZERO, "Textures/PlatformerGUIText/Individual/" + properties.getPlayCost() + ".png");
         level.removeAllChildren();
         this.addChild(level);
         level.setPosition(new Vector2f(5, 99));

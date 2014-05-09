@@ -1,11 +1,13 @@
 package entitysytem.units;
 
+import com.simsilica.es.PersistentComponent;
+
 /**
- * Base damage an entity/unit can do without equipement.
+ * Base damage an entity/unit/object/all can do without equipement.
  *
  * @author roah
  */
-public class DamageComponent {
+public class DamageComponent implements PersistentComponent {
 
     private int damage;
 
@@ -19,7 +21,7 @@ public class DamageComponent {
     }
 
     /**
-     * Base damage of this entity.
+     * Base damage.
      *
      * @return
      */

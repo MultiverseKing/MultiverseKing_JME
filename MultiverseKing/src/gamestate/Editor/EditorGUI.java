@@ -10,7 +10,6 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import gamestate.GameDataAppState;
 import entitysystem.card.CardRenderSystem;
-import entitysystem.card.CardPropertiesComponent;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexTile;
@@ -26,9 +25,6 @@ import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import utility.HexCoordinate;
 import entitysystem.attribut.CardRenderPosition;
-import entitysystem.attribut.CardSubType;
-import entitysystem.attribut.Faction;
-import entitysystem.attribut.Rarity;
 
 /**
  * @todo The geometry count is too high it have to be reduced by merging
@@ -139,12 +135,10 @@ class EditorGUI extends AbstractAppState {
                     //to change, testing purpose
                     CardRenderSystem cardSystem = app.getStateManager().getState(CardRenderSystem.class);
                     if (!cardSystem.gotCardInHand()) {
-                        EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
-                        EntityId cardId = ed.createEntity();
-                        ed.setComponent(cardId, new RenderComponent("Cendrea"));
-                        ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
-                        CardPropertiesComponent properties = new CardPropertiesComponent(4, Faction.PLUG, CardSubType.SUMMON, Rarity.COMMON);
-                        ed.setComponent(cardId, properties);
+                        GameDataAppState gameDataAS = app.getStateManager().getState(GameDataAppState.class);
+                        EntityId cardId = gameDataAS.getEntityData().createEntity();
+                        gameDataAS.getEntityData().setComponent(cardId, new RenderComponent("Cendrea"));
+                        gameDataAS.getEntityData().setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
                     }
 
                     main.getScreen().getElementById("cardEditor").setText("Card Editor: ON");
@@ -174,8 +168,6 @@ class EditorGUI extends AbstractAppState {
                 EntityId cardId = ed.createEntity();
                 ed.setComponent(cardId, new RenderComponent("Cendrea"));
                 ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
-                CardPropertiesComponent properties = new CardPropertiesComponent(0, Faction.PLUG, CardSubType.SUMMON, Rarity.COMMON);
-                ed.setComponent(cardId, properties);
             }
         };
         addCard.setText("Add");

@@ -1,6 +1,6 @@
-package entitysystem;
+package entitysystem.loader;
 
-import entitysytem.units.UnitStatsComponent;
+import entitysystem.card.CardProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,9 +11,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sun.misc.IOUtils;
-import utility.ElementalAttribut;
 
 /**
+ * Master to load Entity from file.
  *
  * @author roah
  */
@@ -22,15 +22,35 @@ public class EntityLoader {
     private String path = System.getProperty("user.dir") + "/assets/Data/CardData/";
     private JSONParser parser = new JSONParser();
 
-    public UnitStatsComponent loadUnitStats(String name) {
+    /**
+     * Load an unit from a file.
+     * @param name of the unit to load.
+     * @return loaded data or null if the unit not found.
+     */
+    public UnitLoader loadUnitStats(String name) {
         String loadPath = path + "Units/" + name + ".card";
         JSONObject obj = getData(loadPath);
-        ElementalAttribut element = (ElementalAttribut) obj.get("element");
-        obj = (JSONObject) obj.get("unitsStats");
-
+        if (obj != null) {
+            return new UnitLoader((JSONObject) obj.get("unitsStats"));
+        }
         return null;
     }
 
+    /**
+     * Load the entity elemental attribut from his RenderName,
+     * @todo load all component for cards.
+     * @param renderName
+     * @return 
+     */
+    public CardProperties loadCard(String renderName) {
+        String loadPath = path + "Units/" + renderName + ".card";
+        JSONObject obj = getData(loadPath);
+        if (obj != null) {
+            return new CardProperties(obj);
+        }
+        return null;
+    }
+    
     private JSONObject getData(String loadPath) {
         try {
             InputStream is = new FileInputStream(new File(loadPath));

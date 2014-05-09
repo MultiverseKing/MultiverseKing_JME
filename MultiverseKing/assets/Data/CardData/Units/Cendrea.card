@@ -3,7 +3,8 @@
    "faction" : "PLUG",
    "cardSubType" : "SUMMON",
    "rarity" : "COMMON",
-   "elemental" : "SHOCK",
+   "element" : "SHOCK",
+   "playCost" : 4,
 
     "unitsStats" : {
         "life" : 100,

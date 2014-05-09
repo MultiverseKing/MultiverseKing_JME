@@ -1,5 +1,6 @@
 package entitysystem;
 
+import entitysystem.loader.EntityLoader;
 import gamestate.GameDataAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;

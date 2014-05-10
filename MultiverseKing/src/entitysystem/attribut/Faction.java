@@ -6,11 +6,15 @@ package entitysystem.attribut;
  */
 public enum Faction {
     /**
-     *
+     * Belong to himself, nearly everything.
+     */
+    NEUTRAL,
+    /**
+     * Robot type faction.
      */
     PLUG,
     /**
-     *
+     * 
      */
-    THUNDRA
+    THUNDRA;
 }

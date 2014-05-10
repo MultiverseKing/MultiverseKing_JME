@@ -1,0 +1,14 @@
+{
+    "faction": "PLUG",
+    "cardSubType": "SUMMON",
+    "rarity": "COMMON",
+    "eAttribut": "SHOCK",
+    "playCost": 4,
+    
+    "unitsStats": {
+        "life": 100,
+        "speed": 1.5,
+        "movePoint": 1,
+        "ability": "PulseVoltage"
+    }
+}

@@ -23,8 +23,9 @@ import entitysystem.position.HexPositionComponent;
 import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.UnitsFieldSystem;
+import entitysytem.units.FieldInputSystem;
 import gamestate.HexMapAppState;
+import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -84,6 +85,8 @@ public class MultiverseMain extends SimpleApplication {
 
         lightSettup();
         generateHexMap();
+        
+        
     }
 
     /**
@@ -188,12 +191,13 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attachAll(
                 new GameDataAppState(entityData),
                 new HexMapAppState(this, mapData),
+                new HexMapMouseInput(),
                 new EntityRenderSystem(),
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new UnitsFieldSystem(),
-                new EditorAppState(mapData, this));
+                new FieldInputSystem(),
+                new EditorAppState());
     }
     private boolean exemple = true;
 

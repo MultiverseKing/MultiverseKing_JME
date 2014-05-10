@@ -42,7 +42,7 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     public AnimControl getAnimControl(EntityId id) {
         return spatials.get(id).getControl(AnimControl.class);
     }
-
+    
     /**
      *
      * @return

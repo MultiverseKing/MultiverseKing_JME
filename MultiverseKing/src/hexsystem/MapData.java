@@ -229,7 +229,8 @@ public final class MapData {
     }
 
     /**
-     * Register a listener to respond to chunk Event. Work outside the entity
+     * Register a listener to respond to chunk Event. 
+     * Work outside the entity
      * system.
      *
      * @param listener to register.
@@ -315,7 +316,8 @@ public final class MapData {
     }
 
     /**
-     * Convert Odd-R Offset tile hexMap position to world unit.
+     * Convert Hex grid position to world position.
+     * Convertion work with Odd-R Offset grid type. (currently used grid type)
      *
      * @param tilePos 
      * @return tile world unit position.
@@ -326,7 +328,8 @@ public final class MapData {
     }
 
     /**
-     * Convert World Position to Odd-R Offset grid position.
+     * Convert World Position to Hex grid position.
+     * Vector3f to Odd-R Offset grid position.
      *
      * @param pos position to convert.
      * @return converted grid position.

@@ -12,23 +12,21 @@ import entitysystem.card.CardRenderComponent;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.position.RotationComponent;
 import entitysystem.render.RenderComponent;
-import gamestate.Editor.EditorAppState;
 import hexsystem.HexTile;
 import java.util.ArrayList;
 import utility.HexCoordinate;
 import utility.Rotation;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
-import entitysystem.attribut.CardSubType;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.UnitLoader;
 
 /**
- * Handle all units on the field.
+ * Handle all input on the field.
  *
  * @author roah
  */
-public class UnitsFieldSystem extends EntitySystemAppState {
+public class FieldInputSystem extends EntitySystemAppState {
 
     ArrayList<EntityId> units = new ArrayList<EntityId>();
     ArrayList<EntityId> trap = new ArrayList<EntityId>();
@@ -42,51 +40,32 @@ public class UnitsFieldSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         app.getInputManager().addMapping("deleteUnit", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         app.getInputManager().addListener(actionListener, "deleteUnit");
-
-        return entityData.getEntities(UnitStatsComponent.class, RenderComponent.class);
+       
+        return entityData.getEntities(UnitStatsComponent.class, RenderComponent.class, HexPositionComponent.class);
     }
-
-    /**
-     *
-     * @param tpf
-     */
+    
     @Override
     protected void updateSystem(float tpf) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    /**
-     *
-     * @param e
-     */
+    
     @Override
     protected void addEntity(Entity e) {
         units.add(e.getId());
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    /**
-     *
-     * @param e
-     */
+    
     @Override
     protected void updateEntity(Entity e) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    /**
-     *
-     * @param e
-     */
+    
     @Override
     protected void removeEntity(Entity e) {
         units.remove(e.getId());
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    /**
-     *
-     */
+    
     @Override
     protected void cleanupSystem() {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -116,8 +95,9 @@ public class UnitsFieldSystem extends EntitySystemAppState {
                                     new RotationComponent(Rotation.A),
                                     new AnimationComponent(Animation.SUMMON),
                                     new EAttributComponent(properties.getElement()),
-                                    unitLoader.getuLife(),
-                                    unitLoader.getuStats()); //Add damage component
+                                    unitLoader.getuLife(),      //life component
+                                    unitLoader.getuStats(),      //stats component
+                                    unitLoader.getAbilityComp());
                             return true;
                         } else {
                             System.err.println("Unit can't be loaded mising data. Researched unit : " + name);
@@ -142,12 +122,12 @@ public class UnitsFieldSystem extends EntitySystemAppState {
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("deleteUnit") && !keyPressed) {
-                HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).pulseCursor();
-                for (EntityId id : units) {
-                    if (entityData.getComponent(id, HexPositionComponent.class).getPosition().equals(castPosition)) {
-                        entityData.removeEntity(id);
-                    }
-                }
+//                HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).pulseCursor();
+//                for (EntityId id : units) {
+//                    if (entityData.getComponent(id, HexPositionComponent.class).getPosition().equals(castPosition)) {
+//                        entityData.removeEntity(id);
+//                    }
+//                }
             }
         }
     };

@@ -5,7 +5,7 @@ package entitysytem.units;
  * @author roah
  */
 public class InfluenceComponent {
-    private int influenceArea;
+    private final int influenceArea;
 
     /**
      * Size of the influence area arround the unit where you are able to summon or control unit. 

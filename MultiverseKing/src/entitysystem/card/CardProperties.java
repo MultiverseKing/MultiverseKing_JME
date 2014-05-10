@@ -37,7 +37,7 @@ public class CardProperties {
         cardSubType = CardSubType.valueOf(obj.get("cardSubType").toString());
         if (cardSubType == CardSubType.SPELL || cardSubType == CardSubType.SUMMON || cardSubType == CardSubType.TRAP) {
             this.cardMainType = CardMainType.WORLD;
-        } else if (cardSubType == CardSubType.AI || cardSubType == CardSubType.EQUIPEMENT || cardSubType == CardSubType.PATHFIND) {
+        } else if (cardSubType == CardSubType.ABILITY || cardSubType == CardSubType.EQUIPEMENT) {
             this.cardMainType = CardMainType.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
@@ -46,7 +46,7 @@ public class CardProperties {
         playCost = tmpValue.intValue();
         faction = Faction.valueOf((String) obj.get("faction"));
         rarity = Rarity.valueOf(obj.get("rarity").toString());
-        element = ElementalAttribut.valueOf(obj.get("element").toString());
+        element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
     }
 
     /**

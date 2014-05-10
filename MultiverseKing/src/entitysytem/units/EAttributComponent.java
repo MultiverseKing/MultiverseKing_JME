@@ -10,7 +10,7 @@ import utility.ElementalAttribut;
  */
 public class EAttributComponent implements PersistentComponent {
 
-    ElementalAttribut eAttribut;
+    private final ElementalAttribut eAttribut;
 
     /**
      * Core Element of this entity.

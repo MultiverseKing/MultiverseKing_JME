@@ -9,11 +9,11 @@ public enum CardSubType {
     /**
      * Used for card who affect the way unit move on the field.
      */
-    PATHFIND,
+//    PATHFIND,
     /**
      * Used for card who affect the way unit behave under defined condition.
      */
-    AI,
+    ABILITY,
     /**
      * Used for card who affect the Titan Equipement.
      */

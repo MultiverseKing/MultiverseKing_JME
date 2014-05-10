@@ -1,7 +1,6 @@
 package entitysystem;
 
 import entitysystem.loader.EntityLoader;
-import com.jme3.asset.AssetManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;
 import com.simsilica.es.EntityId;
@@ -71,7 +70,7 @@ public class ExtendedEntityData extends DefaultEntityData {
     @Override
     public void setComponent(EntityId entityId, EntityComponent component) {
         if (component instanceof HexPositionComponent) {
-            System.out.println("Set Component - 002");
+//            System.out.println("Set Component - 002");
             HexPositionComponent newComp = (HexPositionComponent) component;
             HexPositionComponent oldComp = getComponent(entityId, HexPositionComponent.class);
             if (oldComp != null) {
@@ -94,7 +93,7 @@ public class ExtendedEntityData extends DefaultEntityData {
         if (type.equals(HexPositionComponent.class)) {
             HexCoordinate pos = getComponent(entityId, HexPositionComponent.class).getPosition();
 
-            System.out.println("remove Component - 003");
+//            System.out.println("remove Component - 003");
             mapData.setTileIsWalkable(pos, true);
         }
 
@@ -114,7 +113,7 @@ public class ExtendedEntityData extends DefaultEntityData {
         HexPositionComponent oldComp = (HexPositionComponent) oldValue;
         HexPositionComponent newComp = (HexPositionComponent) newValue;
         if (oldComp != null && newComp != null) {
-            System.out.println("replace Component - 004");
+//            System.out.println("replace Component - 004");
             mapData.setTileIsWalkable(oldComp.getPosition(), true);
             mapData.setTileIsWalkable(newComp.getPosition(), false);
         }

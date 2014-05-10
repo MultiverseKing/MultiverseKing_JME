@@ -9,15 +9,16 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.UnitsFieldSystem;
-import gamestate.Editor.EditorAppState;
+import entitysytem.units.FieldInputSystem;
+import gamestate.HexMapMouseInput;
+import hexsystem.events.HexMapInputEvent;
+import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
-import utility.HexCoordinate;
 
 /**
  * System used to render all card on the screen.
@@ -27,7 +28,8 @@ import utility.HexCoordinate;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends EntitySystemAppState {
+public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
+    // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
      * Screen used by the ToneGodGUI to displays cards on the screen.
@@ -67,14 +69,15 @@ public class CardRenderSystem extends EntitySystemAppState {
      */
     private Window fieldWin;
     /**
-     * Used to know when a card is activated, when to cast the preview card
-     * effect.
-     */
-    private boolean activeCard = false;
-    /**
      * Overlay used when a the mouse is over a card.
      */
     private Hover hover;
+    /**
+     * Show properties of a card currenty previewed.
+     *
+     * @todo Render it on a better way.
+     */
+    Window isCastedDebug;
     /**
      * Used to put a card on from of other when mose is over it.
      */
@@ -90,51 +93,32 @@ public class CardRenderSystem extends EntitySystemAppState {
      */
     private Card cardPreviewCast;
 
-    /**
-     * Check if the player got cards in is hand.
-     *
-     * @return true if there is card in the player hand.
-     */
-    public boolean gotCardInHand() {
-        return !handCards.isEmpty();
-    }
-
-    /**
-     *
-     * @return all cards entityId on the current player hand.
-     */
-    public Set<EntityId> getCardsKeyset() {
-        return handCards.keySet();
-    }
-
+    // </editor-fold>
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
         app.getGuiNode().addControl(screen);
 
-        /**
-         * Used to resolve the current issue with tonegod
-         */
+        // Used to resolve the current issue with tonegod-GUI
         for (Element e : screen.getElementsAsMap().values()) {
             screen.removeElement(e);
         }
         screen.getElementsAsMap().clear();
-        //** See above **//
+        // --
 
         hover = new Hover(screen);
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
+        //Register the input for the card system
         app.getInputManager().addMapping("cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        app.getInputManager().addListener(actionListener, "cancel");
-        app.getInputManager().addMapping("confirmed", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        app.getInputManager().addListener(actionListener, "confirmed");
+        app.getInputManager().addListener(cardInputListener, "cancel");
+        app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
 
         return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
 
     /**
-     * @param e
      * @todo Handle Outerworld cards, show permanently a picture of the last
      * card send to the outerworld. when mouse is over the outerworld Zone last
      * cast send to the outerworld show up his stats. When clic on the area
@@ -188,18 +172,6 @@ public class CardRenderSystem extends EntitySystemAppState {
         handCards.remove(e.getId());
     }
 
-    @Override
-    protected void cleanupSystem() {
-        hover.removeAllChildren();
-        hover = null;
-        for (Card card : handCards.values()) {
-            screen.removeElement(card);
-        }
-        handCards.clear();
-        app.getGuiNode().removeControl(screen);
-        screen = null;
-    }
-
     /**
      * Called when the mouse is over a card.
      *
@@ -229,12 +201,6 @@ public class CardRenderSystem extends EntitySystemAppState {
             castPreview(card);
         }
     }
-    /**
-     * Show when a card is currenty previewed, show the cardName.
-     *
-     * @todo Render it on a better way.
-     */
-    Window isCastedDebug;
 
     /**
      * @todo Add the cast effect activation on the field.
@@ -255,49 +221,19 @@ public class CardRenderSystem extends EntitySystemAppState {
 
     private void castCanceled() {
         screen.addElement(cardPreviewCast);
-        cardPreviewCast = null;
         setActiveCard(false);
         cardPreviewCast.setZOrder(zOrder);
+        cardPreviewCast = null;
     }
 
     private void castConfirmed() {
         cardPreviewCast = null;
         setActiveCard(false);
     }
-    private ActionListener actionListener = new ActionListener() {
-        public void onAction(String name, boolean keyPressed, float tpf) {
-            if (activeCard && name.equals("cancel") && !keyPressed) {
-                castCanceled();
-            } else if (activeCard && name.equals("confirmed") && !keyPressed) {
-                CardProperties properties = cardPreviewCast.getProperties();
-                HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).getOffsetPos();
-                /**
-                 * We switch over all card main type and call the corresponding
-                 * system for that card to be activated properly. Then we
-                 * confirm the cast in this system. (the entity will be removed
-                 * from this system automaticaly if he have to)
-                 */
-                switch (properties.getCardMainType()) {
-                    case TITAN:
-                        //todo : if the player want to use the field and not fast selection menu. TITAN card
-                        break;
-                    case WORLD:
-                        if (app.getStateManager().getState(UnitsFieldSystem.class).canBeCast(castPosition, cardPreviewCast.getCardEntityUID(), properties)) {
-                            castConfirmed();
-                        } else {
-                            castCanceled();
-                        }
-                        break;
-                    default:
-                        throw new UnsupportedOperationException("This type isn't implemented or supported !");
-                }
-            }
-        }
-    };
 
     private void setActiveCard(boolean isActive) {
-        activeCard = isActive;
         if (isActive && cardPreviewCast != null) {
+
             /**
              * We switch over all card Main type to know what preview to
              * activate.
@@ -307,24 +243,89 @@ public class CardRenderSystem extends EntitySystemAppState {
                     //todo
                     break;
                 case WORLD:
-                    app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive);//to change and but on a better place
+                    app.getStateManager().getState(HexMapMouseInput.class).setActiveCursor(isActive, this);
                     break;
                 default:
                     throw new UnsupportedOperationException("This type isn't implemented !");
             }
         } else {
-            app.getStateManager().getState(EditorAppState.class).setActivecursor(isActive);//to change and but on a better place
+            app.getStateManager().getState(HexMapMouseInput.class).setActiveCursor(isActive, this);
             screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         }
+    }
+    private ActionListener cardInputListener = new ActionListener() {
+        public void onAction(String name, boolean keyPressed, float tpf) {
+            if (name.equals("cancel") && !keyPressed) {
+                castCanceled();
+            }
+        }
+    };
+
+    public void leftMouseActionResult(HexMapInputEvent event) {
+        if (cardPreviewCast != null) {
+            CardProperties properties = cardPreviewCast.getProperties();
+            /**
+             * We switch over all card main type and call the corresponding
+             * system for that card to be activated properly. Then we confirm
+             * the cast in this system. (the entity will be removed from this
+             * system automaticaly if he have to)
+             */
+            switch (properties.getCardMainType()) {
+                case TITAN:
+                    //todo : if the player want to use the field and not fast selection menu. TITAN card
+                    break;
+                case WORLD:
+                    if (app.getStateManager().getState(FieldInputSystem.class).canBeCast(event.getEventPosition(), cardPreviewCast.getCardEntityUID(), properties)) {
+                        castConfirmed();
+                    } else {
+                        castCanceled();
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("This type isn't implemented or supported !");
+            }
+        }
+    }
+
+    public void rightMouseActionResult(HexMapInputEvent event) {
+        //Unused
+    }
+
+    /**
+     * Check if the player got cards in is hand.
+     *
+     * @return true if there is card in the player hand.
+     */
+    public boolean gotCardInHand() {
+        return !handCards.isEmpty();
     }
 
     /**
      *
+     * @return all cards entityId on the current player hand.
+     */
+    public Set<EntityId> getCardsKeyset() {
+        return handCards.keySet();
+    }
+
+    /**
      * @todo Get the mouse position to see if on the position of a cards (better
      * than the current hover ?)
      */
     @Override
     protected void updateSystem(float tpf) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected void cleanupSystem() {
+        hover.removeAllChildren();
+        hover = null;
+        for (Card card : handCards.values()) {
+            screen.removeElement(card);
+        }
+        handCards.clear();
+        app.getGuiNode().removeControl(screen);
+        screen = null;
     }
 }

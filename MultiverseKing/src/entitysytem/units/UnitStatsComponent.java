@@ -11,12 +11,10 @@ public class UnitStatsComponent implements PersistentComponent {
 
     private final float speed;
     private final byte movePoint;
-    private final String baseAbility;
 
-    public UnitStatsComponent(float speed, byte movePoint, String baseAbility) {
+    public UnitStatsComponent(float speed, byte movePoint) {
         this.speed = speed;
         this.movePoint = movePoint;
-        this.baseAbility = baseAbility;
     }
 
     /**
@@ -35,14 +33,5 @@ public class UnitStatsComponent implements PersistentComponent {
      */
     public byte getMovePoint() {
         return movePoint;
-    }
-
-    /**
-     * Ability this unit start with.
-     *
-     * @return
-     */
-    public String getBaseAbility() {
-        return baseAbility;
     }
 }

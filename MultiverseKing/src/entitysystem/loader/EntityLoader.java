@@ -1,6 +1,7 @@
 package entitysystem.loader;
 
 import entitysystem.card.CardProperties;
+import entitysytem.units.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sun.misc.IOUtils;
+import utility.ElementalAttribut;
 
 /**
  * Master to load Entity from file.
@@ -19,8 +21,8 @@ import sun.misc.IOUtils;
  */
 public class EntityLoader {
 
-    private String path = System.getProperty("user.dir") + "/assets/Data/CardData/";
-    private JSONParser parser = new JSONParser();
+    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData/";
+    private final JSONParser parser = new JSONParser();
 
     /**
      * Load an unit from a file.
@@ -28,10 +30,10 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        String loadPath = path + "Units/" + name + ".card";
+        String loadPath = path + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
-            return new UnitLoader((JSONObject) obj.get("unitsStats"));
+            return new UnitLoader((JSONObject) obj.get("unitsStats"), this);
         }
         return null;
     }
@@ -43,12 +45,27 @@ public class EntityLoader {
      * @return 
      */
     public CardProperties loadCard(String renderName) {
-        String loadPath = path + "Units/" + renderName + ".card";
+        String loadPath = path + renderName + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new CardProperties(obj);
         }
         return null;
+    }
+    
+    public AbilityComponent loadAbility(String name){
+        String loadPath = path + "Ability/" + name + ".card";
+        JSONObject obj = getData(loadPath);
+        ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
+        
+        JSONObject abilityData = (JSONObject) obj.get("ability");
+        Number damage = (Number) abilityData.get("damage");
+        Number loadTime = (Number) abilityData.get("loadTime");
+        Number activationRange = (Number) abilityData.get("activationRange");
+        Number effectSize = (Number) abilityData.get("effectSize");
+        String description = abilityData.get("description").toString();
+        return new AbilityComponent(activationRange.byteValue(),
+                effectSize.byteValue(), eAttribut, loadTime.floatValue(), damage.intValue(), description);
     }
     
     private JSONObject getData(String loadPath) {

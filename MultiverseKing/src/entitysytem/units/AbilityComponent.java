@@ -8,11 +8,12 @@ import utility.ElementalAttribut;
  * @author roah
  */
 public class AbilityComponent implements PersistentComponent {
-
-    private byte activationRange;
-    private byte areaEffectSize;
-    private float loadTime;
-    private ElementalAttribut eAttribut;
+    private final int damage;
+    private final float loadTime;
+    private final byte activationRange;
+    private final byte effectSize;
+    private final ElementalAttribut eAttribut;
+    private String description;
 
     /**
      * Create a new ability for an entity unit.
@@ -22,11 +23,20 @@ public class AbilityComponent implements PersistentComponent {
      * @param eAttribut of the effect.
      * @param loadTime between activation.
      */
-    public AbilityComponent(byte activationRange, byte effectSize, ElementalAttribut eAttribut, float loadTime) {
+    public AbilityComponent(byte activationRange, byte effectSize, ElementalAttribut eAttribut, float loadTime, int damage, String description) {
         this.activationRange = activationRange;
-        this.areaEffectSize = effectSize;
+        this.effectSize = effectSize;
         this.eAttribut = eAttribut;
         this.loadTime = loadTime;
+        this.damage = damage;
+        this.description = description;
+    }
+    /**
+     * Damage done by this ability.
+     * @return 
+     */
+    public int getDamage() {
+        return damage;
     }
 
     /**
@@ -44,7 +54,7 @@ public class AbilityComponent implements PersistentComponent {
      * @return
      */
     public byte getAreaEffectSize() {
-        return areaEffectSize;
+        return effectSize;
     }
 
     /**
@@ -64,4 +74,10 @@ public class AbilityComponent implements PersistentComponent {
     public ElementalAttribut getEAttribut() {
         return eAttribut;
     }
+
+
+    public String getDescription() {
+        return description;
+    }
+    
 }

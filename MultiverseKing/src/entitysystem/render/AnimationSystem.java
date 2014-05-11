@@ -1,4 +1,4 @@
-package entitysystem.animation;
+package entitysystem.render;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -8,8 +8,6 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.render.EntityRenderSystem;
-import entitysystem.render.RenderComponent;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
@@ -50,7 +48,8 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void updateEntity(Entity e) {
         Animation toPlay = e.get(AnimationComponent.class).getAnimation();
-        if (animControls.containsKey(e.getId()) && !animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
+        if (animControls.containsKey(e.getId()) 
+                && !animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
         }
     }

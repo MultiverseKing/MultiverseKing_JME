@@ -9,16 +9,7 @@ import com.jme3.scene.Spatial;
  */
 public interface SpatialInitializer {
 
-    /**
-     *
-     * @param assetManager
-     */
     public void setAssetManager(AssetManager assetManager);
 
-    /**
-     *
-     * @param spatial
-     * @return
-     */
     public Spatial initialize(String spatial);
 }

@@ -7,7 +7,7 @@
     
     "ability": {
         "damage": 15,
-        "loadTime": 2,
+        "segment": 1,
         "activationRange": 1,
         "effectSize": 1,
         "description": "High voltage shock energy pulse around the unit... Internet is you friends... xD"

@@ -1,7 +1,7 @@
 package entitysystem.loader;
 
 import entitysystem.card.CardProperties;
-import entitysytem.units.AbilityComponent;
+import entitysytem.units.ability.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,6 +26,7 @@ public class EntityLoader {
 
     /**
      * Load an unit from a file.
+     *
      * @param name of the unit to load.
      * @return loaded data or null if the unit not found.
      */
@@ -40,9 +41,10 @@ public class EntityLoader {
 
     /**
      * Load the entity elemental attribut from his RenderName,
+     *
      * @todo load all component for cards.
      * @param renderName
-     * @return 
+     * @return
      */
     public CardProperties loadCard(String renderName) {
         String loadPath = path + renderName + ".card";
@@ -52,22 +54,22 @@ public class EntityLoader {
         }
         return null;
     }
-    
-    public AbilityComponent loadAbility(String name){
+
+    public AbilityComponent loadAbility(String name) {
         String loadPath = path + "Ability/" + name + ".card";
         JSONObject obj = getData(loadPath);
         ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
-        
+
         JSONObject abilityData = (JSONObject) obj.get("ability");
         Number damage = (Number) abilityData.get("damage");
-        Number loadTime = (Number) abilityData.get("loadTime");
+        Number segment = (Number) abilityData.get("segment");
         Number activationRange = (Number) abilityData.get("activationRange");
         Number effectSize = (Number) abilityData.get("effectSize");
         String description = abilityData.get("description").toString();
-        return new AbilityComponent(activationRange.byteValue(),
-                effectSize.byteValue(), eAttribut, loadTime.floatValue(), damage.intValue(), description);
+        return new AbilityComponent(name, activationRange.byteValue(),
+                effectSize.byteValue(), eAttribut, segment.byteValue(), damage.intValue(), description);
     }
-    
+
     private JSONObject getData(String loadPath) {
         try {
             InputStream is = new FileInputStream(new File(loadPath));

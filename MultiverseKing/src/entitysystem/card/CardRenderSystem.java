@@ -9,7 +9,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.FieldInputSystem;
+import entitysytem.units.FieldSystem;
 import gamestate.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
@@ -110,10 +110,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
-        //Register the input for the card system
-        app.getInputManager().addMapping("cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        app.getInputManager().addListener(cardInputListener, "cancel");
-        app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
+        
 
         return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
@@ -140,7 +137,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(), getEntityLoader().loadCard(e.get(RenderComponent.class).getName()));
+                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(), 
+                        getEntityLoader().loadCard(e.get(RenderComponent.class).getName()));
                 handCards.put(e.getId(), card);
                 screen.addElement(card);
                 card.resetHandPosition();
@@ -217,6 +215,10 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         screen.removeElement(card);
         cardPreviewCast = card;
         setActiveCard(true);
+        
+        //Register the input for the card system
+        app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
+        app.getInputManager().addListener(cardInputListener, "Cancel");
     }
 
     private void castCanceled() {
@@ -224,11 +226,17 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         setActiveCard(false);
         cardPreviewCast.setZOrder(zOrder);
         cardPreviewCast = null;
+        //Remove the input for the card system
+        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
+        app.getInputManager().removeListener(cardInputListener);
     }
 
     private void castConfirmed() {
         cardPreviewCast = null;
         setActiveCard(false);
+        //Remove the input for the card system
+        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
+        app.getInputManager().removeListener(cardInputListener);
     }
 
     private void setActiveCard(boolean isActive) {
@@ -255,7 +263,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     }
     private ActionListener cardInputListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("cancel") && !keyPressed) {
+            if (name.equals("Cancel") && !keyPressed) {
                 castCanceled();
             }
         }
@@ -275,7 +283,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                     //todo : if the player want to use the field and not fast selection menu. TITAN card
                     break;
                 case WORLD:
-                    if (app.getStateManager().getState(FieldInputSystem.class).canBeCast(event.getEventPosition(), cardPreviewCast.getCardEntityUID(), properties)) {
+                    if (app.getStateManager().getState(FieldSystem.class).canBeCast(event.getEventPosition(), 
+                            cardPreviewCast.getCardEntityUID(), properties)) {
                         castConfirmed();
                     } else {
                         castCanceled();

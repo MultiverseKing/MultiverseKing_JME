@@ -1,10 +1,12 @@
 package entitysytem.units;
 
+import entitysystem.ExtendedComponent;
+
 /**
  * 
  * @author roah
  */
-public class InfluenceComponent {
+public class InfluenceComponent implements ExtendedComponent{
     private final int influenceArea;
 
     /**
@@ -21,5 +23,9 @@ public class InfluenceComponent {
      */
     public int getInfluenceArea() {
         return influenceArea;
+    }
+
+    public ExtendedComponent clone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

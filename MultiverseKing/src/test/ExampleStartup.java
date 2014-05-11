@@ -23,6 +23,7 @@ import hexsystem.loader.MapDataLoader;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.ElementalAttribut;
+import utility.Rotation;
 
 /**
  *
@@ -75,7 +76,7 @@ public class ExampleStartup extends SimpleApplication {
 //        entityData.setComponent(characterId, new SpatialPositionComponent(0, 0, 0));
 //        entityData.setComponent(characterId, new RotationComponent(Quaternion.DIRECTION_Z));
         entityData.setComponent(characterId, new RenderComponent("character.j3m"));
-        entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
+        entityData.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A));
         entityData.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 20, 20)));
         lightSettup();
         setupCamera();

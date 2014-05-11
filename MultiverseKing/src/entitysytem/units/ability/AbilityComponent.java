@@ -1,15 +1,16 @@
-package entitysytem.units;
+package entitysytem.units.ability;
 
-import com.simsilica.es.PersistentComponent;
+import entitysystem.ExtendedComponent;
 import utility.ElementalAttribut;
 
 /**
  *
  * @author roah
  */
-public class AbilityComponent implements PersistentComponent {
+public class AbilityComponent implements ExtendedComponent {
+    private final String name;
     private final int damage;
-    private final float loadTime;
+    private final byte segment;
     private final byte activationRange;
     private final byte effectSize;
     private final ElementalAttribut eAttribut;
@@ -23,11 +24,13 @@ public class AbilityComponent implements PersistentComponent {
      * @param eAttribut of the effect.
      * @param loadTime between activation.
      */
-    public AbilityComponent(byte activationRange, byte effectSize, ElementalAttribut eAttribut, float loadTime, int damage, String description) {
+    public AbilityComponent(String name, byte activationRange, byte effectSize, 
+            ElementalAttribut eAttribut, byte segment, int damage, String description) {
+        this.name = name;
         this.activationRange = activationRange;
         this.effectSize = effectSize;
         this.eAttribut = eAttribut;
-        this.loadTime = loadTime;
+        this.segment = segment;
         this.damage = damage;
         this.description = description;
     }
@@ -58,12 +61,12 @@ public class AbilityComponent implements PersistentComponent {
     }
 
     /**
-     * Time between two activation.
+     * Segment needed for activation.
      *
      * @return
      */
-    public float getLoadTime() {
-        return loadTime;
+    public byte getSegment() {
+        return segment;
     }
 
     /**
@@ -75,9 +78,24 @@ public class AbilityComponent implements PersistentComponent {
         return eAttribut;
     }
 
-
+    /**
+     * Description of the ability.
+     * @return 
+     */
     public String getDescription() {
         return description;
     }
-    
+
+    /**
+     * Name of the ability.
+     * @return 
+     */
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public ExtendedComponent clone() {
+        return new AbilityComponent(name, activationRange, effectSize, eAttribut, segment, damage, description);
+    }
 }

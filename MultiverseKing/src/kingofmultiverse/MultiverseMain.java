@@ -3,6 +3,8 @@ package kingofmultiverse;
 import hexsystem.MapData;
 import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.input.MouseInput;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -15,15 +17,16 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import gamestate.GameDataAppState;
 import entitysystem.ExtendedEntityData;
-import entitysystem.animation.AnimationSystem;
+import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
+import entitysystem.movement.MovementStatsComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.FieldInputSystem;
+import entitysytem.units.FieldSystem;
+import entitysytem.units.LoadSpeedComponent;
 import gamestate.HexMapAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -79,6 +82,11 @@ public class MultiverseMain extends SimpleApplication {
 
         // Disable the default flyby cam
         cameraInit();
+        
+        //Init general input 
+        inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        
 
         //Create a new screen for tonegodGUI to work with.
         initScreen();
@@ -141,7 +149,7 @@ public class MultiverseMain extends SimpleApplication {
     private void cameraInit() {
         flyCam.setEnabled(false);
         rtsCam = new RTSCamera(RTSCamera.UpVector.Y_UP);
-        rtsCam.setCenter(new Vector3f(8, 15f, 8));
+        rtsCam.setCenter(new Vector3f(8, 20f, 8));
         rtsCam.setRot(120);
         stateManager.attach(rtsCam);
 //        flyCam.setMoveSpeed(10);
@@ -163,7 +171,7 @@ public class MultiverseMain extends SimpleApplication {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
         player.setName("Player");
 
-        player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT() * hexSettings.getFloorHeight(), 0));
+        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT, 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -196,7 +204,7 @@ public class MultiverseMain extends SimpleApplication {
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new FieldInputSystem(),
+                new FieldSystem(),
                 new EditorAppState());
     }
     private boolean exemple = true;
@@ -207,13 +215,15 @@ public class MultiverseMain extends SimpleApplication {
         if (exemple) {
             MapData md = stateManager.getState(GameDataAppState.class).getMapData();
             md.addChunk(Vector2Int.ZERO, null);
+            HexMapMouseInput input = stateManager.getState(HexMapMouseInput.class);
+            input.initCursor();
             EntityData ed = stateManager.getState(GameDataAppState.class).getEntityData();
             //Example: Initialise new character entity.
             EntityId characterId = ed.createEntity();
-            ed.setComponent(characterId, new RenderComponent("Berserk"));
-            ed.setComponent(characterId, new RotationComponent(Rotation.A));
-            ed.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
-            ed.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+            ed.setComponents(characterId, new RenderComponent("Berserk"),
+                    new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A),
+                    new MovementStatsComponent(1f, (byte)3),
+                    new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
 
             exemple = false;
         }

@@ -6,21 +6,21 @@ import entitysystem.ExtendedComponent;
  *
  * @author roah
  */
-public class LifeComponent implements ExtendedComponent {
+public class LoadSpeedComponent implements ExtendedComponent {
 
-    private final int life;
+    private final float speed;
 
-    public LifeComponent(int life) {
-        this.life = life;
+    public LoadSpeedComponent(float speed) {
+        this.speed = speed;
     }
 
     /**
-     * How many life point the unit have.
+     * Base load speed for all action.
      *
      * @return
      */
-    public int getLife() {
-        return life;
+    public float getSpeed() {
+        return speed;
     }
 
     @Override

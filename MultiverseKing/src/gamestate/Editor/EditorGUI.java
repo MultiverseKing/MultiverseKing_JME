@@ -212,7 +212,8 @@ class EditorGUI extends AbstractAppState {
             }
         };
         for (int i = 0; i < ElementalAttribut.getSize(); i++) {
-            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "EButton+" + ElementalAttribut.convert((byte) i), new Vector2f(15, 40 + (40 * i)));
+            ButtonAdapter button = new ButtonAdapter(main.getScreen(), 
+                    "EButton+" + ElementalAttribut.convert((byte) i), new Vector2f(15, 40 + (40 * i)));
             button.setText(ElementalAttribut.convert((byte) i).toString());
             elementG.addButton(button);
         }
@@ -242,20 +243,23 @@ class EditorGUI extends AbstractAppState {
      * Context menu used to show the tile properties.
      */
     private void tilePropertiesWin() {
-        Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 170, 20), new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
+        Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 170, 20), 
+                new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
         tileWin.setWindowTitle("Tile Properties");
         tilePButtonGroup = new RadioButtonGroup(main.getScreen(), "tilePButtonGroup") {
             @Override
             public void onSelect(int index, Button value) {
                 if (index < ElementalAttribut.getSize()) {
-                    mapData.setTile(currentTilePosition, new HexTile(ElementalAttribut.convert((byte) index), (byte) mapData.getTile(currentTilePosition).getHeight()));
+                    mapData.setTile(currentTilePosition, new HexTile(ElementalAttribut.convert((byte) index), 
+                            (byte) mapData.getTile(currentTilePosition).getHeight()));
                 } else if (index == ElementalAttribut.getSize()) {
                     main.getScreen().removeElement(main.getScreen().getElementById("tileP"));
                 }
             }
         };
         for (int i = 0; i < ElementalAttribut.getSize(); i++) {
-            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "TButton+" + ElementalAttribut.convert((byte) i), new Vector2f(15, 40 + (40 * i)));
+            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "TButton+" + ElementalAttribut.convert((byte) i), 
+                    new Vector2f(15, 40 + (40 * i)));
             button.setText(ElementalAttribut.convert((byte) i).toString());
             tilePButtonGroup.addButton(button);
         }
@@ -273,7 +277,8 @@ class EditorGUI extends AbstractAppState {
         closeButton.setText("UP");
         tileWin.addChild(upButton);
 
-        Button downButton = new ButtonAdapter(main.getScreen(), "Down", new Vector2f(120, (20 + (40 * ElementalAttribut.getSize()))), new Vector2f(25, 50)) {
+        Button downButton = new ButtonAdapter(main.getScreen(), "Down", 
+                new Vector2f(120, (20 + (40 * ElementalAttribut.getSize()))), new Vector2f(25, 50)) {
             @Override
             public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftDown(evt, toggled); //To change body of generated methods, choose Tools | Templates.

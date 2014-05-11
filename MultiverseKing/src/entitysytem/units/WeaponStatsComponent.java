@@ -1,12 +1,13 @@
 package entitysytem.units;
 
+import entitysystem.ExtendedComponent;
 import utility.ElementalAttribut;
 
 /**
  * @todo rework
  * @author roah
  */
-public class WeaponStatsComponent {
+public class WeaponStatsComponent implements ExtendedComponent {
 
     private final byte range;
     private final int damage;
@@ -75,5 +76,10 @@ public class WeaponStatsComponent {
      */
     public byte getNeededSlot() {
         return neededSlot;
+    }
+
+    @Override
+    public ExtendedComponent clone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

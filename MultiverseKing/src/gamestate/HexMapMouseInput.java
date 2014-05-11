@@ -19,6 +19,7 @@ import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
+import hexsystem.HexSettings;
 import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,7 +48,7 @@ public class HexMapMouseInput extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         initMarkDebug();
         initInput();
-        initCursor();
+//        initCursor();
         return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
     }
 
@@ -59,16 +60,22 @@ public class HexMapMouseInput extends EntitySystemAppState {
     public void registerTileInputListener(HexMapInputListener listener) {
         hexMapListener.add(listener);
     }
+    /**
+     * Remove a listener to respond to Tile Input.
+     *
+     * @param listener to register.
+     */
+    public void removeTileInputListener(HexMapInputListener listener) {
+        hexMapListener.remove(listener);
+    }
+    
 
     /**
      * Base input, it not depend on the gameMode or other thing if hexMap is
      * instanced that mean Tiles is or will be instanced so this input too.
      */
     private void initInput() {
-        app.getInputManager().addMapping("LeftMouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        app.getInputManager().addListener(tileActionListener, new String[]{"LeftMouse"});
-        app.getInputManager().addMapping("RightMouse", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        app.getInputManager().addListener(tileActionListener, new String[]{"RightMouse"});
+        app.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
     }
 
     private void initMarkDebug() {
@@ -79,17 +86,18 @@ public class HexMapMouseInput extends EntitySystemAppState {
         mark.setMaterial(mark_mat);
     }
 
-    private void initCursor() {
-        /**
-         * Testing cursor
-         */
-        cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
-        Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-        animShader.setInt("Speed", 16);
-        cursor.setMaterial(animShader);
-        app.getRootNode().attachChild(cursor);
-        //Remove offset and set it to zero if hex_void_anim.png is not used
-        cursor.setLocalTranslation(new Vector3f(0f, getMapData().getHexSettings().getGROUND_HEIGHT() + 0.01f, cursorOffset));
+    public void initCursor() {
+        if(cursor == null){
+            cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
+            Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+            animShader.setInt("Speed", 16);
+            cursor.setMaterial(animShader);
+            app.getRootNode().attachChild(cursor);
+            //Remove offset and set it to zero if hex_void_anim.png is not used
+            float z = getMapData().getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
+            cursor.setLocalTranslation(new Vector3f(0f,  z +  0.01f , cursorOffset));
+            System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT+" + "+z+0.01f);
+        }
     }
 
     @Override
@@ -147,19 +155,20 @@ public class HexMapMouseInput extends EntitySystemAppState {
                 return false;
             }
         } else if (lockInput && currentFocusIndex != -1) {
-            System.err.println("input already locked by : " + hexMapListener.get(currentFocusIndex).toString() + ". Lock request by : " + listenerFocus.toString());
+            System.err.println("input already locked by : " + hexMapListener.get(currentFocusIndex).toString() 
+                    + ". Lock request by : " + listenerFocus.toString());
             return false;
         }
         return true;
     }
     private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("LeftMouse") && isPressed) {
+            if (name.equals("Confirm") && isPressed) {
                 castRay("L");
-                System.out.println("Left");
-            } else if (name.equals("RightMouse") && isPressed) {
+//                System.out.println("Left");
+            } else if (name.equals("Cancel") && isPressed) {
                 castRay("R");
-                System.out.println("Right");
+//                System.out.println("Right");
             }
         }
     };
@@ -209,7 +218,8 @@ public class HexMapMouseInput extends EntitySystemAppState {
 
     private void moveCursor(HexCoordinate tilePos) {
         Vector3f pos = getMapData().getTileWorldPosition(tilePos);
-        cursor.setLocalTranslation(pos.x, getMapData().getTile(tilePos).getHeight() * getMapData().getHexSettings().getFloorHeight() + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+        cursor.setLocalTranslation(pos.x, getMapData().getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
+                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
     }
 
     /**
@@ -229,7 +239,8 @@ public class HexMapMouseInput extends EntitySystemAppState {
             } else {
 //                System.out.println(pos);
                 return tilePos;
-            }/*else if (mapData.getTile(tilePos).getHeight() == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
+            }/*else if (mapData.getTile(tilePos).getHeight() 
+             * == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
              return tilePos;
              }*/
         } while (i.hasNext());
@@ -246,7 +257,8 @@ public class HexMapMouseInput extends EntitySystemAppState {
             initCursor();
         }
         if (getMapData().convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
-            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() * getMapData().getHexSettings().getFloorHeight() + 0.1f, cursor.getLocalTranslation().z);
+            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() 
+                    * HexSettings.FLOOR_HEIGHT + 0.1f, cursor.getLocalTranslation().z);
         }
     }
 

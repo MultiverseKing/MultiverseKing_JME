@@ -1,8 +1,8 @@
 package entitysystem.loader;
 
-import entitysytem.units.AbilityComponent;
+import entitysytem.units.ability.AbilityComponent;
 import entitysytem.units.LifeComponent;
-import entitysytem.units.UnitStatsComponent;
+import entitysystem.movement.MovementStatsComponent;
 import org.json.simple.JSONObject;
 
 /**
@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
  * @author roah
  */
 public class UnitLoader {
-    private final UnitStatsComponent uStats;
+    private final MovementStatsComponent uStats;
     private final LifeComponent uLife;
     private final AbilityComponent abilityComp;
 
@@ -20,7 +20,7 @@ public class UnitLoader {
         Number life = (Number) data.get("life");
         
         uLife = new LifeComponent(life.intValue());
-        uStats = new UnitStatsComponent(speed.floatValue(), movePoint.byteValue());
+        uStats = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
         abilityComp = eLoader.loadAbility(data.get("ability").toString());
     }
 
@@ -28,7 +28,7 @@ public class UnitLoader {
      * Stats data component of the unit.
      * @return 
      */
-    public UnitStatsComponent getuStats() {
+    public MovementStatsComponent getuStats() {
         return uStats;
     }
 

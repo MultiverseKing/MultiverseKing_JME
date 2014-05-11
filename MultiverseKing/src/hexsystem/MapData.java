@@ -36,7 +36,6 @@ public final class MapData {
 
     private final AssetManager assetManager;
     private ChunkData chunkData;
-    private HexSettings hexSettings;
     private ElementalAttribut mapElement;
     private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
     private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
@@ -49,23 +48,13 @@ public final class MapData {
      * @param assetManager  
      */
     public MapData(ElementalAttribut eAttribut, AssetManager assetManager) {
-        this.hexSettings = new HexSettings();
         this.assetManager = assetManager;
         mapElement = eAttribut;
-        chunkData = new ChunkData(hexSettings.getCHUNK_DATA_LIMIT());
+        chunkData = new ChunkData();
     }
 
     public AssetManager getAssetManager() {
         return assetManager;
-    }
-
-    /**
-     * Global Settings for hex.
-     *
-     * @return parameters.
-     */
-    public HexSettings getHexSettings() {
-        return hexSettings;
     }
 
     /**
@@ -101,10 +90,10 @@ public final class MapData {
      */
     public void addChunk(Vector2Int chunkPos, HexTile[][] tiles) {
         if (tiles == null) {
-            tiles = new HexTile[hexSettings.getCHUNK_SIZE()][hexSettings.getCHUNK_SIZE()];
-            for (int y = 0; y < hexSettings.getCHUNK_SIZE(); y++) {
-                for (int x = 0; x < hexSettings.getCHUNK_SIZE(); x++) {
-                    tiles[x][y] = new HexTile(mapElement, hexSettings.getGROUND_HEIGHT(), true);
+            tiles = new HexTile[HexSettings.CHUNK_SIZE][HexSettings.CHUNK_SIZE];
+            for (int y = 0; y < HexSettings.CHUNK_SIZE; y++) {
+                for (int x = 0; x < HexSettings.CHUNK_SIZE; x++) {
+                    tiles[x][y] = new HexTile(mapElement, HexSettings.CHUNK_SIZE, true);
                 }
             }
         }
@@ -140,9 +129,10 @@ public final class MapData {
                     if (tile != null) {
                         return tile;
                     } else {
-                        //todo
-                        //Load the chunk from the file and get the tile
-                        //If still null the tile doesn't exist so return null
+                        //todo :
+                        //Check for the file if the chunk exist, if not return null
+                        //Load the file and check for the tile.
+                        //If still null, the tile doesn't exist so return null
                         System.err.println("Chunk data to load haven't been found or tile does not exist. Requested Tile : " + tilePos);
                     }
                 }
@@ -153,6 +143,31 @@ public final class MapData {
         return null;
     }
 
+    /**
+     * Check if a tile exist
+     *
+     * @param tilePos Offset position of the tile.
+     * @return false if the tile doesn't exist.
+     */
+    public boolean tileExist(HexCoordinate tilePos) {
+        Vector2Int chunkPosition = getChunkGridPos(tilePos);
+        if (chunkPosition != null) {
+            tilePos = getChunkTilePos(tilePos);
+            for (Vector2Int pos : chunkPos) {
+                if (pos.equals(chunkPosition) && chunkData.exist(chunkPosition, tilePos)) {
+                    return true;
+                } else if (pos.equals(chunkPosition) && !chunkData.exist(chunkPosition, tilePos)){
+                    //todo :
+                    //Check for the file if the chunk exist, if not return false.
+                    //Load the file and check for the tile, if no tile return false.
+                    System.err.println("Chunk data to load haven't been found or tile does not exist. Requested Tile : " + tilePos);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * Change the designed tile properties.
      *
@@ -270,8 +285,8 @@ public final class MapData {
      */
     public Vector2Int getChunkGridPos(HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
-        int x = (int) (FastMath.abs(tileOffset.x) / hexSettings.getCHUNK_SIZE());
-        int y = (int) (FastMath.abs(tileOffset.y)) / hexSettings.getCHUNK_SIZE();
+        int x = (int) (FastMath.abs(tileOffset.x) / HexSettings.CHUNK_SIZE);
+        int y = (int) (FastMath.abs(tileOffset.y)) / HexSettings.CHUNK_SIZE;
         Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? x * -1 : x), ((tileOffset.y < 0) ? y * -1 : y));
         if (chunkPos.contains(result)) {
             return result;
@@ -294,8 +309,8 @@ public final class MapData {
         if (chunk != null) {
             Vector2Int tileOffset = tilePos.getAsOffset();
             return new HexCoordinate(HexCoordinate.OFFSET,
-                    (int) (FastMath.abs(tileOffset.x) - (FastMath.abs(chunk.x) * hexSettings.getCHUNK_SIZE())),
-                    (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * hexSettings.getCHUNK_SIZE()));
+                    (int) (FastMath.abs(tileOffset.x) - (FastMath.abs(chunk.x) * HexSettings.CHUNK_SIZE)),
+                    (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * HexSettings.CHUNK_SIZE));
         } else {
             //Normal behavior when looking for Neightbors or hexRange
 //            System.err.println("Chunk does not exits in current context, even in Temp. Requested tile : "+tilePos);
@@ -311,22 +326,40 @@ public final class MapData {
      * @return chunk world unit position.
      */
     public Vector3f getChunkWorldPosition(Vector2Int position) {
-        return new Vector3f((position.x * hexSettings.getCHUNK_SIZE()) * hexSettings.getHEX_WIDTH(), 0,
-                (position.y * hexSettings.getCHUNK_SIZE()) * (float) (hexSettings.getHEX_RADIUS() * 1.5));
+        return new Vector3f((position.x * HexSettings.CHUNK_SIZE) * HexSettings.HEX_WIDTH, 0,
+                (position.y * HexSettings.CHUNK_SIZE) * (float) (HexSettings.HEX_RADIUS * 1.5));
     }
 
     /**
      * Convert Hex grid position to world position.
-     * Convertion work with Odd-R Offset grid type. (currently used grid type)
+     * Convertion work with Odd-R Offset grid type. (currently used grid type).
      *
-     * @param tilePos 
      * @return tile world unit position.
      */
     public Vector3f getTileWorldPosition(HexCoordinate tilePos) {
         Vector2Int offsetPos = tilePos.getAsOffset();
-        return new Vector3f((offsetPos.x) * hexSettings.getHEX_WIDTH() + ((offsetPos.y & 1) == 0 ? 0 : hexSettings.getHEX_WIDTH() / 2), 0.05f, offsetPos.y * hexSettings.getHEX_RADIUS() * 1.5f);
+        return new Vector3f((offsetPos.x) * HexSettings.HEX_WIDTH
+                + ((offsetPos.y & 1) == 0 ? 0 : HexSettings.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSettings.HEX_RADIUS * 1.5f);
     }
 
+    /**
+     * Convert Hex grid position to world position and check if the tile exist.
+     * /!\ Return a value only if the tile exist. use getTileWorldPosition() if only a value is needed.
+     * Convertion work with Odd-R Offset grid type. (currently used grid type).
+     *
+     * @return tile world unit position if exist.
+     */
+    public Vector3f hexPositionToSpatialPosition(HexCoordinate hexPos) {
+        HexTile tile = getTile(hexPos);
+        if (tileExist(hexPos)) {
+            int height = tile.getHeight();
+            Vector3f spat = getTileWorldPosition(hexPos);
+            return new Vector3f(spat.x, height, spat.z);
+        } else {
+            System.err.println("There is no Tile on the position " + hexPos.toString());
+            return null;
+        }
+    }
     /**
      * Convert World Position to Hex grid position.
      * Vector3f to Odd-R Offset grid position.
@@ -336,10 +369,10 @@ public final class MapData {
      */
     public HexCoordinate convertWorldToGridPosition(Vector3f pos) {
         float x = pos.x;
-        float z = pos.z + hexSettings.getHEX_RADIUS();
-        x = x / hexSettings.getHEX_WIDTH();
+        float z = pos.z + HexSettings.HEX_RADIUS;
+        x = x / HexSettings.HEX_WIDTH;
 
-        float t1 = z / hexSettings.getHEX_RADIUS(), t2 = FastMath.floor(x + t1);
+        float t1 = z / HexSettings.HEX_RADIUS, t2 = FastMath.floor(x + t1);
         float r = FastMath.floor((FastMath.floor(t1 - x) + t2) / 3);
         float q = FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r;
 
@@ -407,7 +440,8 @@ public final class MapData {
                         };
                         Files.copy(f, file, options);
                     } else {
-                        throw new FileNotFoundException(userHome + "/Data/MapData/" + mapName + "/" + pos.toString() + ".chk" + " can't be saved, data missing.");
+                        throw new FileNotFoundException(userHome + "/Data/MapData/" + mapName + "/" + pos.toString() 
+                                + ".chk" + " can't be saved, data missing.");
                     }
                 } else {
                     cdLoader.setChunk(tiles);

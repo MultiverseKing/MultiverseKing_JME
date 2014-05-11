@@ -1,16 +1,13 @@
 package entitysytem.units;
 
-import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.MouseButtonTrigger;
+import entitysystem.movement.MovementStatsComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.animation.AnimationComponent;
+import entitysystem.render.AnimationComponent;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexTile;
 import java.util.ArrayList;
@@ -20,13 +17,15 @@ import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.UnitLoader;
+import hexsystem.events.HexMapInputEvent;
+import hexsystem.events.HexMapInputListener;
 
 /**
- * Handle all input on the field.
+ * Handle interaction on the field.
  *
  * @author roah
  */
-public class FieldInputSystem extends EntitySystemAppState {
+public class FieldSystem extends EntitySystemAppState implements HexMapInputListener {
 
     ArrayList<EntityId> units = new ArrayList<EntityId>();
     ArrayList<EntityId> trap = new ArrayList<EntityId>();
@@ -38,10 +37,7 @@ public class FieldInputSystem extends EntitySystemAppState {
      */
     @Override
     protected EntitySet initialiseSystem() {
-        app.getInputManager().addMapping("deleteUnit", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        app.getInputManager().addListener(actionListener, "deleteUnit");
-       
-        return entityData.getEntities(UnitStatsComponent.class, RenderComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(MovementStatsComponent.class, RenderComponent.class, HexPositionComponent.class);
     }
     
     @Override
@@ -60,22 +56,11 @@ public class FieldInputSystem extends EntitySystemAppState {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    @Override
-    protected void removeEntity(Entity e) {
-        units.remove(e.getId());
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    protected void cleanupSystem() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     /**
-     * Check if the card can be casted on the defined position.
+     * Check if can be casted on the defined position.
      *
-     * @param castPosition position where the card is cast.
-     * @param id entity this card belong to.
+     * @param castPosition
+     * @param id entity to cast.
      * @return true if it can, false otherwise.
      */
     public boolean canBeCast(HexCoordinate castPosition, EntityId id, CardProperties properties) {
@@ -90,9 +75,8 @@ public class FieldInputSystem extends EntitySystemAppState {
                         UnitLoader unitLoader = entityData.getEntityLoader().loadUnitStats(name);
                         if (unitLoader != null) {
                             entityData.setComponents(id,
-                                    new HexPositionComponent(castPosition),
+                                    new HexPositionComponent(castPosition, Rotation.A),
                                     new CardRenderComponent(CardRenderPosition.FIELD),
-                                    new RotationComponent(Rotation.A),
                                     new AnimationComponent(Animation.SUMMON),
                                     new EAttributComponent(properties.getElement()),
                                     unitLoader.getuLife(),      //life component
@@ -119,16 +103,23 @@ public class FieldInputSystem extends EntitySystemAppState {
         //tile does not exist nothing to cast.
         return false;
     }
-    private ActionListener actionListener = new ActionListener() {
-        public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("deleteUnit") && !keyPressed) {
-//                HexCoordinate castPosition = app.getStateManager().getState(EditorAppState.class).pulseCursor();
-//                for (EntityId id : units) {
-//                    if (entityData.getComponent(id, HexPositionComponent.class).getPosition().equals(castPosition)) {
-//                        entityData.removeEntity(id);
-//                    }
-//                }
-            }
-        }
-    };
+
+    public void leftMouseActionResult(HexMapInputEvent event) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void rightMouseActionResult(HexMapInputEvent event) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    protected void removeEntity(Entity e) {
+        units.remove(e.getId());
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    protected void cleanupSystem() {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

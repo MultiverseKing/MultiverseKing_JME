@@ -9,6 +9,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
+import hexsystem.HexSettings;
 import hexsystem.MapData;
 import java.util.ArrayList;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class ChunkControl extends AbstractControl {
          * Generate new parameter to generate the tile.
          */
         MeshParameter meshParam = new MeshParameter(mapData);
-        meshParam.initialize(mapData.getHexSettings().getCHUNK_SIZE(), false);
+        meshParam.initialize(HexSettings.CHUNK_SIZE, false);
 
         /**
          * Generate the tile and attach them with the right texture. 1 object by

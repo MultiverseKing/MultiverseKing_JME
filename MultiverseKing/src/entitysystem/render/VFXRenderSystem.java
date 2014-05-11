@@ -28,64 +28,38 @@ import utility.Rotation;
  * should be handled seperately. Else there could be double data for the
  * position with inconsistencies between the different data.
  */
-public class EntityRenderSystem extends EntitySystemAppState implements TileChangeListener {
+public class VFXRenderSystem extends EntitySystemAppState implements TileChangeListener {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
-    private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
-    private Node renderSystemNode = new Node("RenderSystemNode");
+    private VFXSpatialInitializer VFXInitializer = new VFXSpatialInitializer();
+    private Node VFXNode = new Node("VFXNode");
 
-    /**
-     * Return the Animation Spatial control of an entity.
-     * @param id of the entity.
-     * @return AnimControl of the entity.
-     */
-    public AnimControl getAnimControl(EntityId id) {
-        return spatials.get(id).getControl(AnimControl.class);
-    }
-    
     @Override
     protected EntitySet initialiseSystem() {
-        spatialInitializer.setAssetManager(app.getAssetManager());
-        app.getRootNode().attachChild(renderSystemNode);
+        VFXInitializer.setAssetManager(app.getAssetManager());
+        app.getRootNode().attachChild(VFXNode);
         getMapData().registerTileChangeListener(this);
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(VFXComponent.class, HexPositionComponent.class);
     }
-
-    /**
-     *
-     * @param tpf
-     */
+    
+    
     @Override
-    protected void updateSystem(float tpf) {
-    }
-
-    /**
-     *
-     * @param e
-     */
-    @Override
-    //TODO: Handle if spatial is already generated (shouldn't happen, but in the case it does, this should be handled))
-    //some spatial can be generated multiple time...
     public void addEntity(Entity e) {
-        Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
+        Spatial s = VFXInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
         HexPositionComponent positionComp = e.get(HexPositionComponent.class);
         s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
         s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
-        renderSystemNode.attachChild(s);
+        VFXNode.attachChild(s);
     }
 
-    /**
-     *
-     * @param e
-     */
     @Override
-    //TODO: Check if spatial is found
+    protected void updateSystem(float tpf) {
+    }
+    
+    @Override
     protected void updateEntity(Entity e) {
-        Spatial s = spatials.get(e.getId());
-        HexPositionComponent positionComp = e.get(HexPositionComponent.class);
-        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
-        s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
+        
     }
 
     /**
@@ -95,7 +69,7 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     @Override
     public void removeEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
-        renderSystemNode.detachChild(s);
+        VFXNode.detachChild(s);
         spatials.remove(e.getId());
     }
 
@@ -105,20 +79,10 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     @Override
     protected void cleanupSystem() {
         spatials.clear();
-        renderSystemNode.removeFromParent();
+        VFXNode.removeFromParent();
     }
 
-//    private Vector3f hexPositionToSpatialPosition(HexCoordinate hexPos) {
-//        HexTile tile = getMapData().getTile(hexPos);
-//        if (tile != null) {
-//            int height = tile.getHeight();
-//            Vector3f spat = getMapData().getTileWorldPosition(hexPos);
-//            return new Vector3f(spat.x, height, spat.z);
-//        } else {
-//            System.err.println("There is no Tile on the position " + hexPos.toString());
-//            return null;
-//        }
-//    }
+    
 
     /**
      *

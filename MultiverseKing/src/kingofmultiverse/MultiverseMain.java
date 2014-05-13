@@ -1,13 +1,14 @@
 package kingofmultiverse;
 
 import hexsystem.MapData;
-import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
@@ -15,6 +16,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import de.lessvoid.nifty.controls.Menu;
+import de.lessvoid.nifty.tools.SizeValue;
 import gamestate.GameDataAppState;
 import entitysystem.ExtendedEntityData;
 import entitysystem.render.AnimationSystem;
@@ -26,7 +29,6 @@ import entitysystem.position.HexPositionComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
 import entitysytem.units.FieldSystem;
-import entitysytem.units.LoadSpeedComponent;
 import gamestate.HexMapAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -35,6 +37,7 @@ import hexsystem.loader.MapDataLoader;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
@@ -90,10 +93,8 @@ public class MultiverseMain extends SimpleApplication {
 
         //Create a new screen for tonegodGUI to work with.
         initScreen();
-
         lightSettup();
-        generateHexMap();
-        
+        initSystem();
         
     }
 
@@ -149,7 +150,7 @@ public class MultiverseMain extends SimpleApplication {
     private void cameraInit() {
         flyCam.setEnabled(false);
         rtsCam = new RTSCamera(RTSCamera.UpVector.Y_UP);
-        rtsCam.setCenter(new Vector3f(8, 20f, 8));
+        rtsCam.setCenter(new Vector3f(8, 15f, 8));
         rtsCam.setRot(120);
         stateManager.attach(rtsCam);
 //        flyCam.setMoveSpeed(10);
@@ -178,7 +179,7 @@ public class MultiverseMain extends SimpleApplication {
 
     private void initScreen() {
         screen = new Screen(this);
-        this.guiNode.addControl(screen);
+        guiNode.addControl(screen);
         for (Element e : screen.getElementsAsMap().values()) {
             screen.removeElement(e);
         }
@@ -190,24 +191,25 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     /**
-     *
+     * @todo Init system only when needed.
      */
-    public void generateHexMap() {
+    public void initSystem() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
         EntityData entityData = new ExtendedEntityData(mapData);
-
+        
         stateManager.attachAll(
                 new GameDataAppState(entityData),
                 new HexMapAppState(this, mapData),
                 new HexMapMouseInput(),
                 new EntityRenderSystem(),
+                new MainGUI(this),
+//                new MapEditorAppState(),
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new FieldSystem(),
-                new EditorAppState());
+                new FieldSystem());
     }
-    private boolean exemple = true;
+    private boolean exemple = false;
 
     @Override
     public void update() {
@@ -215,8 +217,6 @@ public class MultiverseMain extends SimpleApplication {
         if (exemple) {
             MapData md = stateManager.getState(GameDataAppState.class).getMapData();
             md.addChunk(Vector2Int.ZERO, null);
-            HexMapMouseInput input = stateManager.getState(HexMapMouseInput.class);
-            input.initCursor();
             EntityData ed = stateManager.getState(GameDataAppState.class).getEntityData();
             //Example: Initialise new character entity.
             EntityId characterId = ed.createEntity();

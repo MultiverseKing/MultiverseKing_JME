@@ -4,7 +4,7 @@ import entitysystem.render.VFXComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
+import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
 import entitysytem.units.LoadSpeedComponent;
@@ -15,7 +15,7 @@ import java.util.HashMap;
  *
  * @author roah
  */
-public class AbilitySystem extends EntitySystemAppState {
+public class AbilitySystem extends CoreDataAppState {
 
     HashMap<EntityId, AbilityManager> abilityManager = new HashMap<EntityId, AbilityManager>();
 

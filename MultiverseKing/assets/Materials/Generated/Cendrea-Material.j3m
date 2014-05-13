@@ -1,13 +1,14 @@
-Material MyMaterial : Common/MatDefs/Misc/ColoredTextured.j3md {
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        ColorMap : Textures/Units/AO2.png
+        DiffuseMap : Textures/Units/AO2.png
+        UseAlpha : false
     }
     AdditionalRenderState {
       FaceCull Back
       Wireframe Off
       DepthWrite On
       PolyOffset 0.0 0.0
-      AlphaTestFalloff 0.0
+      AlphaTestFalloff 0.1
       Blend Off
       PointSprite Off
       ColorWrite On

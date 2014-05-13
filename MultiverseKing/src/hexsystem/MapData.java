@@ -8,6 +8,7 @@ import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import gamestate.Editor.MapEditorAppState;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.ChunkChangeListener;
 import hexsystem.loader.MapDataLoader;
@@ -20,8 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 import utility.ElementalAttribut;
@@ -71,6 +75,10 @@ public final class MapData {
         return this.mapName;
     }
 
+    public ArrayList<Vector2Int> getAllChunkPos() {
+        return chunkPos;
+    }
+    
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
     /**
      *
@@ -93,7 +101,7 @@ public final class MapData {
             tiles = new HexTile[HexSettings.CHUNK_SIZE][HexSettings.CHUNK_SIZE];
             for (int y = 0; y < HexSettings.CHUNK_SIZE; y++) {
                 for (int x = 0; x < HexSettings.CHUNK_SIZE; x++) {
-                    tiles[x][y] = new HexTile(mapElement, HexSettings.CHUNK_SIZE, true);
+                    tiles[x][y] = new HexTile(mapElement, HexSettings.GROUND_HEIGHT, true);
                 }
             }
         }
@@ -379,30 +387,18 @@ public final class MapData {
         return new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int((int) q, (int) r));
     }
 
-    /**
-     * Save the current map in a folder of the same name of the map.
-     *
-     * @throws IOException
-     */
-    public void saveMap() throws IOException {
-        String userHome = System.getProperty("user.dir") + "/assets";
-        BinaryExporter exporter = BinaryExporter.getInstance();
-        MapDataLoader mdLoader = new MapDataLoader();
-
-        mdLoader.setMapName(mapName);
-        mdLoader.setMapElement(mapElement);
-        mdLoader.setChunkPos(chunkPos);
-
-        File file = new File(userHome + "/MapData/" + mapName + "/" + mapName + ".map");
-        exporter.save(mdLoader, file);
-        saveChunk(Vector2Int.INFINITY);
-    }
 
     /**
      * @param name of the map to load.
+     * @return false if not located
      */
-    public void loadMap(String name) {
-        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset(new AssetKey("/Data/MapData/" + name + "/" + name + ".map"));
+    public boolean loadMap(String name) {
+        File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/"+ name + "/" + name + ".map");
+        if(file.isDirectory() || !file.exists()){
+            System.err.println("Cannot load, files does not exist.");
+            return false;
+        }
+        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset("/Data/MapData/"+ name + "/" + name + ".map");
         mapName = mdLoader.getMapName();
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
@@ -411,6 +407,40 @@ public final class MapData {
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
+        }
+        return true;
+    }
+    
+    /**
+     * Save the current map in a folder of the same name of the map.
+     *
+     * @throws IOException
+     */
+    public boolean saveMap(String mapName) {
+        if(mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("RESET") || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")){
+            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, "Invalid Path name");
+            return false;
+        }
+        try {
+            if(saveChunk(Vector2Int.INFINITY)){
+                this.mapName = mapName;
+                String userHome = System.getProperty("user.dir") + "/assets";
+                BinaryExporter exporter = BinaryExporter.getInstance();
+                MapDataLoader mdLoader = new MapDataLoader();
+
+                mdLoader.setMapName(mapName);
+                mdLoader.setMapElement(mapElement);
+                mdLoader.setChunkPos(chunkPos);
+
+                File file = new File(userHome + "/Data/MapData/" + mapName + "/" + mapName + ".map");
+                exporter.save(mdLoader, file);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MapData.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 
@@ -421,7 +451,7 @@ public final class MapData {
      * @param position the chunk to save.
      * @throws IOException
      */
-    public void saveChunk(Vector2Int position) throws IOException {
+    private boolean saveChunk(Vector2Int position) throws IOException {
         String userHome = System.getProperty("user.dir") + "/assets";
         
         BinaryExporter exporter = BinaryExporter.getInstance();
@@ -440,19 +470,22 @@ public final class MapData {
                         };
                         Files.copy(f, file, options);
                     } else {
-                        throw new FileNotFoundException(userHome + "/Data/MapData/" + mapName + "/" + pos.toString() 
-                                + ".chk" + " can't be saved, data missing.");
+                        Logger.getLogger(MapData.class.getName()).log(Level.WARNING, 
+                                "userHome + \"/Data/MapData/\" + mapName + \"/\" + pos.toString() \n" +
+"                                + \".chk\" + \" can't be saved, data missing.\"");
+                        return false;
                     }
                 } else {
                     cdLoader.setChunk(tiles);
                     exporter.save(cdLoader, file.toFile());
                 }
-
             }
+            return true;
         } else {
             File file = new File(userHome + "/Data/MapData/Temp/" + position.toString() + ".chk");
             cdLoader.setChunk(getChunkTiles(position));
             exporter.save(cdLoader, file);
+            return true;
         }
     }
 
@@ -488,5 +521,21 @@ public final class MapData {
      */
     public void Cleanup() {
         //Todo remove all file from the temps folder
+    }
+    
+    /**
+     * Remove listener from event on tile.
+     * @param listener 
+     */
+    public void removeTileChangeListener(TileChangeListener listener) {
+        tileListeners.remove(listener);
+    }
+    
+    /**
+     * Remove listener from event on Chunk.
+     * @param listener 
+     */
+    public void removeChunkChangeListener(ChunkChangeListener listener) {
+        chunkListeners.remove(listener);
     }
 }

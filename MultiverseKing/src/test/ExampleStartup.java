@@ -55,7 +55,7 @@ public class ExampleStartup extends SimpleApplication {
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
-        mapData.loadMap("IceLand");
+        mapData.loadMap("IceLand"); //be carefull...
 //        mapData.setTile(point, mapData.getTile(point).cloneChangedHeight(0));
         //Initialise render Systems
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));

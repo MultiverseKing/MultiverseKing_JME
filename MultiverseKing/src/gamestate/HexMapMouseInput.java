@@ -16,7 +16,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
+import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexSettings;
@@ -33,7 +33,7 @@ import utility.MouseRay;
  * issue.
  * @author Eike Foede
  */
-public class HexMapMouseInput extends EntitySystemAppState {
+public class HexMapMouseInput extends CoreDataAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -86,8 +86,7 @@ public class HexMapMouseInput extends EntitySystemAppState {
         mark.setMaterial(mark_mat);
     }
 
-    public void initCursor() {
-        if(cursor == null){
+    private void initCursor() {
             cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
             Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
             animShader.setInt("Speed", 16);
@@ -97,7 +96,6 @@ public class HexMapMouseInput extends EntitySystemAppState {
             float z = getMapData().getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
             cursor.setLocalTranslation(new Vector3f(0f,  z +  0.01f , cursorOffset));
             System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT+" + "+z+0.01f);
-        }
     }
 
     @Override
@@ -217,6 +215,9 @@ public class HexMapMouseInput extends EntitySystemAppState {
     }
 
     private void moveCursor(HexCoordinate tilePos) {
+        if(cursor == null){
+            initCursor();
+        }
         Vector3f pos = getMapData().getTileWorldPosition(tilePos);
         cursor.setLocalTranslation(pos.x, getMapData().getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
                 + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);

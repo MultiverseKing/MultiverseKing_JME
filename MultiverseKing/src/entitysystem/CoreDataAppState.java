@@ -16,7 +16,7 @@ import hexsystem.MapData;
  *
  * @author Eike Foede, roah
  */
-public abstract class EntitySystemAppState extends AbstractAppState {
+public abstract class CoreDataAppState extends AbstractAppState {
 
     /**
      * entity System data and bridge to mapData.

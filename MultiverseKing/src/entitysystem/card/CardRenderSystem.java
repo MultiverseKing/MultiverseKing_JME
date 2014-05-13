@@ -7,7 +7,7 @@ import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
+import entitysystem.CoreDataAppState;
 import entitysystem.render.RenderComponent;
 import entitysytem.units.FieldSystem;
 import gamestate.HexMapMouseInput;
@@ -28,7 +28,7 @@ import tonegod.gui.core.Screen;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
+public class CardRenderSystem extends CoreDataAppState implements HexMapInputListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**

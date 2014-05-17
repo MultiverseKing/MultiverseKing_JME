@@ -1,4 +1,4 @@
-package entitysytem.units;
+package entitysystem.units;
 
 import entitysystem.movement.MovementStatsComponent;
 import com.simsilica.es.Entity;

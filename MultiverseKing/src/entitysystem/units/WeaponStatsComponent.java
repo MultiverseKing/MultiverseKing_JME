@@ -1,4 +1,4 @@
-package entitysytem.units;
+package entitysystem.units;
 
 import entitysystem.ExtendedComponent;
 import utility.ElementalAttribut;

@@ -1,8 +1,6 @@
 package entitysystem.card;
 
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;

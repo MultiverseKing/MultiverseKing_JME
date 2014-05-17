@@ -1,11 +1,14 @@
 package kingofmultiverse;
 
 import hexsystem.MapData;
-import gamestate.Editor.EditorAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.input.MouseInput;
+import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
@@ -13,31 +16,35 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import de.lessvoid.nifty.controls.Menu;
+import de.lessvoid.nifty.tools.SizeValue;
 import gamestate.GameDataAppState;
 import entitysystem.ExtendedEntityData;
-import entitysystem.animation.AnimationSystem;
+import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
+import entitysystem.movement.MovementStatsComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysytem.Units.UnitsSystem;
+import entitysytem.units.FieldSystem;
 import gamestate.HexMapAppState;
+import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.HexCoordinate;
 import utility.Rotation;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * test
@@ -78,12 +85,17 @@ public class MultiverseMain extends SimpleApplication {
 
         // Disable the default flyby cam
         cameraInit();
+        
+        //Init general input 
+        inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        
 
         //Create a new screen for tonegodGUI to work with.
         initScreen();
-
         lightSettup();
-        generateHexMap();
+        initSystem();
+        
     }
 
     /**
@@ -160,14 +172,14 @@ public class MultiverseMain extends SimpleApplication {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
         player.setName("Player");
 
-        player.setLocalTranslation(new Vector3f(0, hexSettings.getGROUND_HEIGHT() * hexSettings.getFloorHeight(), 0));
+        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT, 0));
         rootNode.attachChild(player);
         return player;
     }
 
     private void initScreen() {
         screen = new Screen(this);
-        this.guiNode.addControl(screen);
+        guiNode.addControl(screen);
         for (Element e : screen.getElementsAsMap().values()) {
             screen.removeElement(e);
         }
@@ -179,23 +191,25 @@ public class MultiverseMain extends SimpleApplication {
     }
 
     /**
-     *
+     * @todo Init system only when needed.
      */
-    public void generateHexMap() {
+    public void initSystem() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
         EntityData entityData = new ExtendedEntityData(mapData);
-
+        
         stateManager.attachAll(
                 new GameDataAppState(entityData),
                 new HexMapAppState(this, mapData),
+                new HexMapMouseInput(),
                 new EntityRenderSystem(),
+                new MainGUI(this),
+//                new MapEditorAppState(),
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new UnitsSystem(),
-                new EditorAppState(mapData, this));
+                new FieldSystem());
     }
-    private boolean exemple = true;
+    private boolean exemple = false;
 
     @Override
     public void update() {
@@ -206,10 +220,10 @@ public class MultiverseMain extends SimpleApplication {
             EntityData ed = stateManager.getState(GameDataAppState.class).getEntityData();
             //Example: Initialise new character entity.
             EntityId characterId = ed.createEntity();
-            ed.setComponent(characterId, new RenderComponent("Berserk"));
-            ed.setComponent(characterId, new RotationComponent(Rotation.A));
-            ed.setComponent(characterId, new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0)));
-            ed.setComponent(characterId, new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+            ed.setComponents(characterId, new RenderComponent("Berserk"),
+                    new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A),
+                    new MovementStatsComponent(1f, (byte)3),
+                    new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
 
             exemple = false;
         }

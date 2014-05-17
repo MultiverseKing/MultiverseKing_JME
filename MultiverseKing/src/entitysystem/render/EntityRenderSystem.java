@@ -7,14 +7,14 @@ import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
+import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
 import hexsystem.HexTile;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Set;
+import utility.HexCoordinate;
 import utility.Rotation;
 
 /**
@@ -28,31 +28,27 @@ import utility.Rotation;
  * should be handled seperately. Else there could be double data for the
  * position with inconsistencies between the different data.
  */
-public class EntityRenderSystem extends EntitySystemAppState implements TileChangeListener {
+public class EntityRenderSystem extends CoreDataAppState implements TileChangeListener {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
 
     /**
-     *
-     * @param id
-     * @return
+     * Return the Animation Spatial control of an entity.
+     * @param id of the entity.
+     * @return AnimControl of the entity.
      */
     public AnimControl getAnimControl(EntityId id) {
         return spatials.get(id).getControl(AnimControl.class);
     }
-
-    /**
-     *
-     * @return
-     */
+    
     @Override
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
         getMapData().registerTileChangeListener(this);
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class, RotationComponent.class);
+        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
 
     /**
@@ -73,8 +69,9 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     public void addEntity(Entity e) {
         Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
-        s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
-        s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
+        HexPositionComponent positionComp = e.get(HexPositionComponent.class);
+        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
+        s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
         renderSystemNode.attachChild(s);
     }
 
@@ -86,8 +83,9 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     //TODO: Check if spatial is found
     protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
-        s.setLocalTranslation(hexPositionToSpatialPosition(e.get(HexPositionComponent.class)));
-        s.setLocalRotation(Rotation.getQuaternion(e.get(RotationComponent.class).getRotation()));
+        HexPositionComponent positionComp = e.get(HexPositionComponent.class);
+        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
+        s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
     }
 
     /**
@@ -110,17 +108,17 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
         renderSystemNode.removeFromParent();
     }
 
-    private Vector3f hexPositionToSpatialPosition(HexPositionComponent hex) {
-        HexTile tile = getMapData().getTile(hex.getPosition());
-        if (tile != null) {
-            int height = tile.getHeight();
-            Vector3f spat = getMapData().getTileWorldPosition(hex.getPosition());
-            return new Vector3f(spat.x, height, spat.z);
-        } else {
-            System.err.println("There is no Tile on the position " + hex.toString());
-            return null;
-        }
-    }
+//    private Vector3f hexPositionToSpatialPosition(HexCoordinate hexPos) {
+//        HexTile tile = getMapData().getTile(hexPos);
+//        if (tile != null) {
+//            int height = tile.getHeight();
+//            Vector3f spat = getMapData().getTileWorldPosition(hexPos);
+//            return new Vector3f(spat.x, height, spat.z);
+//        } else {
+//            System.err.println("There is no Tile on the position " + hexPos.toString());
+//            return null;
+//        }
+//    }
 
     /**
      *

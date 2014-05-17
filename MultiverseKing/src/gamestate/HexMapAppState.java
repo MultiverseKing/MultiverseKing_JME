@@ -54,7 +54,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
     public HexMapAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
         this.mapData = mapData;
-        this.meshManager = new MeshManager(mapData.getHexSettings());
+        this.meshManager = new MeshManager();
         mapNode = new Node("mapNode");
     }
 

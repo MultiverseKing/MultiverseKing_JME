@@ -7,7 +7,7 @@ import java.util.EnumMap;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  *
@@ -28,7 +28,8 @@ public class MeshParameter {
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
+    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef 
+            = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
     /**
      * Used to define which algorithm to use with meshmanager.
      */
@@ -181,7 +182,8 @@ public class MeshParameter {
 //                    
 //                }
 //            }
-            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, position.get(current).x + j, position.get(current).y));
+            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, 
+                    position.get(current).x + j, position.get(current).y));
             for (byte k = 0; k < 6; k++) {
                 if (height.get(current) >= 0) {
                     if (neightbors[k] != null) {

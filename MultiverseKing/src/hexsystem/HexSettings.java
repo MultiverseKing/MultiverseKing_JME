@@ -11,69 +11,34 @@ import com.jme3.math.FastMath;
  */
 public final class HexSettings {
 
-    private final float HEX_RADIUS = 1;
-    private final float HEX_WIDTH;
-    private final int CHUNK_SIZE = 16; //must be power of two
-    private final float FLOOR_HEIGHT = 1f;
-    private final byte GROUND_HEIGHT = 10;
-    private final byte CHUNK_DATA_LIMIT = 4;
-
     /**
-     * Parameters to use when generating the map.
-     *
+     * Parameters used when generating the map. Radius to use when generating
+     * hex.
      */
-    public HexSettings() {
-        HEX_WIDTH = FastMath.sqrt(3) * HEX_RADIUS;
-    }
-
+    public static final float HEX_RADIUS = 1;
     /**
-     *
-     * @return
+     * Parameters used when generating the map. Width of a generated hex.
      */
-    public float getHEX_RADIUS() {
-        return HEX_RADIUS;
-    }
-
+    public static final float HEX_WIDTH = FastMath.sqrt(3) * HEX_RADIUS;
     /**
-     *
-     * @return
+     * Parameters used when generating the map. Number of hex contain in a
+     * chunk.
      */
-    public float getHEX_WIDTH() {
-        return HEX_WIDTH;
-    }
-
+    public static final int CHUNK_SIZE = 16; //must be power of two
     /**
-     * @return number of hex contain in a chunk.
+     * Parameters used when generating the map. WU distance between two hex of
+     * different height.
      */
-    public int getCHUNK_SIZE() {
-        return CHUNK_SIZE;
-    }
-
+    public static final float FLOOR_HEIGHT = 1f;
     /**
-     * @return WU distance between two hex of different height.
+     * Parameters used when generating the map. Offset value used to put the
+     * ground, to have underground without having to handle negative value,
+     * mainly help with the meshManager and how geometry is handle, generated.
      */
-    public float getFloorHeight() {
-        return FLOOR_HEIGHT;
-    }
-
+    public static final byte GROUND_HEIGHT = 10;
     /**
-     * Offset value used to put the ground, to have underground without having
-     * to handle negative value, mainly help with the meshManager and how
-     * geometry is handle, generated.
-     *
-     * @return Ground Offset.
+     * Used to know how many chunk to keep in memory before start deleting.
+     * Unused for the time being.
      */
-    public byte getGROUND_HEIGHT() {
-        return GROUND_HEIGHT;
-    }
-
-    /**
-     * Used by the OldChunkData to know how many chunk to keep in memory before
-     * start deleting.
-     *
-     * @return
-     */
-    public byte getCHUNK_DATA_LIMIT() {
-        return CHUNK_DATA_LIMIT;
-    }
+    public static final byte CHUNK_DATA_LIMIT = 4;
 }

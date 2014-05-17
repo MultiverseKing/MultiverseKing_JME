@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  *

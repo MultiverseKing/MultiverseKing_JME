@@ -5,7 +5,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * @todo Set a memory limit to avoid to much data. See ChunkDataOld
@@ -19,8 +19,6 @@ class ChunkData {
      */
     HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
 
-    ChunkData(byte limit) {
-    }
 
     void add(Vector2Int chunkPos, HexTile[][] tiles) {
         chunks.put(chunkPos, tiles);
@@ -71,10 +69,15 @@ class ChunkData {
         }
         return false;
     }
+    
+    boolean exist(Vector2Int chunk, HexCoordinate tilePos){
+        Vector2Int tileOffset = tilePos.getAsOffset();
+        return chunks.get(chunk)[tileOffset.x][tileOffset.y] == null ? false : true;
+    }
 
     void setAllTile(ElementalAttribut eAttribut) {
-        Set<Entry<Vector2Int, HexTile[][]>> chunks = getAllChunks();
-        for (Entry<Vector2Int, HexTile[][]> chunk : chunks) {
+        Set<Entry<Vector2Int, HexTile[][]>> chunkValue = getAllChunks();
+        for (Entry<Vector2Int, HexTile[][]> chunk : chunkValue) {
             HexTile[][] tiles = chunk.getValue();
             for (int j = 0; j < tiles.length; j++) {
                 for (int k = 0; k < tiles[j].length; k++) {

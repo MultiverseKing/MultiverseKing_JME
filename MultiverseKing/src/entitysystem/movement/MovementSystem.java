@@ -3,9 +3,9 @@ package entitysystem.movement;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
+import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.position.RotationComponent;
+import entitysystem.units.LoadSpeedComponent;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import utility.Vector3Int;
  * 
  * @author Eike Foede, roah
  */
-public class MovementSystem extends EntitySystemAppState {
+public class MovementSystem extends CoreDataAppState {
 
     private Pathfinder pathfinder = new Astar();
     private HashMap<EntityId, Movement> movements;
@@ -35,7 +35,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         pathfinder.setMapData(getMapData());
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RotationComponent.class);
+        return entityData.getEntities(MovementStatsComponent.class, HexPositionComponent.class, MoveToComponent.class);
     }
 
     /**
@@ -46,17 +46,19 @@ public class MovementSystem extends EntitySystemAppState {
     protected void updateSystem(float tpf) {
         for (Entity e : entities) {
             Movement movement = movements.get(e.getId());
+            float speed = e.get(MovementStatsComponent.class).getMoveSpeed();
             movement.distanceMoved += tpf;
-            while (movement.distanceMoved > secondsPerStep) {
-                movement.distanceMoved -= secondsPerStep;
+            while (movement.distanceMoved > speed) {
+                movement.distanceMoved -= speed;
                 if (movement.actualPosition + 1 < movement.path.size()) {
-                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), movement.path.get(movement.actualPosition + 1).getAsCubic());
+                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), 
+                            movement.path.get(movement.actualPosition + 1).getAsCubic());
                     getMapData().setTileIsWalkable(movement.path.get(movement.actualPosition + 1), false);
-                    if (!e.get(RotationComponent.class).getRotation().equals(dir)) {
-                        e.set(new RotationComponent(dir));
+                    if (!e.get(HexPositionComponent.class).getRotation().equals(dir)) {
+                        e.set(e.get(HexPositionComponent.class).clone(dir));
                     }
                 }
-                e.set(new HexPositionComponent(movement.path.get(movement.actualPosition)));
+                e.set(e.get(HexPositionComponent.class).clone(movement.path.get(movement.actualPosition)));
                 movement.actualPosition++;
                 if (movement.actualPosition == movement.path.size()) {
                     entityData.removeComponent(e.getId(), MoveToComponent.class);//goal is reached

@@ -4,7 +4,7 @@ import com.jme3.math.FastMath;
 import hexsystem.HexTile;
 import utility.HexCoordinate;
 import utility.Vector2Int;
-import utility.attribut.ElementalAttribut;
+import utility.ElementalAttribut;
 
 /**
  * test
@@ -98,10 +98,14 @@ class ChunkDataOld {
         byte resultID;
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;
                     return resultID;
@@ -111,8 +115,10 @@ class ChunkDataOld {
 
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;
                     return resultID;

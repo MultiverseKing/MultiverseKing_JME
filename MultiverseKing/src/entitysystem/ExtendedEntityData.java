@@ -1,5 +1,6 @@
 package entitysystem;
 
+import entitysystem.loader.EntityLoader;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityComponent;
 import com.simsilica.es.EntityId;
@@ -11,7 +12,7 @@ import utility.HexCoordinate;
 
 /**
  * Bridge between hexSystem and entitySystem.
- *
+ * 
  * @todo all method have not been fully checked to see if they update tile
  * Walkable value in mapData.
  * @author roah
@@ -19,6 +20,7 @@ import utility.HexCoordinate;
 public class ExtendedEntityData extends DefaultEntityData {
 
     private final MapData mapData;
+    private final EntityLoader entityLoader;
 
     /**
      * Hex system Data handler.
@@ -29,6 +31,14 @@ public class ExtendedEntityData extends DefaultEntityData {
     }
 
     /**
+     * Entity loader from file.
+     * @return 
+     */
+    public EntityLoader getEntityLoader() {
+        return entityLoader;
+    }
+
+    /**
      * Data handler for Hex system and for the Entity system 
      * (ES set to default param).
      *
@@ -36,6 +46,7 @@ public class ExtendedEntityData extends DefaultEntityData {
      */
     public ExtendedEntityData(MapData mapData) {
         this.mapData = mapData;
+        entityLoader = new EntityLoader();
     }
 
     /**
@@ -47,6 +58,7 @@ public class ExtendedEntityData extends DefaultEntityData {
     public ExtendedEntityData(MapData mapData, EntityIdGenerator idGenerator) {
         super(idGenerator);
         this.mapData = mapData;
+        entityLoader = new EntityLoader();
     }
 
     /**
@@ -58,7 +70,7 @@ public class ExtendedEntityData extends DefaultEntityData {
     @Override
     public void setComponent(EntityId entityId, EntityComponent component) {
         if (component instanceof HexPositionComponent) {
-            System.out.println("Set Component - 002");
+//            System.out.println("Set Component - 002");
             HexPositionComponent newComp = (HexPositionComponent) component;
             HexPositionComponent oldComp = getComponent(entityId, HexPositionComponent.class);
             if (oldComp != null) {
@@ -81,7 +93,7 @@ public class ExtendedEntityData extends DefaultEntityData {
         if (type.equals(HexPositionComponent.class)) {
             HexCoordinate pos = getComponent(entityId, HexPositionComponent.class).getPosition();
 
-            System.out.println("remove Component - 003b");
+//            System.out.println("remove Component - 003");
             mapData.setTileIsWalkable(pos, true);
         }
 
@@ -101,7 +113,7 @@ public class ExtendedEntityData extends DefaultEntityData {
         HexPositionComponent oldComp = (HexPositionComponent) oldValue;
         HexPositionComponent newComp = (HexPositionComponent) newValue;
         if (oldComp != null && newComp != null) {
-            System.out.println("replace Component - 004");
+//            System.out.println("replace Component - 004");
             mapData.setTileIsWalkable(oldComp.getPosition(), true);
             mapData.setTileIsWalkable(newComp.getPosition(), false);
         }

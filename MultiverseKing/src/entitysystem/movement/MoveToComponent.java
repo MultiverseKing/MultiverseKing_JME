@@ -1,13 +1,13 @@
 package entitysystem.movement;
 
-import com.simsilica.es.PersistentComponent;
+import entitysystem.ExtendedComponent;
 import utility.HexCoordinate;
 
 /**
  *
  * @author Eike Foede, roah
  */
-public class MoveToComponent implements PersistentComponent {
+public class MoveToComponent implements ExtendedComponent {
 
     private final HexCoordinate position;
 
@@ -25,5 +25,10 @@ public class MoveToComponent implements PersistentComponent {
      */
     public HexCoordinate getPosition() {
         return position;
+    }
+
+    @Override
+    public ExtendedComponent clone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

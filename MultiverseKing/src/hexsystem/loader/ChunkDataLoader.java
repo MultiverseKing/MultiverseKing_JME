@@ -28,13 +28,13 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     private HexTile[][] tiles;
 
     /**
-     *
+     * internal use. (do not use)
      */
     public ChunkDataLoader() {
     }
 
     /**
-     *
+     * Tile data loaded.
      * @return
      */
     public HexTile[][] getTiles() {
@@ -42,7 +42,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     }
 
     /**
-     *
+     * path used to load data.
      * @return
      */
     public String getRootPath() {
@@ -50,7 +50,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     }
 
     /**
-     *
+     * tile belong to the chunk to save.
      * @param tiles
      */
     public void setChunk(HexTile[][] tiles) {
@@ -58,8 +58,8 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     }
 
     /**
-     *
-     * @param ex
+     * Convert this object data to a file.
+     * @param ex exporter to use.
      * @throws IOException
      */
     public void write(JmeExporter ex) throws IOException {
@@ -68,24 +68,24 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
     }
 
     /**
-     *
-     * @param im
+     * Convert data from file to this object.
+     * @param im importer to use.
      * @throws IOException
      */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
-        Savable[][] t = capsule.readSavableArray2D("tiles", null);
-        tiles = new HexTile[t.length][t.length];
-        for (int y = 0; y < t.length; y++) {
-            for (int x = 0; x < t[y].length; x++) {
-                HexTile tile = (HexTile) t[x][y];
+        Savable[][] sTile = capsule.readSavableArray2D("tiles", null);
+        tiles = new HexTile[sTile.length][sTile.length];
+        for (int y = 0; y < sTile.length; y++) {
+            for (int x = 0; x < sTile[y].length; x++) {
+                HexTile tile = (HexTile) sTile[x][y];
                 tiles[x][y] = new HexTile(tile.getElement(), tile.getHeight());
             }
         }
     }
 
     /**
-     *
+     * Load the file using the binary importer.
      * @param assetInfo
      * @return
      * @throws IOException

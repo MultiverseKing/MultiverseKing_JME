@@ -5,7 +5,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysytem.units.LoadSpeedComponent;
+import entitysystem.units.LoadSpeedComponent;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;

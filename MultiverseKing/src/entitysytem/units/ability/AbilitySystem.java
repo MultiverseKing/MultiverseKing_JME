@@ -7,7 +7,7 @@ import com.simsilica.es.EntitySet;
 import entitysystem.CoreDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.LoadSpeedComponent;
+import entitysystem.units.LoadSpeedComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 

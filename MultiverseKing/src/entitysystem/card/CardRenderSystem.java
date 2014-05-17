@@ -9,7 +9,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.CoreDataAppState;
 import entitysystem.render.RenderComponent;
-import entitysytem.units.FieldSystem;
+import entitysystem.units.FieldSystem;
 import gamestate.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;

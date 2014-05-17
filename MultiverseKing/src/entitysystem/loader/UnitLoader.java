@@ -1,6 +1,6 @@
 package entitysystem.loader;
 
-import entitysytem.units.ability.AbilityComponent;
+import entitysystem.units.ability.AbilityComponent;
 import entitysystem.units.LifeComponent;
 import entitysystem.movement.MovementStatsComponent;
 import org.json.simple.JSONObject;

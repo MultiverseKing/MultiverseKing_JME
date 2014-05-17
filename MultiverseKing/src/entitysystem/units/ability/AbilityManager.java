@@ -1,4 +1,4 @@
-package entitysytem.units.ability;
+package entitysystem.units.ability;
 
 import java.util.ArrayList;
 import java.util.HashMap;

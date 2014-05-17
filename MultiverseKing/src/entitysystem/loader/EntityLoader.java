@@ -1,7 +1,7 @@
 package entitysystem.loader;
 
 import entitysystem.card.CardProperties;
-import entitysytem.units.ability.AbilityComponent;
+import entitysystem.units.ability.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

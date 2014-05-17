@@ -1,4 +1,4 @@
-package entitysytem.units.ability;
+package entitysystem.units.ability;
 
 import entitysystem.render.VFXComponent;
 import com.simsilica.es.Entity;

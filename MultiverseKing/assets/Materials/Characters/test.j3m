@@ -1,0 +1,12 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        Diffuse : 0.8 0.8 0.8 1.0
+     }
+    AdditionalRenderState {
+      DepthWrite On
+      DepthTest On
+      AlphaTestFalloff 0.0
+      ColorWrite On
+        FaceCull Back
+    }
+}

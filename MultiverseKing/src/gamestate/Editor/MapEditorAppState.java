@@ -7,6 +7,14 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
+import com.simsilica.es.EntityData;
+import com.simsilica.es.EntityId;
+import entitysystem.CoreDataAppState;
+import entitysystem.movement.MoveToComponent;
+import entitysystem.movement.MovementStatsComponent;
+import entitysystem.position.HexPositionComponent;
+import entitysystem.render.RenderComponent;
+import gamestate.GameDataAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexTile;
 import hexsystem.MapData;
@@ -31,6 +39,7 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import utility.ElementalAttribut;
 import utility.HexCoordinate;
+import utility.Rotation;
 import utility.Vector2Int;
 
 /**
@@ -88,7 +97,7 @@ public class MapEditorAppState extends AbstractAppState implements TileChangeLis
         mainWin.setMinDimensions(new Vector2f(130, 130));
         mainWin.setIsResizable(false);
         mainWin.getDragBar().setIsMovable(false);
-        mainWin.setIsVisible(); //used to resolve the dragbar issue with tonegodGUI
+//        mainWin.setIsVisible(); //used to resolve the dragbar issue with tonegodGUI
         main.getScreen().addElement(mainWin);
 
         /**

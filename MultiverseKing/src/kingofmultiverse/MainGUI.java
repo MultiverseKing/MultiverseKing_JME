@@ -42,7 +42,7 @@ public class MainGUI extends AbstractAppState {
         win.getDragBar().setPosition(8, win.getHeight()-35);
         win.getDragBar().setWidth(win.getWidth()-14);
         win.setWindowTitle("  Editor Menu");
-        win.setIsVisible(); //used to resolve the dragbar issue with tonegodGUI
+//        win.setIsVisible(); //used to resolve the dragbar issue with tonegodGUI
         win.setIgnoreMouse(true);
         main.getScreen().addElement(win);
 

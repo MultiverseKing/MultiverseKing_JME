@@ -44,7 +44,7 @@ public final class MapData {
     private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
     private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
-    private String mapName = "Reset";
+    private String mapName;// = "Reset";
 
     /**
      * Base constructor.

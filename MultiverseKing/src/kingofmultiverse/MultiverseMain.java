@@ -180,10 +180,10 @@ public class MultiverseMain extends SimpleApplication {
     private void initScreen() {
         screen = new Screen(this);
         guiNode.addControl(screen);
-        for (Element e : screen.getElementsAsMap().values()) {
-            screen.removeElement(e);
-        }
-        screen.getElementsAsMap().clear();
+//        for (Element e : screen.getElementsAsMap().values()) {
+//            screen.removeElement(e);
+//        }
+//        screen.getElementsAsMap().clear();
     }
 
     private void initDebug() {

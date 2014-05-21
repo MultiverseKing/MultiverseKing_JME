@@ -40,14 +40,13 @@ public class EntityLoader {
     }
 
     /**
-     * Load the entity elemental attribut from his RenderName,
+     * Load a card from his Name, and return all of his properties parsed.
      *
-     * @todo load all component for cards.
-     * @param renderName
-     * @return
+     * @param cardName
+     * @return null if file not found.
      */
-    public CardProperties loadCard(String renderName) {
-        String loadPath = path + renderName + ".card";
+    public CardProperties loadCardProperties(String cardName) {
+        String loadPath = path + cardName + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new CardProperties(obj);

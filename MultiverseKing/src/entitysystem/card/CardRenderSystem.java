@@ -135,8 +135,8 @@ public class CardRenderSystem extends CoreDataAppState implements HexMapInputLis
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(), 
-                        getEntityLoader().loadCard(e.get(RenderComponent.class).getName()));
+                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
+                        getEntityLoader().loadCardProperties(e.get(RenderComponent.class).getName()));
                 handCards.put(e.getId(), card);
                 screen.addElement(card);
                 card.resetHandPosition();

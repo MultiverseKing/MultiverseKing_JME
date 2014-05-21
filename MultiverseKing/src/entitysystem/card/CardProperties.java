@@ -4,7 +4,6 @@ import entitysystem.attribut.CardSubType;
 import entitysystem.attribut.CardMainType;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
-import entitysystem.units.EAttributComponent;
 import org.json.simple.JSONObject;
 import utility.ElementalAttribut;
 

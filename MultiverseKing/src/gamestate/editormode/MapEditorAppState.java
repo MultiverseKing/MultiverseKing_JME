@@ -1,4 +1,4 @@
-package gamestate.Editor;
+package gamestate.editormode;
 
 import hexsystem.events.HexMapInputListener;
 import com.jme3.app.Application;

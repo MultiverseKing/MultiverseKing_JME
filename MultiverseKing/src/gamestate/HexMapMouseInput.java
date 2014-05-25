@@ -4,9 +4,7 @@ import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -16,7 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import entitysystem.CoreDataAppState;
+import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexSettings;
@@ -33,7 +31,7 @@ import utility.MouseRay;
  * issue.
  * @author Eike Foede
  */
-public class HexMapMouseInput extends CoreDataAppState {
+public class HexMapMouseInput extends EntityDataAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary

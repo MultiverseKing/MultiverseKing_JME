@@ -4,7 +4,7 @@ import entitysystem.movement.MovementStatsComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.CoreDataAppState;
+import entitysystem.EntityDataAppState;
 import entitysystem.render.AnimationComponent;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.position.HexPositionComponent;
@@ -25,7 +25,7 @@ import hexsystem.events.HexMapInputListener;
  *
  * @author roah
  */
-public class FieldSystem extends CoreDataAppState implements HexMapInputListener {
+public class FieldSystem extends EntityDataAppState implements HexMapInputListener {
 
     ArrayList<EntityId> units = new ArrayList<EntityId>();
     ArrayList<EntityId> trap = new ArrayList<EntityId>();

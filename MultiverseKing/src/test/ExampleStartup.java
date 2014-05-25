@@ -10,12 +10,12 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
 import entitysystem.render.EntityRenderSystem;
-import gamestate.GameDataAppState;
+import gamestate.EntitySystemAppState;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
-import gamestate.HexMapAppState;
+import gamestate.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.loader.ChunkDataLoader;
@@ -43,9 +43,9 @@ public class ExampleStartup extends SimpleApplication {
         EntityData entityData = new DefaultEntityData();
         MapData mapData = new MapData(ElementalAttribut.EARTH, assetManager);
         //Initialise data management
-        stateManager.attach(new GameDataAppState(entityData));
+        stateManager.attach(new EntitySystemAppState(entityData));
 //        stateManager.attach(new MapDataAppState(mapData));
-        stateManager.attach(new HexMapAppState(this, mapData));
+        stateManager.attach(new HexSystemAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
         mapData.addChunk(new Vector2Int(-1, 0), null);
 
@@ -61,7 +61,7 @@ public class ExampleStartup extends SimpleApplication {
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));
         stateManager.attach(new MovementSystem());
         stateManager.attach(new EntityRenderSystem());
-        stateManager.getState(HexMapAppState.class).chunkUpdate(new ChunkChangeEvent(Vector2Int.INFINITY));
+        stateManager.getState(HexSystemAppState.class).chunkUpdate(new ChunkChangeEvent(Vector2Int.INFINITY));
         //TODO: Initialise visual representation of Map
 
         //TODO: Initialise functional systems

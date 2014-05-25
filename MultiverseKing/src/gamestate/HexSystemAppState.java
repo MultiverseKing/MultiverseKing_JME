@@ -24,7 +24,7 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public class HexMapAppState extends AbstractAppState implements ChunkChangeListener, TileChangeListener {
+public class HexSystemAppState extends AbstractAppState implements ChunkChangeListener, TileChangeListener {
 
     private HashMap chunkNode = new HashMap<String, Node>();
     /**
@@ -51,7 +51,7 @@ public class HexMapAppState extends AbstractAppState implements ChunkChangeListe
      * @param main
      * @param mapData
      */
-    public HexMapAppState(SimpleApplication main, MapData mapData) {
+    public HexSystemAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
         this.mapData = mapData;
         this.meshManager = new MeshManager();

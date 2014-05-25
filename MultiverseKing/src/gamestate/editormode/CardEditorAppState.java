@@ -1,4 +1,4 @@
-package gamestate.Editor;
+package gamestate.editormode;
 
 import hexsystem.events.HexMapInputListener;
 import com.jme3.app.Application;
@@ -10,13 +10,15 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import com.simsilica.es.EntitySet;
+import entitysystem.EntityDataAppState;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardProperties;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.loader.EntityLoader;
 import entitysystem.render.RenderComponent;
-import gamestate.GameDataAppState;
+import gamestate.EntitySystemAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.MapData;
 import hexsystem.events.HexMapInputEvent;
@@ -24,16 +26,12 @@ import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.util.List;
 import kingofmultiverse.MainGUI;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.controls.menuing.MenuItem;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.Screen;
 
 /**
  *
@@ -44,7 +42,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
     private MultiverseMain main;
     private MapData mapData;
     private Window mainWin;
-    private Menu loadCategory = null;
+//    private Menu loadCategory = null;
     
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -152,7 +150,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
+                EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
                 ed.setComponent(cardId, new RenderComponent("Cendrea"));
                 ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
@@ -165,7 +163,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(GameDataAppState.class).getEntityData();
+                EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
                 Object[] cards = app.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
                 EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
                 ed.removeComponent(id, CardRenderComponent.class);
@@ -208,10 +206,11 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if(loadCategory == null){
+                if(!main.getScreen().getElementsAsMap().containsKey("loadCategory")){
                     loadMenu();
                 }
-                loadCategory.showMenu(null, getAbsoluteX(), getAbsoluteY()-loadCategory.getHeight());
+                Menu loadMenu = (Menu) main.getScreen().getElementById("loadCategory");
+                loadMenu.showMenu(null, getAbsoluteX(), getAbsoluteY()-loadMenu.getHeight());
             }
         };
         load.setText("Load");
@@ -303,7 +302,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         /**
          * Root menu.
          */
-        loadCategory = new Menu(main.getScreen(), "loadCategory", new Vector2f(0,0), false) {
+        final Menu loadCategory = new Menu(main.getScreen(), "loadCategory", new Vector2f(0,0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) { }
         };
@@ -321,7 +320,15 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
     @Override
     public void cleanup() {
         super.cleanup();
-        main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
+        main.getScreen().removeElement(mainWin);
+        main.getScreen().removeElement(main.getScreen().getElementById("categoryAll"));
+        main.getScreen().removeElement(main.getScreen().getElementById("categoryAbility"));
+        main.getScreen().removeElement(main.getScreen().getElementById("categoryUnit"));
+        main.getScreen().removeElement(main.getScreen().getElementById("loadCategory"));
+        mainWin = null;
+        //@todo remove all card from the card system 
+        // by getting all entity with the card renderer component and remove it
+        //@todo remove all card from the field.
+//        EntitySet comps = main.getStateManager().getState(EntityDataAppState.class).getEntityData().getEntities(CardRenderComponent.class);
     }
-    
 }

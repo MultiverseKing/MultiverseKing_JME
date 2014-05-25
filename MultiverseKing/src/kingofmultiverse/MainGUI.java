@@ -5,8 +5,8 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import gamestate.Editor.CardEditorAppState;
-import gamestate.Editor.MapEditorAppState;
+import gamestate.editormode.CardEditorAppState;
+import gamestate.editormode.MapEditorAppState;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
 

@@ -1,7 +1,7 @@
 package entitysystem;
 
 import entitysystem.loader.EntityLoader;
-import gamestate.GameDataAppState;
+import gamestate.EntitySystemAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -16,7 +16,7 @@ import hexsystem.MapData;
  *
  * @author Eike Foede, roah
  */
-public abstract class CoreDataAppState extends AbstractAppState {
+public abstract class EntityDataAppState extends AbstractAppState {
 
     /**
      * entity System data and bridge to mapData.
@@ -35,15 +35,23 @@ public abstract class CoreDataAppState extends AbstractAppState {
      * Hex system Data handler.
      * @return 
      */
-    public MapData getMapData() {
+    public final MapData getMapData() {
         return entityData.getMapData();
+    }
+    
+    /**
+     * EntityData handler.
+     * @return 
+     */
+    public final ExtendedEntityData getEntityData() {
+        return entityData;
     }
     
     /**
      * Entity loader from file.
      * @return 
      */
-    public EntityLoader getEntityLoader() {
+    public final EntityLoader getEntityLoader() {
         return entityData.getEntityLoader();
     }
     
@@ -52,7 +60,7 @@ public abstract class CoreDataAppState extends AbstractAppState {
         super.initialize(stateManager, app);
 
         this.app = (SimpleApplication) app;
-        this.entityData = (ExtendedEntityData) stateManager.getState(GameDataAppState.class).getEntityData();
+        this.entityData = (ExtendedEntityData) stateManager.getState(EntitySystemAppState.class).getEntityData();
 
         entities = initialiseSystem();
         for (Entity e : entities) {

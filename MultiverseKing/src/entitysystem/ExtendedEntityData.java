@@ -17,7 +17,7 @@ import utility.HexCoordinate;
  * Walkable value in mapData.
  * @author roah
  */
-public class ExtendedEntityData extends DefaultEntityData {
+public final class ExtendedEntityData extends DefaultEntityData {
 
     private final MapData mapData;
     private final EntityLoader entityLoader;

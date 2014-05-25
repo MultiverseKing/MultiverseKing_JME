@@ -14,14 +14,14 @@ import hexsystem.MapData;
  *
  * @author Eike Foede, roah
  */
-public class GameDataAppState extends AbstractAppState {
+public class EntitySystemAppState extends AbstractAppState {
 
     private EntityData entityData;
 
     /**
      *
      */
-    public GameDataAppState() {
+    public EntitySystemAppState() {
         entityData = new DefaultEntityData();
     }
 
@@ -29,7 +29,7 @@ public class GameDataAppState extends AbstractAppState {
      *
      * @param ed
      */
-    public GameDataAppState(EntityData ed) {
+    public EntitySystemAppState(EntityData ed) {
         this.entityData = ed;
     }
 

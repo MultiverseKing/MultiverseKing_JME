@@ -7,7 +7,7 @@ import com.jme3.animation.LoopMode;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.CoreDataAppState;
+import entitysystem.EntityDataAppState;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
@@ -18,7 +18,7 @@ import entitysystem.attribut.Animation;
  *
  * @author roah
  */
-public class AnimationSystem extends CoreDataAppState implements AnimEventListener {
+public class AnimationSystem extends EntityDataAppState implements AnimEventListener {
 
     private EntityRenderSystem renderSystem;
     private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();

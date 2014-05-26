@@ -10,8 +10,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import com.simsilica.es.EntitySet;
-import entitysystem.EntityDataAppState;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardProperties;
 import entitysystem.card.CardRenderComponent;
@@ -20,6 +18,7 @@ import entitysystem.loader.EntityLoader;
 import entitysystem.render.RenderComponent;
 import gamestate.EntitySystemAppState;
 import gamestate.HexMapMouseInput;
+import gamestate.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.TileChangeEvent;
@@ -50,7 +49,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         main = (MultiverseMain) app;
         HexMapMouseInput mouseSystem = app.getStateManager().getState(HexMapMouseInput.class);
         mouseSystem.registerTileInputListener(this);
-        mapData = app.getStateManager().getState(HexMapMouseInput.class).getMapData();
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         if(mapData.getMapName() == null || !mapData.getMapName().equalsIgnoreCase("reset")){
             if(!mapData.loadMap("Reset")){
                 System.err.println("Cannot load the card editor map.");
@@ -142,7 +141,6 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
          */
         Window addRemoveCard = new Window(main.getScreen(), "addRemoveCard", new Vector2f(0f, 42f * 6), new Vector2f(180, 50));
         addRemoveCard.removeAllChildren();
-//        addRemoveCard.getDragBar().setIsVisible(false);
         addRemoveCard.setIgnoreMouse(true);
         mainWin.addChild(addRemoveCard);
 
@@ -163,10 +161,12 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
                 Object[] cards = app.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
-                EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
-                ed.removeComponent(id, CardRenderComponent.class);
+                if(cards.length != 0){
+                    EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+                    EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
+                    ed.removeComponent(id, CardRenderComponent.class);
+                }
             }
         };
         removeCard.setText("Del");
@@ -246,16 +246,13 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 EntityLoader loader = new EntityLoader();
-                openCardWin(loader.loadCardProperties((String) value));
+                openCardWin(loader.loadUnitCardProperties((String) value));
             }
         };
         
         File[] fList = folder.listFiles();
         for(File f : fList){
-            if(!f.isDirectory()){
-                int index = f.getName().lastIndexOf('.');
-                categoryAll.addMenuItem(f.getName().substring(0, index), f.getName().substring(0, index), null);
-            } else {
+            if(f.isDirectory()){
                 String[] subF = f.list(filter);
                 for(String fi : subF){
                     int index = fi.lastIndexOf('.');
@@ -285,7 +282,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         /**
          * Menu listing all saved unit card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/");
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Units");
         Menu categoryUnit = new Menu(main.getScreen(), "categoryUnit", new Vector2f(0,0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -321,14 +318,28 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
     public void cleanup() {
         super.cleanup();
         main.getScreen().removeElement(mainWin);
-        main.getScreen().removeElement(main.getScreen().getElementById("categoryAll"));
-        main.getScreen().removeElement(main.getScreen().getElementById("categoryAbility"));
-        main.getScreen().removeElement(main.getScreen().getElementById("categoryUnit"));
-        main.getScreen().removeElement(main.getScreen().getElementById("loadCategory"));
+        String[] toRemove = new String[] { "categoryAll", "categoryAbility", "categoryUnit", "loadCategory"};
+        for(String s : toRemove){
+            if(main.getScreen().getElementsAsMap().containsKey(s)){
+                main.getScreen().removeElement(main.getScreen().getElementById(s));
+            }
+        }
+//        main.getScreen().removeElement(main.getScreen().getElementById("categoryAbility"));
+//        main.getScreen().removeElement(main.getScreen().getElementById("categoryUnit"));
+//        main.getScreen().removeElement(main.getScreen().getElementById("loadCategory"));
         mainWin = null;
         //@todo remove all card from the card system 
         // by getting all entity with the card renderer component and remove it
         //@todo remove all card from the field.
+        Object[] cards = main.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
+        if(cards.length != 0){
+            EntityData ed = main.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+            for(Object o : cards){
+                EntityId id = (EntityId) o;
+                ed.removeEntity(id);
+//                ed.removeComponent(id, CardRenderComponent.class);
+            }
+        }
 //        EntitySet comps = main.getStateManager().getState(EntityDataAppState.class).getEntityData().getEntities(CardRenderComponent.class);
     }
 }

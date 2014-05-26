@@ -9,6 +9,8 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
+import gamestate.HexSystemAppState;
+import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import utility.Rotation;
  */
 public class EntityRenderSystem extends EntityDataAppState implements TileChangeListener {
 
+    private MapData mapData;
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private CharacterSpatialInitializer spatialInitializer = new CharacterSpatialInitializer();
     private Node renderSystemNode = new Node("RenderSystemNode");
@@ -45,7 +48,8 @@ public class EntityRenderSystem extends EntityDataAppState implements TileChange
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
-        getMapData().registerTileChangeListener(this);
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
+        mapData.registerTileChangeListener(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
 
@@ -68,7 +72,7 @@ public class EntityRenderSystem extends EntityDataAppState implements TileChange
         Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
         HexPositionComponent positionComp = e.get(HexPositionComponent.class);
-        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
+        s.setLocalTranslation(mapData.hexPositionToSpatialPosition(positionComp.getPosition()));
         s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
         renderSystemNode.attachChild(s);
     }
@@ -82,7 +86,7 @@ public class EntityRenderSystem extends EntityDataAppState implements TileChange
     protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
         HexPositionComponent positionComp = e.get(HexPositionComponent.class);
-        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
+        s.setLocalTranslation(mapData.hexPositionToSpatialPosition(positionComp.getPosition()));
         s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
     }
 

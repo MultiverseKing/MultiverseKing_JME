@@ -31,7 +31,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        String loadPath = path + name + ".card";
+        String loadPath = path +"Units/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new UnitLoader((JSONObject) obj.get("unitsStats"), this);
@@ -45,8 +45,8 @@ public class EntityLoader {
      * @param cardName
      * @return null if file not found.
      */
-    public CardProperties loadCardProperties(String cardName) {
-        String loadPath = path + cardName + ".card";
+    public CardProperties loadUnitCardProperties(String cardName) {
+        String loadPath = path +"Units/"+ cardName + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new CardProperties(obj);

@@ -5,7 +5,8 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.units.LoadSpeedComponent;
+import gamestate.HexSystemAppState;
+import hexsystem.MapData;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class MovementSystem extends EntityDataAppState {
 
     private Pathfinder pathfinder = new Astar();
     private HashMap<EntityId, Movement> movements;
-    private float secondsPerStep = 1.5f;
+//    private float secondsPerStep = 1.5f;
 
     /**
      *
@@ -33,7 +34,7 @@ public class MovementSystem extends EntityDataAppState {
      */
     @Override
     protected EntitySet initialiseSystem() {
-        pathfinder.setMapData(getMapData());
+        pathfinder.setMapData(app.getStateManager().getState(HexSystemAppState.class).getMapData());
         movements = new HashMap<EntityId, Movement>();
         return entityData.getEntities(MovementStatsComponent.class, HexPositionComponent.class, MoveToComponent.class);
     }
@@ -53,7 +54,6 @@ public class MovementSystem extends EntityDataAppState {
                 if (movement.actualPosition + 1 < movement.path.size()) {
                     Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), 
                             movement.path.get(movement.actualPosition + 1).getAsCubic());
-                    getMapData().setTileIsWalkable(movement.path.get(movement.actualPosition + 1), false);
                     if (!e.get(HexPositionComponent.class).getRotation().equals(dir)) {
                         e.set(e.get(HexPositionComponent.class).clone(dir));
                     }

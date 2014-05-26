@@ -21,7 +21,7 @@ public enum CardSubType {
     /**
      * Used for card who generate unit on the field.
      */
-    SUMMON,
+    UNIT,
     /**
      * Used for card who generate an effect on the field.
      */

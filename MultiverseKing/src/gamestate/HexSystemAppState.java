@@ -44,6 +44,10 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
      */
     protected final Node mapNode;
 
+    public MapData getMapData() {
+        return mapData;
+    }
+    
     /**
      * Settup the base param for the hexMap, create a new mapNode to hold the
      * hexMap.

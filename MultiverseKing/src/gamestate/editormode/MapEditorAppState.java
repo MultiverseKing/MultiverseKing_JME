@@ -8,6 +8,7 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import gamestate.HexMapMouseInput;
+import gamestate.HexSystemAppState;
 import hexsystem.HexTile;
 import hexsystem.MapData;
 import hexsystem.events.HexMapInputEvent;
@@ -50,7 +51,7 @@ public class MapEditorAppState extends AbstractAppState implements TileChangeLis
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         main = (MultiverseMain) app;
-        mapData = app.getStateManager().getState(HexMapMouseInput.class).getMapData();
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {

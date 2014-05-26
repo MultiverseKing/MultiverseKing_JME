@@ -1,6 +1,5 @@
 package entitysystem.render;
 
-import com.jme3.animation.AnimControl;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -9,12 +8,12 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
-import hexsystem.HexTile;
+import gamestate.HexSystemAppState;
+import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Set;
-import utility.HexCoordinate;
 import utility.Rotation;
 
 /**
@@ -33,12 +32,14 @@ public class VFXRenderSystem extends EntityDataAppState implements TileChangeLis
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private VFXSpatialInitializer VFXInitializer = new VFXSpatialInitializer();
     private Node VFXNode = new Node("VFXNode");
+    private MapData mapData;
 
     @Override
     protected EntitySet initialiseSystem() {
         VFXInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(VFXNode);
-        getMapData().registerTileChangeListener(this);
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
+        mapData.registerTileChangeListener(this);
         return entityData.getEntities(VFXComponent.class, HexPositionComponent.class);
     }
     
@@ -48,7 +49,7 @@ public class VFXRenderSystem extends EntityDataAppState implements TileChangeLis
         Spatial s = VFXInitializer.initialize(e.get(RenderComponent.class).getName());
         spatials.put(e.getId(), s);
         HexPositionComponent positionComp = e.get(HexPositionComponent.class);
-        s.setLocalTranslation(getMapData().hexPositionToSpatialPosition(positionComp.getPosition()));
+        s.setLocalTranslation(mapData.hexPositionToSpatialPosition(positionComp.getPosition()));
         s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
         VFXNode.attachChild(s);
     }

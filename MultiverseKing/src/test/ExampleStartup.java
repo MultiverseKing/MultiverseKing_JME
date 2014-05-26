@@ -40,10 +40,10 @@ public class ExampleStartup extends SimpleApplication {
         HexCoordinate point = new HexCoordinate(HexCoordinate.OFFSET, -1, 0);
         this.getCamera().lookAt(new Vector3f(0f, 1.5f, 0f), Vector3f.UNIT_Y);
         this.getCamera().setLocation(new Vector3f(0, 21.51f, 17.17051f));
-        EntityData entityData = new DefaultEntityData();
         MapData mapData = new MapData(ElementalAttribut.EARTH, assetManager);
         //Initialise data management
-        stateManager.attach(new EntitySystemAppState(entityData));
+        stateManager.attach(new EntitySystemAppState());
+        EntityData entityData = stateManager.getState(EntitySystemAppState.class).getEntityData();
 //        stateManager.attach(new MapDataAppState(mapData));
         stateManager.attach(new HexSystemAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);

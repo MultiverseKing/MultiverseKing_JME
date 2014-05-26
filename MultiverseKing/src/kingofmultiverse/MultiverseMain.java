@@ -14,8 +14,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import com.simsilica.es.base.DefaultEntityData;
 import gamestate.EntitySystemAppState;
-import entitysystem.ExtendedEntityData;
 import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
@@ -24,12 +24,13 @@ import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldSystem;
+import entitysystem.units.FieldCollisionSystem;
 import gamestate.HexSystemAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -189,10 +190,9 @@ public class MultiverseMain extends SimpleApplication {
      */
     public void initSystem() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
-        EntityData entityData = new ExtendedEntityData(mapData);
         
         stateManager.attachAll(
-                new EntitySystemAppState(entityData),
+                new EntitySystemAppState(),
                 new HexSystemAppState(this, mapData),
                 new HexMapMouseInput(),
                 new EntityRenderSystem(),
@@ -201,15 +201,15 @@ public class MultiverseMain extends SimpleApplication {
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new FieldSystem());
+                new FieldCollisionSystem());
     }
-    private boolean exemple = false;
 
+    private boolean exemple = false;
     @Override
     public void update() {
         super.update();
         if (exemple) {
-            MapData md = stateManager.getState(EntitySystemAppState.class).getMapData();
+            MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
             md.addChunk(Vector2Int.ZERO, null);
             EntityData ed = stateManager.getState(EntitySystemAppState.class).getEntityData();
             //Example: Initialise new character entity.
@@ -238,5 +238,26 @@ public class MultiverseMain extends SimpleApplication {
             }
         }
         return null;
+    }
+    /**
+     * 
+     * @param <T>
+     * @param <E>
+     * @param map
+     * @param value
+     * @return multiple key attached to a value
+     */
+    public static <T, E> ArrayList<T> getKeysByValue(Map<T, E> map, E value) {
+        ArrayList<T> keyList = new ArrayList<T>();
+        for (Entry<T, E> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                keyList.add(entry.getKey());
+            }
+        }
+        if(keyList.isEmpty()){
+            return null;
+        } else {
+            return keyList;
+        }
     }
 }

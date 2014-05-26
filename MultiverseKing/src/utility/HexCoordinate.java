@@ -167,4 +167,12 @@ public final class HexCoordinate {
     public int hashCode() {
         return q * 2 ^ 16 + r;
     }
+    
+    /**
+     * Combine two position.
+     * @param value 
+     */
+    public HexCoordinate add(HexCoordinate value){
+        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
+    }
 }

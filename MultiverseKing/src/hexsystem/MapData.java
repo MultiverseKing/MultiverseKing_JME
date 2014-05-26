@@ -99,7 +99,7 @@ public final class MapData {
             tiles = new HexTile[HexSettings.CHUNK_SIZE][HexSettings.CHUNK_SIZE];
             for (int y = 0; y < HexSettings.CHUNK_SIZE; y++) {
                 for (int x = 0; x < HexSettings.CHUNK_SIZE; x++) {
-                    tiles[x][y] = new HexTile(mapElement, HexSettings.GROUND_HEIGHT, true);
+                    tiles[x][y] = new HexTile(mapElement, HexSettings.GROUND_HEIGHT);
                 }
             }
         }
@@ -200,15 +200,6 @@ public final class MapData {
      */
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
-    }
-
-    /**
-     *
-     * @param position
-     * @param walkable
-     */
-    public void setTileIsWalkable(HexCoordinate position, boolean walkable) {
-        setTile(position, getTile(position).cloneChangeWalkable(walkable));
     }
 
     /**

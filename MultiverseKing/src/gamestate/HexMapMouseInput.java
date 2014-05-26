@@ -18,6 +18,7 @@ import entitysystem.EntityDataAppState;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
 import hexsystem.HexSettings;
+import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,9 +42,11 @@ public class HexMapMouseInput extends EntityDataAppState {
     private int currentFocusIndex = -1;
     private HexCoordinate lastHexPos;
     private Vector2f lastMousePos = new Vector2f(0, 0);
+    private MapData mapData;
 
     @Override
     protected EntitySet initialiseSystem() {
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         initMarkDebug();
         initInput();
 //        initCursor();
@@ -91,7 +94,7 @@ public class HexMapMouseInput extends EntityDataAppState {
             cursor.setMaterial(animShader);
             app.getRootNode().attachChild(cursor);
             //Remove offset and set it to zero if hex_void_anim.png is not used
-            float z = getMapData().getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
+            float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
             cursor.setLocalTranslation(new Vector3f(0f,  z +  0.01f , cursorOffset));
             System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT+" + "+z+0.01f);
     }
@@ -216,8 +219,8 @@ public class HexMapMouseInput extends EntityDataAppState {
         if(cursor == null){
             initCursor();
         }
-        Vector3f pos = getMapData().getTileWorldPosition(tilePos);
-        cursor.setLocalTranslation(pos.x, getMapData().getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
+        Vector3f pos = mapData.getTileWorldPosition(tilePos);
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
                 + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
     }
 
@@ -232,8 +235,8 @@ public class HexMapMouseInput extends EntityDataAppState {
 
         do {
             pos = i.next().getContactPoint();
-            tilePos = getMapData().convertWorldToGridPosition(pos);
-            if (getMapData().getTile(tilePos) == null) {
+            tilePos = mapData.convertWorldToGridPosition(pos);
+            if (mapData.getTile(tilePos) == null) {
                 break;
             } else {
 //                System.out.println(pos);
@@ -255,7 +258,7 @@ public class HexMapMouseInput extends EntityDataAppState {
         if (cursor == null) {
             initCursor();
         }
-        if (getMapData().convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
+        if (mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
             cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() 
                     * HexSettings.FLOOR_HEIGHT + 0.1f, cursor.getLocalTranslation().z);
         }

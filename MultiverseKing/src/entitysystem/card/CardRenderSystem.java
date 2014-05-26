@@ -6,8 +6,9 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntityDataAppState;
+import entitysystem.loader.EntityLoader;
 import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldSystem;
+import entitysystem.units.FieldCollisionSystem;
 import gamestate.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
@@ -107,9 +108,7 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
         hover = new Hover(screen);
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
-
         
-
         return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
 
@@ -135,13 +134,18 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
-                        getEntityLoader().loadCardProperties(e.get(RenderComponent.class).getName()));
-                handCards.put(e.getId(), card);
-                screen.addElement(card);
-                card.resetHandPosition();
-                for (Card c : handCards.values()) {
-                    c.setZOrder(c.getZOrder());
+                CardProperties properties = new EntityLoader().loadUnitCardProperties(cardName);
+                if(properties != null){
+                    card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
+                            properties);
+                    handCards.put(e.getId(), card);
+                    screen.addElement(card);
+                    card.resetHandPosition();
+                    for (Card c : handCards.values()) {
+                        c.setZOrder(c.getZOrder());
+                    }
+                } else{
+                    System.err.println("Card files cannot be locate. "+cardName);
                 }
                 break;
             case DECK:
@@ -281,7 +285,7 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
                     //todo : if the player want to use the field and not fast selection menu. TITAN card
                     break;
                 case WORLD:
-                    if (app.getStateManager().getState(FieldSystem.class).canBeCast(event.getEventPosition(), 
+                    if (app.getStateManager().getState(FieldCollisionSystem.class).canBeCast(event.getEventPosition(), 
                             cardPreviewCast.getCardEntityUID(), properties)) {
                         castConfirmed();
                     } else {

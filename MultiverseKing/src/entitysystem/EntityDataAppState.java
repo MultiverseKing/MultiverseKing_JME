@@ -7,6 +7,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
 import hexsystem.MapData;
 
@@ -19,9 +20,9 @@ import hexsystem.MapData;
 public abstract class EntityDataAppState extends AbstractAppState {
 
     /**
-     * entity System data and bridge to mapData.
+     * entity System data.
      */
-    protected ExtendedEntityData entityData;
+    protected EntityData entityData;
     /**
      * Entity bounded to this system.
      */
@@ -30,37 +31,13 @@ public abstract class EntityDataAppState extends AbstractAppState {
      * main.
      */
     protected SimpleApplication app;
-
-    /**
-     * Hex system Data handler.
-     * @return 
-     */
-    public final MapData getMapData() {
-        return entityData.getMapData();
-    }
-    
-    /**
-     * EntityData handler.
-     * @return 
-     */
-    public final ExtendedEntityData getEntityData() {
-        return entityData;
-    }
-    
-    /**
-     * Entity loader from file.
-     * @return 
-     */
-    public final EntityLoader getEntityLoader() {
-        return entityData.getEntityLoader();
-    }
     
     @Override
     public final void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
 
         this.app = (SimpleApplication) app;
-        this.entityData = (ExtendedEntityData) stateManager.getState(EntitySystemAppState.class).getEntityData();
+        this.entityData = stateManager.getState(EntitySystemAppState.class).getEntityData();
 
         entities = initialiseSystem();
         for (Entity e : entities) {

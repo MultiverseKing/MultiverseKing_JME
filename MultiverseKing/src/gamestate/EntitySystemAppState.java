@@ -5,8 +5,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.base.DefaultEntityData;
-import entitysystem.ExtendedEntityData;
-import hexsystem.MapData;
 
 /**
  * The EntityData and MapData of the game is stored in this AppState to allow
@@ -27,23 +25,6 @@ public class EntitySystemAppState extends AbstractAppState {
 
     /**
      *
-     * @param ed
-     */
-    public EntitySystemAppState(EntityData ed) {
-        this.entityData = ed;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public MapData getMapData() {
-        ExtendedEntityData ed = (ExtendedEntityData) entityData;
-        return ed.getMapData();
-    }
-
-    /**
-     *
      * @param stateManager
      * @param app
      */
@@ -58,14 +39,6 @@ public class EntitySystemAppState extends AbstractAppState {
      */
     public EntityData getEntityData() {
         return entityData;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public ExtendedEntityData getExtendedEntityData() {
-        return (ExtendedEntityData) entityData;
     }
 
     @Override

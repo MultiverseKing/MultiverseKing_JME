@@ -1,6 +1,6 @@
 {
     "faction": "PLUG",
-    "cardSubType": "SUMMON",
+    "cardSubType": "UNIT",
     "rarity": "COMMON",
     "eAttribut": "SHOCK",
     "playCost": 4,
@@ -9,6 +9,10 @@
         "life": 100,
         "speed": 1.5,
         "movePoint": 1,
-        "ability": "PulseVoltage"
-    }
+        "ability": "PulseVoltage",
+        "collision": {
+            "key":["0|0"],
+            "layer":[0]
+        }
+    }    
 }

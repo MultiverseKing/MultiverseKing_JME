@@ -34,7 +34,7 @@ public class CardProperties {
      */
     public CardProperties(JSONObject obj) {
         cardSubType = CardSubType.valueOf(obj.get("cardSubType").toString());
-        if (cardSubType == CardSubType.SPELL || cardSubType == CardSubType.SUMMON || cardSubType == CardSubType.TRAP) {
+        if (cardSubType == CardSubType.SPELL || cardSubType == CardSubType.UNIT || cardSubType == CardSubType.TRAP) {
             this.cardMainType = CardMainType.WORLD;
         } else if (cardSubType == CardSubType.ABILITY || cardSubType == CardSubType.EQUIPEMENT) {
             this.cardMainType = CardMainType.TITAN;

@@ -8,7 +8,6 @@ import entitysystem.render.AnimationComponent;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
-import hexsystem.HexTile;
 import utility.HexCoordinate;
 import utility.Rotation;
 import entitysystem.attribut.Animation;
@@ -16,8 +15,6 @@ import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import entitysystem.loader.UnitLoader;
-import gamestate.HexSystemAppState;
-import hexsystem.MapData;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
@@ -28,14 +25,16 @@ import java.util.HashMap;
  *
  * @author roah
  */
-public class FieldCollisionSystem extends EntityDataAppState implements HexMapInputListener {
+public class CollisionSystem extends EntityDataAppState implements HexMapInputListener {
 
     /**
      * Byte == collision layer (unit, trap, object, spell etc...)
      * 0 == unit
      * 1 == trap
      * 2 == spell
-     * more than two is for customLayer
+     * more than two is for customLayer or for special unit like flying unit,
+     * an object can be on multiple layer at the same time.
+     * 
      * HashMap<HexCoordinate, EntityId> == entity position on that layer.
      */
     private HashMap<Byte, ArrayList<EntityId>> collisionLayer = new HashMap<Byte, ArrayList<EntityId>>(3);
@@ -131,14 +130,15 @@ public class FieldCollisionSystem extends EntityDataAppState implements HexMapIn
     
     @Override
     protected void removeEntity(Entity e) {
-        ArrayList<Byte> layers = e.get(CollisionComponent.class).getAllCollisionLayer();
-        for(Byte layer : layers){
-            collisionLayer.get(layer).remove(e.getId());
+        for(ArrayList layer : collisionLayer.values()){
+            if(layer.contains(e.getId())){
+                layer.remove(e.getId());
+            }
         }
     }
     
     @Override
     protected void cleanupSystem() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        collisionLayer.clear();
     }
 }

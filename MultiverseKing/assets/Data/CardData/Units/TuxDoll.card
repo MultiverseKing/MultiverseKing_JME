@@ -1,0 +1,19 @@
+{
+    "faction": "NEUTRAL",
+    "cardType": "UNIT",
+    "rarity": "MULTIVERSE",
+    "eAttribut": "NULL",
+    "playCost": 0,
+    "description": "Testing Unit used on the editor"
+
+    "unitsStats": {
+        "life": POSITIVE_INFINITY,
+        "speed": POSITIVE_INFINITY,
+        "movePoint": MAX_VALUE,
+        "ability": "None",
+        "collision": {
+            "key":["0|0"],
+            "layer":[0]
+        }
+    }    
+}

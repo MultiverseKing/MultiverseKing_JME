@@ -1,18 +1,23 @@
 package entitysystem.loader;
 
+import entitysystem.attribut.CardType;
 import entitysystem.card.CardProperties;
 import entitysystem.units.ability.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sun.misc.IOUtils;
 import utility.ElementalAttribut;
+import utility.HexCoordinate;
+import utility.Vector2Int;
 
 /**
  * Master to load Entity from file.
@@ -45,28 +50,61 @@ public class EntityLoader {
      * @param cardName
      * @return null if file not found.
      */
-    public CardProperties loadUnitCardProperties(String cardName) {
-        String loadPath = path +"Units/"+ cardName + ".card";
-        JSONObject obj = getData(loadPath);
-        if (obj != null) {
-            return new CardProperties(obj);
+    public CardProperties loadCardProperties(String cardName) {
+        String loadPath = null;
+        File[] files = new File(System.getProperty("user.dir") + "/assets/Data/CardData").listFiles();
+        continu:
+        for(File f : files){
+            if(f.isDirectory()){
+                File[] subFiles = f.listFiles();
+                for(File subF : subFiles){
+                    if(subF.isFile() && subF.getName().equals(cardName + ".card")){
+                        loadPath = subF.getPath();
+                        break continu;
+                    }
+                }
+            }
+        }
+        if(loadPath != null){
+            JSONObject obj = getData(loadPath);
+            if (obj != null) {
+                return new CardProperties(obj);
+            }
+            return null;
         }
         return null;
     }
 
     public AbilityComponent loadAbility(String name) {
+        if(name.equals("None")){
+            return null;
+        }
         String loadPath = path + "Ability/" + name + ".card";
         JSONObject obj = getData(loadPath);
         ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
+        String description = obj.get("description").toString();
 
         JSONObject abilityData = (JSONObject) obj.get("ability");
-        Number damage = (Number) abilityData.get("damage");
-        Number segment = (Number) abilityData.get("segment");
+        Number damage = (Number) abilityData.get("power");
+        Number segment = (Number) abilityData.get("segmentCost");
         Number activationRange = (Number) abilityData.get("activationRange");
-        Number effectSize = (Number) abilityData.get("effectSize");
-        String description = abilityData.get("description").toString();
-        return new AbilityComponent(name, activationRange.byteValue(),
-                effectSize.byteValue(), eAttribut, segment.byteValue(), damage.intValue(), description);
+        HashMap<HexCoordinate, Byte> hitCollision = getCollision((JSONObject)abilityData.get("hitCollision"));        
+        
+        return new AbilityComponent(name, activationRange.byteValue(),eAttribut, 
+                segment.byteValue(), damage.intValue(), hitCollision, 
+                (Boolean)abilityData.get("castFromSelf"), description);
+    }
+    
+    public HashMap<HexCoordinate, Byte> getCollision(JSONObject collisionData){
+        HashMap<HexCoordinate, Byte> collisionMap = new HashMap<HexCoordinate, Byte>();
+        JSONArray keyList = (JSONArray) collisionData.get("key");
+        JSONArray keyLayer = (JSONArray) collisionData.get("layer");
+        for (int i = 0; i < keyList.size(); i++) {
+            Number layer = (Number) keyLayer.get(i);
+            collisionMap.put(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) keyList.get(i))),
+                    layer.byteValue());
+        }
+        return collisionMap;
     }
 
     private JSONObject getData(String loadPath) {

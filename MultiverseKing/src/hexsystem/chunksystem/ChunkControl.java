@@ -84,7 +84,7 @@ public class ChunkControl extends AbstractControl {
         for (ElementalAttribut e : paramElement) {
             Geometry tile = new Geometry(e.toString(), meshManager.getMesh(meshParam.setElement(e)));
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
-            Texture text = assetManager.loadTexture("Textures/Test/" + e.toString() + "Center.png");
+            Texture text = assetManager.loadTexture("Textures/HexField/" + e.toString() + ".png");
             text.setWrap(Texture.WrapMode.Repeat);
             mat.setTexture("ColorMap", text);
 //            mat.getAdditionalRenderState().setWireframe(true);

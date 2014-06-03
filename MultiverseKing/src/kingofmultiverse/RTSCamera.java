@@ -261,6 +261,7 @@ public final class RTSCamera extends AbstractAppState {
         mouseRotationButton = mouseButtonName(rotationButton);
     }
 
+    @Override
     public void update(final float tpf) {
 
         for (int i = 0; i < direction.length; i++) {

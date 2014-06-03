@@ -1,15 +1,19 @@
 {
-    "faction": "PLUG",
-    "cardSubType": "ABILITY",
+    "faction": "THUNDRA",
+    "cardType": "ABILITY",
     "rarity": "COMMON",
     "eAttribut": "SHOCK",
     "playCost": 3,
-    
+    "description": "High voltage shock energy pulse around the unit... Internet is you friends... xD",
+
     "ability": {
-        "damage": 15,
-        "segment": 1,
+        "power": 15,
+        "segmentCost": 1,
         "activationRange": 1,
-        "effectSize": 1,
-        "description": "High voltage shock energy pulse around the unit... Internet is you friends... xD"
+        "hitCollision": {
+            "key":["0|0"],
+            "layer":[0]
+        },
+        "castFromSelf": false
     }
 }

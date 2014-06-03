@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
+import utility.Vector2Int;
 
 /**
  *
@@ -16,6 +17,14 @@ public class CollisionComponent implements ExtendedComponent {
      */
     private final HashMap<HexCoordinate, Byte> collision;
 
+    /**
+     * Create a new collision component for a 1 Hex size unit defined layer.
+     */
+    public CollisionComponent(Byte layer){
+        collision = new HashMap<HexCoordinate, Byte>();
+        collision.put(new HexCoordinate(HexCoordinate.AXIAL, Vector2Int.ZERO), layer);
+    }
+    
     public CollisionComponent(HashMap<HexCoordinate, Byte> collision) {
         this.collision = collision;
     }

@@ -32,6 +32,9 @@ import utility.HexCoordinate;
 import utility.Vector2Int;
 
 /**
+ * TODO: Map Edition mode (build up multiple area to create a map)
+ * TODO: Area Edition mode (build up area with object and stuff)
+ * TODO: Area should work with any element(fire area can be converted to ice area)
  *
  * @author Eike Foede, Roah
  */
@@ -131,15 +134,15 @@ public class MapEditorAppState extends AbstractAppState implements TileChangeLis
         /**
          * Open the context menu to edit the room. load asset and stuff.
          */
-        Button RoomEdit = new ButtonAdapter(main.getScreen(), "RoomEdit", new Vector2f(15, 40 * 3)) {
+        Button areaEdit = new ButtonAdapter(main.getScreen(), "AreaEdit", new Vector2f(15, 40 * 3)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 System.err.println("TODO");
             }
         };
-        RoomEdit.setText("RoomEdit");
-        mainWin.addChild(RoomEdit);
+        areaEdit.setText("Area Edit");
+        mainWin.addChild(areaEdit);
 
         /**
          * Load a predefined void map from a File(same as the starting one).

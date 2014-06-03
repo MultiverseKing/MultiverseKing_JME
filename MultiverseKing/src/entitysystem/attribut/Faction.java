@@ -10,11 +10,11 @@ public enum Faction {
      */
     NEUTRAL,
     /**
-     * Robot type faction.
+     * Energy humanoid stuff.
      */
-    PLUG,
+    ATOM,
     /**
-     * 
+     * Robot type faction.
      */
     THUNDRA;
 }

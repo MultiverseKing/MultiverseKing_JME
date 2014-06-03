@@ -14,7 +14,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import com.simsilica.es.base.DefaultEntityData;
 import gamestate.EntitySystemAppState;
 import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
@@ -24,7 +23,7 @@ import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.EntityRenderSystem;
 import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldCollisionSystem;
+import entitysystem.units.CollisionSystem;
 import gamestate.HexSystemAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -58,6 +57,7 @@ public class MultiverseMain extends SimpleApplication {
         app.start();
     }
     private Screen screen;
+    RTSCamera rtsCam;
 
     /**
      *
@@ -67,9 +67,10 @@ public class MultiverseMain extends SimpleApplication {
         return screen;
     }
 
-    /**
-     *
-     */
+    public RTSCamera getRtsCam() {
+        return rtsCam;
+    }
+
     @Override
     public void simpleInitApp() {
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
@@ -118,6 +119,8 @@ public class MultiverseMain extends SimpleApplication {
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
         sun.setColor(ColorRGBA.White);
+//        sun.setColor(new ColorRGBA(200/255, 200/255, 200/255, 1));
+//        sun.setColor(ColorRGBA.Blue);
         rootNode.addLight(sun);
 
         /* this shadow needs a directional light */
@@ -131,16 +134,16 @@ public class MultiverseMain extends SimpleApplication {
 //        final int SHADOWMAP_SIZE = 1024;
 //        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
 //        dlsr.setLight(sun);
-//        viewPort.addProcessor(dlsr);
+//        viewPort.addProcessor(dlsr);ssssss
 
         /**
          * A white ambient light source.
          */
         AmbientLight ambient = new AmbientLight();
-        ambient.setColor(ColorRGBA.White);
+//        ambient.setColor(ColorRGBA.White);
+        ambient.setColor(new ColorRGBA(230/255, 230/255, 230/255, 1));
         rootNode.addLight(ambient);
     }
-    RTSCamera rtsCam;
 
     private void cameraInit() {
         flyCam.setEnabled(false);
@@ -201,7 +204,7 @@ public class MultiverseMain extends SimpleApplication {
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new FieldCollisionSystem());
+                new CollisionSystem());
     }
 
     private boolean exemple = false;

@@ -4,7 +4,7 @@ package entitysystem.attribut;
  * 
  * @author roah
  */
-public enum CardSubType {
+public enum CardType {
 
     /**
      * Used for card who affect the way unit move on the field.

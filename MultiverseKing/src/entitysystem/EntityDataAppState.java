@@ -1,6 +1,5 @@
 package entitysystem;
 
-import entitysystem.loader.EntityLoader;
 import gamestate.EntitySystemAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -9,7 +8,6 @@ import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
-import hexsystem.MapData;
 
 /**
  * An abstract AppState to allow EntitySystems to easily use Entity and

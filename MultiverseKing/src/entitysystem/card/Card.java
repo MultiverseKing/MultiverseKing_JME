@@ -55,7 +55,7 @@ public class Card extends ButtonAdapter {
      */
     public Card(ElementManager screen, boolean rescale, String cardName, int handPosition, EntityId UID, CardProperties cardProperties) {
         super(screen, UID.toString(), Vector2f.ZERO, new Vector2f(200f / (2.5f * (rescale ? 1 : 0)), 
-                300f / (2.5f * (rescale ? 1 : 0))), Vector4f.ZERO, "Textures/Cards/" + cardName + ".png");
+                300f / (2.5f * (rescale ? 1 : 0))), Vector4f.ZERO, "Textures/Cards/Artworks/" + cardName + ".png");
         this.rescaleValue = 2.5f; //if you change this change it in the super constructor above.
         this.isRescale = (rescale ? 1 : 0);
         this.cardSize = new Vector2f(200f / (rescaleValue * isRescale), 300f / (rescaleValue * isRescale));

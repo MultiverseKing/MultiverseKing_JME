@@ -8,7 +8,7 @@ import com.simsilica.es.EntitySet;
 import entitysystem.EntityDataAppState;
 import entitysystem.loader.EntityLoader;
 import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldCollisionSystem;
+import entitysystem.units.CollisionSystem;
 import gamestate.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
@@ -99,11 +99,11 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
         app.getGuiNode().addControl(screen);
 
         // Used to resolve the current issue with tonegod-GUI
-        for (Element e : screen.getElementsAsMap().values()) {
-            screen.removeElement(e);
-        }
-        screen.getElementsAsMap().clear();
-        // --
+//        for (Element e : screen.getElementsAsMap().values()) {
+//            screen.removeElement(e);
+//        }
+//        screen.getElementsAsMap().clear();
+//        // --
 
         hover = new Hover(screen);
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
@@ -134,7 +134,7 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                CardProperties properties = new EntityLoader().loadUnitCardProperties(cardName);
+                CardProperties properties = new EntityLoader().loadCardProperties(cardName);
                 if(properties != null){
                     card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
                             properties);
@@ -285,7 +285,7 @@ public class CardRenderSystem extends EntityDataAppState implements HexMapInputL
                     //todo : if the player want to use the field and not fast selection menu. TITAN card
                     break;
                 case WORLD:
-                    if (app.getStateManager().getState(FieldCollisionSystem.class).canBeCast(event.getEventPosition(), 
+                    if (app.getStateManager().getState(CollisionSystem.class).canBeCast(event.getEventPosition(), 
                             cardPreviewCast.getCardEntityUID(), properties)) {
                         castConfirmed();
                     } else {

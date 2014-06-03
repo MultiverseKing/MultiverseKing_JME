@@ -1,20 +1,28 @@
 package entitysystem.units.ability;
 
 import entitysystem.ExtendedComponent;
+import java.util.HashMap;
 import utility.ElementalAttribut;
+import utility.HexCoordinate;
 
 /**
  *
  * @author roah
  */
 public class AbilityComponent implements ExtendedComponent {
+
     private final String name;
-    private final int damage;
-    private final byte segment;
+    private final int power;
+    private final byte activationSegment;
     private final byte activationRange;
-    private final byte effectSize;
     private final ElementalAttribut eAttribut;
-    private String description;
+    private final String description;
+    /**
+     * HexCoordinate == where the hit happen relative to the caster unit or
+     * target, Byte == Collision layer to use.
+     */
+    private final HashMap<HexCoordinate, Byte> hitCollision;
+    private final boolean castFromSelf;
 
     /**
      * Create a new ability for an entity unit.
@@ -24,22 +32,26 @@ public class AbilityComponent implements ExtendedComponent {
      * @param eAttribut of the effect.
      * @param loadTime between activation.
      */
-    public AbilityComponent(String name, byte activationRange, byte effectSize, 
-            ElementalAttribut eAttribut, byte segment, int damage, String description) {
+    public AbilityComponent(String name, byte activationRange, ElementalAttribut eAttribut,
+            byte activationSegment, int power, HashMap<HexCoordinate, Byte> hitCollision,
+            boolean castFromSelf, String description) {
         this.name = name;
         this.activationRange = activationRange;
-        this.effectSize = effectSize;
+        this.hitCollision = hitCollision;
         this.eAttribut = eAttribut;
-        this.segment = segment;
-        this.damage = damage;
+        this.activationSegment = activationSegment;
+        this.power = power;
+        this.castFromSelf = castFromSelf;
         this.description = description;
     }
+
     /**
-     * Damage done by this ability.
-     * @return 
+     * Power this ability have.
+     *
+     * @return
      */
-    public int getDamage() {
-        return damage;
+    public int getPower() {
+        return power;
     }
 
     /**
@@ -52,12 +64,22 @@ public class AbilityComponent implements ExtendedComponent {
     }
 
     /**
-     * Area effect range of the ability. 0 if non area effect.
+     * Where the ability will hit when activated.
      *
      * @return
      */
-    public byte getAreaEffectSize() {
-        return effectSize;
+    public HashMap<HexCoordinate, Byte> getHitCollision() {
+        return hitCollision;
+    }
+
+    /**
+     * is the ability collision hit is relative to the caster unit or the target
+     * unit.
+     *
+     * @return
+     */
+    public boolean isCastFromSelf() {
+        return castFromSelf;
     }
 
     /**
@@ -66,7 +88,7 @@ public class AbilityComponent implements ExtendedComponent {
      * @return
      */
     public byte getSegment() {
-        return segment;
+        return activationSegment;
     }
 
     /**
@@ -80,7 +102,8 @@ public class AbilityComponent implements ExtendedComponent {
 
     /**
      * Description of the ability.
-     * @return 
+     *
+     * @return
      */
     public String getDescription() {
         return description;
@@ -88,7 +111,8 @@ public class AbilityComponent implements ExtendedComponent {
 
     /**
      * Name of the ability.
-     * @return 
+     *
+     * @return
      */
     public String getName() {
         return name;
@@ -96,6 +120,7 @@ public class AbilityComponent implements ExtendedComponent {
 
     @Override
     public ExtendedComponent clone() {
-        return new AbilityComponent(name, activationRange, effectSize, eAttribut, segment, damage, description);
+        return new AbilityComponent(name, activationRange, eAttribut, activationSegment,
+                power, hitCollision, castFromSelf, description);
     }
 }

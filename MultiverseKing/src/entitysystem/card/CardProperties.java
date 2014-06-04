@@ -69,6 +69,30 @@ public class CardProperties {
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
     }
+
+    /**
+     * Constructor used for the editor mode.
+     * @param playCost
+     * @param faction
+     * @param mainType
+     * @param cardType
+     * @param rarity
+     * @param element 
+     */
+    public CardProperties(int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element) {
+        if (cardType == CardType.SPELL || cardType == CardType.UNIT || cardType == CardType.TRAP) {
+            this.mainType = Maintype.WORLD;
+        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
+            this.mainType = Maintype.TITAN;
+        } else {
+            throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
+        }
+        this.playCost = playCost;
+        this.faction = faction;
+        this.cardType = cardType;
+        this.rarity = rarity;
+        this.element = element;
+    }
     
     // <editor-fold defaultstate="collapsed" desc="Getter">
     /**

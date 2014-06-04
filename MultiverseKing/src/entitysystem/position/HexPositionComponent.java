@@ -1,6 +1,6 @@
 package entitysystem.position;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import utility.HexCoordinate;
 import utility.Rotation;
 
@@ -8,7 +8,7 @@ import utility.Rotation;
  *
  * @author Eike Foede
  */
-public class HexPositionComponent implements ExtendedComponent {
+public class HexPositionComponent implements PersistentComponent {
 
     private final HexCoordinate position;
     private Rotation rotation;
@@ -36,9 +36,9 @@ public class HexPositionComponent implements ExtendedComponent {
     public Rotation getRotation() {
         return rotation;
     }
-
+    
     @Override
-    public ExtendedComponent clone() {
+    public HexPositionComponent clone() {
         return new HexPositionComponent(position, rotation);
     }
     /**

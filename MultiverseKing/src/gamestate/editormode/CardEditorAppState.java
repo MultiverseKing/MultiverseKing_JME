@@ -17,15 +17,17 @@ import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.attribut.CardType;
 import entitysystem.attribut.Faction;
+import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.card.CardRenderSystem;
+import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.render.RenderComponent;
 import entitysystem.units.CollisionComponent;
-import gamestate.EntitySystemAppState;
+import gamestate.EntityDataAppState;
 import gamestate.HexMapMouseInput;
 import gamestate.HexSystemAppState;
 import hexsystem.HexSettings;
@@ -35,7 +37,6 @@ import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashMap;
 import kingofmultiverse.MainGUI;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.Button;
@@ -53,7 +54,9 @@ import utility.Rotation;
 import utility.Vector2Int;
 
 /**
- * TODO : Card layout for neutral/ATOM/THUNDRA faction.
+ * TODO : The GUI resolution should be consistant, 
+ * gui scale should not depend on the resolution screen, 
+ * have an option to change it's resolution.
  * @author Eike Foede, Roah
  */
 public class CardEditorAppState extends AbstractAppState implements TileChangeListener, HexMapInputListener {
@@ -64,12 +67,14 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
     private Window mainWin;
 //    private Menu loadCategory = null;
     private EntityId tuxDoll = null;
+    private float rightMenu = 245;
+    private Hover hover;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
         main = (MultiverseMain) app;
-        entityData = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+        entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
         HexMapMouseInput mouseSystem = app.getStateManager().getState(HexMapMouseInput.class);
         mouseSystem.registerTileInputListener(this);
         mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
@@ -99,6 +104,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
 
     private float timer = 0.5f;
     private float current = 0;
+    //Tux doll is instanced there to leave some delay
     @Override
     public void update(float tpf) {
         super.update(tpf);
@@ -149,8 +155,6 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         };
         mapElement.setText("Generator");
         mainWin.addChild(mapElement);
-
-
         genCardAddRemoveWin();
 
         /**
@@ -191,7 +195,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
                 ed.setComponent(cardId, new RenderComponent("Cendrea"));
                 ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
@@ -207,7 +211,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 super.onButtonMouseLeftUp(evt, toggled);
                 Object[] cards = app.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
                 if (cards.length != 0) {
-                    EntityData ed = app.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+                    EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                     EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
                     ed.removeComponent(id, CardRenderComponent.class);
                 }
@@ -227,18 +231,17 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         genMenu.setIsResizable(false);
         genMenu.setIsMovable(false);
         mainWin.addChild(genMenu);
-
+        
         /**
          * Configure all button of the menu.
          */
         initGeneratorMenu(genMenu);
-
+        
         /**
          * Window used to show a preview of a card.
          */
         ButtonAdapter preview = new ButtonAdapter(main.getScreen(), "geneneratorImgPreview", new Vector2f(genMenu.getWidth(), 0),
                 new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png"){
-            //TODO: add a windows to preview cards from the cardsTextureFolder
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -277,13 +280,12 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         preview.removeAllChildren();
         preview.setIsResizable(false);
         preview.setIsMovable(false);
-        Window hover = new Window(main.getScreen(), "cardHover", new Vector2f(), preview.getDimensions(),
-                    new Vector4f(), "Textures/Cards/cardHover.png");
-        hover.removeAllChildren();
-        hover.setIgnoreMouse(true);
+        hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
+        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.UNIT, Rarity.COMMON, ElementalAttribut.NULL);
+        hover.setProperties(cardProperties, "Undefined");
         preview.addChild(hover);
         genMenu.addChild(preview);
-
+        
         /**
          * Window used to load and save card to/from file.
          */
@@ -292,7 +294,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         cardLoader.removeAllChildren();
         cardLoader.setIgnoreMouse(true);
         genMenu.addChild(cardLoader);
-
+        
         ButtonAdapter load = new ButtonAdapter(main.getScreen(), "loadCardButton", new Vector2f(10, 10)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -317,17 +319,15 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         save.setText("Save");
         cardLoader.addChild(save);
     }
-
-    private float rightMenu = 245; 
     
-    private void initGeneratorMenu(Window menu) {
+    private void initGeneratorMenu(Window callerMenu) {
         /**
          * Part used to show/set the card Name.
          */
         Label nameLabel = new Label(main.getScreen(), "generatorNameLabel",
                 new Vector2f(10, 5), new Vector2f(60, 35));
         nameLabel.setText("Name : ");
-        menu.addChild(nameLabel);
+        callerMenu.addChild(nameLabel);
 
         ButtonAdapter fieldButton = new ButtonAdapter(main.getScreen(), "generatorFieldButton",
                 new Vector2f(nameLabel.getDimensions().x + 5, 12)){
@@ -351,15 +351,15 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             }            
         };
         fieldButton.setText("Undefined");
-        menu.addChild(fieldButton);
+        callerMenu.addChild(fieldButton);
         
         /**
          * Part used to show/choose the card Type.
          */
         Label subTypeLabel = new Label(main.getScreen(), "generatorCardTypeLabel", new Vector2f(10, 45), new Vector2f(95, 35));
         subTypeLabel.setText("Card Type : ");
-        menu.addChild(subTypeLabel);
-
+        callerMenu.addChild(subTypeLabel);
+        
         ButtonAdapter subTypeButton = new ButtonAdapter(main.getScreen(), "generatorCardTypeButton",
                 new Vector2f(subTypeLabel.getDimensions().x , 48)) {
             @Override
@@ -371,17 +371,17 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 SubTypeMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - SubTypeMenu.getHeight());
             }
         };
-        subTypeButton.setText("Undefined");
-        menu.addChild(subTypeButton);
+        subTypeButton.setText(CardType.UNIT.name());
+        callerMenu.addChild(subTypeButton);
         
         /**
-         * Part used to show/set the card Name.
+         * Part used to show/set the card Description text.
          */
         Label descriptionLabel = new Label(main.getScreen(), "generatorDescriptionLabel",
                 new Vector2f(10, 85), new Vector2f(150, 35));
         descriptionLabel.setText("Description : ");
-        menu.addChild(descriptionLabel);
-
+        callerMenu.addChild(descriptionLabel);
+        
         ButtonAdapter descriptionButton = new ButtonAdapter(main.getScreen(), "generatorDescriptionButton",
                 new Vector2f(10, 115), new Vector2f(main.getScreen().getElementById("cardGeneratorW").getWidth()*0.9f, 30)){
             @Override
@@ -403,15 +403,15 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             }            
         };
         descriptionButton.setText("Undefined");
-        menu.addChild(descriptionButton);
+        callerMenu.addChild(descriptionButton);
         
         /**
          * Part used to show/choose the card faction.
          */
         Label factionLabel = new Label(main.getScreen(), "generatorFactionLabel", new Vector2f(rightMenu, 5), new Vector2f(75, 35));
         factionLabel.setText("Faction : ");
-        menu.addChild(factionLabel);
-
+        callerMenu.addChild(factionLabel);
+        
         ButtonAdapter factionButton = new ButtonAdapter(main.getScreen(), "generatorFactionButton",
                 new Vector2f(rightMenu + factionLabel.getDimensions().x, 11)) {
             @Override
@@ -423,16 +423,16 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 factionMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - factionMenu.getHeight());
             }
         };
-        factionButton.setText("Undefined");
-        menu.addChild(factionButton);         
-
+        factionButton.setText(Faction.NEUTRAL.name());
+        callerMenu.addChild(factionButton);
+        
         /**
          * Part used to show/choose the card Element Attribut.
          */
         Label elementTypeLabel = new Label(main.getScreen(), "generatorEAttributLabel", new Vector2f(rightMenu, 45), new Vector2f(80, 35));
         elementTypeLabel.setText("E.Attribut : ");
-        menu.addChild(elementTypeLabel);
-
+        callerMenu.addChild(elementTypeLabel);
+        
         ButtonAdapter elementTypeButton = new ButtonAdapter(main.getScreen(), "generatorEAttributButton",
                 new Vector2f(rightMenu + elementTypeLabel.getDimensions().x +5 , 48)) {
             @Override
@@ -444,26 +444,45 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 SubTypeMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - SubTypeMenu.getHeight());
             }
         };
-        elementTypeButton.setText("Undefined");
-        menu.addChild(elementTypeButton);
+        elementTypeButton.setText(ElementalAttribut.NULL.name());
+        callerMenu.addChild(elementTypeButton);
         
         /**
          * Part used to show/choose the cost needed to use the card.
          */
         Label costLabel = new Label(main.getScreen(), "generatorCostLabel", new Vector2f(rightMenu, 80), new Vector2f(75, 35));
         costLabel.setText("Cost : ");
-        menu.addChild(costLabel);
-
+        callerMenu.addChild(costLabel);
+        
         Spinner spinner = new Spinner(main.getScreen(), "generatorCostSpinner", 
                         new Vector2f(rightMenu + costLabel.getDimensions().x -22 , 85), Spinner.Orientation.HORIZONTAL, true){
             @Override
             public void onChange(int selectedIndex, String value) {
-//                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                hover.setCastCost(selectedIndex);
             }
         };
         spinner.setStepIntegerRange(0, 20, 1);
-        menu.addChild(spinner);
+        spinner.setSelectedIndex(0);
+        callerMenu.addChild(spinner);
         
+        /**
+         * Part used to test out the card.
+         */
+        Window cardTest = new Window(main.getScreen(), "cardTestWin",
+                new Vector2f(285, callerMenu.getHeight()), new Vector2f(150, 50));
+        cardTest.removeAllChildren();
+        cardTest.setIgnoreMouse(true);
+        callerMenu.addChild(cardTest);
+        
+        ButtonAdapter cast = new ButtonAdapter(main.getScreen(), "castCardButton", new Vector2f(10, 10), new Vector2f(130, 30)) {
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                
+            }
+        };
+        cast.setText("Cast test !");
+        cardTest.addChild(cast);
         
     }
     // <editor-fold defaultstate="collapsed" desc="Menu Selection">
@@ -473,6 +492,8 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 ElementalAttribut eAttribut = (ElementalAttribut) value;
                 main.getScreen().getElementById("generatorEAttributButton").setText(eAttribut.name());
+                main.getScreen().getElementById("cardHover").setColorMap("Textures/Cards/"+eAttribut.name()+".png");
+                
             }
         };
         ElementalAttribut[] eAttributList = ElementalAttribut.values();
@@ -643,7 +664,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 return (name.endsWith(".card"));
             }
         };
-
+        
         /**
          * Menu listing all saved card.
          */
@@ -654,7 +675,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 loadProperties(value.toString());
             }
         };
-
+        
         File[] fList = folder.listFiles();
         for (File f : fList) {
             if (f.isDirectory()) {
@@ -666,7 +687,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             }
         }
         main.getScreen().addElement(categoryAll);
-
+        
         /**
          * Menu listing all saved Ability card.
          */
@@ -677,14 +698,14 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 loadProperties(value.toString());
             }
         };
-
+        
         String[] abilityList = folder.list(filter);
         for (String s : abilityList) {
             int index = s.lastIndexOf('.');
             categoryAbility.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
         main.getScreen().addElement(categoryAbility);
-
+        
         /**
          * Menu listing all saved unit card.
          */
@@ -695,14 +716,14 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 loadProperties(value.toString());
             }
         };
-
+        
         String[] unitList = folder.list(filter);
         for (String s : unitList) {
             int index = s.lastIndexOf('.');
             categoryUnit.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
         main.getScreen().addElement(categoryUnit);
-
+        
         /**
          * Root menu.
          */
@@ -714,10 +735,10 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         loadCategory.addMenuItem("All", null, categoryAll);
         loadCategory.addMenuItem("Unit", null, categoryUnit);
         loadCategory.addMenuItem("Ability", null, categoryAbility);
-
+        
         main.getScreen().addElement(loadCategory);
     }
-
+    
     private void loadProperties(String cardName) {
         System.out.println(cardName);
         EntityLoader loader = new EntityLoader();
@@ -726,7 +747,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             //TODO
         }
     }
-
+    
     @Override
     public void cleanup() {
         super.cleanup();
@@ -740,7 +761,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         }
         Object[] cards = main.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
         if (cards.length != 0) {
-            EntityData ed = main.getStateManager().getState(EntitySystemAppState.class).getEntityData();
+            EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
             for (Object o : cards) {
                 EntityId id = (EntityId) o;
                 ed.removeEntity(id);

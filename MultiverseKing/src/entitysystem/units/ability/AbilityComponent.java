@@ -1,6 +1,6 @@
 package entitysystem.units.ability;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import java.util.HashMap;
 import utility.ElementalAttribut;
 import utility.HexCoordinate;
@@ -9,7 +9,7 @@ import utility.HexCoordinate;
  *
  * @author roah
  */
-public class AbilityComponent implements ExtendedComponent {
+public class AbilityComponent implements PersistentComponent {
 
     private final String name;
     private final int power;
@@ -116,11 +116,5 @@ public class AbilityComponent implements ExtendedComponent {
      */
     public String getName() {
         return name;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        return new AbilityComponent(name, activationRange, eAttribut, activationSegment,
-                power, hitCollision, castFromSelf, description);
     }
 }

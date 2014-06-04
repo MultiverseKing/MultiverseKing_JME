@@ -1,12 +1,12 @@
 package entitysystem.render;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 
 /**
  *
  * @author roah
  */
-public class VFXComponent implements ExtendedComponent {
+public class VFXComponent implements PersistentComponent {
     private final String abilityName;
 
     public VFXComponent(String abilityName) {
@@ -16,10 +16,4 @@ public class VFXComponent implements ExtendedComponent {
     public String getAbilityName() {
         return abilityName;
     }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

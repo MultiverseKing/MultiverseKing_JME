@@ -1,13 +1,13 @@
 package entitysystem.units;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import utility.ElementalAttribut;
 
 /**
  * @todo rework
  * @author roah
  */
-public class WeaponStatsComponent implements ExtendedComponent {
+public class WeaponStatsComponent implements PersistentComponent {
 
     private final byte range;
     private final int damage;
@@ -76,10 +76,5 @@ public class WeaponStatsComponent implements ExtendedComponent {
      */
     public byte getNeededSlot() {
         return neededSlot;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

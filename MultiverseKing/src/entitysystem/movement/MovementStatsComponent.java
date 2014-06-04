@@ -1,13 +1,13 @@
 package entitysystem.movement;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 
 /**
  * Entity unit, native stats.
  *
  * @author roah
  */
-public class MovementStatsComponent implements ExtendedComponent {
+public class MovementStatsComponent implements PersistentComponent {
 
     private final byte movePoint;
     private final float moveSpeed;
@@ -33,10 +33,5 @@ public class MovementStatsComponent implements ExtendedComponent {
      */
     public float getMoveSpeed() {
         return moveSpeed;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

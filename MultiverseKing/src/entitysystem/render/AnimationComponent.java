@@ -1,6 +1,6 @@
 package entitysystem.render;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import entitysystem.attribut.Animation;
 
 /**
@@ -8,7 +8,7 @@ import entitysystem.attribut.Animation;
  * or the animation who will be played (depend on the situation).
  * @author roah
  */
-public class AnimationComponent implements ExtendedComponent {
+public class AnimationComponent implements PersistentComponent {
 
     private Animation animation;
 
@@ -26,10 +26,5 @@ public class AnimationComponent implements ExtendedComponent {
      */
     public Animation getAnimation() {
         return animation;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

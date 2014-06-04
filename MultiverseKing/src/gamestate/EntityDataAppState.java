@@ -12,14 +12,14 @@ import com.simsilica.es.base.DefaultEntityData;
  *
  * @author Eike Foede, roah
  */
-public class EntitySystemAppState extends AbstractAppState {
+public class EntityDataAppState extends AbstractAppState {
 
     private EntityData entityData;
 
     /**
      *
      */
-    public EntitySystemAppState() {
+    public EntityDataAppState() {
         entityData = new DefaultEntityData();
     }
 

@@ -10,7 +10,7 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
 import entitysystem.render.EntityRenderSystem;
-import gamestate.EntitySystemAppState;
+import gamestate.EntityDataAppState;
 import entitysystem.movement.MoveToComponent;
 import entitysystem.movement.MovementSystem;
 import entitysystem.position.HexPositionComponent;
@@ -42,8 +42,8 @@ public class ExampleStartup extends SimpleApplication {
         this.getCamera().setLocation(new Vector3f(0, 21.51f, 17.17051f));
         MapData mapData = new MapData(ElementalAttribut.EARTH, assetManager);
         //Initialise data management
-        stateManager.attach(new EntitySystemAppState());
-        EntityData entityData = stateManager.getState(EntitySystemAppState.class).getEntityData();
+        stateManager.attach(new EntityDataAppState());
+        EntityData entityData = stateManager.getState(EntityDataAppState.class).getEntityData();
 //        stateManager.attach(new MapDataAppState(mapData));
         stateManager.attach(new HexSystemAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);

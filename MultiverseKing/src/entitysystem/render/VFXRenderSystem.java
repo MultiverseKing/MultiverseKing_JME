@@ -6,7 +6,7 @@ import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntityDataAppState;
+import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import gamestate.HexSystemAppState;
 import hexsystem.MapData;
@@ -27,7 +27,7 @@ import utility.Rotation;
  * should be handled seperately. Else there could be double data for the
  * position with inconsistencies between the different data.
  */
-public class VFXRenderSystem extends EntityDataAppState implements TileChangeListener {
+public class VFXRenderSystem extends EntitySystemAppState implements TileChangeListener {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private VFXSpatialInitializer VFXInitializer = new VFXSpatialInitializer();

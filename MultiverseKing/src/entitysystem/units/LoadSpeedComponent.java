@@ -1,12 +1,12 @@
 package entitysystem.units;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 
 /**
  *
  * @author roah
  */
-public class LoadSpeedComponent implements ExtendedComponent {
+public class LoadSpeedComponent implements PersistentComponent {
 
     private final float speed;
 
@@ -21,10 +21,5 @@ public class LoadSpeedComponent implements ExtendedComponent {
      */
     public float getSpeed() {
         return speed;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

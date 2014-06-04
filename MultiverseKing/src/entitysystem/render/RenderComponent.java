@@ -1,13 +1,13 @@
 package entitysystem.render;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 
 /**
  * TODO: Comments Used by the card system and the render system.
  *
  * @author Eike Foede, roah
  */
-public class RenderComponent implements ExtendedComponent {
+public class RenderComponent implements PersistentComponent {
 
     private String name;
 
@@ -17,10 +17,5 @@ public class RenderComponent implements ExtendedComponent {
 
     public String getName() {
         return name;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -14,7 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import gamestate.EntitySystemAppState;
+import gamestate.EntityDataAppState;
 import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.movement.MoveToComponent;
@@ -195,7 +195,7 @@ public class MultiverseMain extends SimpleApplication {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
         
         stateManager.attachAll(
-                new EntitySystemAppState(),
+                new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
                 new HexMapMouseInput(),
                 new EntityRenderSystem(),
@@ -214,7 +214,7 @@ public class MultiverseMain extends SimpleApplication {
         if (exemple) {
             MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
             md.addChunk(Vector2Int.ZERO, null);
-            EntityData ed = stateManager.getState(EntitySystemAppState.class).getEntityData();
+            EntityData ed = stateManager.getState(EntityDataAppState.class).getEntityData();
             //Example: Initialise new character entity.
             EntityId characterId = ed.createEntity();
             ed.setComponents(characterId, new RenderComponent("Berserk"),

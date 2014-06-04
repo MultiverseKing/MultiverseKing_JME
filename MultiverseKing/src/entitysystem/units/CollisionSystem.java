@@ -3,7 +3,7 @@ package entitysystem.units;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntityDataAppState;
+import entitysystem.EntitySystemAppState;
 import entitysystem.render.AnimationComponent;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.position.HexPositionComponent;
@@ -25,7 +25,7 @@ import java.util.HashMap;
  *
  * @author roah
  */
-public class CollisionSystem extends EntityDataAppState implements HexMapInputListener {
+public class CollisionSystem extends EntitySystemAppState implements HexMapInputListener {
 
     /**
      * Byte == collision layer (unit, trap, object, spell etc...)

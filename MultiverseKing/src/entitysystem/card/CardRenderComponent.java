@@ -1,6 +1,6 @@
 package entitysystem.card;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import entitysystem.attribut.CardRenderPosition;
 
 /**
@@ -9,9 +9,9 @@ import entitysystem.attribut.CardRenderPosition;
  *
  * @author roah
  */
-public class CardRenderComponent implements ExtendedComponent {
+public class CardRenderComponent implements PersistentComponent {
 
-    private CardRenderPosition cardPos;
+    private final CardRenderPosition cardPos;
 
     /**
      * Define where the card will be generated/ rendered on the screen.
@@ -28,10 +28,5 @@ public class CardRenderComponent implements ExtendedComponent {
      */
     public CardRenderPosition getCardPosition() {
         return cardPos;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -7,10 +7,6 @@ package entitysystem.attribut;
 public enum CardType {
 
     /**
-     * Used for card who affect the way unit move on the field.
-     */
-//    PATHFIND,
-    /**
      * Used for card who affect the way unit behave under defined condition.
      */
     ABILITY,
@@ -32,4 +28,8 @@ public enum CardType {
      * (object can be unit... or, unit when sleepin then spell when activated...)
      */
     TRAP;
+    /**
+     * Used for card who affect the way unit move on the field.
+     */
+//    PATHFIND;
 }

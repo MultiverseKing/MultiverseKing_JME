@@ -1,6 +1,6 @@
 package entitysystem.units;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
@@ -11,7 +11,7 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public class CollisionComponent implements ExtendedComponent {
+public class CollisionComponent implements PersistentComponent {
     /**
      * Collision layer of the entity and collision size.
      */
@@ -39,9 +39,5 @@ public class CollisionComponent implements ExtendedComponent {
     
     public ArrayList<HexCoordinate> getCollisionOnLayer(Byte layer){
         return MultiverseMain.getKeysByValue(collision, layer);
-    }
-
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

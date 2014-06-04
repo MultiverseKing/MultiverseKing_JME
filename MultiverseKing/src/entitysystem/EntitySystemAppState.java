@@ -1,6 +1,5 @@
 package entitysystem;
 
-import gamestate.EntitySystemAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -8,6 +7,7 @@ import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
+import gamestate.EntityDataAppState;
 
 /**
  * An abstract AppState to allow EntitySystems to easily use Entity and
@@ -15,7 +15,7 @@ import com.simsilica.es.EntitySet;
  *
  * @author Eike Foede, roah
  */
-public abstract class EntityDataAppState extends AbstractAppState {
+public abstract class EntitySystemAppState extends AbstractAppState {
 
     /**
      * entity System data.
@@ -35,7 +35,7 @@ public abstract class EntityDataAppState extends AbstractAppState {
         super.initialize(stateManager, app);
 
         this.app = (SimpleApplication) app;
-        this.entityData = stateManager.getState(EntitySystemAppState.class).getEntityData();
+        this.entityData = stateManager.getState(EntityDataAppState.class).getEntityData();
 
         entities = initialiseSystem();
         for (Entity e : entities) {

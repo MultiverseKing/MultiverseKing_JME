@@ -3,7 +3,7 @@ package entitysystem.movement;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntityDataAppState;
+import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
 import gamestate.HexSystemAppState;
 import hexsystem.MapData;
@@ -22,7 +22,7 @@ import utility.Vector3Int;
  * 
  * @author Eike Foede, roah
  */
-public class MovementSystem extends EntityDataAppState {
+public class MovementSystem extends EntitySystemAppState {
 
     private Pathfinder pathfinder = new Astar();
     private HashMap<EntityId, Movement> movements;

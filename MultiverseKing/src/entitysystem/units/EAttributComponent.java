@@ -1,6 +1,6 @@
 package entitysystem.units;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 import utility.ElementalAttribut;
 
 /**
@@ -8,7 +8,7 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-public class EAttributComponent implements ExtendedComponent {
+public class EAttributComponent implements PersistentComponent {
 
     private final ElementalAttribut eAttribut;
 
@@ -28,10 +28,5 @@ public class EAttributComponent implements ExtendedComponent {
      */
     public ElementalAttribut geteAttribut() {
         return eAttribut;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

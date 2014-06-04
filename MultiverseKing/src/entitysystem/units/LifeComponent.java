@@ -1,12 +1,12 @@
 package entitysystem.units;
 
-import entitysystem.ExtendedComponent;
+import com.simsilica.es.PersistentComponent;
 
 /**
  *
  * @author roah
  */
-public class LifeComponent implements ExtendedComponent {
+public class LifeComponent implements PersistentComponent {
 
     private final int life;
 
@@ -21,10 +21,5 @@ public class LifeComponent implements ExtendedComponent {
      */
     public int getLife() {
         return life;
-    }
-
-    @Override
-    public ExtendedComponent clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

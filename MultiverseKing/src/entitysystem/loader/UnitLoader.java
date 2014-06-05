@@ -1,10 +1,10 @@
 package entitysystem.loader;
 
-import entitysystem.attribut.CardType;
 import entitysystem.units.ability.AbilityComponent;
 import entitysystem.units.LifeComponent;
 import entitysystem.movement.MovementStatsComponent;
 import entitysystem.units.CollisionComponent;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -28,7 +28,7 @@ public class UnitLoader {
         uStats = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
         abilityComp = eLoader.loadAbility(data.get("ability").toString());
         
-        collision = new CollisionComponent(eLoader.getCollision((JSONObject)data.get("collision")));
+        collision = new CollisionComponent(eLoader.getCollision((JSONArray)data.get("collision")));
     }
 
     public CollisionComponent getCollisionComp() {

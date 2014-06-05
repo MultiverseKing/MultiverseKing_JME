@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,23 +89,25 @@ public class EntityLoader {
         Number damage = (Number) abilityData.get("power");
         Number segment = (Number) abilityData.get("segmentCost");
         Number activationRange = (Number) abilityData.get("activationRange");
-        HashMap<HexCoordinate, Byte> hitCollision = getCollision((JSONObject)abilityData.get("hitCollision"));        
+        HashMap<Byte, ArrayList> hitCollision = getCollision((JSONArray)abilityData.get("hitCollision"));        
         
         return new AbilityComponent(name, activationRange.byteValue(),eAttribut, 
                 segment.byteValue(), damage.intValue(), hitCollision, 
                 (Boolean)abilityData.get("castFromSelf"), description);
     }
     
-    public HashMap<HexCoordinate, Byte> getCollision(JSONObject collisionData){
-        HashMap<HexCoordinate, Byte> collisionMap = new HashMap<HexCoordinate, Byte>();
-        JSONArray keyList = (JSONArray) collisionData.get("key");
-        JSONArray keyLayer = (JSONArray) collisionData.get("layer");
-        for (int i = 0; i < keyList.size(); i++) {
-            Number layer = (Number) keyLayer.get(i);
-            collisionMap.put(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) keyList.get(i))),
-                    layer.byteValue());
+    public HashMap<Byte, ArrayList> getCollision(JSONArray collisionData){
+        HashMap<Byte, ArrayList> collisionList = new HashMap<Byte, ArrayList>(2);
+        for (int i = 0; i < collisionData.size(); i++) {
+            JSONObject value = (JSONObject) collisionData.get(i);
+            Number layer = (Number) value.get("layer");
+            JSONArray key = (JSONArray) value.get("key");
+            collisionList.put(layer.byteValue(), new ArrayList<HexCoordinate>());
+            for(int j = 0; j < key.size(); j++) {
+                collisionList.get(layer.byteValue()).add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) key.get(j))));
+            }
         }
-        return collisionMap;
+        return collisionList;
     }
 
     private JSONObject getData(String loadPath) {

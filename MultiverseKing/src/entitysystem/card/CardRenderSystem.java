@@ -196,7 +196,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
 
     void isInCastArea(Card card) {
         if (screen.getMouseXY().x > minCastArea.x && screen.getMouseXY().x < maxCastArea.x
-                && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y) {
+                && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y
+                && cardPreviewCast == null) {
             castPreview(card);
         }
     }

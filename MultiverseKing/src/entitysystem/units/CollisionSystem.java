@@ -19,6 +19,8 @@ import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
+import kingofmultiverse.MultiverseMain;
 
 /**
  * Handle interaction on the field.
@@ -55,7 +57,7 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
     
     @Override
     protected void addEntity(Entity e) {
-        ArrayList<Byte> entityCollisionLayer = e.get(CollisionComponent.class).getAllCollisionLayer();
+        Byte[] entityCollisionLayer = e.get(CollisionComponent.class).getUsedLayers();
         for(Byte layer : entityCollisionLayer){
             if(collisionLayer.isEmpty() || !collisionLayer.containsKey(layer)){
                 collisionLayer.put(layer, new ArrayList<EntityId>());
@@ -80,14 +82,13 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
         switch (properties.getCardSubType()) {
             case SUMMON:
                 if(collisionLayer.containsKey((byte)0)){
-                    ArrayList<EntityId> list = collisionLayer.get((byte)0);
-                    for(EntityId idList : list){
+                    for(EntityId currentId : collisionLayer.get((byte)0)){
                         ArrayList<HexCoordinate> collision 
-                                = entityData.getComponent(idList, CollisionComponent.class).getCollisionOnLayer((byte)0);
+                                = entityData.getComponent(currentId, CollisionComponent.class).getCollisionOnLayer((byte)0);
                         for(HexCoordinate coord : collision){
-                            HexCoordinate worldPos = coord.add(entityData.getComponent(idList, HexPositionComponent.class).getPosition());
+                            HexCoordinate worldPos = coord.add(entityData.getComponent(currentId, HexPositionComponent.class).getPosition());
                             if(worldPos.equals(castPosition)){
-                                return false;
+                            return false;
                             }
                         }
                     }
@@ -130,15 +131,18 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
     
     @Override
     protected void removeEntity(Entity e) {
-        for(ArrayList layer : collisionLayer.values()){
-            if(layer.contains(e.getId())){
-                layer.remove(e.getId());
+        for(Byte layer : collisionLayer.keySet()){
+            if(collisionLayer.get(layer).contains(e.getId())){
+                collisionLayer.get(layer).remove(e.getId());
             }
         }
     }
     
     @Override
     protected void cleanupSystem() {
+        for(Byte b : collisionLayer.keySet()){
+            collisionLayer.get(b).clear();
+        }
         collisionLayer.clear();
     }
 }

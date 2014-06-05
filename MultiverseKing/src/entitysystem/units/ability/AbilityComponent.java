@@ -1,6 +1,7 @@
 package entitysystem.units.ability;
 
 import com.simsilica.es.PersistentComponent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import utility.ElementalAttribut;
 import utility.HexCoordinate;
@@ -21,7 +22,7 @@ public class AbilityComponent implements PersistentComponent {
      * HexCoordinate == where the hit happen relative to the caster unit or
      * target, Byte == Collision layer to use.
      */
-    private final HashMap<HexCoordinate, Byte> hitCollision;
+    private final HashMap<Byte, ArrayList> hitCollision;
     private final boolean castFromSelf;
 
     /**
@@ -33,7 +34,7 @@ public class AbilityComponent implements PersistentComponent {
      * @param loadTime between activation.
      */
     public AbilityComponent(String name, byte activationRange, ElementalAttribut eAttribut,
-            byte activationSegment, int power, HashMap<HexCoordinate, Byte> hitCollision,
+            byte activationSegment, int power, HashMap<Byte, ArrayList> hitCollision,
             boolean castFromSelf, String description) {
         this.name = name;
         this.activationRange = activationRange;
@@ -68,7 +69,7 @@ public class AbilityComponent implements PersistentComponent {
      *
      * @return
      */
-    public HashMap<HexCoordinate, Byte> getHitCollision() {
+    public HashMap<Byte, ArrayList> getHitCollision() {
         return hitCollision;
     }
 

@@ -1,19 +1,22 @@
 {
     "faction": "NEUTRAL",
-    "cardType": "UNIT",
+    "cardType": "SUMMON",
     "rarity": "MULTIVERSE",
     "eAttribut": "NULL",
     "playCost": 0,
-    "description": "Testing Unit used on the editor"
+    "description": "Testing Unit used on the editor",
 
     "unitsStats": {
-        "life": POSITIVE_INFINITY,
-        "speed": POSITIVE_INFINITY,
-        "movePoint": MAX_VALUE,
+        "life": 50000,
+        "speed": 100,
+        "movePoint": 100,
         "ability": "None",
-        "collision": {
-            "key":["0|0"],
-            "layer":[0]
-        }
+        "collision":[
+             {
+                "layer": 0,
+                "key" :[ "0|0" ]
+             }
+          ]
+      }
     }    
 }

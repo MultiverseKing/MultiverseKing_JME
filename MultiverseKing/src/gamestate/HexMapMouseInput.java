@@ -239,7 +239,6 @@ public class HexMapMouseInput extends EntitySystemAppState {
             if (mapData.getTile(tilePos) == null) {
                 break;
             } else {
-//                System.out.println(pos);
                 return tilePos;
             }/*else if (mapData.getTile(tilePos).getHeight() 
              * == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){

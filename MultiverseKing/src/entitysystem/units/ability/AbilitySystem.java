@@ -6,7 +6,6 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.position.HexPositionComponent;
-import entitysystem.render.RenderComponent;
 import entitysystem.units.LoadSpeedComponent;
 import java.util.ArrayList;
 import java.util.HashMap;

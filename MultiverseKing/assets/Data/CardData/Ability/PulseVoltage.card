@@ -1,19 +1,20 @@
 {
-    "faction": "THUNDRA",
-    "cardType": "ABILITY",
-    "rarity": "COMMON",
-    "eAttribut": "SHOCK",
-    "playCost": 3,
-    "description": "High voltage shock energy pulse around the unit... Internet is you friends... xD",
-
-    "ability": {
-        "power": 15,
-        "segmentCost": 1,
-        "activationRange": 1,
-        "hitCollision": {
-            "key":["0|0"],
-            "layer":[0]
-        },
-        "castFromSelf": false
-    }
+   "faction":"THUNDRA",
+   "cardType":"ABILITY",
+   "rarity":"COMMON",
+   "eAttribut":"SHOCK",
+   "playCost":3,
+   "description":"High voltage shock energy pulse around the unit... Internet is you friends... xD",
+   "ability":{
+      "power":15,
+      "segmentCost":1,
+      "activationRange":1,
+      "hitCollision":[
+         {
+            "layer": 0,
+            "key" :[ "0|1", "0|-1", "1|0", "-1|0", "1|1", "-1|-1" ]
+         }
+      ],
+      "castFromSelf":true
+   }
 }

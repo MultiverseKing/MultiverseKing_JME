@@ -281,7 +281,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.UNIT, Rarity.COMMON, ElementalAttribut.NULL);
+        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.SUMMON, Rarity.COMMON, ElementalAttribut.NULL);
         hover.setProperties(cardProperties, "Undefined");
         preview.addChild(hover);
         genMenu.addChild(preview);
@@ -342,10 +342,12 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                         super.onKeyRelease(evt);
                         if(evt.getKeyCode() == KeyInput.KEY_RETURN){
                             screen.getElementById("generatorFieldButton").setText(getText());
+                            hover.setCardName(getText());
                             getElementParent().removeChild(this);
                         }
                     }
                 };
+                field.setMaxLength(15);
                 field.setText(getText());
                 getElementParent().addChild(field);
             }            
@@ -371,7 +373,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 SubTypeMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - SubTypeMenu.getHeight());
             }
         };
-        subTypeButton.setText(CardType.UNIT.name());
+        subTypeButton.setText(CardType.SUMMON.name());
         callerMenu.addChild(subTypeButton);
         
         /**
@@ -492,7 +494,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 ElementalAttribut eAttribut = (ElementalAttribut) value;
                 main.getScreen().getElementById("generatorEAttributButton").setText(eAttribut.name());
-                main.getScreen().getElementById("cardHover").setColorMap("Textures/Cards/"+eAttribut.name()+".png");
+                main.getScreen().getElementById("cardPropertiesHover").setColorMap("Textures/Cards/"+eAttribut.name()+".png");
                 
             }
         };
@@ -512,7 +514,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 if(!genButton.getText().equals(cardType.name())){
                     genButton.setText(cardType.name());
                     //TODO: change the hover depending on the card type
-//                    main.getScreen().getElementById("cardHover").setColorMap("Textures/Cards/"+c.name()+"Hover.png");
+                    hover.setType(cardType);
                     loadSubMenu(cardType);
                 }
             }
@@ -548,7 +550,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                     case TRAP:
                         //@todo: Trap subMenu
                         break;
-                    case UNIT:
+                    case SUMMON:
                         openSubUnitMenu(subMenu);
                         break;
                 }
@@ -627,7 +629,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
              * Menu used to tweak unit properties.
              */
             private void openSubUnitMenu(Window subMenu) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
             // </editor-fold>
         };
@@ -644,6 +646,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 Faction f = (Faction) value;
                 main.getScreen().getElementById("generatorFactionButton").setText(f.name());
+                hover.setFaction(f);
             }
         };
         Faction[] factionList = Faction.values();

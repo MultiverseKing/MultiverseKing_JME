@@ -78,7 +78,7 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
      */
     public boolean canBeCast(HexCoordinate castPosition, EntityId id, CardProperties properties) {
         switch (properties.getCardSubType()) {
-            case UNIT:
+            case SUMMON:
                 if(collisionLayer.containsKey((byte)0)){
                     ArrayList<EntityId> list = collisionLayer.get((byte)0);
                     for(EntityId idList : list){

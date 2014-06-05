@@ -1,18 +1,18 @@
 package entitysystem.card;
 
-import com.jme3.math.FastMath;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture2D;
-import kingofmultiverse.MultiverseMain;
+import entitysystem.attribut.CardType;
+import entitysystem.attribut.Faction;
+import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import utility.ElementalAttribut;
 
 /**
- * @todo generate too much object have to be solved/reduce.
+ * @todo generate too much object have to be solved/reduce.)
  * @see tonegodgui update it was planned to be implemented on the core GUI.
  * @author roah
  */
@@ -46,87 +46,93 @@ public class Hover extends Window {
     }
     
     private void initProperties(CardProperties properties, String cardName){
-        Texture tex = app.getAssetManager().loadTexture("Textures/PlatformerGUIText/Individual/" + properties.getPlayCost() + ".png");
-        Window level = new Window(this.screen, "playCostHover", Vector2f.ZERO, 
-                new Vector2f(tex.getImage().getWidth()*0.68f, tex.getImage().getHeight()*0.68f), 
-                Vector4f.ZERO, "Textures/PlatformerGUIText/Individual/" + properties.getPlayCost() + ".png");
-        level.removeAllChildren();
-        addChild(level);
-        level.setPosition(new Vector2f(getDimensions().x*0.75f, getDimensions().y*0.79f));
-//        level.scale(1.8f);
+        /**
+         * Label used to show the cost needed for the card.
+         */
+        Label cost = new Label(screen, "playCostHover", new Vector2f(), new Vector2f(60, 45));
+        cost.setText("0");
+        cost.setFont("Interface/Fonts/Vemana2000.fnt");
+        cost.setFontColor(ColorRGBA.White);
+        cost.setFontSize(30);
+        addChild(cost);
+        cost.setPosition(new Vector2f(getDimensions().x*0.75f, getDimensions().y*0.75f));
         
-//        float posY = this.getPosition().y-this.getHeight()-20;
+        /**
+         * Window used to show the type of the card.
+         */
+        Window typeIco = new Window(this.screen, "typeIconHover", Vector2f.ZERO, 
+                new Vector2f(33,30), 
+                Vector4f.ZERO, "Textures/Cards/Icons/CardType/" + properties.getCardSubType().name() + ".png");
+        typeIco.removeAllChildren();
+        addChild(typeIco);
+        typeIco.setPosition(new Vector2f(getDimensions().x*0.06f, getDimensions().y*0.8f));
         
-//        level.getDragBar().hide();
-
-//        Window name = new Window(this.screen, Vector2f.ZERO, new Vector2f(this.getDimensions().x, 15));
-//        name.removeAllChildren();
-//        this.addChild(name);
-//        name.centerToParent();
-//        name.setPosition(new Vector2f(level.getPosition().x, 20));
-//        name.setText(cardName);
-//        name.hideWindow();
-//        screen.updateZOrder(name);
-////        name.getDragBar().hide();
-
-//        setGlowing();
+        /**
+         * Window used to show the Faction of the card.
+         */
+        Window factionIco = new Window(this.screen, "factionIconHover", Vector2f.ZERO, 
+                new Vector2f(33,30), 
+                Vector4f.ZERO, "Textures/Cards/Icons/Faction/" + properties.getFaction().name() + ".png");
+        factionIco.removeAllChildren();
+        addChild(factionIco);
+        factionIco.setPosition(new Vector2f(getDimensions().x*0.71f, getDimensions().y*0.61f));
+        
+        /**
+         * Label used to show the name of the card.
+         */
+        Label cardNameLabel = new Label(screen, "cardNameLabelHover", new Vector2f(), new Vector2f(300, 45));
+        cardNameLabel.setText(cardName);
+        addChild(cardNameLabel);
+        
+        cardNameLabel.setFont("Interface/Fonts/Purisa.fnt");
+        cardNameLabel.setPosition(new Vector2f(getDimensions().x*0.2f, -10));
+        cardNameLabel.setFontSize(17);
+        cardNameLabel.setFontColor(ColorRGBA.White);
     }
     
-    /**
-     * Used to store and delete the additional cost windows
-     */
-    Window[] costWindows = null;
-    
-    public void setCastCost(int cost){
-        if(!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("playCostHover")){
-            if(costWindows != null){
-                for(Window w : costWindows){
-                    if(w != null){
-                        w.removeFromParent();
-                    }
-                }
-                costWindows = null;
-            }
-            Window costWin = (Window) getElementsAsMap().get("playCostHover");
-            if(cost > 9){
-                String value = Integer.toString(cost);
-                byte i = 0;
-                costWindows = new Window[value.toCharArray().length];
-                for(Character c : value.toCharArray()){
-                    Texture tex = app.getAssetManager().loadTexture(
-                            "Textures/PlatformerGUIText/Individual/" + c.toString() + ".png");
-                    if(i == 0){
-                        costWin.setDimensions(new Vector2f(tex.getImage().getWidth()*0.5f, tex.getImage().getHeight()*0.5f));
-                        costWin.setPosition(new Vector2f(getDimensions().x*0.8f-12, getDimensions().y*0.8f));
-                        costWin.getMaterial().setTexture("ColorMap", tex);
-                        i++;
-                    } else {
-                        costWindows[i-1] = new Window(this.screen, Vector2f.ZERO, 
-                                new Vector2f(tex.getImage().getWidth()*0.5f, tex.getImage().getHeight()*0.5f), 
-                Vector4f.ZERO, "Textures/PlatformerGUIText/Individual/" + c.toString() + ".png");
-                        costWindows[i-1].removeAllChildren();
-                        addChild(costWindows[i-1]);
-                        costWindows[i-1].setPosition(new Vector2f(getDimensions().x*0.8f+2, getDimensions().y*0.8f));
-                        i++;
-                    }
-                }
-            } else {
-                Texture tex = app.getAssetManager().loadTexture(
-                            "Textures/PlatformerGUIText/Individual/" + cost + ".png");
-                costWin.setDimensions(tex.getImage().getWidth()*0.68f, tex.getImage().getHeight()*0.68f);
-                costWin.setPosition(new Vector2f(getDimensions().x*0.75f, getDimensions().y*0.79f));
-                costWin.getMaterial().setTexture("ColorMap", tex);
-            }
+    public void setFaction(Faction faction){
+        if(!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("factionIconHover")){
+            Element icon = getElementsAsMap().get("factionIconHover");
+            icon.setColorMap("Textures/Cards/Icons/Faction/"+faction.name()+".png");
         }
     }
     
-    private void updateProperties(CardProperties properties, String cardName){
-        getElementsAsMap().get("hoverCardCost").setColorMap("Textures/PlatformerGUIText/Individual/" + properties.getPlayCost() + ".png");
+    public void setCardName(String name){
+        if(!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("cardNameLabelHover")){
+            Element nameLabel = getElementsAsMap().get("cardNameLabelHover");
+            if(name.length() > 11){
+                nameLabel.setFontSize(14);
+            } else {
+                nameLabel.setFontSize(17);
+            }
+            nameLabel.setText(name);
+        }
     }
     
-    private void setGlowing(float tpf) {
-        Window glow = new Window(this.screen, Vector2f.ZERO, new Vector2f(11, 17), Vector4f.ZERO, "Textures/Cards/cardHoverTest.png");
-        glow.removeAllChildren();
-        this.addChild(glow);
+    public void setType(CardType type){
+        if(!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("typeIconHover")){
+            Element icon = getElementsAsMap().get("typeIconHover");
+            icon.setColorMap("Textures/Cards/Icons/CardType/"+type.name()+".png");
+        }
+    }
+    
+    public void setCastCost(int cost){
+        if(!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("playCostHover")){
+            Element costLabel = getElementsAsMap().get("playCostHover");
+            if (cost == 20) {
+                costLabel.setPosition(new Vector2f(getDimensions().x*0.75f-6, getDimensions().y*0.75f));
+            } else if (cost == 11) {
+                costLabel.setPosition(new Vector2f(getDimensions().x*0.75f, getDimensions().y*0.75f));
+            } else if(cost > 9){
+                costLabel.setPosition(new Vector2f(getDimensions().x*0.75f-5, getDimensions().y*0.75f));
+            } else {
+                costLabel.setPosition(new Vector2f(getDimensions().x*0.75f, getDimensions().y*0.75f));
+            }
+            costLabel.setText(Integer.toString(cost));
+        }
+    }
+
+    private void updateProperties(CardProperties properties, String cardName) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

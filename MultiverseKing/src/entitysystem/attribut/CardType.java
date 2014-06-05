@@ -17,7 +17,7 @@ public enum CardType {
     /**
      * Used for card who generate unit on the field.
      */
-    UNIT,
+    SUMMON,
     /**
      * Used for card who generate an effect on the field.
      */

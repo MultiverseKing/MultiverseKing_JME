@@ -56,7 +56,7 @@ public class CardProperties {
      */
     public CardProperties(JSONObject obj) {
         cardType = CardType.valueOf(obj.get("cardType").toString());
-        if (cardType == CardType.SPELL || cardType == CardType.UNIT || cardType == CardType.TRAP) {
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
             this.mainType = Maintype.WORLD;
         } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;
@@ -80,7 +80,7 @@ public class CardProperties {
      * @param element 
      */
     public CardProperties(int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element) {
-        if (cardType == CardType.SPELL || cardType == CardType.UNIT || cardType == CardType.TRAP) {
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
             this.mainType = Maintype.WORLD;
         } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;

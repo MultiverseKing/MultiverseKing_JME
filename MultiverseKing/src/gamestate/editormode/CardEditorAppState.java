@@ -13,6 +13,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import entitysystem.ability.AbilityComponent;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.attribut.CardType;
@@ -754,12 +755,14 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         System.out.println(cardName);
         EntityLoader loader = new EntityLoader();
         CardProperties load = loader.loadCardProperties(cardName);
+        
         if(load != null){
             /**
              * Load the card cost.
              */
             Spinner cost = (Spinner) main.getScreen().getElementById("generatorCostSpinner");
             cost.setSelectedIndex(load.getPlayCost());
+            hover.setCastCost(load.getPlayCost());
             /**
              * Load the element Attribut.
              */
@@ -782,6 +785,37 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 genButton.setText(load.getCardSubType().name());
                 hover.setType(load.getCardSubType());
                 openCardTypeSubMenu(load.getCardSubType());
+            }
+            switch(load.getCardSubType()){
+                case ABILITY:
+                    /**
+                     * @todo: Load ability SubMenu Data.
+                     */
+                    AbilityComponent abilityData = loader.loadAbility(cardName);
+                    main.getScreen().getElementById("powerButton").setText(Integer.toString(abilityData.getPower()));
+                    Spinner spin = (Spinner) main.getScreen().getElementById("unitCastCostSlider");
+                    spin.setSelectedIndex(abilityData.getSegment());
+                    break;
+                case EQUIPEMENT:
+                    /**
+                     * @todo: Load Equipement SubMenu Data.
+                     */ 
+                    break;
+                case SPELL:
+                    /**
+                     * @todo: Load Spell SubMenu Data.
+                     */ 
+                    break;
+                case TRAP:
+                    /**
+                     * @todo: Load Trap SubMenu Data.
+                     */ 
+                    break;
+                case SUMMON:
+                    /**
+                     * @todo: Load Summon SubMenu Data
+                     */
+                    break;
             }
         }
     }

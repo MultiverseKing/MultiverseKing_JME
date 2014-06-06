@@ -72,8 +72,9 @@ public class EntityLoader {
                 return new CardProperties(obj);
             }
             return null;
+        } else {
+            return null;
         }
-        return null;
     }
 
     public AbilityComponent loadAbility(String name) {
@@ -82,6 +83,9 @@ public class EntityLoader {
         }
         String loadPath = path + "Ability/" + name + ".card";
         JSONObject obj = getData(loadPath);
+        if(obj == null){
+            return null;
+        }
         ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
         String description = obj.get("description").toString();
 
@@ -112,7 +116,11 @@ public class EntityLoader {
 
     private JSONObject getData(String loadPath) {
         try {
-            InputStream is = new FileInputStream(new File(loadPath));
+            File file = new File(loadPath);
+            if(!file.exists() || file.isDirectory()){
+                return null;
+            }
+            InputStream is = new FileInputStream(file);
             String s = new String(IOUtils.readFully(is, -1, true));
             JSONObject j = (JSONObject) parser.parse(s);
             return j;

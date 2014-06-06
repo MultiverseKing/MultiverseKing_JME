@@ -1,4 +1,4 @@
-package entitysystem.render;
+package entitysystem.field.render;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;

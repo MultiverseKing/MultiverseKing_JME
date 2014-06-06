@@ -16,6 +16,11 @@ import com.simsilica.es.EntityId;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.attribut.CardType;
+import static entitysystem.attribut.CardType.ABILITY;
+import static entitysystem.attribut.CardType.EQUIPEMENT;
+import static entitysystem.attribut.CardType.SPELL;
+import static entitysystem.attribut.CardType.SUMMON;
+import static entitysystem.attribut.CardType.TRAP;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
@@ -23,10 +28,10 @@ import entitysystem.card.CardRenderComponent;
 import entitysystem.card.CardRenderSystem;
 import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.render.AnimationComponent;
-import entitysystem.render.RenderComponent;
-import entitysystem.units.CollisionComponent;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.AnimationComponent;
+import entitysystem.field.render.RenderComponent;
+import entitysystem.field.CollisionComponent;
 import gamestate.EntityDataAppState;
 import gamestate.HexMapMouseInput;
 import gamestate.HexSystemAppState;
@@ -225,6 +230,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         /**
          * Window used to show card Properties.
          */
+        cleanupTestCard();
         Window genMenu = new Window(main.getScreen(), "cardGeneratorW", new Vector2f(130, 0),
                 new Vector2f(main.getScreen().getWidth() * 0.5f, mainWin.getHeight()));
         genMenu.removeAllChildren();
@@ -281,8 +287,9 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.SUMMON, Rarity.COMMON, ElementalAttribut.NULL);
-        hover.setProperties(cardProperties, "Undefined");
+        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.SUMMON, 
+                Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
+        hover.setProperties(cardProperties, "TuxDoll");
         preview.addChild(hover);
         genMenu.addChild(preview);
         
@@ -300,7 +307,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if (!main.getScreen().getElementsAsMap().containsKey("loadCategory")) {
-                    loadMenu();
+                    openLoadingMenu();
                 }
                 Menu loadMenu = (Menu) main.getScreen().getElementById("loadCategory");
                 loadMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - loadMenu.getHeight());
@@ -329,7 +336,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         nameLabel.setText("Name : ");
         callerMenu.addChild(nameLabel);
 
-        ButtonAdapter fieldButton = new ButtonAdapter(main.getScreen(), "generatorFieldButton",
+        ButtonAdapter nameButton = new ButtonAdapter(main.getScreen(), "generatorFieldButton",
                 new Vector2f(nameLabel.getDimensions().x + 5, 12)){
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -352,8 +359,8 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 getElementParent().addChild(field);
             }            
         };
-        fieldButton.setText("Undefined");
-        callerMenu.addChild(fieldButton);
+        nameButton.setText("TuxDoll");
+        callerMenu.addChild(nameButton);
         
         /**
          * Part used to show/choose the card Type.
@@ -404,7 +411,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 getElementParent().addChild(field);
             }            
         };
-        descriptionButton.setText("Undefined");
+        descriptionButton.setText("This is a Testing unit");
         callerMenu.addChild(descriptionButton);
         
         /**
@@ -419,7 +426,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 if (!main.getScreen().getElementsAsMap().containsKey("generatorFactionMenu")) {
-                    loadFactionMenu();
+                    OpenFactionMenu();
                 }
                 Menu factionMenu = (Menu) main.getScreen().getElementById("generatorFactionMenu");
                 factionMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - factionMenu.getHeight());
@@ -515,123 +522,9 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                     genButton.setText(cardType.name());
                     //TODO: change the hover depending on the card type
                     hover.setType(cardType);
-                    loadSubMenu(cardType);
+                    openCardTypeSubMenu(cardType);
                 }
             }
-
-            /**
-             * Open a menu where card properties can be tweaked,
-             * it depend on the subMenu loaded, who depend on the cardType.
-             */
-            private void loadSubMenu(CardType cardType) {
-                Window subMenu;
-                if(main.getScreen().getElementById("subMenu") != null){
-                    subMenu = (Window) main.getScreen().getElementById("subMenu");
-                    subMenu.removeAllChildren();
-                } else {
-                    Element win = screen.getElementById("geneneratorImgPreview");
-                    subMenu = new Window(screen, "subMenu", new Vector2f(
-                            win.getAbsoluteX(), 0), new Vector2f(
-                            screen.getWidth()-(win.getAbsoluteX()+win.getWidth()+10),
-                            245));
-                    subMenu.removeAllChildren();
-                    mainWin.getElementsAsMap().get("cardGeneratorW").addChild(subMenu);
-                }
-                switch(cardType) {
-                    case ABILITY:
-                        openSubAbilityMenu(subMenu);
-                        break;
-                    case EQUIPEMENT:
-                        //@todo: Equipement subMenu
-                        break;
-                    case SPELL:
-                        //@todo: Spell subMenu
-                        break;
-                    case TRAP:
-                        //@todo: Trap subMenu
-                        break;
-                    case SUMMON:
-                        openSubUnitMenu(subMenu);
-                        break;
-                }
-            }
-
-            // <editor-fold defaultstate="collapsed" desc="Used SubMenu">
-            /**
-             * Menu used to tweak ability properties.
-             */
-            private void openSubAbilityMenu(Window subMenu) {
-                //damage - segmentCost - activationRange - FXUsed - hitCollision - isCastOnSelf
-                
-                /**
-                 * Part used to show/set how many power have the ability.
-                 */
-                Label damageLabel = new Label(screen, "powerLabel", new Vector2f(10,10), new Vector2f(55,30));
-                damageLabel.setText("Power : ");
-                subMenu.addChild(damageLabel);
-                
-                ButtonAdapter damageButton = new ButtonAdapter(screen, "powerButton", 
-                        new Vector2f(damageLabel.getWidth(), 2), new Vector2f(45,30)){
-                    @Override
-                    public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                        super.onButtonMouseLeftUp(evt, toggled);
-                        TextField damageField = new TextField(screen, Vector2f.ZERO, new Vector2f(45, 30)){
-                            @Override
-                            public void onKeyRelease(KeyInputEvent evt) {
-                                super.onKeyRelease(evt);
-                                if(evt.getKeyCode() == KeyInput.KEY_RETURN 
-                                        && getText() != null && getText().length() != 0){
-//                                    for(int i = 0; i < getText().length(); i++){
-//                                        if(!Character.isDigit(getText().charAt(i))){
-//                                            getElementParent().removeChild(this);
-//                                            return;
-//                                        }
-//                                    }
-                                    screen.getElementById("powerButton").setText(getText());
-                                    getElementParent().removeChild(this);
-                                }
-                            }
-                        };
-//                        damageField.setTextAlign(BitmapFont.Align.Center);
-                        damageField.setType(TextField.Type.NUMERIC);
-                        addChild(damageField);
-                        damageField.setText(getText());
-                    }
-                };
-                damageButton.setText("0");
-                damageLabel.addChild(damageButton);
-                
-                /**
-                 * Part used to show/set the segmentCost needed for the unit
-                 * to cast the ability.
-                 */
-                Label unitCastCostLabel = new Label(screen, "unitCastCostLabel", new Vector2f(10,45), new Vector2f(110,30));
-                unitCastCostLabel.setText("Unit Cast Cost : ");
-                subMenu.addChild(unitCastCostLabel);
-                
-                Spinner unitCastCostSpinner = new Spinner(screen, "unitCastCostSlider",
-                        new Vector2f(unitCastCostLabel.getDimensions().x, 2), Orientation.HORIZONTAL, true) {
-
-                    @Override
-                    public void onChange(int selectedIndex, String value) {
-//                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                    }
-                };
-                unitCastCostSpinner.setStepIntegerRange(0, 20, 1);
-                unitCastCostLabel.addChild(unitCastCostSpinner);
-                
-                /**
-                 * Part used to set the Activation range of the ability.
-                 */
-            }
-
-            /**
-             * Menu used to tweak unit properties.
-             */
-            private void openSubUnitMenu(Window subMenu) {
-//                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-            // </editor-fold>
         };
         CardType[] cardSubTypeList = CardType.values();
         for (CardType s : cardSubTypeList) {
@@ -640,7 +533,123 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         main.getScreen().addElement(subType);
     }
 
-    private void loadFactionMenu() {
+    // <editor-fold defaultstate="collapsed" desc="Open CardTypeSubMenu">
+    /**
+     * Open a menu where card properties can be tweaked,
+     * it depend on the subMenu loaded, who depend on the cardType.
+     */
+    public void openCardTypeSubMenu(CardType cardType) {
+        Window subMenu;
+        if(main.getScreen().getElementById("subMenu") != null){
+            subMenu = (Window) main.getScreen().getElementById("subMenu");
+            subMenu.removeAllChildren();
+        } else {
+            Element win = main.getScreen().getElementById("geneneratorImgPreview");
+            subMenu = new Window(main.getScreen(), "subMenu", new Vector2f(
+                    win.getAbsoluteX(), 0), new Vector2f(
+                    main.getScreen().getWidth()-(win.getAbsoluteX()+win.getWidth()+10),
+                    245));
+            subMenu.removeAllChildren();
+            mainWin.getElementsAsMap().get("cardGeneratorW").addChild(subMenu);
+        }
+        switch(cardType) {
+            case ABILITY:
+                openSubAbilityMenu(subMenu);
+                break;
+            case EQUIPEMENT:
+                /**
+                 * @todo: Equipement subMenu
+                 */ 
+                break;
+            case SPELL:
+                /*
+                 * @todo: Spell subMenu
+                 */ 
+                break;
+            case TRAP:
+                /**
+                 * @todo: Trap subMenu
+                 */ 
+                break;
+            case SUMMON:
+                openSubUnitMenu(subMenu);
+                break;
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Used SubMenu">
+    /**
+     * Menu used to tweak ability properties.
+     */
+    private void openSubAbilityMenu(Window subMenu) {
+
+        /**
+         * Part used to show/set how many power have the ability.
+         * damage - segmentCost - activationRange - FXUsed - hitCollision - isCastOnSelf
+         */
+        Label damageLabel = new Label(main.getScreen(), "powerLabel", new Vector2f(10,10), new Vector2f(58,30));
+        damageLabel.setText("Power : ");
+        subMenu.addChild(damageLabel);
+
+        ButtonAdapter damageButton = new ButtonAdapter(main.getScreen(), "powerButton", 
+                new Vector2f(damageLabel.getWidth(), 2), new Vector2f(45,30)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                super.onButtonMouseLeftUp(evt, toggled);
+                TextField damageField = new TextField(screen, Vector2f.ZERO, new Vector2f(45, 30)){
+                    @Override
+                    public void onKeyRelease(KeyInputEvent evt) {
+                        super.onKeyRelease(evt);
+                        if(evt.getKeyCode() == KeyInput.KEY_RETURN 
+                                && getText() != null && getText().length() != 0){
+                            screen.getElementById("powerButton").setText(getText());
+                            getElementParent().removeChild(this);
+                        }
+                    }
+                };
+                damageField.setType(TextField.Type.NUMERIC);
+                addChild(damageField);
+                damageField.setText(getText());
+            }
+        };
+        damageButton.setText("0");
+        damageLabel.addChild(damageButton);
+
+        /**
+         * Part used to show/set the segmentCost needed for the unit
+         * to cast the ability.
+         */
+        Label unitCastCostLabel = new Label(main.getScreen(), "unitCastCostLabel", new Vector2f(10,40), new Vector2f(160,30));
+        unitCastCostLabel.setText("Unit Segment Used : ");
+        subMenu.addChild(unitCastCostLabel);
+
+        Spinner unitCastCostSpinner = new Spinner(main.getScreen(), "unitCastCostSlider",
+                new Vector2f(10, unitCastCostLabel.getDimensions().y), Element.Orientation.HORIZONTAL, true) {
+
+            @Override
+            public void onChange(int selectedIndex, String value) {
+//                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+        unitCastCostSpinner.setStepIntegerRange(0, 20, 1);
+        unitCastCostLabel.addChild(unitCastCostSpinner);
+
+        /**
+         * @todo Part used to set the Activation range of the ability.
+         */
+    }
+
+    /**
+     * @todo Menu used to tweak unit properties.
+     * 
+     */
+    private void openSubUnitMenu(Window subMenu) {
+//                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    // </editor-fold>
+    // </editor-fold>
+    
+    private void OpenFactionMenu() {
         Menu faction = new Menu(main.getScreen(), "generatorFactionMenu", new Vector2f(0, 30), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -655,9 +664,8 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         }
         main.getScreen().addElement(faction);
     }
-    // </editor-fold>
 
-    private void loadMenu() {
+    private void openLoadingMenu() {
         /**
          * Some variable to get files name.
          */
@@ -675,7 +683,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         Menu categoryAll = new Menu(main.getScreen(), "categoryAll", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                loadProperties(value.toString());
+                loadCardPropertiesFromFile(value.toString());
             }
         };
         
@@ -698,7 +706,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         Menu categoryAbility = new Menu(main.getScreen(), "categoryAbility", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                loadProperties(value.toString());
+                loadCardPropertiesFromFile(value.toString());
             }
         };
         
@@ -716,7 +724,7 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         Menu categoryUnit = new Menu(main.getScreen(), "categoryUnit", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                loadProperties(value.toString());
+                loadCardPropertiesFromFile(value.toString());
             }
         };
         
@@ -742,12 +750,39 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
         main.getScreen().addElement(loadCategory);
     }
     
-    private void loadProperties(String cardName) {
+    private void loadCardPropertiesFromFile(String cardName) {
         System.out.println(cardName);
         EntityLoader loader = new EntityLoader();
         CardProperties load = loader.loadCardProperties(cardName);
         if(load != null){
-            //TODO
+            /**
+             * Load the card cost.
+             */
+            Spinner cost = (Spinner) main.getScreen().getElementById("generatorCostSpinner");
+            cost.setSelectedIndex(load.getPlayCost());
+            /**
+             * Load the element Attribut.
+             */
+            main.getScreen().getElementById("generatorEAttributButton").setText(load.getElement().name());
+            main.getScreen().getElementById("cardPropertiesHover").setColorMap("Textures/Cards/"+load.getElement().name()+".png");
+            /**
+             * Load the Faction Attribut.
+             */
+            main.getScreen().getElementById("generatorFactionButton").setText(load.getFaction().name());
+            hover.setFaction(load.getFaction());
+            /**
+             * Load the description Text.
+             */
+            main.getScreen().getElementById("generatorDescriptionButton").setText(load.getDescription());
+            /**
+             * Load the card type.
+             */
+            Element genButton = main.getScreen().getElementById("generatorCardTypeButton");
+            if(!genButton.getText().equals(load.getCardSubType().name())){
+                genButton.setText(load.getCardSubType().name());
+                hover.setType(load.getCardSubType());
+                openCardTypeSubMenu(load.getCardSubType());
+            }
         }
     }
     
@@ -762,15 +797,22 @@ public class CardEditorAppState extends AbstractAppState implements TileChangeLi
                 main.getScreen().removeElement(main.getScreen().getElementById(s));
             }
         }
-        Object[] cards = main.getStateManager().getState(CardRenderSystem.class).getCardsKeyset().toArray();
-        if (cards.length != 0) {
-            EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
-            for (Object o : cards) {
-                EntityId id = (EntityId) o;
-                ed.removeEntity(id);
-            }
-        }
+        cleanupTestCard();
         entityData.removeEntity(tuxDoll);
         mainWin = null;
+    }
+    
+    private void cleanupTestCard(){
+        CardRenderSystem cardRender = main.getStateManager().getState(CardRenderSystem.class);
+        if(cardRender != null){
+            Object[] cards = cardRender.getCardsKeyset().toArray();
+            if (cards.length != 0) {
+                EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
+                for (Object o : cards) {
+                    EntityId id = (EntityId) o;
+                    ed.removeEntity(id);
+                }
+            }
+        }
     }
 }

@@ -1,10 +1,10 @@
-package entitysystem.movement;
+package entitysystem.field.movement;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.position.HexPositionComponent;
+import entitysystem.field.position.HexPositionComponent;
 import gamestate.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.pathfinding.Astar;

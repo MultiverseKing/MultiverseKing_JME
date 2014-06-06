@@ -1,4 +1,4 @@
-package entitysystem.units.ability;
+package entitysystem.ability;
 
 import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package entitysystem.render;
+package entitysystem.field.render;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.math.Vector3f;
@@ -8,7 +8,7 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.position.HexPositionComponent;
+import entitysystem.field.position.HexPositionComponent;
 import gamestate.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;

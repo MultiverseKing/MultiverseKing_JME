@@ -1,4 +1,4 @@
-package entitysystem.movement;
+package entitysystem.field.movement;
 
 import com.simsilica.es.PersistentComponent;
 import utility.HexCoordinate;

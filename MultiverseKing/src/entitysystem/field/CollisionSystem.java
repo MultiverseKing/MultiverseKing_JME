@@ -1,13 +1,13 @@
-package entitysystem.units;
+package entitysystem.field;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.render.AnimationComponent;
+import entitysystem.field.render.AnimationComponent;
 import entitysystem.card.CardRenderComponent;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.render.RenderComponent;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.RenderComponent;
 import utility.HexCoordinate;
 import utility.Rotation;
 import entitysystem.attribut.Animation;

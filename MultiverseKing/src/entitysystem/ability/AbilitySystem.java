@@ -1,12 +1,11 @@
-package entitysystem.units.ability;
+package entitysystem.ability;
 
-import entitysystem.render.VFXComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.units.LoadSpeedComponent;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.LoadSpeedComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,8 +40,11 @@ public class AbilitySystem extends EntitySystemAppState {
         if(abilityCast != null){
             for(String abilityName : abilityCast){
                 EntityId abilityID = entityData.createEntity();
-                entityData.setComponents(abilityID, new VFXComponent(abilityName), 
-                        entityData.getComponent(id, HexPositionComponent.class).clone());
+                /**
+                 * @todo : Get all ability in the list,
+                 * call the FXSystem to render them on the screen,
+                 * call other system to the ability effect.
+                 */
             }
         }
     }

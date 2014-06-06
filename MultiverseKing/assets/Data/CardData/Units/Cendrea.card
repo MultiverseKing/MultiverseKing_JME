@@ -2,7 +2,7 @@
    "faction":"THUNDRA",
    "cardType":"SUMMON",
    "rarity":"COMMON",
-   "eAttribut":"SHOCK",
+   "eAttribut":"EARTH",
    "playCost":4,
    "description":"Should be named spider moonlord king...  don't ask...",
    "unitsStats":{

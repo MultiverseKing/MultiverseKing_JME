@@ -1,4 +1,4 @@
-package entitysystem.position;
+package entitysystem.field.position;
 
 import com.jme3.math.Vector3f;
 import com.simsilica.es.PersistentComponent;

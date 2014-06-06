@@ -15,20 +15,21 @@ import utility.ElementalAttribut;
  */
 public class CardProperties {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
+
     /**
      * Used to know how much ressource is needed to play the card.
      */
     private final int playCost;
     /**
-     * Used as deck requirement restriction to synergize 
-     * the background story and art-design to use.
+     * Used as deck requirement restriction to synergize the background story
+     * and art-design to use.
      */
     private final Faction faction;
     /**
-     * Used to know the outliner to use.
-     * Will be used later on to know wich card can be used to populate GameWorld.
+     * Used to know the outliner to use. Will be used later on to know wich card
+     * can be used to populate GameWorld.
      */
-    private final Maintype mainType; 
+    private final Maintype mainType;
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
@@ -42,8 +43,12 @@ public class CardProperties {
      * Used for the elemental interaction.
      */
     private final ElementalAttribut element;
-    // </editor-fold>
+    /**
+     * Used to show the card description text.
+     */
+    private final String description;
 
+    // </editor-fold>
     /**
      * Create a new card type component, throw UnsupportedOperationException if
      * the subType didn't match the mainType. WORLD subType == SPELL, SUMMON,
@@ -68,18 +73,20 @@ public class CardProperties {
         faction = Faction.valueOf((String) obj.get("faction"));
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
+        description = (String) obj.get("description");
     }
 
     /**
      * Constructor used for the editor mode.
+     *
      * @param playCost
      * @param faction
      * @param mainType
      * @param cardType
      * @param rarity
-     * @param element 
+     * @param element
      */
-    public CardProperties(int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element) {
+    public CardProperties(int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
         if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
             this.mainType = Maintype.WORLD;
         } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
@@ -92,8 +99,9 @@ public class CardProperties {
         this.cardType = cardType;
         this.rarity = rarity;
         this.element = element;
+        this.description = description;
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Getter">
     /**
      * Play Cost to use the card.
@@ -150,6 +158,15 @@ public class CardProperties {
      */
     public ElementalAttribut getElement() {
         return element;
+    }
+
+    /**
+     * The description Text belong to this card.
+     *
+     * @return
+     */
+    public String getDescription() {
+        return description;
     }
     // </editor-fold>
 }

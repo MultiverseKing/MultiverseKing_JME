@@ -1,4 +1,4 @@
-package entitysystem.units;
+package entitysystem.field;
 
 import com.simsilica.es.PersistentComponent;
 import utility.ElementalAttribut;

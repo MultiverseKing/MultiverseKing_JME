@@ -1,0 +1,20 @@
+{
+   "faction":"NEUTRAL",
+   "cardType":"SUMMON",
+   "rarity":"MULTIVERSE",
+   "eAttribut":"NULL",
+   "playCost":0,
+   "description":"Testing Unit used on the editor",
+   "unitsStats":{
+      "life":50000,
+      "speed":100,
+      "movePoint":100,
+      "ability":"None",
+      "collision":[
+         {
+            "layer":0,
+            "key":[ "0|0" ]
+         }
+      ]
+   }
+}

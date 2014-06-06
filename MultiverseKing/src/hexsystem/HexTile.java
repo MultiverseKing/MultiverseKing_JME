@@ -16,7 +16,6 @@ public class HexTile implements Savable {
 
     private byte element;
     private int height;
-    private boolean walkable;
 
     /**
      *
@@ -24,7 +23,6 @@ public class HexTile implements Savable {
     public HexTile() {
         this.element = (byte) ElementalAttribut.NULL.ordinal();
         this.height = 0;
-        this.walkable = true;
     }
 
     /**
@@ -34,7 +32,6 @@ public class HexTile implements Savable {
     public HexTile(ElementalAttribut eAttribut) {
         this.element = (byte) eAttribut.ordinal();
         this.height = 0;
-        this.walkable = true;
     }
 
     /**
@@ -45,19 +42,6 @@ public class HexTile implements Savable {
     public HexTile(ElementalAttribut hexElement, int height) {
         this.element = (byte) hexElement.ordinal();
         this.height = height;
-        this.walkable = true;
-    }
-
-    /**
-     *
-     * @param hexElement
-     * @param height
-     * @param walkable
-     */
-    public HexTile(ElementalAttribut hexElement, int height, boolean walkable) {
-        this.element = (byte) hexElement.ordinal();
-        this.height = height;
-        this.walkable = walkable;
     }
 
     /**
@@ -75,15 +59,6 @@ public class HexTile implements Savable {
     public int getHeight() {
         return height;
     }
-
-    /**
-     *
-     * @return
-     */
-    public boolean getWalkable() {
-        return walkable;
-    }
-
     /**
      *
      * @param ex
@@ -93,7 +68,6 @@ public class HexTile implements Savable {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(height, "height", 0);
         capsule.write(element, "element", 0);
-        capsule.write(walkable, "walkable", true);
 //        System.out.println(height + " "+element);
     }
 
@@ -108,7 +82,6 @@ public class HexTile implements Savable {
 //        capsule.readByte("element", element);
         height = (byte) capsule.readInt("height", 0);
         element = (byte) capsule.readInt("element", ElementalAttribut.NULL.ordinal());
-        walkable = (boolean) capsule.readBoolean("walkable", true);
     }
 
     /**
@@ -118,7 +91,7 @@ public class HexTile implements Savable {
      * @return
      */
     public HexTile cloneChangedElement(ElementalAttribut element) {
-        return new HexTile(element, height, walkable);
+        return new HexTile(element, height);
     }
 
     /**
@@ -128,16 +101,6 @@ public class HexTile implements Savable {
      * @return
      */
     public HexTile cloneChangedHeight(int height) {
-        return new HexTile(ElementalAttribut.convert(element), height, walkable);
-    }
-
-    /**
-     * Returns a clone of this tile with changed walkable param.
-     *
-     * @param walkable
-     * @return
-     */
-    public HexTile cloneChangeWalkable(boolean walkable) {
-        return new HexTile(ElementalAttribut.convert(element), height, walkable);
+        return new HexTile(ElementalAttribut.convert(element), height);
     }
 }

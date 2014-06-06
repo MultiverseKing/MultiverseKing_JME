@@ -9,13 +9,13 @@ import com.jme3.math.Vector3f;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.base.DefaultEntityData;
-import entitysystem.render.EntityRenderSystem;
-import gamestate.GameDataAppState;
-import entitysystem.movement.MoveToComponent;
-import entitysystem.movement.MovementSystem;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.render.RenderComponent;
-import gamestate.HexMapAppState;
+import entitysystem.field.render.EntityRenderSystem;
+import gamestate.EntityDataAppState;
+import entitysystem.field.movement.MoveToComponent;
+import entitysystem.field.movement.MovementSystem;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.RenderComponent;
+import gamestate.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.loader.ChunkDataLoader;
@@ -40,12 +40,12 @@ public class ExampleStartup extends SimpleApplication {
         HexCoordinate point = new HexCoordinate(HexCoordinate.OFFSET, -1, 0);
         this.getCamera().lookAt(new Vector3f(0f, 1.5f, 0f), Vector3f.UNIT_Y);
         this.getCamera().setLocation(new Vector3f(0, 21.51f, 17.17051f));
-        EntityData entityData = new DefaultEntityData();
         MapData mapData = new MapData(ElementalAttribut.EARTH, assetManager);
         //Initialise data management
-        stateManager.attach(new GameDataAppState(entityData));
+        stateManager.attach(new EntityDataAppState());
+        EntityData entityData = stateManager.getState(EntityDataAppState.class).getEntityData();
 //        stateManager.attach(new MapDataAppState(mapData));
-        stateManager.attach(new HexMapAppState(this, mapData));
+        stateManager.attach(new HexSystemAppState(this, mapData));
         mapData.addChunk(new Vector2Int(0, 0), null);
         mapData.addChunk(new Vector2Int(-1, 0), null);
 
@@ -61,7 +61,7 @@ public class ExampleStartup extends SimpleApplication {
 //        stateManager.attach(new RenderSystem(new ExampleSpatialInitialiser()));
         stateManager.attach(new MovementSystem());
         stateManager.attach(new EntityRenderSystem());
-        stateManager.getState(HexMapAppState.class).chunkUpdate(new ChunkChangeEvent(Vector2Int.INFINITY));
+        stateManager.getState(HexSystemAppState.class).chunkUpdate(new ChunkChangeEvent(Vector2Int.INFINITY));
         //TODO: Initialise visual representation of Map
 
         //TODO: Initialise functional systems

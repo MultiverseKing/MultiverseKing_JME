@@ -5,9 +5,10 @@ import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.CoreDataAppState;
-import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldSystem;
+import entitysystem.EntitySystemAppState;
+import entitysystem.loader.EntityLoader;
+import entitysystem.field.render.RenderComponent;
+import entitysystem.field.CollisionSystem;
 import gamestate.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
 /**
@@ -26,7 +26,7 @@ import tonegod.gui.core.Screen;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends CoreDataAppState implements HexMapInputListener {
+public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
@@ -98,18 +98,16 @@ public class CardRenderSystem extends CoreDataAppState implements HexMapInputLis
         app.getGuiNode().addControl(screen);
 
         // Used to resolve the current issue with tonegod-GUI
-        for (Element e : screen.getElementsAsMap().values()) {
-            screen.removeElement(e);
-        }
-        screen.getElementsAsMap().clear();
-        // --
+//        for (Element e : screen.getElementsAsMap().values()) {
+//            screen.removeElement(e);
+//        }
+//        screen.getElementsAsMap().clear();
+//        // --
 
         hover = new Hover(screen);
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
-
         
-
         return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
 
@@ -135,13 +133,18 @@ public class CardRenderSystem extends CoreDataAppState implements HexMapInputLis
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
-                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(), 
-                        getEntityLoader().loadCard(e.get(RenderComponent.class).getName()));
-                handCards.put(e.getId(), card);
-                screen.addElement(card);
-                card.resetHandPosition();
-                for (Card c : handCards.values()) {
-                    c.setZOrder(c.getZOrder());
+                CardProperties properties = new EntityLoader().loadCardProperties(cardName);
+                if(properties != null){
+                    card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
+                            properties);
+                    handCards.put(e.getId(), card);
+                    screen.addElement(card);
+                    card.resetHandPosition();
+                    for (Card c : handCards.values()) {
+                        c.setZOrder(c.getZOrder());
+                    }
+                } else{
+                    System.err.println("Card files cannot be locate. "+cardName);
                 }
                 break;
             case DECK:
@@ -193,7 +196,8 @@ public class CardRenderSystem extends CoreDataAppState implements HexMapInputLis
 
     void isInCastArea(Card card) {
         if (screen.getMouseXY().x > minCastArea.x && screen.getMouseXY().x < maxCastArea.x
-                && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y) {
+                && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y
+                && cardPreviewCast == null) {
             castPreview(card);
         }
     }
@@ -281,7 +285,7 @@ public class CardRenderSystem extends CoreDataAppState implements HexMapInputLis
                     //todo : if the player want to use the field and not fast selection menu. TITAN card
                     break;
                 case WORLD:
-                    if (app.getStateManager().getState(FieldSystem.class).canBeCast(event.getEventPosition(), 
+                    if (app.getStateManager().getState(CollisionSystem.class).canBeCast(event.getEventPosition(), 
                             cardPreviewCast.getCardEntityUID(), properties)) {
                         castConfirmed();
                     } else {

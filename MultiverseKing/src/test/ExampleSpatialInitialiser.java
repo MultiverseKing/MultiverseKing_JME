@@ -2,7 +2,7 @@ package test;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;
-import entitysystem.render.SpatialInitializer;
+import entitysystem.field.render.SpatialInitializer;
 
 /**
  *

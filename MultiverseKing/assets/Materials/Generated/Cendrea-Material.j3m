@@ -1,7 +1,21 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material MyMaterial : ShaderBlow/MatDefs/LightBlow/LightBlow.j3md {
     MaterialParameters {
-        DiffuseMap : Textures/Units/AO2.png
-        UseAlpha : false
+        DiffuseMap : Textures/Units/SpiderColor.png
+        ColorRamp : Textures/Units/ramp2.png
+        Specular_Lighting : false
+        Toon : false
+        LATC : false
+        LightMap_G : false
+        Spec_A_Dif : false
+        Multiply_Color : false
+        Fog_Edges : false
+        Linear_Lighting : false
+        Nor_Inv_X : false
+        OverlayLightmap : false
+        SteepParallax : false
+        Shininess : 0.0
+        LightMap_R : false
+        EmissiveMap : false
     }
     AdditionalRenderState {
       FaceCull Back

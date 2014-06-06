@@ -8,12 +8,10 @@ import hexsystem.events.TileChangeListener;
 import hexsystem.events.TileChangeEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import gamestate.Editor.MapEditorAppState;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.ChunkChangeListener;
 import hexsystem.loader.MapDataLoader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -101,7 +99,7 @@ public final class MapData {
             tiles = new HexTile[HexSettings.CHUNK_SIZE][HexSettings.CHUNK_SIZE];
             for (int y = 0; y < HexSettings.CHUNK_SIZE; y++) {
                 for (int x = 0; x < HexSettings.CHUNK_SIZE; x++) {
-                    tiles[x][y] = new HexTile(mapElement, HexSettings.GROUND_HEIGHT, true);
+                    tiles[x][y] = new HexTile(mapElement, HexSettings.GROUND_HEIGHT);
                 }
             }
         }
@@ -202,15 +200,6 @@ public final class MapData {
      */
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
-    }
-
-    /**
-     *
-     * @param position
-     * @param walkable
-     */
-    public void setTileIsWalkable(HexCoordinate position, boolean walkable) {
-        setTile(position, getTile(position).cloneChangeWalkable(walkable));
     }
 
     /**

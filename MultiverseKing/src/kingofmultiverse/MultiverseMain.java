@@ -4,11 +4,9 @@ import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
@@ -16,29 +14,25 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import de.lessvoid.nifty.controls.Menu;
-import de.lessvoid.nifty.tools.SizeValue;
-import gamestate.GameDataAppState;
-import entitysystem.ExtendedEntityData;
-import entitysystem.render.AnimationSystem;
+import gamestate.EntityDataAppState;
+import entitysystem.field.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
-import entitysystem.movement.MoveToComponent;
-import entitysystem.movement.MovementStatsComponent;
-import entitysystem.movement.MovementSystem;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.render.EntityRenderSystem;
-import entitysystem.render.RenderComponent;
-import entitysystem.units.FieldSystem;
-import gamestate.HexMapAppState;
+import entitysystem.field.movement.MoveToComponent;
+import entitysystem.field.movement.MovementStatsComponent;
+import entitysystem.field.movement.MovementSystem;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.EntityRenderSystem;
+import entitysystem.field.render.RenderComponent;
+import entitysystem.field.CollisionSystem;
+import gamestate.HexSystemAppState;
 import gamestate.HexMapMouseInput;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
 import utility.HexCoordinate;
@@ -63,6 +57,7 @@ public class MultiverseMain extends SimpleApplication {
         app.start();
     }
     private Screen screen;
+    RTSCamera rtsCam;
 
     /**
      *
@@ -72,9 +67,10 @@ public class MultiverseMain extends SimpleApplication {
         return screen;
     }
 
-    /**
-     *
-     */
+    public RTSCamera getRtsCam() {
+        return rtsCam;
+    }
+
     @Override
     public void simpleInitApp() {
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
@@ -123,6 +119,8 @@ public class MultiverseMain extends SimpleApplication {
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
         sun.setColor(ColorRGBA.White);
+//        sun.setColor(new ColorRGBA(200/255, 200/255, 200/255, 1));
+//        sun.setColor(ColorRGBA.Blue);
         rootNode.addLight(sun);
 
         /* this shadow needs a directional light */
@@ -136,16 +134,16 @@ public class MultiverseMain extends SimpleApplication {
 //        final int SHADOWMAP_SIZE = 1024;
 //        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
 //        dlsr.setLight(sun);
-//        viewPort.addProcessor(dlsr);
+//        viewPort.addProcessor(dlsr);ssssss
 
         /**
          * A white ambient light source.
          */
         AmbientLight ambient = new AmbientLight();
-        ambient.setColor(ColorRGBA.White);
+//        ambient.setColor(ColorRGBA.White);
+        ambient.setColor(new ColorRGBA(230/255, 230/255, 230/255, 1));
         rootNode.addLight(ambient);
     }
-    RTSCamera rtsCam;
 
     private void cameraInit() {
         flyCam.setEnabled(false);
@@ -195,11 +193,10 @@ public class MultiverseMain extends SimpleApplication {
      */
     public void initSystem() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
-        EntityData entityData = new ExtendedEntityData(mapData);
         
         stateManager.attachAll(
-                new GameDataAppState(entityData),
-                new HexMapAppState(this, mapData),
+                new EntityDataAppState(),
+                new HexSystemAppState(this, mapData),
                 new HexMapMouseInput(),
                 new EntityRenderSystem(),
                 new MainGUI(this),
@@ -207,17 +204,17 @@ public class MultiverseMain extends SimpleApplication {
                 new MovementSystem(),
                 new CardRenderSystem(),
                 new AnimationSystem(),
-                new FieldSystem());
+                new CollisionSystem());
     }
-    private boolean exemple = false;
 
+    private boolean exemple = false;
     @Override
     public void update() {
         super.update();
         if (exemple) {
-            MapData md = stateManager.getState(GameDataAppState.class).getMapData();
+            MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
             md.addChunk(Vector2Int.ZERO, null);
-            EntityData ed = stateManager.getState(GameDataAppState.class).getEntityData();
+            EntityData ed = stateManager.getState(EntityDataAppState.class).getEntityData();
             //Example: Initialise new character entity.
             EntityId characterId = ed.createEntity();
             ed.setComponents(characterId, new RenderComponent("Berserk"),
@@ -244,5 +241,26 @@ public class MultiverseMain extends SimpleApplication {
             }
         }
         return null;
+    }
+    /**
+     * 
+     * @param <T>
+     * @param <E>
+     * @param map
+     * @param value
+     * @return multiple key attached to a value
+     */
+    public static <T, E> ArrayList<T> getKeysByValue(Map<T, E> map, E value) {
+        ArrayList<T> keyList = new ArrayList<T>();
+        for (Entry<T, E> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                keyList.add(entry.getKey());
+            }
+        }
+        if(keyList.isEmpty()){
+            return null;
+        } else {
+            return keyList;
+        }
     }
 }

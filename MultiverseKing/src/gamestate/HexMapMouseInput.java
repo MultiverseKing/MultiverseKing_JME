@@ -4,9 +4,7 @@ import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -16,10 +14,11 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import entitysystem.CoreDataAppState;
-import entitysystem.position.HexPositionComponent;
-import entitysystem.render.RenderComponent;
+import entitysystem.EntitySystemAppState;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.RenderComponent;
 import hexsystem.HexSettings;
+import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,7 +32,7 @@ import utility.MouseRay;
  * issue.
  * @author Eike Foede
  */
-public class HexMapMouseInput extends CoreDataAppState {
+public class HexMapMouseInput extends EntitySystemAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -43,9 +42,11 @@ public class HexMapMouseInput extends CoreDataAppState {
     private int currentFocusIndex = -1;
     private HexCoordinate lastHexPos;
     private Vector2f lastMousePos = new Vector2f(0, 0);
+    private MapData mapData;
 
     @Override
     protected EntitySet initialiseSystem() {
+        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         initMarkDebug();
         initInput();
 //        initCursor();
@@ -93,7 +94,7 @@ public class HexMapMouseInput extends CoreDataAppState {
             cursor.setMaterial(animShader);
             app.getRootNode().attachChild(cursor);
             //Remove offset and set it to zero if hex_void_anim.png is not used
-            float z = getMapData().getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
+            float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
             cursor.setLocalTranslation(new Vector3f(0f,  z +  0.01f , cursorOffset));
             System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT+" + "+z+0.01f);
     }
@@ -218,8 +219,8 @@ public class HexMapMouseInput extends CoreDataAppState {
         if(cursor == null){
             initCursor();
         }
-        Vector3f pos = getMapData().getTileWorldPosition(tilePos);
-        cursor.setLocalTranslation(pos.x, getMapData().getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
+        Vector3f pos = mapData.getTileWorldPosition(tilePos);
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
                 + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
     }
 
@@ -234,11 +235,10 @@ public class HexMapMouseInput extends CoreDataAppState {
 
         do {
             pos = i.next().getContactPoint();
-            tilePos = getMapData().convertWorldToGridPosition(pos);
-            if (getMapData().getTile(tilePos) == null) {
+            tilePos = mapData.convertWorldToGridPosition(pos);
+            if (mapData.getTile(tilePos) == null) {
                 break;
             } else {
-//                System.out.println(pos);
                 return tilePos;
             }/*else if (mapData.getTile(tilePos).getHeight() 
              * == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
@@ -257,7 +257,7 @@ public class HexMapMouseInput extends CoreDataAppState {
         if (cursor == null) {
             initCursor();
         }
-        if (getMapData().convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
+        if (mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
             cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() 
                     * HexSettings.FLOOR_HEIGHT + 0.1f, cursor.getLocalTranslation().z);
         }

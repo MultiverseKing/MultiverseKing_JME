@@ -1,10 +1,9 @@
 package entitysystem.card;
 
-import entitysystem.attribut.CardSubType;
-import entitysystem.attribut.CardMainType;
+import entitysystem.attribut.CardType;
+import entitysystem.attribut.Maintype;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
-import entitysystem.units.EAttributComponent;
 import org.json.simple.JSONObject;
 import utility.ElementalAttribut;
 
@@ -15,14 +14,41 @@ import utility.ElementalAttribut;
  * @author roah
  */
 public class CardProperties {
+    // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
+    /**
+     * Used to know how much ressource is needed to play the card.
+     */
     private final int playCost;
+    /**
+     * Used as deck requirement restriction to synergize the background story
+     * and art-design to use.
+     */
     private final Faction faction;
-    private final CardMainType cardMainType;
-    private final CardSubType cardSubType;
+    /**
+     * Used to know the outliner to use. Will be used later on to know wich card
+     * can be used to populate GameWorld.
+     */
+    private final Maintype mainType;
+    /**
+     * Used to know where the card can be played etc, mainly used stats.
+     */
+    private final CardType cardType;
+    /**
+     * Used to know the amount of time the player can have/play this card.
+     * Balance stats mainly.
+     */
     private final Rarity rarity;
+    /**
+     * Used for the elemental interaction.
+     */
     private final ElementalAttribut element;
+    /**
+     * Used to show the card description text.
+     */
+    private final String description;
 
+    // </editor-fold>
     /**
      * Create a new card type component, throw UnsupportedOperationException if
      * the subType didn't match the mainType. WORLD subType == SPELL, SUMMON,
@@ -34,11 +60,11 @@ public class CardProperties {
      * @param rarity balance...
      */
     public CardProperties(JSONObject obj) {
-        cardSubType = CardSubType.valueOf(obj.get("cardSubType").toString());
-        if (cardSubType == CardSubType.SPELL || cardSubType == CardSubType.SUMMON || cardSubType == CardSubType.TRAP) {
-            this.cardMainType = CardMainType.WORLD;
-        } else if (cardSubType == CardSubType.ABILITY || cardSubType == CardSubType.EQUIPEMENT) {
-            this.cardMainType = CardMainType.TITAN;
+        cardType = CardType.valueOf(obj.get("cardType").toString());
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
+            this.mainType = Maintype.WORLD;
+        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
+            this.mainType = Maintype.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
         }
@@ -47,8 +73,36 @@ public class CardProperties {
         faction = Faction.valueOf((String) obj.get("faction"));
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
+        description = (String) obj.get("description");
     }
 
+    /**
+     * Constructor used for the editor mode.
+     *
+     * @param playCost
+     * @param faction
+     * @param mainType
+     * @param cardType
+     * @param rarity
+     * @param element
+     */
+    public CardProperties(int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
+            this.mainType = Maintype.WORLD;
+        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
+            this.mainType = Maintype.TITAN;
+        } else {
+            throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
+        }
+        this.playCost = playCost;
+        this.faction = faction;
+        this.cardType = cardType;
+        this.rarity = rarity;
+        this.element = element;
+        this.description = description;
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Getter">
     /**
      * Play Cost to use the card.
      *
@@ -73,8 +127,8 @@ public class CardProperties {
      *
      * @return CardMainType the card belong too.
      */
-    public CardMainType getCardMainType() {
-        return cardMainType;
+    public Maintype getCardMainType() {
+        return mainType;
     }
 
     /**
@@ -83,8 +137,8 @@ public class CardProperties {
      * @see CardSubType
      * @return
      */
-    public CardSubType getCardSubType() {
-        return cardSubType;
+    public CardType getCardSubType() {
+        return cardType;
     }
 
     /**
@@ -105,4 +159,14 @@ public class CardProperties {
     public ElementalAttribut getElement() {
         return element;
     }
+
+    /**
+     * The description Text belong to this card.
+     *
+     * @return
+     */
+    public String getDescription() {
+        return description;
+    }
+    // </editor-fold>
 }

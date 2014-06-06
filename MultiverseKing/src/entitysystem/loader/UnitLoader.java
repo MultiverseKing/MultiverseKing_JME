@@ -1,18 +1,23 @@
 package entitysystem.loader;
 
-import entitysystem.units.ability.AbilityComponent;
-import entitysystem.units.LifeComponent;
-import entitysystem.movement.MovementStatsComponent;
+import entitysystem.ability.AbilityComponent;
+import entitysystem.field.LifeComponent;
+import entitysystem.field.movement.MovementStatsComponent;
+import entitysystem.field.CollisionComponent;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  * loader to load entity units from file.
+ *
  * @author roah
  */
 public class UnitLoader {
+
     private final MovementStatsComponent uStats;
     private final LifeComponent uLife;
     private final AbilityComponent abilityComp;
+    private final CollisionComponent collision;
 
     UnitLoader(JSONObject data, EntityLoader eLoader) {
         Number speed = (Number) data.get("speed");
@@ -22,11 +27,18 @@ public class UnitLoader {
         uLife = new LifeComponent(life.intValue());
         uStats = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
         abilityComp = eLoader.loadAbility(data.get("ability").toString());
+        
+        collision = new CollisionComponent(eLoader.getCollision((JSONArray)data.get("collision")));
+    }
+
+    public CollisionComponent getCollisionComp() {
+        return collision;
     }
 
     /**
      * Stats data component of the unit.
-     * @return 
+     *
+     * @return
      */
     public MovementStatsComponent getuStats() {
         return uStats;
@@ -34,7 +46,8 @@ public class UnitLoader {
 
     /**
      * Life component of the unit.
-     * @return 
+     *
+     * @return
      */
     public LifeComponent getuLife() {
         return uLife;
@@ -42,7 +55,8 @@ public class UnitLoader {
 
     /**
      * Ability component the unit have.
-     * @return 
+     *
+     * @return
      */
     public AbilityComponent getAbilityComp() {
         return abilityComp;

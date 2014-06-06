@@ -1,0 +1,20 @@
+{
+   "faction":"THUNDRA",
+   "cardType":"SUMMON",
+   "rarity":"COMMON",
+   "eAttribut":"EARTH",
+   "playCost":4,
+   "description":"Should be named spider moonlord king...  don't ask...",
+   "unitsStats":{
+      "life":100,
+      "speed":1.5,
+      "movePoint":1,
+      "ability":"PulseVoltage",
+      "collision":[
+         {
+            "layer": 0,
+            "key" :[ "0|0" ]
+         }
+      ]
+   }
+}

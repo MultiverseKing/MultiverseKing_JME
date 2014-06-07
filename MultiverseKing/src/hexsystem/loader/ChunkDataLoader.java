@@ -35,6 +35,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * Tile data loaded.
+     *
      * @return
      */
     public HexTile[][] getTiles() {
@@ -43,6 +44,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * path used to load data.
+     *
      * @return
      */
     public String getRootPath() {
@@ -51,6 +53,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * tile belong to the chunk to save.
+     *
      * @param tiles
      */
     public void setChunk(HexTile[][] tiles) {
@@ -59,6 +62,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * Convert this object data to a file.
+     *
      * @param ex exporter to use.
      * @throws IOException
      */
@@ -69,6 +73,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * Convert data from file to this object.
+     *
      * @param im importer to use.
      * @throws IOException
      */
@@ -86,6 +91,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      * Load the file using the binary importer.
+     *
      * @param assetInfo
      * @return
      * @throws IOException

@@ -6,10 +6,21 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
+import entitysystem.attribut.Animation;
+import entitysystem.attribut.CardRenderPosition;
+import static entitysystem.attribut.CardRenderPosition.DECK;
+import static entitysystem.attribut.CardRenderPosition.FIELD;
+import static entitysystem.attribut.CardRenderPosition.HAND;
+import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
+import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.render.RenderComponent;
 import entitysystem.field.CollisionSystem;
-import gamestate.HexMapMouseInput;
+import entitysystem.field.EAttributComponent;
+import entitysystem.field.position.HexPositionComponent;
+import entitysystem.field.render.AnimationComponent;
+import entitysystem.loader.UnitLoader;
+import hexsystem.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
@@ -17,6 +28,8 @@ import java.util.HashMap;
 import java.util.Set;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
+import utility.HexCoordinate;
+import utility.Rotation;
 
 /**
  * System used to render all card on the screen.
@@ -26,7 +39,7 @@ import tonegod.gui.core.Screen;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
+public class CardSystem extends EntitySystemAppState implements HexMapInputListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
@@ -97,21 +110,22 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         this.screen = new Screen(app);
         app.getGuiNode().addControl(screen);
 
-        // Used to resolve the current issue with tonegod-GUI
-//        for (Element e : screen.getElementsAsMap().values()) {
-//            screen.removeElement(e);
-//        }
-//        screen.getElementsAsMap().clear();
-//        // --
-
         hover = new Hover(screen);
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
-        
+
         return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
     }
 
+    @Override
+    protected void addEntity(Entity e) {
+        addCardToScreen(e);
+    }
+
     /**
+     * Add a new card corresponding to the entity on the screen.
+     *
+     * @param e
      * @todo Handle Outerworld cards, show permanently a picture of the last
      * card send to the outerworld. when mouse is over the outerworld Zone last
      * cast send to the outerworld show up his stats. When clic on the area
@@ -127,14 +141,13 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      * the field and visible show up, when clic on one of these card, it zoom to
      * the location of the card on the field
      */
-    @Override
-    protected void addEntity(Entity e) {
+    private void addCardToScreen(Entity e) {
         switch (e.get(CardRenderComponent.class).getCardPosition()) {
             case HAND:
                 String cardName = e.get(RenderComponent.class).getName();
                 Card card;
                 CardProperties properties = new EntityLoader().loadCardProperties(cardName);
-                if(properties != null){
+                if (properties != null) {
                     card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
                             properties);
                     handCards.put(e.getId(), card);
@@ -143,8 +156,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                     for (Card c : handCards.values()) {
                         c.setZOrder(c.getZOrder());
                     }
-                } else{
-                    System.err.println("Card files cannot be locate. "+cardName);
+                } else {
+                    System.err.println("Card files cannot be locate. " + cardName);
                 }
                 break;
             case DECK:
@@ -160,15 +173,81 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     }
 
     @Override
-    protected void updateEntity(Entity e) {
-        //todo//...
+    protected void removeEntity(Entity e) {
+        removeCardFromScreen(e.getId(), e.get(CardRenderComponent.class).getCardPosition());
+    }
+
+    /**
+     * Remove a card corresponding to the entity without knowing the
+     * CardRenderPosition of it.
+     *
+     * @param id
+     */
+    private void removeCardFromScreen(EntityId id) {
+        CardRenderPosition[] screenPos = CardRenderPosition.values();
+        for (CardRenderPosition p : screenPos) {
+            if (removeCardFromScreen(id, p)) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Remove a card corresponding to the entity when knowing the
+     * CardRenderPosition of it.
+     *
+     * @param id
+     * @param screenPos
+     * @return true if the card have been removed.
+     */
+    private boolean removeCardFromScreen(EntityId id, CardRenderPosition screenPos) {
+        switch (screenPos) {
+            case DECK:
+                if (deckCards.contains(id)) {
+                    deckCards.remove(id);
+                    return true;
+                }
+                break;
+            case FIELD:
+                if (fieldCards.contains(id)) {
+                    fieldCards.remove(id);
+                    return true;
+                }
+                break;
+            case HAND:
+                if (handCards.containsKey(id)) {
+                    Card card = handCards.get(id);
+                    screen.removeElement(card);
+                    handCards.remove(id);
+                    return true;
+                }
+                break;
+            case OUTERWORLD:
+                if (outerworldCards.contains(id)) {
+                    outerworldCards.remove(id);
+                    return true;
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException(screenPos
+                        + " CardPosition isn't supported by " + this.getClass().getName());
+        }
+        return false;
     }
 
     @Override
-    protected void removeEntity(Entity e) {
-        Card card = handCards.get(e.getId());
-        screen.removeElement(card);
-        handCards.remove(e.getId());
+    protected void updateEntity(Entity e) {
+        removeCardFromScreen(e.getId());
+        addCardToScreen(e);
+    }
+
+    /**
+     * @todo Get the mouse position to see if on the position of a cards (better
+     * than the current hover ?)
+     */
+    @Override
+    protected void updateSystem(float tpf) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
@@ -208,7 +287,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      */
     private void castPreview(Card card) {
         if (isCastedDebug == null) {
-            isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 175), new Vector2f(250, 20));
+            isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 155), new Vector2f(250, 20));
             isCastedDebug.setMinDimensions(new Vector2f(200, 26));
             isCastedDebug.setIgnoreMouse(true);
         }
@@ -217,7 +296,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         screen.removeElement(card);
         cardPreviewCast = card;
         setActiveCard(true);
-        
+
         //Register the input for the card system
         app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
         app.getInputManager().addListener(cardInputListener, "Cancel");
@@ -241,6 +320,22 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         app.getInputManager().removeListener(cardInputListener);
     }
 
+    private void initializeCastedCard(HexCoordinate castCoord, CardType type) {
+        String name = entityData.getComponent(cardPreviewCast.getCardEntityUID(), RenderComponent.class).getName();
+        UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
+        if (unitLoader != null) {
+            entityData.setComponents(cardPreviewCast.getCardEntityUID(),
+                    new HexPositionComponent(castCoord, Rotation.A),
+                    new CardRenderComponent(CardRenderPosition.FIELD),
+                    new AnimationComponent(Animation.SUMMON),
+                    new EAttributComponent(cardPreviewCast.getProperties().getElement()),
+                    unitLoader.getCollisionComp(), //Collision Comp
+                    unitLoader.getuLife(), //life component
+                    unitLoader.getuStats(), //stats component
+                    unitLoader.getAbilityComp());
+        }
+    }
+
     private void setActiveCard(boolean isActive) {
         if (isActive && cardPreviewCast != null) {
 
@@ -253,13 +348,13 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                     //todo
                     break;
                 case WORLD:
-                    app.getStateManager().getState(HexMapMouseInput.class).setActiveCursor(isActive, this);
+                    app.getStateManager().getState(HexMapMouseInput.class).setCursorOnPulseMode(isActive, this);
                     break;
                 default:
                     throw new UnsupportedOperationException("This type isn't implemented !");
             }
         } else {
-            app.getStateManager().getState(HexMapMouseInput.class).setActiveCursor(isActive, this);
+            app.getStateManager().getState(HexMapMouseInput.class).setCursorOnPulseMode(isActive, this);
             screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         }
     }
@@ -272,24 +367,35 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     };
 
     public void leftMouseActionResult(HexMapInputEvent event) {
+        //If a card is currently in Casting Preview we check his type then the collision before casting it
+        /**
+         * If a card is currently in Casting Preview we check his Main Type,
+         * then we check if it can be casted and finaly we activate that card
+         * properly. (the entity will be removed from this system automaticaly
+         * if he have to)
+         */
         if (cardPreviewCast != null) {
-            CardProperties properties = cardPreviewCast.getProperties();
-            /**
-             * We switch over all card main type and call the corresponding
-             * system for that card to be activated properly. Then we confirm
-             * the cast in this system. (the entity will be removed from this
-             * system automaticaly if he have to)
-             */
-            switch (properties.getCardMainType()) {
+            switch (cardPreviewCast.getProperties().getCardMainType()) {
                 case TITAN:
                     //todo : if the player want to use the field and not fast selection menu. TITAN card
                     break;
                 case WORLD:
-                    if (app.getStateManager().getState(CollisionSystem.class).canBeCast(event.getEventPosition(), 
-                            cardPreviewCast.getCardEntityUID(), properties)) {
-                        castConfirmed();
+                    /**
+                     * We check if the collision system is currently running, if
+                     * it's not the card will be directly casted.
+                     */
+                    CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
+                    if (collisionSystem != null) {
+                        if (collisionSystem.canBeCast(event.getEventPosition(),
+                                cardPreviewCast.getProperties().getCardSubType())) {
+                            initializeCastedCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                            castConfirmed();
+                        } else {
+                            castCanceled();
+                        }
                     } else {
-                        castCanceled();
+                        initializeCastedCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                        castConfirmed();
                     }
                     break;
                 default:
@@ -319,13 +425,100 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         return handCards.keySet();
     }
 
+    public void hideCards() {
+        hideCards(null);
+    }
+
     /**
-     * @todo Get the mouse position to see if on the position of a cards (better
-     * than the current hover ?)
+     * Hide card on the selected position in the system, Set to null to hide all
+     * cards.
+     *
+     * @param screenPosition
      */
-    @Override
-    protected void updateSystem(float tpf) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void hideCards(CardRenderPosition screenPosition) {
+        if (screenPosition == null) {
+            if (!handCards.isEmpty()) {
+                for (Card card : handCards.values()) {
+                    card.hide();
+                }
+            }
+            /**
+             * @todo: other position.
+             */
+            return;
+        }
+        switch (screenPosition) {
+            case DECK:
+                /**
+                 * @todo
+                 */
+                break;
+            case FIELD:
+                /**
+                 * @todo
+                 */
+                break;
+            case HAND:
+                if (!handCards.isEmpty()) {
+                    for (Card card : handCards.values()) {
+                        card.hide();
+                    }
+                }
+                break;
+            case OUTERWORLD:
+                /**
+                 * @todo
+                 */
+                break;
+        }
+    }
+
+    public void showCards() {
+        showCards(null);
+    }
+
+    /**
+     * Show card on the selected position in the system, Set to null to show all
+     * cards.
+     *
+     * @param screenPosition
+     */
+    public void showCards(CardRenderPosition screenPosition) {
+        if (screenPosition == null) {
+            if (!handCards.isEmpty()) {
+                for (Card card : handCards.values()) {
+                    card.show();
+                }
+            }
+            /**
+             * @todo: other position.
+             */
+            return;
+        }
+        switch (screenPosition) {
+            case DECK:
+                /**
+                 * @todo
+                 */
+                break;
+            case FIELD:
+                /**
+                 * @todo
+                 */
+                break;
+            case HAND:
+                if (!handCards.isEmpty()) {
+                    for (Card card : handCards.values()) {
+                        card.show();
+                    }
+                }
+                break;
+            case OUTERWORLD:
+                /**
+                 * @todo
+                 */
+                break;
+        }
     }
 
     @Override

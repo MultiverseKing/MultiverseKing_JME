@@ -4,7 +4,6 @@ import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import utility.ElementalAttribut;
-import utility.HexCoordinate;
 
 /**
  *

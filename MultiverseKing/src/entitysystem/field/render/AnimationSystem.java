@@ -29,12 +29,12 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 
         return entityData.getEntities(AnimationComponent.class, RenderComponent.class);
     }
-    
+
     @Override
     protected void updateSystem(float tpf) {
 //        Use onAnimCycleDone && onAnimChange
     }
-    
+
     @Override
     protected void addEntity(Entity e) {
         AnimControl control = renderSystem.getAnimControl(e.getId());
@@ -44,16 +44,16 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 
         animControls.put(e.getId(), control);
     }
-    
+
     @Override
     protected void updateEntity(Entity e) {
         Animation toPlay = e.get(AnimationComponent.class).getAnimation();
-        if (animControls.containsKey(e.getId()) 
+        if (animControls.containsKey(e.getId())
                 && !animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
         }
     }
-    
+
     @Override
     protected void removeEntity(Entity e) {
         AnimControl animControl = animControls.get(e.getId());
@@ -61,7 +61,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
         animControl.clearListeners();
         animControls.remove(e.getId());
     }
-    
+
     @Override
     protected void cleanupSystem() {
         for (AnimControl control : animControls.values()) {
@@ -72,9 +72,9 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     }
 
     /**
-     * Activate the defined animation in the AnimationComponent, 
-     * on the main channel (Currently only one channel is used).
-     * 
+     * Activate the defined animation in the AnimationComponent, on the main
+     * channel (Currently only one channel is used).
+     *
      * @param channel to use for the animation.
      * @param anim animation to play.
      */
@@ -91,6 +91,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 
     /**
      * Called When an animation on a channel ended his life cycle.
+     *
      * @param control who this animation belong.
      * @param channel channel used by the animation.
      * @param animName name of the ended animation.
@@ -104,6 +105,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 
     /**
      * Called when an animation got changed during his life cycle.
+     *
      * @param control who this animation belong.
      * @param channel channel used by the animation.
      * @param animName name of the ended animation.

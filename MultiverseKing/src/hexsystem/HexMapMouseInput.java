@@ -1,5 +1,8 @@
-package gamestate;
+package hexsystem;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import com.jme3.collision.CollisionResult;
@@ -12,30 +15,22 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
-import com.simsilica.es.Entity;
-import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
-import entitysystem.field.position.HexPositionComponent;
-import entitysystem.field.render.RenderComponent;
-import hexsystem.HexSettings;
-import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import kingofmultiverse.MultiverseMain;
 import utility.HexCoordinate;
 import utility.MouseRay;
 
 /**
- * TODO: JUST temporarily, has to be better designed!!
  *
- * @Idea : Switch it to hexMapMouseInput, but the dependency to mapData is an
- * issue.
- * @author Eike Foede
+ * @author Eike Foede, roah
  */
-public class HexMapMouseInput extends EntitySystemAppState {
+public class HexMapMouseInput extends AbstractAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
+    private MultiverseMain app;
     private ArrayList<HexMapInputListener> hexMapListener = new ArrayList<HexMapInputListener>();
     private Spatial cursor;
     private Spatial mark;
@@ -45,12 +40,11 @@ public class HexMapMouseInput extends EntitySystemAppState {
     private MapData mapData;
 
     @Override
-    protected EntitySet initialiseSystem() {
-        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
+    public void initialize(AppStateManager stateManager, Application app) {
+        this.app = (MultiverseMain) app;
+        mapData = stateManager.getState(HexSystemAppState.class).getMapData();
         initMarkDebug();
         initInput();
-//        initCursor();
-        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
     }
 
     /**
@@ -61,6 +55,7 @@ public class HexMapMouseInput extends EntitySystemAppState {
     public void registerTileInputListener(HexMapInputListener listener) {
         hexMapListener.add(listener);
     }
+
     /**
      * Remove a listener to respond to Tile Input.
      *
@@ -69,7 +64,6 @@ public class HexMapMouseInput extends EntitySystemAppState {
     public void removeTileInputListener(HexMapInputListener listener) {
         hexMapListener.remove(listener);
     }
-    
 
     /**
      * Base input, it not depend on the gameMode or other thing if hexMap is
@@ -88,19 +82,19 @@ public class HexMapMouseInput extends EntitySystemAppState {
     }
 
     private void initCursor() {
-            cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
-            Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-            animShader.setInt("Speed", 16);
-            cursor.setMaterial(animShader);
-            app.getRootNode().attachChild(cursor);
-            //Remove offset and set it to zero if hex_void_anim.png is not used
-            float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
-            cursor.setLocalTranslation(new Vector3f(0f,  z +  0.01f , cursorOffset));
-            System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT+" + "+z+0.01f);
+        cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
+        Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+        animShader.setInt("Speed", 16);
+        cursor.setMaterial(animShader);
+        app.getRootNode().attachChild(cursor);
+        //Remove offset and set it to zero if hex_void_anim.png is not used
+        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
+        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
+        System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT + " + " + z + 0.01f);
     }
 
     @Override
-    protected void updateSystem(float tpf) {
+    public void update(float tpf) {
         if (currentFocusIndex != -1) {
             Vector2f newMousePos = app.getInputManager().getCursorPosition().normalize();
             if (!newMousePos.equals(lastMousePos)) {
@@ -110,29 +104,15 @@ public class HexMapMouseInput extends EntitySystemAppState {
         }
     }
 
-    @Override
-    protected void addEntity(Entity e) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    protected void updateEntity(Entity e) {
-////        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    protected void removeEntity(Entity e) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     /**
-     * Activate the cursor on pulse mode, Raycast will follow the mouse.
+     * Activate the cursor on pulse mode, Raycast will follow the mouse. The
+     * pulse mode can be locked to update only one System.
      *
      * @param lockInput is this the listener locking the input.
      * @param listenerFocus listener to add.
      * @return false
      */
-    public boolean setActiveCursor(boolean lockInput, HexMapInputListener listenerFocus) {
+    public boolean setCursorOnPulseMode(boolean lockInput, HexMapInputListener listenerFocus) {
         if (lockInput && currentFocusIndex == -1) {
             //We keep track of the listener locking the input.
             if (!hexMapListener.contains(listenerFocus)) {
@@ -154,7 +134,7 @@ public class HexMapMouseInput extends EntitySystemAppState {
                 return false;
             }
         } else if (lockInput && currentFocusIndex != -1) {
-            System.err.println("input already locked by : " + hexMapListener.get(currentFocusIndex).toString() 
+            System.err.println("input already locked by : " + hexMapListener.get(currentFocusIndex).toString()
                     + ". Lock request by : " + listenerFocus.toString());
             return false;
         }
@@ -216,11 +196,11 @@ public class HexMapMouseInput extends EntitySystemAppState {
     }
 
     private void moveCursor(HexCoordinate tilePos) {
-        if(cursor == null){
+        if (cursor == null) {
             initCursor();
         }
         Vector3f pos = mapData.getTileWorldPosition(tilePos);
-        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT 
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT
                 + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
     }
 
@@ -258,13 +238,13 @@ public class HexMapMouseInput extends EntitySystemAppState {
             initCursor();
         }
         if (mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
-            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight() 
+            cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight()
                     * HexSettings.FLOOR_HEIGHT + 0.1f, cursor.getLocalTranslation().z);
         }
     }
 
     @Override
-    protected void cleanupSystem() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void cleanup() {
+        super.cleanup();
     }
 }

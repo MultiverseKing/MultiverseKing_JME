@@ -28,8 +28,7 @@ public class MeshParameter {
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef 
-            = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
+    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
     /**
      * Used to define which algorithm to use with meshmanager.
      */
@@ -161,7 +160,8 @@ public class MeshParameter {
 
     /**
      * set to true if the depth isn't needed.
-     * @return 
+     *
+     * @return
      */
     public boolean onlyGround() {
         return onlyGround;
@@ -169,7 +169,8 @@ public class MeshParameter {
 
     /**
      * wish side of the mesh should be rendered on other term.
-     * @return 
+     *
+     * @return
      */
     public Boolean[][] getCulling() {
         int current = elementTypeRef.get(currentElement).get(currentIndex);
@@ -182,7 +183,7 @@ public class MeshParameter {
 //                    
 //                }
 //            }
-            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET, 
+            HexTile[] neightbors = mapData.getNeightbors(new HexCoordinate(HexCoordinate.OFFSET,
                     position.get(current).x + j, position.get(current).y));
             for (byte k = 0; k < 6; k++) {
                 if (height.get(current) >= 0) {
@@ -225,7 +226,8 @@ public class MeshParameter {
 
     /**
      * How many mesh param this element have.
-     * @return 
+     *
+     * @return
      */
     public int getElementMeshCount() {
         return elementTypeRef.get(currentElement).size();
@@ -233,7 +235,8 @@ public class MeshParameter {
 
     /**
      * Return true if there is another mesh to generate for the current element.
-     * @return 
+     *
+     * @return
      */
     public boolean hasNext() {
         currentIndex++;

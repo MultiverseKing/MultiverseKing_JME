@@ -5,8 +5,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import gamestate.HexSystemAppState;
-import hexsystem.MapData;
+import hexsystem.HexSystemAppState;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
@@ -16,10 +15,10 @@ import utility.Rotation;
 import utility.Vector3Int;
 
 /**
- * Todo : behavior when unit got an obstacle appearing when moving 
- * (stop it and remove the component 
- * or put the move on pause until the obstacle is gone (2nd idea best)).
- * 
+ * Todo : behavior when unit got an obstacle appearing when moving (stop it and
+ * remove the component or put the move on pause until the obstacle is gone (2nd
+ * idea best)).
+ *
  * @author Eike Foede, roah
  */
 public class MovementSystem extends EntitySystemAppState {
@@ -52,7 +51,7 @@ public class MovementSystem extends EntitySystemAppState {
             while (movement.distanceMoved > speed) {
                 movement.distanceMoved -= speed;
                 if (movement.actualPosition + 1 < movement.path.size()) {
-                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(), 
+                    Rotation dir = getDirection(movement.path.get(movement.actualPosition).getAsCubic(),
                             movement.path.get(movement.actualPosition + 1).getAsCubic());
                     if (!e.get(HexPositionComponent.class).getRotation().equals(dir)) {
                         e.set(e.get(HexPositionComponent.class).clone(dir));

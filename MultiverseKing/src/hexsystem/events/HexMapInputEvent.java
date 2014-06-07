@@ -12,6 +12,7 @@ import utility.HexCoordinate;
  * @author roah
  */
 public class HexMapInputEvent {
+
     private final HexCoordinate eventPosition;
     private final CollisionResults rayResults;
 
@@ -19,7 +20,7 @@ public class HexMapInputEvent {
         this.eventPosition = eventPosition;
         this.rayResults = rayResults;
     }
-    
+
     public HexCoordinate getEventPosition() {
         return eventPosition;
     }

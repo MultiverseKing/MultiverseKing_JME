@@ -15,6 +15,7 @@ public class CardRenderComponent implements PersistentComponent {
 
     /**
      * Define where the card will be generated/ rendered on the screen.
+     *
      * @param cardPos
      */
     public CardRenderComponent(CardRenderPosition cardPos) {
@@ -23,6 +24,7 @@ public class CardRenderComponent implements PersistentComponent {
 
     /**
      * where the card is.
+     *
      * @see CardRenderPosition
      * @return
      */

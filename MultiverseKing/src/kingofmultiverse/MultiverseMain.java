@@ -1,5 +1,6 @@
 package kingofmultiverse;
 
+import gamemode.editor.EditorMainGUI;
 import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -12,20 +13,14 @@ import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
-import com.simsilica.es.EntityData;
-import com.simsilica.es.EntityId;
-import gamestate.EntityDataAppState;
+import entitysystem.EntityDataAppState;
 import entitysystem.field.render.AnimationSystem;
-import entitysystem.card.CardRenderSystem;
-import entitysystem.field.movement.MoveToComponent;
-import entitysystem.field.movement.MovementStatsComponent;
+import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
-import entitysystem.field.position.HexPositionComponent;
 import entitysystem.field.render.EntityRenderSystem;
-import entitysystem.field.render.RenderComponent;
 import entitysystem.field.CollisionSystem;
-import gamestate.HexSystemAppState;
-import gamestate.HexMapMouseInput;
+import hexsystem.HexSystemAppState;
+import hexsystem.HexMapMouseInput;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -35,9 +30,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
-import utility.HexCoordinate;
-import utility.Rotation;
-import utility.Vector2Int;
 import utility.ElementalAttribut;
 
 /**
@@ -59,10 +51,6 @@ public class MultiverseMain extends SimpleApplication {
     private Screen screen;
     RTSCamera rtsCam;
 
-    /**
-     *
-     * @return
-     */
     public Screen getScreen() {
         return screen;
     }
@@ -79,34 +67,29 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
 
-        // Disable the default flyby cam
-        cameraInit();
-        
         //Init general input 
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        
 
         //Create a new screen for tonegodGUI to work with.
-        initScreen();
+        screen = new Screen(this);
+        guiNode.addControl(screen);
+
+        // Disable the default flyby cam
+        cameraInit();
+
+        //Init all light
         lightSettup();
+        //init All used System
         initSystem();
-        
+
     }
 
-    /**
-     *
-     * @param tpf
-     */
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
     }
 
-    /**
-     *
-     * @param rm
-     */
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
@@ -114,7 +97,7 @@ public class MultiverseMain extends SimpleApplication {
 
     private void lightSettup() {
         /**
-         * A white, directional light source
+         * A white, directional light source.
          */
         DirectionalLight sun = new DirectionalLight();
         sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
@@ -125,7 +108,7 @@ public class MultiverseMain extends SimpleApplication {
 
         /* this shadow needs a directional light */
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 1024, 2);
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 2);
         dlsf.setLight(sun);
         fpp.addFilter(dlsf);
         viewPort.addProcessor(fpp);
@@ -141,7 +124,7 @@ public class MultiverseMain extends SimpleApplication {
          */
         AmbientLight ambient = new AmbientLight();
 //        ambient.setColor(ColorRGBA.White);
-        ambient.setColor(new ColorRGBA(230/255, 230/255, 230/255, 1));
+        ambient.setColor(new ColorRGBA(230 / 255, 230 / 255, 230 / 255, 1));
         rootNode.addLight(ambient);
     }
 
@@ -151,10 +134,9 @@ public class MultiverseMain extends SimpleApplication {
         rtsCam.setCenter(new Vector3f(8, 15f, 8));
         rtsCam.setRot(120);
         stateManager.attach(rtsCam);
-//        flyCam.setMoveSpeed(10);
-//        cam.setLocation(new Vector3f(10f, 18f, -5f));
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Put on Standby, Exploration mode Stuff.">
     /**
      * Use to generate a character who can move on the field, this will be used
      * for Exploration mode configuration, jme terrain is called with it.
@@ -174,15 +156,7 @@ public class MultiverseMain extends SimpleApplication {
         rootNode.attachChild(player);
         return player;
     }
-
-    private void initScreen() {
-        screen = new Screen(this);
-        guiNode.addControl(screen);
-//        for (Element e : screen.getElementsAsMap().values()) {
-//            screen.removeElement(e);
-//        }
-//        screen.getElementsAsMap().clear();
-    }
+    // </editor-fold>
 
     private void initDebug() {
         ArrowShape arrowShape = new ArrowShape(assetManager, rootNode, new Vector3f(0f, 0f, 0f));
@@ -193,46 +167,43 @@ public class MultiverseMain extends SimpleApplication {
      */
     public void initSystem() {
         MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
-        
+
         stateManager.attachAll(
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
                 new HexMapMouseInput(),
                 new EntityRenderSystem(),
-                new MainGUI(this),
-//                new MapEditorAppState(),
                 new MovementSystem(),
-                new CardRenderSystem(),
+                new CardSystem(),
                 new AnimationSystem(),
-                new CollisionSystem());
+                new CollisionSystem(),
+                new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
+//    private boolean exemple = false;
 
-    private boolean exemple = false;
-    @Override
-    public void update() {
-        super.update();
-        if (exemple) {
-            MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
-            md.addChunk(Vector2Int.ZERO, null);
-            EntityData ed = stateManager.getState(EntityDataAppState.class).getEntityData();
-            //Example: Initialise new character entity.
-            EntityId characterId = ed.createEntity();
-            ed.setComponents(characterId, new RenderComponent("Berserk"),
-                    new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A),
-                    new MovementStatsComponent(1f, (byte)3),
-                    new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
-
-            exemple = false;
-        }
-    }
-
+//    @Override
+//    public void simpleUpdate(float tpf) {
+//        super.update();
+//        if (exemple) {
+//            MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
+//            md.addChunk(Vector2Int.ZERO, null);
+//            EntityData ed = stateManager.getState(EntityDataAppState.class).getEntityData();
+//            //Example: Initialise new character entity.
+//            EntityId characterId = ed.createEntity();
+//            ed.setComponents(characterId, new RenderComponent("Berserk"),
+//                    new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A),
+//                    new MovementStatsComponent(1f, (byte) 3),
+//                    new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
+//
+//            exemple = false;
+//        }
+//    }
     /**
+     * Return the first founded key.
      *
-     * @param <T>
-     * @param <E>
      * @param map
      * @param value
-     * @return
+     * @return the key associated to a key in a map.
      */
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Entry<T, E> entry : map.entrySet()) {
@@ -242,13 +213,13 @@ public class MultiverseMain extends SimpleApplication {
         }
         return null;
     }
+
     /**
-     * 
-     * @param <T>
-     * @param <E>
+     * Return a list of key associated to a value.
+     *
      * @param map
      * @param value
-     * @return multiple key attached to a value
+     * @return multiple key attached to a value.
      */
     public static <T, E> ArrayList<T> getKeysByValue(Map<T, E> map, E value) {
         ArrayList<T> keyList = new ArrayList<T>();
@@ -257,7 +228,7 @@ public class MultiverseMain extends SimpleApplication {
                 keyList.add(entry.getKey());
             }
         }
-        if(keyList.isEmpty()){
+        if (keyList.isEmpty()) {
             return null;
         } else {
             return keyList;

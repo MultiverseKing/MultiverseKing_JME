@@ -23,12 +23,12 @@ public class UnitLoader {
         Number speed = (Number) data.get("speed");
         Number movePoint = (Number) data.get("movePoint");
         Number life = (Number) data.get("life");
-        
+
         uLife = new LifeComponent(life.intValue());
         uStats = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
         abilityComp = eLoader.loadAbility(data.get("ability").toString());
-        
-        collision = new CollisionComponent(eLoader.getCollision((JSONArray)data.get("collision")));
+
+        collision = new CollisionComponent(eLoader.getCollision((JSONArray) data.get("collision")));
     }
 
     public CollisionComponent getCollisionComp() {

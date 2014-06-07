@@ -59,6 +59,7 @@ public class HexTile implements Savable {
     public int getHeight() {
         return height;
     }
+
     /**
      *
      * @param ex

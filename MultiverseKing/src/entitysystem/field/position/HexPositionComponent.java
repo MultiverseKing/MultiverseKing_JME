@@ -28,33 +28,38 @@ public class HexPositionComponent implements PersistentComponent {
     public HexCoordinate getPosition() {
         return position;
     }
-    
+
     /**
      * Direction hes facing.
+     *
      * @see Rotation
      */
     public Rotation getRotation() {
         return rotation;
     }
-    
+
     @Override
     public HexPositionComponent clone() {
         return new HexPositionComponent(position, rotation);
     }
+
     /**
      * Create a clone with modifiate rotation.
+     *
      * @param rot new rotation.
      * @return the cloned component.
      */
-    public HexPositionComponent clone(Rotation rot){
+    public HexPositionComponent clone(Rotation rot) {
         return new HexPositionComponent(position, rot);
     }
+
     /**
      * Create a clone with modifiate position.
+     *
      * @param pos new position.
      * @return the cloned component.
      */
-    public HexPositionComponent clone (HexCoordinate pos){
+    public HexPositionComponent clone(HexCoordinate pos) {
         return new HexPositionComponent(pos, rotation);
     }
 }

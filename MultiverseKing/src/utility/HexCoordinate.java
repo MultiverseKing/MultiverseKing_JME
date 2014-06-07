@@ -3,22 +3,13 @@ package utility;
 /**
  *
  * @author Roah with the help of : ArtemisArt => http://artemis.art.free.fr/ &&
- * http://www.redblobgames.com --Changed version by Eike Foede-- This Class is only
- * used as a converter system so we can simplifie algorithm.
+ * http://www.redblobgames.com --Changed version by Eike Foede-- This Class is
+ * only used as a converter system so we can simplifie algorithm.
  */
 public final class HexCoordinate {
 
-    /**
-     *
-     */
     public static final int OFFSET = 0;
-    /**
-     *
-     */
     public static final int AXIAL = 1;
-    /**
-     *
-     */
     public static final int CUBIC = 2;
     /**
      * Axial position in Grid. q == x
@@ -62,10 +53,7 @@ public final class HexCoordinate {
     }
 
     /**
-     * Only for internal use
-     *
-     * @param q
-     * @param r
+     * Only for internal use.
      */
     private HexCoordinate(int q, int r) {
         this.q = q;
@@ -167,12 +155,13 @@ public final class HexCoordinate {
     public int hashCode() {
         return q * 2 ^ 16 + r;
     }
-    
+
     /**
      * Combine two position.
-     * @param value 
+     *
+     * @param value
      */
-    public HexCoordinate add(HexCoordinate value){
+    public HexCoordinate add(HexCoordinate value) {
         return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
     }
 }

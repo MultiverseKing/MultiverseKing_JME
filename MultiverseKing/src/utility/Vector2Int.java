@@ -16,33 +16,12 @@ import java.io.IOException;
  */
 public class Vector2Int implements Savable {
 
-    /**
-     *
-     */
     public static final int X = 0;
-    /**
-     *
-     */
     public static final int Y = 1;
-    /**
-     *
-     */
     public static final Vector2Int ZERO = new Vector2Int(0, 0);
-    /**
-     *
-     */
     public static final Vector2Int INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    /**
-     *
-     */
     public static final Vector2Int NEG_INFINITY = new Vector2Int(Integer.MIN_VALUE, Integer.MIN_VALUE);
-    /**
-     *
-     */
     public int x;
-    /**
-     *
-     */
     public int y;
 
     @Override
@@ -82,7 +61,7 @@ public class Vector2Int implements Savable {
     }
 
     /**
-     *
+     * X = 0, Y = 0, same as Vector2Int.ZERO.
      */
     public Vector2Int() {
         this.x = 0;
@@ -90,7 +69,7 @@ public class Vector2Int implements Savable {
     }
 
     /**
-     *
+     * String must be split as X|Y.
      * @param input
      */
     public Vector2Int(String input) {
@@ -100,7 +79,7 @@ public class Vector2Int implements Savable {
     }
 
     /**
-     *
+     * each value is converted to integer.
      * @param value
      */
     public Vector2Int(Vector2f value) {
@@ -149,17 +128,18 @@ public class Vector2Int implements Savable {
     }
 
     /**
-     *
-     * @param i
-     * @return
+     * return a new Vector2Int as x*i and y*i.
+     * @param i multiply factor.
+     * @return new Vector2Int
      */
     public Vector2Int multiply(int i) {
         return new Vector2Int(x * i, y * i);
     }
 
     /**
-     *
-     * @param value
+     * return a new Vector2Int as 
+     * new Vector2Int(this.x + value.x, this.y + value.y).
+     * @param value vector to add
      * @return
      */
     public Vector2Int add(Vector2Int value) {

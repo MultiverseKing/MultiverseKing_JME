@@ -127,7 +127,7 @@ public final class RTSCamera extends AbstractAppState {
     private static final int DISTANCE = DoF.DISTANCE.ordinal();
     private static final float WHEEL_SPEED = 1f / 15;
     private static String[] mappings = new String[]{
-        "+SIDE", "+FWD", "+ROTATE", "+TILT", "+DISTANCE", "-SIDE", "-FWD", "-ROTATE", "-TILT", 
+        "+SIDE", "+FWD", "+ROTATE", "+TILT", "+DISTANCE", "-SIDE", "-FWD", "-ROTATE", "-TILT",
         "-DISTANCE", "+WHEEL", "-WHEEL", "-MOUSEX", "+MOUSEX", "-MOUSEY", "+MOUSEY",
         "BUTTON1", "BUTTON2", "BUTTON3"};
 
@@ -225,7 +225,8 @@ public final class RTSCamera extends AbstractAppState {
 
     /**
      * Enables/disabled wheel-zoom behaviour Default is enabled
-     * @param wheelEnabled 
+     *
+     * @param wheelEnabled
      */
     public void setWheelEnabled(boolean wheelEnabled) {
         this.wheelEnabled = wheelEnabled;

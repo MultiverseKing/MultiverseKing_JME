@@ -9,7 +9,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import gamestate.HexSystemAppState;
+import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
@@ -37,13 +37,14 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
 
     /**
      * Return the Animation Spatial control of an entity.
+     *
      * @param id of the entity.
      * @return AnimControl of the entity.
      */
     public AnimControl getAnimControl(EntityId id) {
         return spatials.get(id).getControl(AnimControl.class);
     }
-    
+
     @Override
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
@@ -121,7 +122,6 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
 //            return null;
 //        }
 //    }
-
     /**
      *
      * @param event

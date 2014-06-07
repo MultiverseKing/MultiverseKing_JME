@@ -1,4 +1,4 @@
-package gamestate;
+package hexsystem;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -6,8 +6,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
-import hexsystem.HexTile;
-import hexsystem.MapData;
 import hexsystem.chunksystem.ChunkControl;
 import hexsystem.chunksystem.MeshManager;
 import hexsystem.events.ChunkChangeEvent;
@@ -47,7 +45,7 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
     public MapData getMapData() {
         return mapData;
     }
-    
+
     /**
      * Settup the base param for the hexMap, create a new mapNode to hold the
      * hexMap.

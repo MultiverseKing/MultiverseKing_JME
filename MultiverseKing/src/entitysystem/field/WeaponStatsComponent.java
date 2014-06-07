@@ -16,13 +16,14 @@ public class WeaponStatsComponent implements PersistentComponent {
      */
     private final byte activationRange;
     /**
-     * The hit collision contain where the weapon hit when used.
-     * When the weapon is used the rotation and position of the holder is 
-     * used to know where collision realy happen.
+     * The hit collision contain where the weapon hit when used. When the weapon
+     * is used the rotation and position of the holder is used to know where
+     * collision realy happen.
      */
     private final ArrayList<HexCoordinate> hitCollision;
     /**
-     * Each weapon consume weapon slot on titan, the avarage slot of a titan is about 4.
+     * Each weapon consume weapon slot on titan, the avarage slot of a titan is
+     * about 4.
      */
     private final byte neededSlot;
     private final int power;
@@ -48,8 +49,8 @@ public class WeaponStatsComponent implements PersistentComponent {
     }
 
     /**
-     * Where the weapon will realy got his effect apply,
-     * where the weapon can shoot when activated.
+     * Where the weapon will realy got his effect apply, where the weapon can
+     * shoot when activated.
      *
      * @return
      */
@@ -58,14 +59,16 @@ public class WeaponStatsComponent implements PersistentComponent {
     }
 
     /**
-     * Range for the weapon to trigger his effect,
-     * /!\ This should be not used to know where the weapon effect is apply /!\.
-     * This is usualy equals to the max collision range arround the weapon holder.
-     * @return 
+     * Range for the weapon to trigger his effect, /!\ This should be not used
+     * to know where the weapon effect is apply /!\. This is usualy equals to
+     * the max collision range arround the weapon holder.
+     *
+     * @return
      */
-    public byte getActivationRange(){
+    public byte getActivationRange() {
         return activationRange;
     }
+
     /**
      * The power of the weapon effect, for damage calculation or other.
      *

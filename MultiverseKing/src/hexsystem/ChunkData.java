@@ -19,7 +19,6 @@ class ChunkData {
      */
     HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
 
-
     void add(Vector2Int chunkPos, HexTile[][] tiles) {
         chunks.put(chunkPos, tiles);
     }
@@ -69,8 +68,8 @@ class ChunkData {
         }
         return false;
     }
-    
-    boolean exist(Vector2Int chunk, HexCoordinate tilePos){
+
+    boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
         return chunks.get(chunk)[tileOffset.x][tileOffset.y] == null ? false : true;
     }

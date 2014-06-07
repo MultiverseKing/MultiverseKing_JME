@@ -46,8 +46,9 @@ public final class MapData {
 
     /**
      * Base constructor.
+     *
      * @param eAttribut
-     * @param assetManager  
+     * @param assetManager
      */
     public MapData(ElementalAttribut eAttribut, AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -76,7 +77,7 @@ public final class MapData {
     public ArrayList<Vector2Int> getAllChunkPos() {
         return chunkPos;
     }
-    
+
     //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
     /**
      *
@@ -92,7 +93,7 @@ public final class MapData {
      * Add a specifiate chunk in mapData at choosen position.
      *
      * @param chunkPos Where to put the chunk.
-     * @param tiles  
+     * @param tiles
      */
     public void addChunk(Vector2Int chunkPos, HexTile[][] tiles) {
         if (tiles == null) {
@@ -111,7 +112,7 @@ public final class MapData {
     }
 
     /**
-     * @param chunkPos 
+     * @param chunkPos
      * @return All tiles of the requested chunk.
      */
     public HexTile[][] getChunkTiles(Vector2Int chunkPos) {
@@ -162,7 +163,7 @@ public final class MapData {
             for (Vector2Int pos : chunkPos) {
                 if (pos.equals(chunkPosition) && chunkData.exist(chunkPosition, tilePos)) {
                     return true;
-                } else if (pos.equals(chunkPosition) && !chunkData.exist(chunkPosition, tilePos)){
+                } else if (pos.equals(chunkPosition) && !chunkData.exist(chunkPosition, tilePos)) {
                     //todo :
                     //Check for the file if the chunk exist, if not return false.
                     //Load the file and check for the tile, if no tile return false.
@@ -173,7 +174,7 @@ public final class MapData {
         }
         return false;
     }
-    
+
     /**
      * Change the designed tile properties.
      *
@@ -194,8 +195,8 @@ public final class MapData {
     }
 
     /**
-     * @param tilePos 
-     * @param height 
+     * @param tilePos
+     * @param height
      * @todo
      */
     public void setTileHeight(HexCoordinate tilePos, byte height) {
@@ -241,8 +242,7 @@ public final class MapData {
     }
 
     /**
-     * Register a listener to respond to chunk Event. 
-     * Work outside the entity
+     * Register a listener to respond to chunk Event. Work outside the entity
      * system.
      *
      * @param listener to register.
@@ -318,7 +318,7 @@ public final class MapData {
     /**
      * Convert chunk position in hexMap to world unit.
      *
-     * @param position 
+     * @param position
      * @hint chunk world unit position is the same than the chunk node.
      * @return chunk world unit position.
      */
@@ -328,8 +328,8 @@ public final class MapData {
     }
 
     /**
-     * Convert Hex grid position to world position.
-     * Convertion work with Odd-R Offset grid type. (currently used grid type).
+     * Convert Hex grid position to world position. Convertion work with Odd-R
+     * Offset grid type. (currently used grid type).
      *
      * @return tile world unit position.
      */
@@ -341,8 +341,9 @@ public final class MapData {
 
     /**
      * Convert Hex grid position to world position and check if the tile exist.
-     * /!\ Return a value only if the tile exist. use getTileWorldPosition() if only a value is needed.
-     * Convertion work with Odd-R Offset grid type. (currently used grid type).
+     * /!\ Return a value only if the tile exist. use getTileWorldPosition() if
+     * only a value is needed. Convertion work with Odd-R Offset grid type.
+     * (currently used grid type).
      *
      * @return tile world unit position if exist.
      */
@@ -357,9 +358,10 @@ public final class MapData {
             return null;
         }
     }
+
     /**
-     * Convert World Position to Hex grid position.
-     * Vector3f to Odd-R Offset grid position.
+     * Convert World Position to Hex grid position. Vector3f to Odd-R Offset
+     * grid position.
      *
      * @param pos position to convert.
      * @return converted grid position.
@@ -376,18 +378,20 @@ public final class MapData {
         return new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int((int) q, (int) r));
     }
 
-
     /**
+     * load a map and all the corresponding chunk and return true if done
+     * properly, return false otherwise.
+     *
      * @param name of the map to load.
      * @return false if not located
      */
     public boolean loadMap(String name) {
-        File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/"+ name + "/" + name + ".map");
-        if(file.isDirectory() || !file.exists()){
-            System.err.println("Cannot load, files does not exist.");
+        File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/" + name + "/" + name + ".map");
+        if (file.isDirectory() || !file.exists()) {
+            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, null, new IOException(mapName + " can't be found."));
             return false;
         }
-        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset("/Data/MapData/"+ name + "/" + name + ".map");
+        MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset("/Data/MapData/" + name + "/" + name + ".map");
         mapName = mdLoader.getMapName();
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
@@ -399,19 +403,19 @@ public final class MapData {
         }
         return true;
     }
-    
+
     /**
      * Save the current map in a folder of the same name of the map.
      *
      * @throws IOException
      */
     public boolean saveMap(String mapName) {
-        if(mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("RESET") || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")){
+        if (mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("RESET") || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")) {
             Logger.getLogger(MapData.class.getName()).log(Level.WARNING, "Invalid Path name");
             return false;
         }
         try {
-            if(saveChunk(Vector2Int.INFINITY)){
+            if (saveChunk(Vector2Int.INFINITY)) {
                 this.mapName = mapName;
                 String userHome = System.getProperty("user.dir") + "/assets";
                 BinaryExporter exporter = BinaryExporter.getInstance();
@@ -442,7 +446,7 @@ public final class MapData {
      */
     private boolean saveChunk(Vector2Int position) throws IOException {
         String userHome = System.getProperty("user.dir") + "/assets";
-        
+
         BinaryExporter exporter = BinaryExporter.getInstance();
         ChunkDataLoader cdLoader = new ChunkDataLoader();
 
@@ -459,9 +463,9 @@ public final class MapData {
                         };
                         Files.copy(f, file, options);
                     } else {
-                        Logger.getLogger(MapData.class.getName()).log(Level.WARNING, 
-                                "userHome + \"/Data/MapData/\" + mapName + \"/\" + pos.toString() \n" +
-"                                + \".chk\" + \" can't be saved, data missing.\"");
+                        Logger.getLogger(MapData.class.getName()).log(Level.WARNING,
+                                "userHome + \"/Data/MapData/\" + mapName + \"/\" + pos.toString() \n"
+                                + "                                + \".chk\" + \" can't be saved, data missing.\"");
                         return false;
                     }
                 } else {
@@ -511,18 +515,20 @@ public final class MapData {
     public void Cleanup() {
         //Todo remove all file from the temps folder
     }
-    
+
     /**
      * Remove listener from event on tile.
-     * @param listener 
+     *
+     * @param listener
      */
     public void removeTileChangeListener(TileChangeListener listener) {
         tileListeners.remove(listener);
     }
-    
+
     /**
      * Remove listener from event on Chunk.
-     * @param listener 
+     *
+     * @param listener
      */
     public void removeChunkChangeListener(ChunkChangeListener listener) {
         chunkListeners.remove(listener);

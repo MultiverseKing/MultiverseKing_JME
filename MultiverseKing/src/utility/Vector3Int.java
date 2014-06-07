@@ -10,21 +10,9 @@ import com.jme3.math.Vector3f;
  */
 public class Vector3Int {
 
-    /**
-     *
-     */
     public static final Vector3Int ZERO = new Vector3Int(0, 0, 0);
-    /**
-     *
-     */
     public int x;
-    /**
-     *
-     */
     public int y;
-    /**
-     *
-     */
     public int z;
 
     /**

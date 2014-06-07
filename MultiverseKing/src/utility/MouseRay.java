@@ -10,10 +10,7 @@ import com.jme3.math.Vector3f;
  * @author roah
  */
 public class MouseRay {
-
-    /**
-     *
-     */
+    
     public MouseRay() {
     }
 

@@ -7,11 +7,9 @@ import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntitySet;
-import gamestate.EntityDataAppState;
 
 /**
- * An abstract AppState to allow EntitySystems to easily use Entity and
- * MapData.
+ * An abstract AppState to allow EntitySystems to easily use Entity and MapData.
  *
  * @author Eike Foede, roah
  */
@@ -29,7 +27,7 @@ public abstract class EntitySystemAppState extends AbstractAppState {
      * main.
      */
     protected SimpleApplication app;
-    
+
     @Override
     public final void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -71,30 +69,35 @@ public abstract class EntitySystemAppState extends AbstractAppState {
 
     /**
      * Activate the system.
+     *
      * @return entity used with this system.
      */
     protected abstract EntitySet initialiseSystem();
 
     /**
      * Called each frame.
+     *
      * @param tpf
      */
     protected abstract void updateSystem(float tpf);
 
     /**
      * Called when an entity is added.
+     *
      * @param e entity to add.
      */
     protected abstract void addEntity(Entity e);
 
     /**
      * Called when an entity got an update.
+     *
      * @param e updated entity.
      */
     protected abstract void updateEntity(Entity e);
 
     /**
      * Called when an entity is removed.
+     *
      * @param e removed entity.
      */
     protected abstract void removeEntity(Entity e);

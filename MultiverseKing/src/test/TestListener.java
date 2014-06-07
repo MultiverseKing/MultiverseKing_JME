@@ -9,7 +9,7 @@ import hexsystem.events.TileChangeListener;
  *
  * @author Eike Foede
  */
-public class TestListener implements ChunkChangeListener, TileChangeListener{
+public class TestListener implements ChunkChangeListener, TileChangeListener {
 
     /**
      *
@@ -26,5 +26,4 @@ public class TestListener implements ChunkChangeListener, TileChangeListener{
     public void tileChange(TileChangeEvent event) {
         System.out.println("tileChange with tilepos " + event.getTilePos().getAsOffset().toString());
     }
-    
 }

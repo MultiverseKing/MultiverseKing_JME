@@ -41,11 +41,10 @@ public class Card extends ButtonAdapter {
     public CardProperties getProperties() {
         return cardProperties;
     }
-    
 
     /**
-     * Create a new card for the specifiate entity, rescaled down.
-     * if rescale == true, scale factor == 2.5f.
+     * Create a new card for the specifiate entity, rescaled down. if rescale ==
+     * true, scale factor == 2.5f.
      *
      * @param screen used to render the card (tonegodGUI)
      * @param rescale should this cards rescaled down.
@@ -54,7 +53,7 @@ public class Card extends ButtonAdapter {
      * @param UID Entity this card belong to.
      */
     public Card(ElementManager screen, boolean rescale, String cardName, int handPosition, EntityId UID, CardProperties cardProperties) {
-        super(screen, UID.toString(), Vector2f.ZERO, new Vector2f(200f / (2.5f * (rescale ? 1 : 0)), 
+        super(screen, UID.toString(), Vector2f.ZERO, new Vector2f(200f / (2.5f * (rescale ? 1 : 0)),
                 300f / (2.5f * (rescale ? 1 : 0))), Vector4f.ZERO, "Textures/Cards/Artworks/" + cardName + ".png");
         this.rescaleValue = 2.5f; //if you change this change it in the super constructor above.
         this.isRescale = (rescale ? 1 : 0);
@@ -63,7 +62,7 @@ public class Card extends ButtonAdapter {
         this.cardName = cardName;
         this.UID = UID;
         this.cardProperties = cardProperties;
-        
+
         this.removeEffect(Effect.EffectEvent.Hover);
         this.removeEffect(Effect.EffectEvent.Press);
         this.setIsResizable(false);
@@ -79,20 +78,22 @@ public class Card extends ButtonAdapter {
 
     /**
      * Called when the mouse is over the card.
+     *
      * @param hasFocus true if over.
      */
     @Override
     public void setHasFocus(boolean hasFocus) {
         super.setHasFocus(hasFocus);
         if (hasFocus) {
-            app.getStateManager().getState(CardRenderSystem.class).hasFocus(this);
+            app.getStateManager().getState(CardSystem.class).hasFocus(this);
         } else {
-            app.getStateManager().getState(CardRenderSystem.class).lostFocus(this);
+            app.getStateManager().getState(CardSystem.class).lostFocus(this);
         }
     }
 
     /**
      * Called when the left Mouse is pressed over this card.
+     *
      * @param evt ??
      * @param toggled ??
      */
@@ -108,13 +109,14 @@ public class Card extends ButtonAdapter {
 
     /**
      * Called when the left mouse is released (over this card?).
+     *
      * @param evt ??
      * @param toggled ??
      */
     @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftUp(evt, toggled);
-        CardRenderSystem renderSystem = app.getStateManager().getState(CardRenderSystem.class);
+        CardSystem renderSystem = app.getStateManager().getState(CardSystem.class);
         renderSystem.isInCastArea(this);
         resetHandPosition();
     }
@@ -138,6 +140,7 @@ public class Card extends ButtonAdapter {
 
     /**
      * Used when adding the Hover so it fit the cardSize.
+     *
      * @param child
      */
     @Override

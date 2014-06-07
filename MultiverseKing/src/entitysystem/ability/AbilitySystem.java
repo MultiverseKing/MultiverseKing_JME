@@ -21,7 +21,7 @@ public class AbilitySystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         return entityData.getEntities(LoadSpeedComponent.class, AbilityComponent.class, HexPositionComponent.class);
     }
-    
+
     @Override
     protected void addEntity(Entity e) {
         AbilityManager aManager = new AbilityManager(e.get(AbilityComponent.class).getName(),
@@ -35,20 +35,19 @@ public class AbilitySystem extends EntitySystemAppState {
             cast(abilityManager.get(id).update(tpf), id);
         }
     }
-    
+
     private void cast(ArrayList<String> abilityCast, EntityId id) {
-        if(abilityCast != null){
-            for(String abilityName : abilityCast){
+        if (abilityCast != null) {
+            for (String abilityName : abilityCast) {
                 EntityId abilityID = entityData.createEntity();
                 /**
-                 * @todo : Get all ability in the list,
-                 * call the FXSystem to render them on the screen,
-                 * call other system to the ability effect.
+                 * @todo : Get all ability in the list, call the FXSystem to
+                 * render them on the screen, call other system to the ability
+                 * effect.
                  */
             }
         }
     }
-
 
     @Override
     protected void updateEntity(Entity e) {
@@ -64,5 +63,4 @@ public class AbilitySystem extends EntitySystemAppState {
     protected void cleanupSystem() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 }

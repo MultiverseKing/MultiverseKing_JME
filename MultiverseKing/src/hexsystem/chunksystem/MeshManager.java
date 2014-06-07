@@ -18,7 +18,7 @@ public class MeshManager {
     private final float hexRadius = HexSettings.HEX_RADIUS;
     private final float hexWidth = HexSettings.HEX_WIDTH;
     private final float floorHeight = HexSettings.FLOOR_HEIGHT;
-    
+
     /**
      * Generate a mesh accordingly to meshParam.
      *
@@ -195,17 +195,17 @@ public class MeshManager {
                 vertices[index + 5] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
                         height * floorHeight, (hexRadius / 2) + Ypos);
             } else {
-                vertices[index] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth), height * floorHeight, 
+                vertices[index] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth), height * floorHeight,
                         (hexRadius / 2) + (hexRadius * (i - 1)) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 1] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth), 
+                vertices[index + 1] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
                         height * floorHeight, (hexRadius / 2) + (hexRadius * (i - 1)) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 2] = new Vector3f((offset.x * hexWidth), height * floorHeight, 
+                vertices[index + 2] = new Vector3f((offset.x * hexWidth), height * floorHeight,
                         -(hexRadius / 2) + Ypos);
-                vertices[index + 3] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth), 
+                vertices[index + 3] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
                         height * floorHeight, -(hexRadius / 2) + Ypos);
-                vertices[index + 4] = new Vector3f((offset.x * hexWidth), height * floorHeight, 
+                vertices[index + 4] = new Vector3f((offset.x * hexWidth), height * floorHeight,
                         (hexRadius / 2) + Ypos);
-                vertices[index + 5] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth), 
+                vertices[index + 5] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
                         height * floorHeight, (hexRadius / 2) + Ypos);
             }
             index += 6;

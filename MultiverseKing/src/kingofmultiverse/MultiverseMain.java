@@ -14,11 +14,12 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import entitysystem.field.render.AnimationSystem;
+import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
-import entitysystem.field.render.EntityRenderSystem;
+import entitysystem.render.EntityRenderSystem;
 import entitysystem.field.CollisionSystem;
+import entitysystem.field.EntityFieldSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -177,6 +178,7 @@ public class MultiverseMain extends SimpleApplication {
                 new CardSystem(),
                 new AnimationSystem(),
                 new CollisionSystem(),
+                new EntityFieldSystem(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

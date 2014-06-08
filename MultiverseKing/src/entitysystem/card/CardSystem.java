@@ -14,11 +14,11 @@ import static entitysystem.attribut.CardRenderPosition.HAND;
 import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
 import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
-import entitysystem.field.render.RenderComponent;
+import entitysystem.render.EntityRenderComponent;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.field.render.AnimationComponent;
+import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
 import hexsystem.HexMapMouseInput;
 import hexsystem.events.HexMapInputEvent;
@@ -114,7 +114,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
-        return entityData.getEntities(CardRenderComponent.class, RenderComponent.class);
+        return entityData.getEntities(CardRenderComponent.class, EntityRenderComponent.class);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     private void addCardToScreen(Entity e) {
         switch (e.get(CardRenderComponent.class).getCardPosition()) {
             case HAND:
-                String cardName = e.get(RenderComponent.class).getName();
+                String cardName = e.get(EntityRenderComponent.class).getName();
                 Card card;
                 CardProperties properties = new EntityLoader().loadCardProperties(cardName);
                 if (properties != null) {
@@ -174,7 +174,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
 
     @Override
     protected void removeEntity(Entity e) {
-        removeCardFromScreen(e.getId(), e.get(CardRenderComponent.class).getCardPosition());
+        removeCardFromScreen(e.getId());
     }
 
     /**
@@ -295,50 +295,56 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         screen.addElement(isCastedDebug);
         screen.removeElement(card);
         cardPreviewCast = card;
-        setActiveCard(true);
+        setActiveCard();
 
         //Register the input for the card system
         app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
         app.getInputManager().addListener(cardInputListener, "Cancel");
     }
 
+    private void closePreview() {
+        setActiveCard();
+        cardPreviewCast = null;
+        screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
+        //Remove the input for the card system
+        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
+        app.getInputManager().removeListener(cardInputListener);
+    }
+    
     private void castCanceled() {
         screen.addElement(cardPreviewCast);
-        setActiveCard(false);
         cardPreviewCast.setZOrder(zOrder);
-        cardPreviewCast = null;
-        //Remove the input for the card system
-        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
-        app.getInputManager().removeListener(cardInputListener);
+        closePreview();
     }
 
-    private void castConfirmed() {
-        cardPreviewCast = null;
-        setActiveCard(false);
-        //Remove the input for the card system
-        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
-        app.getInputManager().removeListener(cardInputListener);
-    }
-
-    private void initializeCastedCard(HexCoordinate castCoord, CardType type) {
-        String name = entityData.getComponent(cardPreviewCast.getCardEntityUID(), RenderComponent.class).getName();
-        UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
-        if (unitLoader != null) {
-            entityData.setComponents(cardPreviewCast.getCardEntityUID(),
-                    new HexPositionComponent(castCoord, Rotation.A),
-                    new CardRenderComponent(CardRenderPosition.FIELD),
-                    new AnimationComponent(Animation.SUMMON),
-                    new EAttributComponent(cardPreviewCast.getProperties().getElement()),
-                    unitLoader.getCollisionComp(), //Collision Comp
-                    unitLoader.getuLife(), //life component
-                    unitLoader.getuStats(), //stats component
-                    unitLoader.getAbilityComp());
+    private void activateWorldCard(HexCoordinate castCoord, CardType type) {
+        switch (type) {
+            case SPELL:
+                break;
+            case SUMMON:
+                String name = entityData.getComponent(cardPreviewCast.getCardEntityUID(), EntityRenderComponent.class).getName();
+                UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
+                if (unitLoader != null) {
+                    entityData.setComponents(cardPreviewCast.getCardEntityUID(),
+                            new HexPositionComponent(castCoord, Rotation.A),
+                            new CardRenderComponent(CardRenderPosition.FIELD),
+                            new AnimationComponent(Animation.SUMMON),
+                            new EAttributComponent(cardPreviewCast.getProperties().getElement()),
+                            unitLoader.getCollisionComp(), //Collision Comp
+                            unitLoader.getuLife(), //life component
+                            unitLoader.getMovementComp(), //stats component
+                            unitLoader.getAbilityComp());
+                }
+                break;
+            case TRAP:
+                break;
+            default:
+                throw new UnsupportedOperationException(type.name() + " isn't a supported cardType.");
         }
     }
 
-    private void setActiveCard(boolean isActive) {
-        if (isActive && cardPreviewCast != null) {
-
+    private void setActiveCard() {
+        if (cardPreviewCast != null) {
             /**
              * We switch over all card Main type to know what preview to
              * activate.
@@ -348,14 +354,11 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                     //todo
                     break;
                 case WORLD:
-                    app.getStateManager().getState(HexMapMouseInput.class).setCursorOnPulseMode(isActive, this);
+                    app.getStateManager().getState(HexMapMouseInput.class).setCursorPulseMode(this);
                     break;
                 default:
                     throw new UnsupportedOperationException("This type isn't implemented !");
             }
-        } else {
-            app.getStateManager().getState(HexMapMouseInput.class).setCursorOnPulseMode(isActive, this);
-            screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         }
     }
     private ActionListener cardInputListener = new ActionListener() {
@@ -388,14 +391,14 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                     if (collisionSystem != null) {
                         if (collisionSystem.canBeCast(event.getEventPosition(),
                                 cardPreviewCast.getProperties().getCardSubType())) {
-                            initializeCastedCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                            castConfirmed();
+                            activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                            closePreview();
                         } else {
                             castCanceled();
                         }
                     } else {
-                        initializeCastedCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                        castConfirmed();
+                        activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                        closePreview();
                     }
                     break;
                 default:

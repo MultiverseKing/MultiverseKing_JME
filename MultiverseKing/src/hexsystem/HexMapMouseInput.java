@@ -10,11 +10,13 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
+import hexsystem.events.HexMapRayListener;
 import hexsystem.events.TileChangeEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,13 +33,18 @@ public class HexMapMouseInput extends AbstractAppState {
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private MultiverseMain app;
-    private ArrayList<HexMapInputListener> hexMapListener = new ArrayList<HexMapInputListener>();
+    private ArrayList<HexMapInputListener> hexMapListeners = new ArrayList<HexMapInputListener>();
+    private ArrayList<HexMapRayListener> rayListeners = new ArrayList<HexMapRayListener>(3);
     private Spatial cursor;
-    private Spatial mark;
-    private int currentFocusIndex = -1;
+    private Spatial rayDebug;
+    private int listenerPulseIndex = -1;
     private HexCoordinate lastHexPos;
-    private Vector2f lastMousePos = new Vector2f(0, 0);
+    private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
+
+    public Spatial getRayDebug() {
+        return rayDebug;
+    }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -53,7 +60,7 @@ public class HexMapMouseInput extends AbstractAppState {
      * @param listener to register.
      */
     public void registerTileInputListener(HexMapInputListener listener) {
-        hexMapListener.add(listener);
+        hexMapListeners.add(listener);
     }
 
     /**
@@ -62,7 +69,25 @@ public class HexMapMouseInput extends AbstractAppState {
      * @param listener to register.
      */
     public void removeTileInputListener(HexMapInputListener listener) {
-        hexMapListener.remove(listener);
+        hexMapListeners.remove(listener);
+    }
+
+    /**
+     * Add a listener for the mouse Raycasting.
+     *
+     * @param listener
+     */
+    public void registerRayInputListener(HexMapRayListener listener) {
+        rayListeners.add(listener);
+    }
+
+    /**
+     * Remove a listener from the mouse Raycasting.
+     *
+     * @param listener
+     */
+    public void removeRayInputListener(HexMapRayListener listener) {
+        rayListeners.remove(listener);
     }
 
     /**
@@ -72,13 +97,29 @@ public class HexMapMouseInput extends AbstractAppState {
     private void initInput() {
         app.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
     }
+    private final ActionListener tileActionListener = new ActionListener() {
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (name.equals("Confirm") && isPressed) {
+                if (listenerPulseIndex == -1) {
+                    castRay("L");
+                } else {
+                    hexMapListeners.get(listenerPulseIndex).leftMouseActionResult(
+                            new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), null));
+                }
+            } else if (name.equals("Cancel") && isPressed) {
+                if (listenerPulseIndex == -1) {
+                    castRay("R");
+                }
+            }
+        }
+    };
 
     private void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
-        mark = new Geometry("BOOM!", sphere);
+        rayDebug = new Geometry("BOOM!", sphere);
         Material mark_mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         mark_mat.setColor("Color", ColorRGBA.Red);
-        mark.setMaterial(mark_mat);
+        rayDebug.setMaterial(mark_mat);
     }
 
     private void initCursor() {
@@ -95,120 +136,145 @@ public class HexMapMouseInput extends AbstractAppState {
 
     @Override
     public void update(float tpf) {
-        if (currentFocusIndex != -1) {
+        if (listenerPulseIndex != -1) {
             Vector2f newMousePos = app.getInputManager().getCursorPosition().normalize();
-            if (!newMousePos.equals(lastMousePos)) {
+            if (!newMousePos.equals(lastScreenMousePos)) {
                 castRay("0");
-                lastMousePos = newMousePos;
+                lastScreenMousePos = newMousePos;
             }
         }
     }
 
     /**
-     * Activate the cursor on pulse mode, Raycast will follow the mouse. The
-     * pulse mode can be locked to update only one System.
+     * Activate the cursor on pulse mode, Raycast will follow the mouse, Have to
+     * be called by the the same listener to disable. The pulse mode lock other
+     * update.
      *
-     * @param lockInput is this the listener locking the input.
-     * @param listenerFocus listener to add.
-     * @return false
+     * @todo Ray listener support
+     * @param listener calling for it.
+     * @return false if an error happen or if already on pulseMode.
      */
-    public boolean setCursorOnPulseMode(boolean lockInput, HexMapInputListener listenerFocus) {
-        if (lockInput && currentFocusIndex == -1) {
+    public boolean setCursorPulseMode(HexMapInputListener listener) {
+        if (listenerPulseIndex == -1) {
             //We keep track of the listener locking the input.
-            if (!hexMapListener.contains(listenerFocus)) {
-                hexMapListener.add(listenerFocus);
+            if (!hexMapListeners.contains(listener)) {
+                hexMapListeners.add(listener);
             }
-            currentFocusIndex = hexMapListener.indexOf(listenerFocus);
-            lastMousePos = app.getInputManager().getCursorPosition();
+            listenerPulseIndex = hexMapListeners.indexOf(listener);
+            lastScreenMousePos = app.getInputManager().getCursorPosition();
             return true;
-        } else if (!lockInput && currentFocusIndex != -1) {
-            //We check if the listener unlocking the input is the same then the one who locked it.
-            if (hexMapListener.contains(listenerFocus) && hexMapListener.indexOf(listenerFocus) == currentFocusIndex) {
-                currentFocusIndex = -1;
+        } else {
+            /**
+             * We check if the listener calling the pulseMode is the same than
+             * the one who activated it. if it is the same we desable the pulse
+             * mode.
+             */
+            if (hexMapListeners.contains(listener) && hexMapListeners.indexOf(listener) == listenerPulseIndex) {
+                listenerPulseIndex = -1;
                 return true;
-            } else if (hexMapListener.contains(listenerFocus) && hexMapListener.indexOf(listenerFocus) != currentFocusIndex) {
-                System.err.println("listener not allowed to unlock the input : " + listenerFocus.toString());
+            } else if (hexMapListeners.contains(listener) && hexMapListeners.indexOf(listener) != listenerPulseIndex) {
+                System.err.println("Pulse already locked by : " + hexMapListeners.get(listenerPulseIndex).getClass().toString()
+                        + ". Lock request by : " + listener.toString());
                 return false;
             } else {
-                System.err.println("listener not registered : " + listenerFocus.toString());
+                System.err.println("listener not registered : " + listener.toString());
                 return false;
             }
-        } else if (lockInput && currentFocusIndex != -1) {
-            System.err.println("input already locked by : " + hexMapListener.get(currentFocusIndex).toString()
-                    + ". Lock request by : " + listenerFocus.toString());
-            return false;
         }
-        return true;
     }
-    private final ActionListener tileActionListener = new ActionListener() {
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("Confirm") && isPressed) {
-                castRay("L");
-//                System.out.println("Left");
-            } else if (name.equals("Cancel") && isPressed) {
-                castRay("R");
-//                System.out.println("Right");
-            }
-        }
-    };
 
     private void castRay(String mouseInput) {
         CollisionResults results = new CollisionResults();
-        app.getRootNode().getChild("mapNode").collideWith(mouseRay.get3DRay(app), results);
-        if (results.size() != 0) {
-            if (results.size() > 0) {
-                CollisionResult closest = results.getClosestCollision();
+        Ray ray = mouseRay.get3DRay(app);
+        HexMapInputEvent event = callRayActionListeners(mouseInput, ray);
 
-                mark.setLocalTranslation(closest.getContactPoint());
-                app.getRootNode().attachChild(mark);    //TODO Debug to remove.
+        if (event == null) {
+            app.getRootNode().getChild("mapNode").collideWith(ray, results);
+            if (results.size() != 0) {
+                if (results.size() > 0) {
+                    CollisionResult closest = results.getClosestCollision();
 
-                setMouseRayResult(results, mouseInput);
-            } else if (app.getRootNode().hasChild(mark)) {
-                // No hits? Then remove the red mark.
-                app.getRootNode().detachChild(mark);    //TODO Debug to remove.
+                    rayDebug.setLocalTranslation(closest.getContactPoint());
+                    app.getRootNode().attachChild(rayDebug);    //TODO Debug to remove.
+
+                    HexCoordinate newPos = convertMouseCollision(results);
+                    if (newPos != null && !newPos.equals(lastHexPos)) {
+                        event = new HexMapInputEvent(newPos, ray);
+                        moveCursor(newPos);
+                        callMouseActionListeners(mouseInput, event);
+                    }
+                } else if (app.getRootNode().hasChild(rayDebug)) {
+                    // No hits? Then remove the red mark.
+                    app.getRootNode().detachChild(rayDebug);    //TODO Debug to remove.
+                } else {
+                    System.out.println("no  mark");
+                }
             } else {
-                System.out.println("no  mark");
+                //Error catching.
+                System.out.println("null raycast");
             }
         } else {
-            //Error catching.
-            System.out.println("null raycast");
-        }
-    }
-
-    private void setMouseRayResult(CollisionResults rayResults, String mouseInput) {
-        HexCoordinate newPos = getLastLeftMouseCollisionGridPos(rayResults);
-        if (newPos != null) {
-            if (!newPos.equals(lastHexPos) || mouseInput.contains("L") || mouseInput.contains("R")) {
-                HexMapInputEvent event = new HexMapInputEvent(newPos, rayResults);
+            if (!event.getEventPosition().equals(lastHexPos)) {
                 moveCursor(event.getEventPosition());
-                if (mouseInput.contains("L")) {
-                    for (HexMapInputListener l : hexMapListener) {
-                        l.leftMouseActionResult(event);
-                    }
-                } else if (mouseInput.contains("R")) {
-                    for (HexMapInputListener l : hexMapListener) {
-                        l.rightMouseActionResult(event);
-                    }
-                }
-                lastHexPos = newPos;
+                callMouseActionListeners(mouseInput, event);
             }
         }
     }
 
-    private void moveCursor(HexCoordinate tilePos) {
+    /**
+     * @param mouseInput L or R listener to call
+     * @param event event to pass
+     */
+    private void callMouseActionListeners(String mouseInput, HexMapInputEvent event) {
+        for (HexMapInputListener l : hexMapListeners) {
+            if (mouseInput.contains("L")) {
+                l.leftMouseActionResult(event);
+            } else if ((mouseInput.contains("R"))) {
+                l.rightMouseActionResult(event);
+            } else {
+                return; //in case of...
+            }
+        }
+    }
+
+    /**
+     * @todo When multiple ray listeners run on same time, the closest got the
+     * event.
+     * @param mouseInput
+     * @param ray
+     */
+    private HexMapInputEvent callRayActionListeners(String mouseInput, Ray ray) {
+        HexMapInputEvent event = null;
+        for (HexMapRayListener l : rayListeners) {
+            if (mouseInput.contains("L")) {
+                event = l.leftRayInputAction(ray);
+            } else if ((mouseInput.contains("R"))) {
+                event = l.rightRayInputAction(ray);
+            }
+        }
+        return event;
+    }
+
+    public void moveCursor(HexCoordinate tilePos) {
         if (cursor == null) {
             initCursor();
         }
         Vector3f pos = mapData.getTileWorldPosition(tilePos);
         cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT
                 + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+        /**
+         * The cursor real position is not updated on pulseMode.
+         */
+        if (listenerPulseIndex == -1) {
+            lastHexPos = tilePos;
+        }
     }
 
     /**
      *
      * @return
      */
-    private HexCoordinate getLastLeftMouseCollisionGridPos(CollisionResults rayResults) {
+    private HexCoordinate convertMouseCollision(CollisionResults rayResults) {
         HexCoordinate tilePos;
         Vector3f pos;
         Iterator<CollisionResult> i = rayResults.iterator();

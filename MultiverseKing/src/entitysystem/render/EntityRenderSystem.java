@@ -1,7 +1,8 @@
-package entitysystem.field.render;
+package entitysystem.render;
 
 import com.jme3.animation.AnimControl;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
@@ -45,13 +46,21 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
         return spatials.get(id).getControl(AnimControl.class);
     }
 
+    /**
+     * The node caontaining all Entity Spatial.
+     * @return 
+     */
+    public Node getNode() {
+        return renderSystemNode;
+    }
+    
     @Override
     protected EntitySet initialiseSystem() {
         spatialInitializer.setAssetManager(app.getAssetManager());
         app.getRootNode().attachChild(renderSystemNode);
         mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         mapData.registerTileChangeListener(this);
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(EntityRenderComponent.class, HexPositionComponent.class);
     }
 
     /**
@@ -70,7 +79,8 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
     //TODO: Handle if spatial is already generated (shouldn't happen, but in the case it does, this should be handled))
     //some spatial can be generated multiple time...
     public void addEntity(Entity e) {
-        Spatial s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
+        Spatial s = spatialInitializer.initialize(e.get(EntityRenderComponent.class).getName());
+        s.setName(e.getId().toString());
         spatials.put(e.getId(), s);
         HexPositionComponent positionComp = e.get(HexPositionComponent.class);
         s.setLocalTranslation(mapData.hexPositionToSpatialPosition(positionComp.getPosition()));
@@ -110,18 +120,7 @@ public class EntityRenderSystem extends EntitySystemAppState implements TileChan
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
-
-//    private Vector3f hexPositionToSpatialPosition(HexCoordinate hexPos) {
-//        HexTile tile = getMapData().getTile(hexPos);
-//        if (tile != null) {
-//            int height = tile.getHeight();
-//            Vector3f spat = getMapData().getTileWorldPosition(hexPos);
-//            return new Vector3f(spat.x, height, spat.z);
-//        } else {
-//            System.err.println("There is no Tile on the position " + hexPos.toString());
-//            return null;
-//        }
-//    }
+    
     /**
      *
      * @param event

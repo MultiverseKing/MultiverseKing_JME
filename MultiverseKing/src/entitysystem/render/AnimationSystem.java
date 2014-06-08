@@ -1,4 +1,4 @@
-package entitysystem.field.render;
+package entitysystem.render;
 
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
@@ -27,7 +27,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(EntityRenderSystem.class);
 
-        return entityData.getEntities(AnimationComponent.class, RenderComponent.class);
+        return entityData.getEntities(AnimationComponent.class, EntityRenderComponent.class);
     }
 
     @Override

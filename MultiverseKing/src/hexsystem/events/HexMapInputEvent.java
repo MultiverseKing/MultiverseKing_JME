@@ -4,7 +4,7 @@
  */
 package hexsystem.events;
 
-import com.jme3.collision.CollisionResults;
+import com.jme3.math.Ray;
 import utility.HexCoordinate;
 
 /**
@@ -14,18 +14,18 @@ import utility.HexCoordinate;
 public class HexMapInputEvent {
 
     private final HexCoordinate eventPosition;
-    private final CollisionResults rayResults;
+    private final Ray lastUsedRay;
 
-    public HexMapInputEvent(HexCoordinate eventPosition, CollisionResults rayResults) {
+    public HexMapInputEvent(HexCoordinate eventPosition, Ray usedRay) {
         this.eventPosition = eventPosition;
-        this.rayResults = rayResults;
+        this.lastUsedRay = usedRay;
     }
-
+    
     public HexCoordinate getEventPosition() {
         return eventPosition;
     }
 
-    public CollisionResults getRayResults() {
-        return rayResults;
+    public Ray getLastUsedRay() {
+        return lastUsedRay;
     }
 }

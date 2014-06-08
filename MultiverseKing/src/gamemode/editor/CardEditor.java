@@ -27,10 +27,12 @@ import entitysystem.card.CardSystem;
 import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.field.render.AnimationComponent;
-import entitysystem.field.render.RenderComponent;
+import entitysystem.render.AnimationComponent;
+import entitysystem.render.EntityRenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
+import entitysystem.field.EntityFieldComponent;
+import entitysystem.field.EntityFieldComponent.EntityType;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
@@ -102,18 +104,22 @@ public class CardEditor implements HexMapInputListener {
          * Init the testingDoll.
          */
         tuxDoll = entityData.createEntity();
-        entityData.setComponents(tuxDoll, new RenderComponent("TuxDoll"),
+        entityData.setComponents(tuxDoll, new EntityRenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
+//                new Vector2Int(0, 0)), Rotation.A),
                 new AnimationComponent(Animation.SUMMON),
-                new CollisionComponent((byte) 0));
+                new CollisionComponent((byte) 0),
+                new EntityFieldComponent(EntityType.TITAN));
 
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
+        
     }
 
     public void rightMouseActionResult(HexMapInputEvent event) {
+        
     }
 
     private void initCardGUI() {
@@ -207,7 +213,7 @@ public class CardEditor implements HexMapInputListener {
                 super.onButtonMouseLeftUp(evt, toggled);
                 EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
                 EntityId cardId = ed.createEntity();
-                ed.setComponent(cardId, new RenderComponent("Cendrea"));
+                ed.setComponent(cardId, new EntityRenderComponent("Cendrea"));
                 ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
             }
         };
@@ -233,7 +239,7 @@ public class CardEditor implements HexMapInputListener {
         if (!main.getStateManager().getState(CardSystem.class).gotCardInHand()) {
             EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
             EntityId cardId = ed.createEntity();
-            ed.setComponent(cardId, new RenderComponent("Cendrea"));
+            ed.setComponent(cardId, new EntityRenderComponent("Cendrea"));
             ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
         }
     }

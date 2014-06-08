@@ -1,4 +1,4 @@
-package entitysystem.field.render;
+package entitysystem.render;
 
 import com.simsilica.es.PersistentComponent;
 
@@ -7,11 +7,11 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author Eike Foede, roah
  */
-public class RenderComponent implements PersistentComponent {
+public class EntityRenderComponent implements PersistentComponent {
 
     private String name;
 
-    public RenderComponent(String name) {
+    public EntityRenderComponent(String name) {
         this.name = name;
     }
 

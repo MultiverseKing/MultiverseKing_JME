@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
  */
 public class UnitLoader {
 
-    private final MovementStatsComponent uStats;
+    private final MovementStatsComponent moveComp;
     private final LifeComponent uLife;
     private final AbilityComponent abilityComp;
     private final CollisionComponent collision;
@@ -25,7 +25,7 @@ public class UnitLoader {
         Number life = (Number) data.get("life");
 
         uLife = new LifeComponent(life.intValue());
-        uStats = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
+        moveComp = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
         abilityComp = eLoader.loadAbility(data.get("ability").toString());
 
         collision = new CollisionComponent(eLoader.getCollision((JSONArray) data.get("collision")));
@@ -40,8 +40,8 @@ public class UnitLoader {
      *
      * @return
      */
-    public MovementStatsComponent getuStats() {
-        return uStats;
+    public MovementStatsComponent getMovementComp() {
+        return moveComp;
     }
 
     /**

@@ -327,32 +327,32 @@ public final class MapData {
                 (position.y * HexSettings.CHUNK_SIZE) * (float) (HexSettings.HEX_RADIUS * 1.5));
     }
 
-    /**
-     * Convert Hex grid position to world position. Convertion work with Odd-R
-     * Offset grid type. (currently used grid type).
-     *
-     * @return tile world unit position.
-     */
-    public Vector3f getTileWorldPosition(HexCoordinate tilePos) {
-        Vector2Int offsetPos = tilePos.getAsOffset();
-        return new Vector3f((offsetPos.x) * HexSettings.HEX_WIDTH
-                + ((offsetPos.y & 1) == 0 ? 0 : HexSettings.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSettings.HEX_RADIUS * 1.5f);
-    }
+//    /**
+//     * Convert Hex grid position to world position. Convertion work with Odd-R
+//     * Offset grid type. (currently used grid type).
+//     *
+//     * @return tile world unit position.
+//     */
+//    public Vector3f convertHexCoordinateToWorldPosition(HexCoordinate tilePos) {
+//        Vector2Int offsetPos = tilePos.getAsOffset();
+//        return new Vector3f((offsetPos.x) * HexSettings.HEX_WIDTH
+//                + ((offsetPos.y & 1) == 0 ? 0 : HexSettings.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSettings.HEX_RADIUS * 1.5f);
+//    }
 
     /**
      * Convert Hex grid position to world position and check if the tile exist.
      * /!\ Return a value only if the tile exist. use getTileWorldPosition() if
-     * only a value is needed. Convertion work with Odd-R Offset grid type.
-     * (currently used grid type).
+     * only a value is needed. 
+     * Convertion work with Odd-R Offset grid type.(currently used grid type).
      *
      * @return tile world unit position if exist.
      */
-    public Vector3f hexPositionToSpatialPosition(HexCoordinate hexPos) {
+    public Vector3f convertTileToWorldPosition(HexCoordinate hexPos) {
         HexTile tile = getTile(hexPos);
         if (tileExist(hexPos)) {
             int height = tile.getHeight();
-            Vector3f spat = getTileWorldPosition(hexPos);
-            return new Vector3f(spat.x, height, spat.z);
+            Vector3f spat = hexPos.convertToWorldPosition();
+            return new Vector3f(spat.x, height*HexSettings.FLOOR_OFFSET, spat.z);
         } else {
             System.err.println("There is no Tile on the position " + hexPos.toString());
             return null;

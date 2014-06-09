@@ -44,11 +44,11 @@ public abstract class EntitySystemAppState extends AbstractAppState {
     @Override
     public final void update(float tpf) {
         if (entities.applyChanges()) {
-            for (Entity e : entities.getAddedEntities()) {
-                addEntity(e);
-            }
             for (Entity e : entities.getChangedEntities()) {
                 updateEntity(e);
+            }
+            for (Entity e : entities.getAddedEntities()) {
+                addEntity(e);
             }
             for (Entity e : entities.getRemovedEntities()) {
                 removeEntity(e);

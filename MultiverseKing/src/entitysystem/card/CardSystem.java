@@ -14,7 +14,6 @@ import static entitysystem.attribut.CardRenderPosition.HAND;
 import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
 import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
-import entitysystem.render.EntityRenderComponent;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
@@ -105,6 +104,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     private Card cardPreviewCast;
 
     // </editor-fold>
+    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -114,7 +114,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
-        return entityData.getEntities(CardRenderComponent.class, EntityRenderComponent.class);
+        return entityData.getEntities(CardRenderComponent.class);
     }
 
     @Override
@@ -142,33 +142,26 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      * the location of the card on the field
      */
     private void addCardToScreen(Entity e) {
-        switch (e.get(CardRenderComponent.class).getCardPosition()) {
-            case HAND:
-                String cardName = e.get(EntityRenderComponent.class).getName();
-                Card card;
-                CardProperties properties = new EntityLoader().loadCardProperties(cardName);
-                if (properties != null) {
-                    card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
+        CardRenderPosition cardPos = e.get(CardRenderComponent.class).getRenderPosition();
+        if (cardPos == CardRenderPosition.HAND) {
+            String cardName = e.get(CardRenderComponent.class).getName();
+            Card card;
+            CardProperties properties = new EntityLoader().loadCardProperties(cardName);
+            if (properties != null) {
+                card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
                             properties);
-                    handCards.put(e.getId(), card);
-                    screen.addElement(card);
-                    card.resetHandPosition();
-                    for (Card c : handCards.values()) {
-                        c.setZOrder(c.getZOrder());
-                    }
-                } else {
-                    System.err.println("Card files cannot be locate. " + cardName);
-                }
-                break;
-            case DECK:
-                deckCards.add(e.getId());
-                break;
-            case OUTERWORLD:
-                outerworldCards.add(e.getId());
-                break;
-            case FIELD:
-                fieldCards.add(e.getId());
-                break;
+                handCards.put(e.getId(), card);
+                screen.addElement(card);
+                card.resetHandPosition();
+                for (Card c : handCards.values()) {
+                    c.setZOrder(c.getZOrder());
+                } 
+            } else {
+                System.err.println("Card files cannot be locate. " + cardName);
+                entityData.removeComponent(e.getId(), CardRenderComponent.class);
+            }
+        } else {
+            modifyCardOnScreen(e.getId(), cardPos, new CardProperties());
         }
     }
 
@@ -185,47 +178,71 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      */
     private void removeCardFromScreen(EntityId id) {
         CardRenderPosition[] screenPos = CardRenderPosition.values();
-        for (CardRenderPosition p : screenPos) {
-            if (removeCardFromScreen(id, p)) {
+        for (CardRenderPosition cardPos : screenPos) {
+            if (modifyCardOnScreen(id, cardPos, null)) {
                 return;
             }
         }
     }
 
     /**
-     * Remove a card corresponding to the entity when knowing the
+     * Remove/add a card corresponding to the entity when knowing the
      * CardRenderPosition of it.
      *
      * @param id
-     * @param screenPos
-     * @return true if the card have been removed.
+     * @param screenPos where the card is.
+     * @param properties Set to null to remove a card.
+     * @return true if the card have to be removed and have been removed.
      */
-    private boolean removeCardFromScreen(EntityId id, CardRenderPosition screenPos) {
+    private boolean modifyCardOnScreen(EntityId id, CardRenderPosition screenPos, CardProperties properties) {
         switch (screenPos) {
             case DECK:
-                if (deckCards.contains(id)) {
-                    deckCards.remove(id);
-                    return true;
+                if (properties != null) {
+                    deckCards.add(id);
+                } else {
+                    if (deckCards.contains(id)) {
+                        deckCards.remove(id);
+                        return true;
+                    }
                 }
                 break;
             case FIELD:
-                if (fieldCards.contains(id)) {
-                    fieldCards.remove(id);
-                    return true;
+                if (properties != null) {
+                    fieldCards.add(id);
+                } else {
+                    if (fieldCards.contains(id)) {
+                        fieldCards.remove(id);
+                        return true;
+                    }
                 }
                 break;
             case HAND:
-                if (handCards.containsKey(id)) {
-                    Card card = handCards.get(id);
-                    screen.removeElement(card);
-                    handCards.remove(id);
-                    return true;
+                if (properties != null) {
+                    Card card = new Card(screen, true, properties.getName(), handCards.size() - 1, id,
+                            properties);
+                    handCards.put(id, card);
+                    screen.addElement(card);
+                    card.resetHandPosition();
+                    for (Card c : handCards.values()) {
+                        c.setZOrder(c.getZOrder());
+                    }
+                } else {
+                    if (handCards.containsKey(id)) {
+                        Card card = handCards.get(id);
+                        screen.removeElement(card);
+                        handCards.remove(id);
+                        return true;
+                    }
                 }
                 break;
             case OUTERWORLD:
-                if (outerworldCards.contains(id)) {
-                    outerworldCards.remove(id);
-                    return true;
+                if (properties != null) {
+                    outerworldCards.add(id);
+                } else {
+                    if (outerworldCards.contains(id)) {
+                        outerworldCards.remove(id);
+                        return true;
+                    }
                 }
                 break;
             default:
@@ -234,6 +251,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         }
         return false;
     }
+
 
     @Override
     protected void updateEntity(Entity e) {
@@ -258,7 +276,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     void hasFocus(Card card) {
         zOrder = card.getZOrder();
         screen.updateZOrder(card);
-        hover.setProperties(card.getProperties(), card.getCardName());
+        hover.setProperties(card.getProperties());
         card.addChild(hover);
     }
 
@@ -295,7 +313,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         screen.addElement(isCastedDebug);
         screen.removeElement(card);
         cardPreviewCast = card;
-        setActiveCard();
+        activateCard(null);
 
         //Register the input for the card system
         app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
@@ -303,14 +321,14 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     }
 
     private void closePreview() {
-        setActiveCard();
+        activateCard(null);
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         //Remove the input for the card system
         app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
-    
+
     private void castCanceled() {
         screen.addElement(cardPreviewCast);
         cardPreviewCast.setZOrder(zOrder);
@@ -322,12 +340,13 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
             case SPELL:
                 break;
             case SUMMON:
-                String name = entityData.getComponent(cardPreviewCast.getCardEntityUID(), EntityRenderComponent.class).getName();
+                CardRenderComponent cardRender = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardRenderComponent.class);
+                String name = cardRender.getName();
                 UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
                 if (unitLoader != null) {
                     entityData.setComponents(cardPreviewCast.getCardEntityUID(),
                             new HexPositionComponent(castCoord, Rotation.A),
-                            new CardRenderComponent(CardRenderPosition.FIELD),
+                            cardRender.clone(CardRenderPosition.FIELD),
                             new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
                             unitLoader.getCollisionComp(), //Collision Comp
@@ -343,24 +362,67 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         }
     }
 
-    private void setActiveCard() {
+    /**
+     * Activate the HexMapInput on pulse Mode if (event == null &&
+     * cardPreviewCast != null), Desactivate the HexMapInput pulseMode if (event
+     * != null && cardPreview != null)
+     *
+     * @param event result when a leftMouse event happen on hexMap.
+     */
+    private void activateCard(HexMapInputEvent event) {
+        /**
+         * If a card is currently in Casting Preview we check we check if it can
+         * be casted, If no card is currently activated we switch over all card
+         * Main type to know what preview to activate. (the entity will be
+         * removed from this system automaticaly if he have to)
+         */
         if (cardPreviewCast != null) {
             /**
-             * We switch over all card Main type to know what preview to
-             * activate.
+             *
              */
             switch (cardPreviewCast.getProperties().getCardMainType()) {
                 case TITAN:
-                    //todo
+                    /**
+                     * todo if the player want to use the field and not fast
+                     * selection menu.
+                     */
                     break;
                 case WORLD:
-                    app.getStateManager().getState(HexMapMouseInput.class).setCursorPulseMode(this);
+                    if (event == null) {
+                        /**
+                         * We activate the pulse Mode, if not activated the cast
+                         * is canceled.
+                         */
+                        if (!app.getStateManager().getState(HexMapMouseInput.class).setCursorPulseMode(this)) {
+                            castCanceled();
+                        }
+                    } else {
+                        /**
+                         * We check if the collision system is currently
+                         * running, if it's not the card will be directly
+                         * casted.
+                         */
+                        CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
+                        if (collisionSystem != null) {
+                            if (collisionSystem.canBeCast(event.getEventPosition(),
+                                    cardPreviewCast.getProperties().getCardSubType())) {
+                                activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                                closePreview();
+                            } else {
+                                castCanceled();
+                            }
+                        } else {
+                            activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
+                            closePreview();
+                        }
+                    }
                     break;
                 default:
-                    throw new UnsupportedOperationException("This type isn't implemented !");
+                    throw new UnsupportedOperationException(cardPreviewCast.getProperties().getCardMainType() + " isn't a supported Type.");
             }
         }
     }
+    
     private ActionListener cardInputListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("Cancel") && !keyPressed) {
@@ -370,41 +432,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     };
 
     public void leftMouseActionResult(HexMapInputEvent event) {
-        //If a card is currently in Casting Preview we check his type then the collision before casting it
-        /**
-         * If a card is currently in Casting Preview we check his Main Type,
-         * then we check if it can be casted and finaly we activate that card
-         * properly. (the entity will be removed from this system automaticaly
-         * if he have to)
-         */
-        if (cardPreviewCast != null) {
-            switch (cardPreviewCast.getProperties().getCardMainType()) {
-                case TITAN:
-                    //todo : if the player want to use the field and not fast selection menu. TITAN card
-                    break;
-                case WORLD:
-                    /**
-                     * We check if the collision system is currently running, if
-                     * it's not the card will be directly casted.
-                     */
-                    CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
-                    if (collisionSystem != null) {
-                        if (collisionSystem.canBeCast(event.getEventPosition(),
-                                cardPreviewCast.getProperties().getCardSubType())) {
-                            activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                            closePreview();
-                        } else {
-                            castCanceled();
-                        }
-                    } else {
-                        activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                        closePreview();
-                    }
-                    break;
-                default:
-                    throw new UnsupportedOperationException("This type isn't implemented or supported !");
-            }
-        }
+        activateCard(event);
     }
 
     public void rightMouseActionResult(HexMapInputEvent event) {
@@ -421,72 +449,31 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     }
 
     /**
+     * hide all card on the current System.
      *
-     * @return all cards entityId on the current player hand.
+     * @todo Extends to affect the whole system GUI.
      */
-    public Set<EntityId> getCardsKeyset() {
-        return handCards.keySet();
-    }
-
     public void hideCards() {
-        hideCards(null);
+        showCards(null, false);
     }
 
     /**
-     * Hide card on the selected position in the system, Set to null to hide all
-     * cards.
+     * Show all card on the current System.
      *
-     * @param screenPosition
+     * @todo Extends to affect the whole system GUI.
      */
-    public void hideCards(CardRenderPosition screenPosition) {
-        if (screenPosition == null) {
-            if (!handCards.isEmpty()) {
-                for (Card card : handCards.values()) {
-                    card.hide();
-                }
-            }
-            /**
-             * @todo: other position.
-             */
-            return;
-        }
-        switch (screenPosition) {
-            case DECK:
-                /**
-                 * @todo
-                 */
-                break;
-            case FIELD:
-                /**
-                 * @todo
-                 */
-                break;
-            case HAND:
-                if (!handCards.isEmpty()) {
-                    for (Card card : handCards.values()) {
-                        card.hide();
-                    }
-                }
-                break;
-            case OUTERWORLD:
-                /**
-                 * @todo
-                 */
-                break;
-        }
-    }
-
     public void showCards() {
-        showCards(null);
+        showCards(null, true);
     }
 
     /**
-     * Show card on the selected position in the system, Set to null to show all
-     * cards.
+     * Show/hide card on the selected position in the system, Set to null to
+     * show/hide all cards.
      *
+     * @param show Set to true to show, false to hide.
      * @param screenPosition
      */
-    public void showCards(CardRenderPosition screenPosition) {
+    public void showCards(CardRenderPosition screenPosition, boolean show) {
         if (screenPosition == null) {
             if (!handCards.isEmpty()) {
                 for (Card card : handCards.values()) {
@@ -512,7 +499,11 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
             case HAND:
                 if (!handCards.isEmpty()) {
                     for (Card card : handCards.values()) {
-                        card.show();
+                        if (show) {
+                            card.show();
+                        } else {
+                            card.hide();
+                        }
                     }
                 }
                 break;

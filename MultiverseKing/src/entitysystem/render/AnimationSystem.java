@@ -14,20 +14,21 @@ import entitysystem.attribut.Animation;
 
 /**
  * Handle how animation work when they got they cycle done or under defined
- * pattern.
+ * pattern. 
+ * @todo make this a sub-system of the renderSystem
  *
  * @author roah
  */
 public class AnimationSystem extends EntitySystemAppState implements AnimEventListener {
 
-    private EntityRenderSystem renderSystem;
+    private RenderSystem renderSystem;
     private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();
 
     @Override
     protected EntitySet initialiseSystem() {
-        renderSystem = app.getStateManager().getState(EntityRenderSystem.class);
+        renderSystem = app.getStateManager().getState(RenderSystem.class);
 
-        return entityData.getEntities(AnimationComponent.class, EntityRenderComponent.class);
+        return entityData.getEntities(AnimationComponent.class);
     }
 
     @Override
@@ -38,6 +39,10 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void addEntity(Entity e) {
         AnimControl control = renderSystem.getAnimControl(e.getId());
+        if(control == null){
+//            entityData.removeComponent(e.getId(), AnimationComponent.class);
+            return;
+        } 
         control.addListener(this);
         AnimChannel channel = control.createChannel();
         setPlay(channel, e.get(AnimationComponent.class).getAnimation());
@@ -57,6 +62,9 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void removeEntity(Entity e) {
         AnimControl animControl = animControls.get(e.getId());
+        if(animControl == null){
+            return;
+        }
         animControl.clearChannels();
         animControl.clearListeners();
         animControls.remove(e.getId());

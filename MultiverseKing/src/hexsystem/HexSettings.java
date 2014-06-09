@@ -29,7 +29,7 @@ public final class HexSettings {
      * Parameters used when generating the map. WU distance between two hex of
      * different height.
      */
-    public static final float FLOOR_HEIGHT = 1f;
+    public static final float FLOOR_OFFSET = 1f;
     /**
      * Parameters used when generating the map. Offset value used to put the
      * ground, to have underground without having to handle negative value,

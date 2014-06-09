@@ -26,10 +26,6 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
 
     private HashMap chunkNode = new HashMap<String, Node>();
     /**
-     * Mesh generator.
-     */
-    protected final MeshManager meshManager;
-    /**
      * Main application.
      */
     protected final SimpleApplication main;
@@ -56,15 +52,12 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
     public HexSystemAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
         this.mapData = mapData;
-        this.meshManager = new MeshManager();
         mapNode = new Node("mapNode");
     }
 
     /**
      * Load the shader used by the hexMap to render all tile.
      *
-     * @todo AddAllChunks method should be cleaned, it didn't follow the main
-     * pattern.
      * @param stateManager
      * @param app
      */
@@ -75,9 +68,12 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
         mapData.registerTileChangeListener(this);
 
         main.getRootNode().attachChild(mapNode);
+        /**
+         * This double the Vertice count.
+         */
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
 
-        addAllChunks(); //to remove
+//        addAllChunks(); //to remove
     }
 
     /**
@@ -103,7 +99,7 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
         Node chunk = new Node(pos.toString());
         chunkNode.put(pos.toString(), chunk);
         chunk.setLocalTranslation(mapData.getChunkWorldPosition(pos));
-        chunk.addControl(new ChunkControl(mapData, meshManager, main.getAssetManager(), mapData.getMapElement()));
+        chunk.addControl(new ChunkControl(mapData, main.getAssetManager(), mapData.getMapElement()));
         mapNode.attachChild(chunk);
     }
 

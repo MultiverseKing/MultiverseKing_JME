@@ -2,13 +2,12 @@ package test;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;
-import entitysystem.render.SpatialInitializer;
 
 /**
  *
  * @author Eike Foede
  */
-public class ExampleSpatialInitialiser implements SpatialInitializer {
+public class ExampleSpatialInitialiser implements ISpatialInitializer {
 
     AssetManager assetManager;
 

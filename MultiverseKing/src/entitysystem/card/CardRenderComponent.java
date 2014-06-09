@@ -11,15 +11,17 @@ import entitysystem.attribut.CardRenderPosition;
  */
 public class CardRenderComponent implements PersistentComponent {
 
-    private final CardRenderPosition cardPos;
+    private final CardRenderPosition renderPosition;
+    private final String name;
 
     /**
      * Define where the card will be generated/ rendered on the screen.
      *
-     * @param cardPos
+     * @param renderPosition
      */
-    public CardRenderComponent(CardRenderPosition cardPos) {
-        this.cardPos = cardPos;
+    public CardRenderComponent(CardRenderPosition renderPosition, String name) {
+        this.name = name;
+        this.renderPosition = renderPosition;
     }
 
     /**
@@ -28,7 +30,19 @@ public class CardRenderComponent implements PersistentComponent {
      * @see CardRenderPosition
      * @return
      */
-    public CardRenderPosition getCardPosition() {
-        return cardPos;
+    public CardRenderPosition getRenderPosition() {
+        return renderPosition;
+    }
+
+    public String getName() {
+        return name;
+    }
+    
+    public CardRenderComponent clone(String name){
+        return new CardRenderComponent(renderPosition, name);
+    }
+    
+    public CardRenderComponent clone(CardRenderPosition renderPosition){
+        return new CardRenderComponent(renderPosition, name);
     }
 }

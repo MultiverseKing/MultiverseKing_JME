@@ -20,7 +20,7 @@ public class Card extends ButtonAdapter {
     private final EntityId UID;
     private final float rescaleValue;
     private final Vector2f cardSize;
-    private int isRescale = 1;
+    private int isRescale = 1;//<<todo remove the value
     private int handPosition;
     private CardProperties cardProperties;
 

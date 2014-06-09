@@ -17,9 +17,8 @@ import entitysystem.EntityDataAppState;
 import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
-import entitysystem.render.EntityRenderSystem;
+import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.field.EntityFieldSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -109,7 +108,7 @@ public class MultiverseMain extends SimpleApplication {
 
         /* this shadow needs a directional light */
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 2);
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 1024, 2);
         dlsf.setLight(sun);
         fpp.addFilter(dlsf);
         viewPort.addProcessor(fpp);
@@ -153,7 +152,7 @@ public class MultiverseMain extends SimpleApplication {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
         player.setName("Player");
 
-        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT, 0));
+        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_OFFSET, 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -173,12 +172,11 @@ public class MultiverseMain extends SimpleApplication {
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
                 new HexMapMouseInput(),
-                new EntityRenderSystem(),
+                new RenderSystem(),
                 new MovementSystem(),
                 new CardSystem(),
                 new AnimationSystem(),
                 new CollisionSystem(),
-                new EntityFieldSystem(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

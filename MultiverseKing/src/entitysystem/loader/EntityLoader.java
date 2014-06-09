@@ -68,7 +68,7 @@ public class EntityLoader {
         if (loadPath != null) {
             JSONObject obj = getData(loadPath);
             if (obj != null) {
-                return new CardProperties(obj);
+                return new CardProperties(obj, cardName);
             }
             return null;
         } else {
@@ -124,9 +124,9 @@ public class EntityLoader {
             JSONObject j = (JSONObject) parser.parse(s);
             return j;
         } catch (IOException ex) {
-            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, "File not found : " + ex.toString(), ex);
+            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         } catch (ParseException ex) {
-            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, "Object can't be parsed : " + ex.toString(), ex);
+            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
         return null;
     }

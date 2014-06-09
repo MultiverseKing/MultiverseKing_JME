@@ -21,8 +21,7 @@ import utility.ElementalAttribut;
  * @author roah
  */
 public class ChunkControl extends AbstractControl {
-
-    private final MeshManager meshManager;
+    
     private final AssetManager assetManager;
     private ArrayList<Geometry> geo = new ArrayList<Geometry>();
     private final MapData mapData;
@@ -34,9 +33,8 @@ public class ChunkControl extends AbstractControl {
      * @param assetManager
      * @param mapElement
      */
-    public ChunkControl(MapData mapData, MeshManager meshManager, AssetManager assetManager, ElementalAttribut mapElement) {
+    public ChunkControl(MapData mapData, AssetManager assetManager, ElementalAttribut mapElement) {
         this.mapData = mapData;
-        this.meshManager = meshManager;
         this.assetManager = assetManager;
     }
 
@@ -80,6 +78,7 @@ public class ChunkControl extends AbstractControl {
          * Generate the tile and attach them with the right texture. 1 object by
          * element.
          */
+        MeshManager meshManager = new MeshManager();
         Set<ElementalAttribut> paramElement = meshParam.getAllElementInList();
         for (ElementalAttribut e : paramElement) {
             Geometry tile = new Geometry(e.toString(), meshManager.getMesh(meshParam.setElement(e)));

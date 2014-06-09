@@ -38,15 +38,15 @@ public class Hover extends Window {
     /**
      * @todo
      */
-    public void setProperties(CardProperties properties, String cardName) {
+    public void setProperties(CardProperties properties) {
         if (getElementsAsMap().isEmpty()) {
-            initProperties(properties, cardName);
+            initProperties(properties);
         } else {
-            updateProperties(properties, cardName);
+            updateProperties(properties);
         }
     }
 
-    private void initProperties(CardProperties properties, String cardName) {
+    private void initProperties(CardProperties properties) {
         /**
          * Label used to show the cost needed for the card.
          */
@@ -82,7 +82,7 @@ public class Hover extends Window {
          * Label used to show the name of the card.
          */
         Label cardNameLabel = new Label(screen, "cardNameLabelHover", new Vector2f(), new Vector2f(300, 45));
-        cardNameLabel.setText(cardName);
+        cardNameLabel.setText(properties.getName());
         addChild(cardNameLabel);
 
         cardNameLabel.setFont("Interface/Fonts/Purisa.fnt");
@@ -133,7 +133,7 @@ public class Hover extends Window {
         }
     }
 
-    private void updateProperties(CardProperties properties, String cardName) {
+    private void updateProperties(CardProperties properties) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

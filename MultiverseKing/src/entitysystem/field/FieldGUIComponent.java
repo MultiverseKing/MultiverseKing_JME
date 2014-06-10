@@ -7,17 +7,20 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class EntityFieldComponent implements PersistentComponent {
+public class FieldGUIComponent implements PersistentComponent {
 
     public enum EntityType {
-
+        NULL,
         TITAN,
         UNIT,
         ENVIRONMENT;
     }
+    /**
+     * Value used to know the GUI to use with.
+     */
     private EntityType entityType;
 
-    public EntityFieldComponent(EntityType entityType) {
+    public FieldGUIComponent(EntityType entityType) {
         this.entityType = entityType;
     }
 

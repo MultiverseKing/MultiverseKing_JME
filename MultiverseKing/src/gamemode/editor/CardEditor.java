@@ -47,7 +47,7 @@ import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.controls.text.Label;
+import tonegod.gui.controls.text.LabelElement;
 import tonegod.gui.controls.text.TextField;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
@@ -102,7 +102,7 @@ public class CardEditor implements HexMapInputListener {
          * Init the testingDoll.
          */
         entity.add(entityData.createEntity());
-        entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll", RenderComponent.EntityType.TITAN),
+        entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
 //                new Vector2Int(0, 0)), Rotation.A),
@@ -208,11 +208,7 @@ public class CardEditor implements HexMapInputListener {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                EntityId cardId = ed.createEntity();
-                ed.setComponent(cardId, new RenderComponent("Cendrea", RenderComponent.EntityType.UNIT));
-                ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, "Cendrea"));
-                entity.add(cardId);
+                addEntityCard("Cendrea");
             }
         };
         addCard.setText("Add");
@@ -227,7 +223,7 @@ public class CardEditor implements HexMapInputListener {
                     int i = 0;
                     i = FastMath.nextRandomInt(2, entity.size());
                     i-=1;
-                    app.getStateManager().getState(EntityDataAppState.class).getEntityData().removeEntity(entity.get(i));
+                    entityData.removeEntity(entity.get(i));
                     entity.remove(entity.get(i));
                 }
             }
@@ -235,14 +231,18 @@ public class CardEditor implements HexMapInputListener {
         removeCard.setText("Del");
         addRemoveCard.addChild(removeCard);
 
-//        if (!main.getStateManager().getState(CardSystem.class).gotCardInHand()) {
-//            EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
-//            EntityId cardId = ed.createEntity();
-//            ed.setComponent(cardId, new RenderComponent("Cendrea", RenderComponent.EntityType.UNIT));
-//            ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, "Cendrea"));
-//        }
+        if (!main.getStateManager().getState(CardSystem.class).gotCardInHand()) {
+            addEntityCard("Cendrea");
+        }
     }
 
+    private void addEntityCard(String name){
+            EntityId cardId = entityData.createEntity();
+            entityData.setComponent(cardId, new RenderComponent(name));
+            entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
+            entity.add(cardId);
+    }
+    
     private void generatorMenu() {
         /**
          * Window used to show card Properties.
@@ -347,7 +347,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/set the card Name.
          */
-        Label nameLabel = new Label(main.getScreen(), "generatorNameLabel",
+        LabelElement nameLabel = new LabelElement(main.getScreen(), "generatorNameLabel",
                 new Vector2f(10, 5), new Vector2f(60, 35));
         nameLabel.setText("Name : ");
         callerMenu.addChild(nameLabel);
@@ -381,7 +381,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card Type.
          */
-        Label subTypeLabel = new Label(main.getScreen(), "generatorCardTypeLabel", new Vector2f(10, 45), new Vector2f(95, 35));
+        LabelElement subTypeLabel = new LabelElement(main.getScreen(), "generatorCardTypeLabel", new Vector2f(10, 45), new Vector2f(95, 35));
         subTypeLabel.setText("Card Type : ");
         callerMenu.addChild(subTypeLabel);
 
@@ -402,7 +402,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/set the card Description text.
          */
-        Label descriptionLabel = new Label(main.getScreen(), "generatorDescriptionLabel",
+        LabelElement descriptionLabel = new LabelElement(main.getScreen(), "generatorDescriptionLabel",
                 new Vector2f(10, 85), new Vector2f(150, 35));
         descriptionLabel.setText("Description : ");
         callerMenu.addChild(descriptionLabel);
@@ -433,7 +433,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card faction.
          */
-        Label factionLabel = new Label(main.getScreen(), "generatorFactionLabel", new Vector2f(rightMenu, 5), new Vector2f(75, 35));
+        LabelElement factionLabel = new LabelElement(main.getScreen(), "generatorFactionLabel", new Vector2f(rightMenu, 5), new Vector2f(75, 35));
         factionLabel.setText("Faction : ");
         callerMenu.addChild(factionLabel);
 
@@ -454,7 +454,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card Element Attribut.
          */
-        Label elementTypeLabel = new Label(main.getScreen(), "generatorEAttributLabel", new Vector2f(rightMenu, 45), new Vector2f(80, 35));
+        LabelElement elementTypeLabel = new LabelElement(main.getScreen(), "generatorEAttributLabel", new Vector2f(rightMenu, 45), new Vector2f(80, 35));
         elementTypeLabel.setText("E.Attribut : ");
         callerMenu.addChild(elementTypeLabel);
 
@@ -475,7 +475,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the cost needed to use the card.
          */
-        Label costLabel = new Label(main.getScreen(), "generatorCostLabel", new Vector2f(rightMenu, 80), new Vector2f(75, 35));
+        LabelElement costLabel = new LabelElement(main.getScreen(), "generatorCostLabel", new Vector2f(rightMenu, 80), new Vector2f(75, 35));
         costLabel.setText("Cost : ");
         callerMenu.addChild(costLabel);
 
@@ -603,7 +603,7 @@ public class CardEditor implements HexMapInputListener {
          * Part used to show/set how many power have the ability. damage -
          * segmentCost - activationRange - FXUsed - hitCollision - isCastOnSelf
          */
-        Label damageLabel = new Label(main.getScreen(), "powerLabel", new Vector2f(10, 10), new Vector2f(58, 30));
+        LabelElement damageLabel = new LabelElement(main.getScreen(), "powerLabel", new Vector2f(10, 10), new Vector2f(58, 30));
         damageLabel.setText("Power : ");
         subMenu.addChild(damageLabel);
 
@@ -635,7 +635,7 @@ public class CardEditor implements HexMapInputListener {
          * Part used to show/set the segmentCost needed for the unit to cast the
          * ability.
          */
-        Label unitCastCostLabel = new Label(main.getScreen(), "unitCastCostLabel", new Vector2f(10, 40), new Vector2f(160, 30));
+        LabelElement unitCastCostLabel = new LabelElement(main.getScreen(), "unitCastCostLabel", new Vector2f(10, 40), new Vector2f(160, 30));
         unitCastCostLabel.setText("Unit Segment Used : ");
         subMenu.addChild(unitCastCostLabel);
 
@@ -845,9 +845,8 @@ public class CardEditor implements HexMapInputListener {
     }
 
     private void cleanupEntityTest() {
-        EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
         for(EntityId id : entity){
-            ed.removeEntity(id);
+            entityData.removeEntity(id);
         }
     }
 }

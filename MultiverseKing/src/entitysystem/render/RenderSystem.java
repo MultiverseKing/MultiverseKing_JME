@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.control.Control;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
@@ -16,7 +17,7 @@ import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Set;
-import kingofmultiverse.MultiverseMain;
+import tonegod.gui.core.Screen;
 import utility.Rotation;
 import utility.SimpleMath;
 
@@ -49,6 +50,12 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
             return spatials.get(id).getControl(AnimControl.class);
         } else {
             return null;
+        }
+    }
+    
+    public void addControl(EntityId id, Control control) {
+        if (spatials.containsKey(id)) {
+            spatials.get(id).addControl(control);
         }
     }
 

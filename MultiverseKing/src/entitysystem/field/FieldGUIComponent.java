@@ -10,7 +10,6 @@ import com.simsilica.es.PersistentComponent;
 public class FieldGUIComponent implements PersistentComponent {
 
     public enum EntityType {
-        NULL,
         TITAN,
         UNIT,
         ENVIRONMENT;

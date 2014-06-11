@@ -36,12 +36,8 @@ public abstract class EntitySystemAppState extends AbstractAppState {
         this.entityData = stateManager.getState(EntityDataAppState.class).getEntityData();
 
         entities = initialiseSystem();
-        if(entities != null){
-            for (Entity e : entities) {
-                addEntity(e);
-            }
-        } else {
-            app.getStateManager().detach(this);
+        for (Entity e : entities) {
+            addEntity(e);
         }
     }
 

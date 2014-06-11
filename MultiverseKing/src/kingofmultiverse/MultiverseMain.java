@@ -20,6 +20,7 @@ import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
+import entitysystem.field.EntityFieldSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -178,6 +179,7 @@ public class MultiverseMain extends SimpleApplication {
                 new CardSystem(),
                 new AnimationSystem(),
                 new CollisionSystem(),
+                new EntityFieldSystem(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

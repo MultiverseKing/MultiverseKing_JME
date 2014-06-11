@@ -31,6 +31,7 @@ import entitysystem.render.AnimationComponent;
 import entitysystem.render.RenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
+import entitysystem.field.FieldGUIComponent;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
@@ -107,6 +108,7 @@ public class CardEditor implements HexMapInputListener {
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
 //                new Vector2Int(0, 0)), Rotation.A),
                 new AnimationComponent(Animation.SUMMON),
+                new FieldGUIComponent(FieldGUIComponent.EntityType.TITAN),
                 new CollisionComponent((byte) 0));
 
     }

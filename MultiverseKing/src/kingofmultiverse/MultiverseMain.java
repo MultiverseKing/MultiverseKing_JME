@@ -11,7 +11,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
@@ -20,7 +19,7 @@ import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.field.EntityFieldSystem;
+import entitysystem.field.InteractiveFieldSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseInput;
 import hexsystem.HexSettings;
@@ -179,7 +178,7 @@ public class MultiverseMain extends SimpleApplication {
                 new CardSystem(),
                 new AnimationSystem(),
                 new CollisionSystem(),
-                new EntityFieldSystem(),
+                new InteractiveFieldSystem(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

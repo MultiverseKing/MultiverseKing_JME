@@ -16,6 +16,7 @@ import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
+import entitysystem.field.FieldGUIComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
@@ -24,7 +25,6 @@ import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
@@ -104,7 +104,6 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
     private Card cardPreviewCast;
 
     // </editor-fold>
-    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -149,13 +148,13 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
             CardProperties properties = new EntityLoader().loadCardProperties(cardName);
             if (properties != null) {
                 card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
-                            properties);
+                        properties);
                 handCards.put(e.getId(), card);
                 screen.addElement(card);
                 card.resetHandPosition();
                 for (Card c : handCards.values()) {
                     c.setZOrder(c.getZOrder());
-                } 
+                }
             } else {
                 System.err.println("Card files cannot be locate. " + cardName);
                 entityData.removeComponent(e.getId(), CardRenderComponent.class);
@@ -251,7 +250,6 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         }
         return false;
     }
-
 
     @Override
     protected void updateEntity(Entity e) {
@@ -349,6 +347,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                             cardRender.clone(CardRenderPosition.FIELD),
                             new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
+                            new FieldGUIComponent(FieldGUIComponent.EntityType.UNIT),
                             unitLoader.getCollisionComp(), //Collision Comp
                             unitLoader.getuLife(), //life component
                             unitLoader.getMovementComp(), //stats component
@@ -422,7 +421,6 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
             }
         }
     }
-    
     private ActionListener cardInputListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("Cancel") && !keyPressed) {

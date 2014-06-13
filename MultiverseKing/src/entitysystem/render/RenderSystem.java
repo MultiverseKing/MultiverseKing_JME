@@ -1,6 +1,8 @@
 package entitysystem.render;
 
 import com.jme3.animation.AnimControl;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
@@ -11,12 +13,14 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
+import entitysystem.tonegod.ToneControl;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Set;
+import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Screen;
 import utility.Rotation;
 import utility.SimpleMath;
@@ -157,5 +161,9 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
                 spatials.get(id).setLocalTranslation(currentLoc.x, event.getNewTile().getHeight(), currentLoc.z);
             }
         }
+    }
+
+    public void addControl(EntityId id, ToneControl control, Menu currentMenu) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

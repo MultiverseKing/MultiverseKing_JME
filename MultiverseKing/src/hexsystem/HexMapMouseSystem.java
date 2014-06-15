@@ -25,14 +25,15 @@ import utility.HexCoordinate;
 import utility.MouseRay;
 
 /**
+ * WIP
  *
  * @author Eike Foede, roah
  */
-public class HexMapMouseInput extends AbstractAppState {
+public class HexMapMouseSystem extends AbstractAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
-    private MultiverseMain app;
+    private MultiverseMain main;
     private ArrayList<HexMapInputListener> hexMapListeners = new ArrayList<HexMapInputListener>();
     private ArrayList<HexMapRayListener> rayListeners = new ArrayList<HexMapRayListener>(3);
     private Spatial cursor;
@@ -48,7 +49,7 @@ public class HexMapMouseInput extends AbstractAppState {
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-        this.app = (MultiverseMain) app;
+        this.main = (MultiverseMain) app;
         mapData = stateManager.getState(HexSystemAppState.class).getMapData();
         initMarkDebug();
         initInput();
@@ -79,6 +80,7 @@ public class HexMapMouseInput extends AbstractAppState {
      */
     public void registerRayInputListener(HexMapRayListener listener) {
         rayListeners.add(listener);
+        hexMapListeners.add(listener);
     }
 
     /**
@@ -88,6 +90,7 @@ public class HexMapMouseInput extends AbstractAppState {
      */
     public void removeRayInputListener(HexMapRayListener listener) {
         rayListeners.remove(listener);
+        hexMapListeners.remove(listener);
     }
 
     /**
@@ -95,18 +98,18 @@ public class HexMapMouseInput extends AbstractAppState {
      * instanced that mean Tiles is or will be instanced so this input too.
      */
     private void initInput() {
-        app.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
+        main.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
     }
     private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("Confirm") && isPressed) {
+            if (name.equals("Confirm") && !isPressed) {
                 if (listenerPulseIndex == -1) {
                     castRay("L");
                 } else {
                     hexMapListeners.get(listenerPulseIndex).leftMouseActionResult(
-                            new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), null));
+                            new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), mouseRay.get3DRay(main), null));
                 }
-            } else if (name.equals("Cancel") && isPressed) {
+            } else if (name.equals("Cancel") && !isPressed) {
                 if (listenerPulseIndex == -1) {
                     castRay("R");
                 }
@@ -116,28 +119,28 @@ public class HexMapMouseInput extends AbstractAppState {
 
     private void initMarkDebug() {
         Sphere sphere = new Sphere(30, 30, 0.2f);
-        rayDebug = new Geometry("BOOM!", sphere);
-        Material mark_mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        rayDebug = new Geometry("DebugRayCast", sphere);
+        Material mark_mat = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         mark_mat.setColor("Color", ColorRGBA.Red);
         rayDebug.setMaterial(mark_mat);
     }
 
     private void initCursor() {
-        cursor = app.getAssetManager().loadModel("Models/utility/animPlane.j3o");
-        Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+        cursor = main.getAssetManager().loadModel("Models/utility/animPlane.j3o");
+        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
         animShader.setInt("Speed", 16);
         cursor.setMaterial(animShader);
-        app.getRootNode().attachChild(cursor);
+        main.getRootNode().attachChild(cursor);
         //Remove offset and set it to zero if hex_void_anim.png is not used
-        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_HEIGHT + 0.01f;
+        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
         cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
-        System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT + " + " + z + 0.01f);
+        System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_OFFSET + " + " + z + 0.01f);
     }
 
     @Override
     public void update(float tpf) {
         if (listenerPulseIndex != -1) {
-            Vector2f newMousePos = app.getInputManager().getCursorPosition().normalize();
+            Vector2f newMousePos = main.getInputManager().getCursorPosition().normalize();
             if (!newMousePos.equals(lastScreenMousePos)) {
                 castRay("0");
                 lastScreenMousePos = newMousePos;
@@ -161,7 +164,7 @@ public class HexMapMouseInput extends AbstractAppState {
                 hexMapListeners.add(listener);
             }
             listenerPulseIndex = hexMapListeners.indexOf(listener);
-            lastScreenMousePos = app.getInputManager().getCursorPosition();
+            lastScreenMousePos = main.getInputManager().getCursorPosition();
             return true;
         } else {
             /**
@@ -185,39 +188,33 @@ public class HexMapMouseInput extends AbstractAppState {
 
     private void castRay(String mouseInput) {
         CollisionResults results = new CollisionResults();
-        Ray ray = mouseRay.get3DRay(app);
+        Ray ray = mouseRay.get3DRay(main);
         HexMapInputEvent event = callRayActionListeners(mouseInput, ray);
 
         if (event == null) {
-            app.getRootNode().getChild("mapNode").collideWith(ray, results);
+            main.getRootNode().getChild("mapNode").collideWith(ray, results);
             if (results.size() != 0) {
                 if (results.size() > 0) {
                     CollisionResult closest = results.getClosestCollision();
-
-                    rayDebug.setLocalTranslation(closest.getContactPoint());
-                    app.getRootNode().attachChild(rayDebug);    //TODO Debug to remove.
+                    setDebugPosition(closest.getContactPoint());
 
                     HexCoordinate newPos = convertMouseCollision(results);
-                    if (newPos != null && !newPos.equals(lastHexPos)) {
-                        event = new HexMapInputEvent(newPos, ray);
+//                    if (newPos != null && !newPos.equals(lastHexPos)) {
+                        event = new HexMapInputEvent(newPos, ray, closest);
                         moveCursor(newPos);
                         callMouseActionListeners(mouseInput, event);
-                    }
-                } else if (app.getRootNode().hasChild(rayDebug)) {
-                    // No hits? Then remove the red mark.
-                    app.getRootNode().detachChild(rayDebug);    //TODO Debug to remove.
-                } else {
-                    System.out.println("no  mark");
-                }
+//                    }
+                } 
             } else {
                 //Error catching.
                 System.out.println("null raycast");
+                main.getRootNode().detachChild(rayDebug);
             }
         } else {
-            if (!event.getEventPosition().equals(lastHexPos)) {
+//            if (!event.getEventPosition().equals(lastHexPos)) {
                 moveCursor(event.getEventPosition());
                 callMouseActionListeners(mouseInput, event);
-            }
+//            }
         }
     }
 
@@ -232,7 +229,7 @@ public class HexMapMouseInput extends AbstractAppState {
             } else if ((mouseInput.contains("R"))) {
                 l.rightMouseActionResult(event);
             } else {
-                return; //in case of...
+                return;
             }
         }
     }
@@ -250,23 +247,46 @@ public class HexMapMouseInput extends AbstractAppState {
                 event = l.leftRayInputAction(ray);
             } else if ((mouseInput.contains("R"))) {
                 event = l.rightRayInputAction(ray);
+            } else {
+                return null;
             }
         }
         return event;
     }
 
-    public void moveCursor(HexCoordinate tilePos) {
-        if (cursor == null) {
-            initCursor();
+    public void setDebugPosition(Vector3f pos){
+        if(rayDebug != null){
+            if(main.getRootNode().hasChild(rayDebug)){
+                rayDebug.setLocalTranslation(pos);
+            } else {
+                main.getRootNode().attachChild(rayDebug);
+                rayDebug.setLocalTranslation(pos);
+            }
         }
-        Vector3f pos = mapData.getTileWorldPosition(tilePos);
-        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_HEIGHT
-                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
-        /**
-         * The cursor real position is not updated on pulseMode.
-         */
-        if (listenerPulseIndex == -1) {
-            lastHexPos = tilePos;
+    }
+    
+    public void setCursor(HexCoordinate tilePos) {
+        moveCursor(tilePos);
+        enable = 1;
+    }
+    
+    Byte enable = 0;
+    private void moveCursor(HexCoordinate tilePos) {
+        if(enable <= 0){
+            if (cursor == null) {
+                initCursor();
+            }
+            Vector3f pos = tilePos.convertToWorldPosition();
+            cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_OFFSET
+                    + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+            /**
+             * The cursor real position is not updated on pulseMode.
+             */
+            if (listenerPulseIndex == -1) {
+                lastHexPos = tilePos;
+            }
+        } else {
+            enable--;
         }
     }
 
@@ -305,7 +325,7 @@ public class HexMapMouseInput extends AbstractAppState {
         }
         if (mapData.convertWorldToGridPosition(cursor.getLocalTranslation()).equals(event.getTilePos())) {
             cursor.setLocalTranslation(cursor.getLocalTranslation().x, event.getNewTile().getHeight()
-                    * HexSettings.FLOOR_HEIGHT + 0.1f, cursor.getLocalTranslation().z);
+                    * HexSettings.FLOOR_OFFSET + 0.1f, cursor.getLocalTranslation().z);
         }
     }
 

@@ -14,14 +14,14 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import entitysystem.render.AnimationSystem;
+import entitysystem.render.AnimationRenderSystem;
 import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
-import entitysystem.render.EntityRenderSystem;
+import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.field.EntityFieldSystem;
+import entitysystem.render.GUIRenderSystem;
 import hexsystem.HexSystemAppState;
-import hexsystem.HexMapMouseInput;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -109,7 +109,7 @@ public class MultiverseMain extends SimpleApplication {
 
         /* this shadow needs a directional light */
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 2);
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 1024, 2);
         dlsf.setLight(sun);
         fpp.addFilter(dlsf);
         viewPort.addProcessor(fpp);
@@ -153,7 +153,7 @@ public class MultiverseMain extends SimpleApplication {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
         player.setName("Player");
 
-        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_HEIGHT, 0));
+        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_OFFSET, 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -172,13 +172,13 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attachAll(
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
-                new HexMapMouseInput(),
-                new EntityRenderSystem(),
+                new HexMapMouseSystem(),
+                new RenderSystem(),
                 new MovementSystem(),
                 new CardSystem(),
-                new AnimationSystem(),
+                new AnimationRenderSystem(),
                 new CollisionSystem(),
-                new EntityFieldSystem(),
+                new GUIRenderSystem(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

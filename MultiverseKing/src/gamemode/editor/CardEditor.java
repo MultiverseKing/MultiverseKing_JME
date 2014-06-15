@@ -13,12 +13,12 @@ import com.simsilica.es.EntityId;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
-import entitysystem.attribut.CardType;
-import static entitysystem.attribut.CardType.ABILITY;
-import static entitysystem.attribut.CardType.EQUIPEMENT;
-import static entitysystem.attribut.CardType.SPELL;
-import static entitysystem.attribut.CardType.SUMMON;
-import static entitysystem.attribut.CardType.TRAP;
+import entitysystem.attribut.SubType;
+import static entitysystem.attribut.SubType.ABILITY;
+import static entitysystem.attribut.SubType.EQUIPEMENT;
+import static entitysystem.attribut.SubType.SPELL;
+import static entitysystem.attribut.SubType.SUMMON;
+import static entitysystem.attribut.SubType.TRAP;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
@@ -27,13 +27,13 @@ import entitysystem.card.CardSystem;
 import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.AnimationComponent;
-import entitysystem.render.EntityRenderComponent;
+import entitysystem.render.AnimationRenderComponent;
+import entitysystem.render.RenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
-import entitysystem.field.EntityFieldComponent;
-import entitysystem.field.EntityFieldComponent.EntityType;
-import hexsystem.HexMapMouseInput;
+import entitysystem.render.GUIRenderComponent;
+import entitysystem.render.GUIRenderSystem;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
 import hexsystem.MapData;
@@ -41,6 +41,7 @@ import hexsystem.events.HexMapInputEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import kingofmultiverse.MultiverseMain;
@@ -48,7 +49,7 @@ import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.controls.text.Label;
+import tonegod.gui.controls.text.LabelElement;
 import tonegod.gui.controls.text.TextField;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
@@ -70,10 +71,10 @@ public class CardEditor implements HexMapInputListener {
     private MultiverseMain main;
     private EntityData entityData;
     private MapData mapData;
-    private EntityId tuxDoll = null;
     private float rightMenu = 245;
     private Hover hover;
-    EditorMainGUI rootGUI;
+    private EditorMainGUI rootGUI;
+    private ArrayList<EntityId> entity = new ArrayList<EntityId>();
 
     public CardEditor(MultiverseMain main) {
         this.main = main;
@@ -96,21 +97,19 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Move the camera to the center of the map.
          */
-        Vector3f center = mapData.getTileWorldPosition(
-                new HexCoordinate(HexCoordinate.OFFSET,
-                new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)));
+        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
+                new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)).convertToWorldPosition();
         main.getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
         /**
          * Init the testingDoll.
          */
-        tuxDoll = entityData.createEntity();
-        entityData.setComponents(tuxDoll, new EntityRenderComponent("TuxDoll"),
+        entity.add(entityData.createEntity());
+        entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
-//                new Vector2Int(0, 0)), Rotation.A),
-                new AnimationComponent(Animation.SUMMON),
-                new CollisionComponent((byte) 0),
-                new EntityFieldComponent(EntityType.TITAN));
+                new AnimationRenderComponent(Animation.SUMMON),
+                new GUIRenderComponent(GUIRenderComponent.EntityType.TITAN),
+                new CollisionComponent((byte) 0));
 
     }
 
@@ -138,7 +137,7 @@ public class CardEditor implements HexMapInputListener {
             editorMain.populateReturnEditorMain(mainMenu);
         }
 
-        HexMapMouseInput mouseSystem = main.getStateManager().getState(HexMapMouseInput.class);
+        HexMapMouseSystem mouseSystem = main.getStateManager().getState(HexMapMouseSystem.class);
         if (mouseSystem != null) {
             mouseSystem.registerTileInputListener(this);
         }
@@ -211,10 +210,7 @@ public class CardEditor implements HexMapInputListener {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                EntityId cardId = ed.createEntity();
-                ed.setComponent(cardId, new EntityRenderComponent("Cendrea"));
-                ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+                addEntityCard("Cendrea");
             }
         };
         addCard.setText("Add");
@@ -225,11 +221,12 @@ public class CardEditor implements HexMapInputListener {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                Object[] cards = app.getStateManager().getState(CardSystem.class).getCardsKeyset().toArray();
-                if (cards.length != 0) {
-                    EntityData ed = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                    EntityId id = (EntityId) cards[FastMath.nextRandomInt(0, cards.length - 1)];
-                    ed.removeComponent(id, CardRenderComponent.class);
+                if (entity.size() > 1) {
+                    int i = 0;
+                    i = FastMath.nextRandomInt(2, entity.size());
+                    i-=1;
+                    entityData.removeEntity(entity.get(i));
+                    entity.remove(entity.get(i));
                 }
             }
         };
@@ -237,13 +234,17 @@ public class CardEditor implements HexMapInputListener {
         addRemoveCard.addChild(removeCard);
 
         if (!main.getStateManager().getState(CardSystem.class).gotCardInHand()) {
-            EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
-            EntityId cardId = ed.createEntity();
-            ed.setComponent(cardId, new EntityRenderComponent("Cendrea"));
-            ed.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND));
+            addEntityCard("Cendrea");
         }
     }
 
+    private void addEntityCard(String name){
+            EntityId cardId = entityData.createEntity();
+            entityData.setComponent(cardId, new RenderComponent(name));
+            entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
+            entity.add(cardId);
+    }
+    
     private void generatorMenu() {
         /**
          * Window used to show card Properties.
@@ -258,7 +259,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Configure all button in the menu.
          */
-        initGeneratorMenu(genMenu);
+        generatorFields(genMenu);
 
         /**
          * Window used to show a preview of the card.
@@ -304,9 +305,9 @@ public class CardEditor implements HexMapInputListener {
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties(0, Faction.NEUTRAL, CardType.SUMMON,
+        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, SubType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
-        hover.setProperties(cardProperties, "TuxDoll");
+        hover.setProperties(cardProperties);
         preview.addChild(hover);
         genMenu.addChild(preview);
 
@@ -344,11 +345,11 @@ public class CardEditor implements HexMapInputListener {
         cardLoader.addChild(save);
     }
 
-    private void initGeneratorMenu(Window callerMenu) {
+    private void generatorFields(Window callerMenu) {
         /**
          * Part used to show/set the card Name.
          */
-        Label nameLabel = new Label(main.getScreen(), "generatorNameLabel",
+        LabelElement nameLabel = new LabelElement(main.getScreen(), "generatorNameLabel",
                 new Vector2f(10, 5), new Vector2f(60, 35));
         nameLabel.setText("Name : ");
         callerMenu.addChild(nameLabel);
@@ -382,7 +383,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card Type.
          */
-        Label subTypeLabel = new Label(main.getScreen(), "generatorCardTypeLabel", new Vector2f(10, 45), new Vector2f(95, 35));
+        LabelElement subTypeLabel = new LabelElement(main.getScreen(), "generatorCardTypeLabel", new Vector2f(10, 45), new Vector2f(95, 35));
         subTypeLabel.setText("Card Type : ");
         callerMenu.addChild(subTypeLabel);
 
@@ -397,13 +398,13 @@ public class CardEditor implements HexMapInputListener {
                 SubTypeMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - SubTypeMenu.getHeight());
             }
         };
-        subTypeButton.setText(CardType.SUMMON.name());
+        subTypeButton.setText(SubType.SUMMON.name());
         callerMenu.addChild(subTypeButton);
 
         /**
          * Part used to show/set the card Description text.
          */
-        Label descriptionLabel = new Label(main.getScreen(), "generatorDescriptionLabel",
+        LabelElement descriptionLabel = new LabelElement(main.getScreen(), "generatorDescriptionLabel",
                 new Vector2f(10, 85), new Vector2f(150, 35));
         descriptionLabel.setText("Description : ");
         callerMenu.addChild(descriptionLabel);
@@ -434,7 +435,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card faction.
          */
-        Label factionLabel = new Label(main.getScreen(), "generatorFactionLabel", new Vector2f(rightMenu, 5), new Vector2f(75, 35));
+        LabelElement factionLabel = new LabelElement(main.getScreen(), "generatorFactionLabel", new Vector2f(rightMenu, 5), new Vector2f(75, 35));
         factionLabel.setText("Faction : ");
         callerMenu.addChild(factionLabel);
 
@@ -455,7 +456,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the card Element Attribut.
          */
-        Label elementTypeLabel = new Label(main.getScreen(), "generatorEAttributLabel", new Vector2f(rightMenu, 45), new Vector2f(80, 35));
+        LabelElement elementTypeLabel = new LabelElement(main.getScreen(), "generatorEAttributLabel", new Vector2f(rightMenu, 45), new Vector2f(80, 35));
         elementTypeLabel.setText("E.Attribut : ");
         callerMenu.addChild(elementTypeLabel);
 
@@ -476,7 +477,7 @@ public class CardEditor implements HexMapInputListener {
         /**
          * Part used to show/choose the cost needed to use the card.
          */
-        Label costLabel = new Label(main.getScreen(), "generatorCostLabel", new Vector2f(rightMenu, 80), new Vector2f(75, 35));
+        LabelElement costLabel = new LabelElement(main.getScreen(), "generatorCostLabel", new Vector2f(rightMenu, 80), new Vector2f(75, 35));
         costLabel.setText("Cost : ");
         callerMenu.addChild(costLabel);
 
@@ -504,7 +505,6 @@ public class CardEditor implements HexMapInputListener {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-
             }
         };
         cast.setText("Cast test !");
@@ -534,7 +534,7 @@ public class CardEditor implements HexMapInputListener {
         Menu subType = new Menu(main.getScreen(), "generatorCardTypeMenu", new Vector2f(0, 30), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                CardType cardType = (CardType) value;
+                SubType cardType = (SubType) value;
                 Element genButton = main.getScreen().getElementById("generatorCardTypeButton");
                 if (!genButton.getText().equals(cardType.name())) {
                     genButton.setText(cardType.name());
@@ -544,8 +544,8 @@ public class CardEditor implements HexMapInputListener {
                 }
             }
         };
-        CardType[] cardSubTypeList = CardType.values();
-        for (CardType s : cardSubTypeList) {
+        SubType[] cardSubTypeList = SubType.values();
+        for (SubType s : cardSubTypeList) {
             subType.addMenuItem(s.name(), s, null);
         }
         main.getScreen().addElement(subType);
@@ -556,7 +556,7 @@ public class CardEditor implements HexMapInputListener {
      * Open a menu where card properties can be tweaked, it depend on the
      * subMenu loaded, who depend on the cardType.
      */
-    public void openCardTypeSubMenu(CardType cardType) {
+    public void openCardTypeSubMenu(SubType cardType) {
         Window subMenu;
         if (main.getScreen().getElementById("subMenu") != null) {
             subMenu = (Window) main.getScreen().getElementById("subMenu");
@@ -604,7 +604,7 @@ public class CardEditor implements HexMapInputListener {
          * Part used to show/set how many power have the ability. damage -
          * segmentCost - activationRange - FXUsed - hitCollision - isCastOnSelf
          */
-        Label damageLabel = new Label(main.getScreen(), "powerLabel", new Vector2f(10, 10), new Vector2f(58, 30));
+        LabelElement damageLabel = new LabelElement(main.getScreen(), "powerLabel", new Vector2f(10, 10), new Vector2f(58, 30));
         damageLabel.setText("Power : ");
         subMenu.addChild(damageLabel);
 
@@ -636,7 +636,7 @@ public class CardEditor implements HexMapInputListener {
          * Part used to show/set the segmentCost needed for the unit to cast the
          * ability.
          */
-        Label unitCastCostLabel = new Label(main.getScreen(), "unitCastCostLabel", new Vector2f(10, 40), new Vector2f(160, 30));
+        LabelElement unitCastCostLabel = new LabelElement(main.getScreen(), "unitCastCostLabel", new Vector2f(10, 40), new Vector2f(160, 30));
         unitCastCostLabel.setText("Unit Segment Used : ");
         subMenu.addChild(unitCastCostLabel);
 
@@ -842,21 +842,12 @@ public class CardEditor implements HexMapInputListener {
                 main.getScreen().removeElement(main.getScreen().getElementById(s));
             }
         }
-        cleanupTestCard();
-        entityData.removeEntity(tuxDoll);
+        cleanupEntityTest();
     }
 
-    private void cleanupTestCard() {
-        CardSystem cardRender = main.getStateManager().getState(CardSystem.class);
-        if (cardRender != null) {
-            Object[] cards = cardRender.getCardsKeyset().toArray();
-            if (cards.length != 0) {
-                EntityData ed = main.getStateManager().getState(EntityDataAppState.class).getEntityData();
-                for (Object o : cards) {
-                    EntityId id = (EntityId) o;
-                    ed.removeEntity(id);
-                }
-            }
+    private void cleanupEntityTest() {
+        for(EntityId id : entity){
+            entityData.removeEntity(id);
         }
     }
 }

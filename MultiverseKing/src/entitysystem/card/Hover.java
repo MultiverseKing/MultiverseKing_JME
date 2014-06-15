@@ -3,7 +3,7 @@ package entitysystem.card;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import entitysystem.attribut.CardType;
+import entitysystem.attribut.SubType;
 import entitysystem.attribut.Faction;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
@@ -12,8 +12,9 @@ import tonegod.gui.core.ElementManager;
 import utility.ElementalAttribut;
 
 /**
- * @todo generate too much object have to be solved/reduce.)
- * @see tonegodgui update it was planned to be implemented on the core GUI.
+ * @todo generate too much object have to be solved/reduce.) tonegodgui update 
+ * plan to implemented something of this order.
+ * @todo The scale/position of Icon isn't correct when card is rescaled
  * @author roah
  */
 public class Hover extends Window {
@@ -38,15 +39,15 @@ public class Hover extends Window {
     /**
      * @todo
      */
-    public void setProperties(CardProperties properties, String cardName) {
+    public void setProperties(CardProperties properties) {
         if (getElementsAsMap().isEmpty()) {
-            initProperties(properties, cardName);
+            initProperties(properties);
         } else {
-            updateProperties(properties, cardName);
+            updateProperties(properties);
         }
     }
 
-    private void initProperties(CardProperties properties, String cardName) {
+    private void initProperties(CardProperties properties) {
         /**
          * Label used to show the cost needed for the card.
          */
@@ -57,6 +58,7 @@ public class Hover extends Window {
         cost.setFontSize(30);
         addChild(cost);
         cost.setPosition(new Vector2f(getDimensions().x * 0.75f, getDimensions().y * 0.75f));
+        cost.setIgnoreMouse(true);
 
         /**
          * Window used to show the type of the card.
@@ -67,6 +69,7 @@ public class Hover extends Window {
         typeIco.removeAllChildren();
         addChild(typeIco);
         typeIco.setPosition(new Vector2f(getDimensions().x * 0.06f, getDimensions().y * 0.8f));
+        typeIco.setIgnoreMouse(true);
 
         /**
          * Window used to show the Faction of the card.
@@ -77,24 +80,27 @@ public class Hover extends Window {
         factionIco.removeAllChildren();
         addChild(factionIco);
         factionIco.setPosition(new Vector2f(getDimensions().x * 0.71f, getDimensions().y * 0.61f));
+        factionIco.setIgnoreMouse(true);
 
         /**
          * Label used to show the name of the card.
          */
         Label cardNameLabel = new Label(screen, "cardNameLabelHover", new Vector2f(), new Vector2f(300, 45));
-        cardNameLabel.setText(cardName);
+        cardNameLabel.setText(properties.getName());
         addChild(cardNameLabel);
 
         cardNameLabel.setFont("Interface/Fonts/Purisa.fnt");
         cardNameLabel.setPosition(new Vector2f(getDimensions().x * 0.2f, -10));
         cardNameLabel.setFontSize(17);
         cardNameLabel.setFontColor(ColorRGBA.White);
+        cardNameLabel.setIgnoreMouse(true);
     }
 
     public void setFaction(Faction faction) {
         if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("factionIconHover")) {
             Element icon = getElementsAsMap().get("factionIconHover");
             icon.setColorMap("Textures/Cards/Icons/Faction/" + faction.name() + ".png");
+            icon.setIgnoreMouse(true);
         }
     }
 
@@ -107,13 +113,15 @@ public class Hover extends Window {
                 nameLabel.setFontSize(17);
             }
             nameLabel.setText(name);
+//            nameLabel.setIgnoreMouse(true);
         }
     }
 
-    public void setType(CardType type) {
+    public void setType(SubType type) {
         if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("typeIconHover")) {
             Element icon = getElementsAsMap().get("typeIconHover");
             icon.setColorMap("Textures/Cards/Icons/CardType/" + type.name() + ".png");
+//            icon.setIgnoreMouse(true);
         }
     }
 
@@ -130,10 +138,11 @@ public class Hover extends Window {
                 costLabel.setPosition(new Vector2f(getDimensions().x * 0.75f, getDimensions().y * 0.75f));
             }
             costLabel.setText(Integer.toString(cost));
+//            costLabel.setIgnoreMouse(true);
         }
     }
 
-    private void updateProperties(CardProperties properties, String cardName) {
+    private void updateProperties(CardProperties properties) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

@@ -4,7 +4,7 @@ import hexsystem.events.HexMapInputListener;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
-import hexsystem.HexMapMouseInput;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexTile;
 import hexsystem.MapData;
@@ -64,7 +64,7 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
 
     private void initMap() {
         mapData = main.getStateManager().getState(HexSystemAppState.class).getMapData();
-        main.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
+        main.getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(Vector2Int.ZERO, null);
@@ -405,6 +405,6 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
 
     public void cleanup() {
         mapData.removeTileChangeListener(this);
-        main.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
+        main.getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
     }
 }

@@ -17,7 +17,7 @@ public class MeshManager {
 
     private final float hexRadius = HexSettings.HEX_RADIUS;
     private final float hexWidth = HexSettings.HEX_WIDTH;
-    private final float floorHeight = HexSettings.FLOOR_HEIGHT;
+    private final float floorHeight = HexSettings.FLOOR_OFFSET;
 
     /**
      * Generate a mesh accordingly to meshParam.

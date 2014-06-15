@@ -6,13 +6,13 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import entitysystem.render.SpatialInitializer;
+import test.ISpatialInitializer;
 
 /**
  *
  * @author Eike Foede
  */
-public class CubeSpatialInitializer implements SpatialInitializer {
+public class CubeSpatialInitializer implements ISpatialInitializer {
 
     private AssetManager assetManager = null;
 

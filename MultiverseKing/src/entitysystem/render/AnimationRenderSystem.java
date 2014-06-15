@@ -14,20 +14,21 @@ import entitysystem.attribut.Animation;
 
 /**
  * Handle how animation work when they got they cycle done or under defined
- * pattern.
+ * pattern. 
+ * @todo make this a sub-system of the renderSystem
  *
  * @author roah
  */
-public class AnimationSystem extends EntitySystemAppState implements AnimEventListener {
+public class AnimationRenderSystem extends EntitySystemAppState implements AnimEventListener, SubSystem {
 
-    private EntityRenderSystem renderSystem;
+    private RenderSystem renderSystem;
     private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();
 
     @Override
     protected EntitySet initialiseSystem() {
-        renderSystem = app.getStateManager().getState(EntityRenderSystem.class);
-
-        return entityData.getEntities(AnimationComponent.class, EntityRenderComponent.class);
+        renderSystem = app.getStateManager().getState(RenderSystem.class);
+        renderSystem.registerSubSystem(this);
+        return entityData.getEntities(AnimationRenderComponent.class, RenderComponent.class);
     }
 
     @Override
@@ -38,18 +39,27 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void addEntity(Entity e) {
         AnimControl control = renderSystem.getAnimControl(e.getId());
+        if(control == null){
+            entityData.removeComponent(e.getId(), AnimationRenderComponent.class);
+            System.out.println(getClass().toString() + ": There is no Animation control for this entity.");
+            return;
+        } 
         control.addListener(this);
         AnimChannel channel = control.createChannel();
-        setPlay(channel, e.get(AnimationComponent.class).getAnimation());
+        setPlay(channel, e.get(AnimationRenderComponent.class).getAnimation());
 
         animControls.put(e.getId(), control);
     }
 
     @Override
     protected void updateEntity(Entity e) {
-        Animation toPlay = e.get(AnimationComponent.class).getAnimation();
-        if (animControls.containsKey(e.getId())
-                && !animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
+        if(renderSystem.getAnimControl(e.getId()) != animControls.get(e.getId())){
+            removeEntity(e);
+            addEntity(e);
+            return;
+        }
+        Animation toPlay = e.get(AnimationRenderComponent.class).getAnimation();
+        if (!animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
         }
     }
@@ -57,6 +67,9 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void removeEntity(Entity e) {
         AnimControl animControl = animControls.get(e.getId());
+        if(animControl == null){
+            return;
+        }
         animControl.clearChannels();
         animControl.clearListeners();
         animControls.remove(e.getId());
@@ -99,7 +112,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
         if (animName.equals(Animation.SUMMON.toString())) {
             EntityId id = MultiverseMain.getKeyByValue(animControls, control);
-            entityData.setComponent(id, new AnimationComponent(Animation.IDLE));
+            entityData.setComponent(id, new AnimationRenderComponent(Animation.IDLE));
         }
     }
 
@@ -113,5 +126,9 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
      */
     public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void remove() {
+        app.getStateManager().detach(this);
     }
 }

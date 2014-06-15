@@ -1,4 +1,4 @@
-package entitysystem.field;
+package entitysystem.render;
 
 import com.simsilica.es.PersistentComponent;
 
@@ -7,17 +7,19 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class EntityFieldComponent implements PersistentComponent {
+public class GUIRenderComponent implements PersistentComponent {
 
     public enum EntityType {
-
         TITAN,
         UNIT,
         ENVIRONMENT;
     }
+    /**
+     * Value used to know the GUI to use with.
+     */
     private EntityType entityType;
 
-    public EntityFieldComponent(EntityType entityType) {
+    public GUIRenderComponent(EntityType entityType) {
         this.entityType = entityType;
     }
 

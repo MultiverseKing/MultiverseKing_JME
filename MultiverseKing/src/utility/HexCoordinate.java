@@ -1,5 +1,8 @@
 package utility;
 
+import com.jme3.math.Vector3f;
+import hexsystem.HexSettings;
+
 /**
  *
  * @author Roah with the help of : ArtemisArt => http://artemis.art.free.fr/ &&
@@ -123,6 +126,30 @@ public final class HexCoordinate {
         return neighbours;
     }
 
+    /**
+     * Convert Hex grid position to world position. Convertion work with Odd-R
+     * Offset grid type. (currently used grid type).
+     * Ignore y value so this.y always = 0
+     * @return tile world unit position.
+     */
+    public Vector3f convertToWorldPosition() {
+        Vector2Int offsetPos = getAsOffset();
+        return new Vector3f((offsetPos.x) * HexSettings.HEX_WIDTH
+                + ((offsetPos.y & 1) == 0 ? 0 : HexSettings.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSettings.HEX_RADIUS * 1.5f);
+    }
+    
+    /**
+     * Convert Hex grid position to world position.
+     * Take in account y as Floor so 
+     * this.y = (HexSettings.GROUND_HEIGHT*HexSettings.FLOOR_OFFSET)
+     * @return tile world unit position.
+     */
+    public Vector3f convertToWorldPositionYAsFloor() {
+        Vector3f result = convertToWorldPosition();
+        result.y = result.y + (HexSettings.GROUND_HEIGHT*HexSettings.FLOOR_OFFSET);
+        return result;
+    }
+    
     /**
      *
      * @param other

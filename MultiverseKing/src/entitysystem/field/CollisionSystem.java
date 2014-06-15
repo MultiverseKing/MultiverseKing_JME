@@ -1,14 +1,13 @@
 package entitysystem.field;
 
+import entitysystem.render.GUIRenderComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
 import utility.HexCoordinate;
-import entitysystem.attribut.CardType;
-import hexsystem.events.HexMapInputEvent;
-import hexsystem.events.HexMapInputListener;
+import entitysystem.attribut.SubType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,7 +16,7 @@ import java.util.HashMap;
  *
  * @author roah
  */
-public class CollisionSystem extends EntitySystemAppState implements HexMapInputListener {
+public class CollisionSystem extends EntitySystemAppState {
 
     /**
      * Byte == collision layer (unit, trap, object, spell etc...) 0 == unit 1 ==
@@ -65,19 +64,11 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
      * @param id entity to cast.
      * @return true if it can, false otherwise.
      */
-    public boolean canBeCast(HexCoordinate castPosition, CardType cardType) {
+    public boolean isEmptyPosition(HexCoordinate castPosition, SubType cardType) {
         switch (cardType) {
             case SUMMON:
                 if (collisionLayer.containsKey((byte) 0)) {
-                    for (EntityId currentId : collisionLayer.get((byte) 0)) {
-                        ArrayList<HexCoordinate> collision = entityData.getComponent(currentId, CollisionComponent.class).getCollisionOnLayer((byte) 0);
-                        for (HexCoordinate coord : collision) {
-                            HexCoordinate worldPos = coord.add(entityData.getComponent(currentId, HexPositionComponent.class).getPosition());
-                            if (worldPos.equals(castPosition)) {
-                                return false;
-                            }
-                        }
-                    }
+                    return checkCollision(new Byte((byte)0), castPosition);
                 }
                 return true;
             case TRAP:
@@ -91,14 +82,32 @@ public class CollisionSystem extends EntitySystemAppState implements HexMapInput
         }
     }
 
-    public void leftMouseActionResult(HexMapInputEvent event) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean isEmptyPosition(HexCoordinate castPosition, GUIRenderComponent.EntityType field) {
+        switch(field){
+            case ENVIRONMENT:
+                return false;
+            case TITAN:
+                return checkCollision(new Byte((byte)0), castPosition);
+            case UNIT:
+                return checkCollision(new Byte((byte)0), castPosition);
+            default:
+                throw new UnsupportedOperationException(field + " isn't a valid type for the field system.");
+        }
     }
 
-    public void rightMouseActionResult(HexMapInputEvent event) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private boolean checkCollision(Byte layer, HexCoordinate position){
+        for (EntityId currentId : collisionLayer.get(layer.byteValue())) {
+                ArrayList<HexCoordinate> collision = entityData.getComponent(currentId, CollisionComponent.class).getCollisionOnLayer((byte) 0);
+                for (HexCoordinate coord : collision) {
+                    HexCoordinate worldPos = coord.add(entityData.getComponent(currentId, HexPositionComponent.class).getPosition());
+                    if (worldPos.equals(position)) {
+                        return false;
+                    }
+                }
+            }
+        return true;
     }
-
+    
     @Override
     protected void removeEntity(Entity e) {
         for (Byte layer : collisionLayer.keySet()) {

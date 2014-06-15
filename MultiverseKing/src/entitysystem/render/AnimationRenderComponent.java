@@ -9,7 +9,7 @@ import entitysystem.attribut.Animation;
  *
  * @author roah
  */
-public class AnimationComponent implements PersistentComponent {
+public class AnimationRenderComponent implements PersistentComponent {
 
     private Animation animation;
 
@@ -18,7 +18,7 @@ public class AnimationComponent implements PersistentComponent {
      *
      * @param animation
      */
-    public AnimationComponent(Animation animation) {
+    public AnimationRenderComponent(Animation animation) {
         this.animation = animation;
     }
 

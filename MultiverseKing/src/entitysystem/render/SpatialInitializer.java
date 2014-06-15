@@ -1,15 +1,24 @@
 package entitysystem.render;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
 
 /**
  *
- * @author Eike Foede
+ * @author roah
  */
-public interface SpatialInitializer {
+public class SpatialInitializer {
 
-    public void setAssetManager(AssetManager assetManager);
+    private final AssetManager assetManager;
 
-    public Spatial initialize(String spatial);
+    public SpatialInitializer(AssetManager am) {
+        this.assetManager = am;
+    }
+
+    public Spatial initialize(String name) {
+        Spatial model = assetManager.loadModel("Models/Units/" + name + ".j3o");
+        model.setShadowMode(RenderQueue.ShadowMode.Inherit);
+        return model;
+    }
 }

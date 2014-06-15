@@ -8,11 +8,11 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.EntityId;
-import entitysystem.render.RenderGUIComponent;
-import static entitysystem.render.RenderGUIComponent.EntityType.ENVIRONMENT;
-import static entitysystem.render.RenderGUIComponent.EntityType.TITAN;
-import static entitysystem.render.RenderGUIComponent.EntityType.UNIT;
-import entitysystem.render.RenderSubSystemFieldGUI;
+import entitysystem.render.GUIRenderComponent;
+import static entitysystem.render.GUIRenderComponent.EntityType.ENVIRONMENT;
+import static entitysystem.render.GUIRenderComponent.EntityType.TITAN;
+import static entitysystem.render.GUIRenderComponent.EntityType.UNIT;
+import entitysystem.render.GUIRenderSystem;
 import java.util.HashMap;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.ElementManager;
@@ -31,9 +31,9 @@ import tonegod.gui.style.StyleManager;
 public class InteractiveNode extends Node {
 
 //    private final HashMap<EntityId, Spatial> entitiesSpatial = new HashMap<EntityId, Spatial>();
-    private final HashMap<EntityId, RenderGUIComponent.EntityType> entitiesType = new HashMap<EntityId, RenderGUIComponent.EntityType>();
+    private final HashMap<EntityId, GUIRenderComponent.EntityType> entitiesType = new HashMap<EntityId, GUIRenderComponent.EntityType>();
     private EntityId selectedId = null;
-    private final RenderSubSystemFieldGUI iSystem;
+    private final GUIRenderSystem iSystem;
     private final ElementManager screen;
     private Material defMat, hlMat;
     private GameTimer timer;
@@ -49,13 +49,13 @@ public class InteractiveNode extends Node {
     private Menu unitMenu = null;
     private Menu environmentMenu = null;
 
-    public InteractiveNode(ElementManager screen, RenderSubSystemFieldGUI iSystem) {
+    public InteractiveNode(ElementManager screen, GUIRenderSystem iSystem) {
         this.screen = screen;
         this.iSystem = iSystem;
         initTimer();
     }
 
-    public void addEntity(EntityId id, RenderGUIComponent.EntityType type) {
+    public void addEntity(EntityId id, GUIRenderComponent.EntityType type) {
         entitiesType.put(id, type);
     }
 
@@ -64,11 +64,11 @@ public class InteractiveNode extends Node {
         return 0;
     }
 
-    public RenderGUIComponent.EntityType getEntityField(EntityId id) {
+    public GUIRenderComponent.EntityType getEntityField(EntityId id) {
         return entitiesType.get(id);
     }
     
-    public void updateMenuElement(EntityId id, RenderGUIComponent.EntityType type){
+    public void updateMenuElement(EntityId id, GUIRenderComponent.EntityType type){
         entitiesType.put(id, type);
     }
 
@@ -192,7 +192,7 @@ public class InteractiveNode extends Node {
 //    public abstract void onSpatialLeftMouseDown(MouseButtonEvent evt);
 //    public abstract void onSpatialLeftMouseUp(MouseButtonEvent evt);
     // <editor-fold defaultstate="collapsed" desc="Menu Method">
-    private Menu getRenderMenu(RenderGUIComponent.EntityType field) {
+    private Menu getRenderMenu(GUIRenderComponent.EntityType field) {
         switch (field) {
             case ENVIRONMENT:
                 if (environmentMenu == null) {

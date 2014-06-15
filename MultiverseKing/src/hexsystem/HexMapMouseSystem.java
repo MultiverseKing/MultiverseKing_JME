@@ -107,7 +107,7 @@ public class HexMapMouseSystem extends AbstractAppState {
                     castRay("L");
                 } else {
                     hexMapListeners.get(listenerPulseIndex).leftMouseActionResult(
-                            new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), null));
+                            new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), mouseRay.get3DRay(main), null));
                 }
             } else if (name.equals("Cancel") && !isPressed) {
                 if (listenerPulseIndex == -1) {
@@ -200,7 +200,7 @@ public class HexMapMouseSystem extends AbstractAppState {
 
                     HexCoordinate newPos = convertMouseCollision(results);
 //                    if (newPos != null && !newPos.equals(lastHexPos)) {
-                        event = new HexMapInputEvent(newPos, ray);
+                        event = new HexMapInputEvent(newPos, ray, closest);
                         moveCursor(newPos);
                         callMouseActionListeners(mouseInput, event);
 //                    }

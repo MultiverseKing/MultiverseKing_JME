@@ -27,12 +27,12 @@ import entitysystem.card.CardSystem;
 import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.AnimationComponent;
-import entitysystem.render.CoreRenderComponent;
+import entitysystem.render.AnimationRenderComponent;
+import entitysystem.render.RenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
-import entitysystem.render.RenderGUIComponent;
-import entitysystem.render.RenderSubSystemFieldGUI;
+import entitysystem.render.GUIRenderComponent;
+import entitysystem.render.GUIRenderSystem;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
@@ -104,12 +104,11 @@ public class CardEditor implements HexMapInputListener {
          * Init the testingDoll.
          */
         entity.add(entityData.createEntity());
-        entityData.setComponents(entity.get(0), new CoreRenderComponent("TuxDoll"),
+        entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
-//                new Vector2Int(0, 0)), Rotation.A),
-                new AnimationComponent(Animation.SUMMON),
-                new RenderGUIComponent(RenderGUIComponent.EntityType.TITAN),
+                new AnimationRenderComponent(Animation.SUMMON),
+                new GUIRenderComponent(GUIRenderComponent.EntityType.TITAN),
                 new CollisionComponent((byte) 0));
 
     }
@@ -241,7 +240,7 @@ public class CardEditor implements HexMapInputListener {
 
     private void addEntityCard(String name){
             EntityId cardId = entityData.createEntity();
-            entityData.setComponent(cardId, new CoreRenderComponent(name));
+            entityData.setComponent(cardId, new RenderComponent(name));
             entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
             entity.add(cardId);
     }

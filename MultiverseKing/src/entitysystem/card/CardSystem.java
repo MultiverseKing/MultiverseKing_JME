@@ -16,9 +16,9 @@ import entitysystem.attribut.SubType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
-import entitysystem.render.RenderGUIComponent;
+import entitysystem.render.GUIRenderComponent;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.AnimationComponent;
+import entitysystem.render.AnimationRenderComponent;
 import entitysystem.loader.UnitLoader;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.events.HexMapInputEvent;
@@ -346,9 +346,9 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                     entityData.setComponents(cardPreviewCast.getCardEntityUID(),
                             new HexPositionComponent(castCoord, Rotation.A),
                             cardRender.clone(CardRenderPosition.FIELD),
-                            new AnimationComponent(Animation.SUMMON),
+                            new AnimationRenderComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
-                            new RenderGUIComponent(RenderGUIComponent.EntityType.UNIT),
+                            new GUIRenderComponent(GUIRenderComponent.EntityType.UNIT),
                             unitLoader.getCollisionComp(), //Collision Comp
                             unitLoader.getuLife(), //life component
                             unitLoader.getMovementComp(), //stats component

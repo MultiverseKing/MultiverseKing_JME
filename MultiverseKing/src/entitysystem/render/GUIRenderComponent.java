@@ -7,7 +7,7 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class RenderGUIComponent implements PersistentComponent {
+public class GUIRenderComponent implements PersistentComponent {
 
     public enum EntityType {
         TITAN,
@@ -19,7 +19,7 @@ public class RenderGUIComponent implements PersistentComponent {
      */
     private EntityType entityType;
 
-    public RenderGUIComponent(EntityType entityType) {
+    public GUIRenderComponent(EntityType entityType) {
         this.entityType = entityType;
     }
 

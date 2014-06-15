@@ -14,9 +14,11 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.CoreRenderComponent;
-import entitysystem.render.CoreRenderSystem;
+import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderSystem;
 import hexsystem.HexMapMouseSystem;
+import hexsystem.HexSystemAppState;
+import hexsystem.MapData;
 import hexsystem.events.HexMapInputEvent;
 import kingofmultiverse.MultiverseMain;
 import kingofmultiverse.RTSCamera;
@@ -36,86 +38,48 @@ import utility.HexCoordinate;
  * @todo Show a popup menu when an error occur and have been catch internaly.
  * @author roah
  */
-public class RenderSubSystemFieldGUI extends EntitySystemAppState implements HexMapRayListener {
+public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayListener, SubSystem {
 
     /**
      * Map containing everything the player can interact with on the Field.
      */
-    private HashMap<EntityId, RenderGUIComponent.EntityType> interactiveEntities = new HashMap<EntityId, RenderGUIComponent.EntityType>();
-    private Node iNode = new Node("InteractiveNode");
-    private Screen screen;
+    private HashMap<EntityId, GUIRenderComponent.EntityType> interactiveEntities = new HashMap<EntityId, GUIRenderComponent.EntityType>();
+    private Node iNode;
+    private GUIFieldMenu menus;
+//    private Screen screen;
     private Camera cam;
-    private CoreRenderSystem renderSystem = null;
+    private RenderSystem renderSystem = null;
     private HexMapMouseSystem hexMouseSystem = null;
-    private Menu titanMenu;
-    private Menu unitMenu;
-    private Menu environmentMenu;
-    private Vector3f inspectedSpatialPosition;
+    private Vector3f inspectedSpatialPosition = null;
 
     @Override
     protected EntitySet initialiseSystem() {
-        if (app.getStateManager().getState(CoreRenderSystem.class) == null
+        if (app.getStateManager().getState(RenderSystem.class) == null
                 || app.getStateManager().getState(HexMapMouseSystem.class) == null) {
-            Logger.getLogger(RenderSubSystemFieldGUI.class.getName()).warning(
+            Logger.getLogger(GUIRenderSystem.class.getName()).warning(
                     "This System need RenderSystem and HexMapMouseInputSystem to work, it is removed.");
             app.getStateManager().detach(this);
             return null;
         }
-        screen = ((MultiverseMain) app).getScreen();
-        screen.setUse3DSceneSupport(true);
-        cam = app.getStateManager().getState(RTSCamera.class).getCamera();
-        renderSystem = app.getStateManager().getState(CoreRenderSystem.class);
+        menus = new GUIFieldMenu(((MultiverseMain) app).getScreen(), 
+                app.getStateManager().getState(RTSCamera.class).getCamera());
+//        screen = ((MultiverseMain) app).getScreen();
+//        screen.setUse3DSceneSupport(true);
+//        cam = app.getStateManager().getState(RTSCamera.class).getCamera();
+        renderSystem = app.getStateManager().getState(RenderSystem.class);
+        iNode = renderSystem.addSubSystemNode("InteractiveNode");
+        renderSystem.registerSubSystem(this);
         hexMouseSystem = app.getStateManager().getState(HexMapMouseSystem.class);
         hexMouseSystem.registerRayInputListener(this);
-        renderSystem.addSystemNode(iNode);
-        initMenu();
-        return entityData.getEntities(RenderGUIComponent.class, CoreRenderComponent.class);
+        return entityData.getEntities(GUIRenderComponent.class, RenderComponent.class);
     }
 
     /**
      * Initialize all needed Menu to work with.
      */
-    private void initMenu() {
-        titanMenu = new Menu(screen, Vector2f.ZERO, false) {
-            @Override
-            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                switch (index) {
-                    case 0:
-//                        eSystem.move(entityId, field);
-                }
-            }
-        };
-        titanMenu.addMenuItem(" Move        ", 0, null);
-        titanMenu.addMenuItem(" Ability     ", 1, null);
-        titanMenu.addMenuItem(" Inventory   ", 2, null);
-        titanMenu.addMenuItem(" Stats       ", 3, null);
-        screen.addElement(titanMenu);
-        
-        unitMenu = new Menu(screen, Vector2f.ZERO, false) {
-            @Override
-            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-            }
-        };
-        unitMenu.addMenuItem("Contextual unitMenu Menu Item 1", 0, null);
-        unitMenu.addMenuItem("Contextual unitMenu Menu Item 2", 1, null);
-        unitMenu.addMenuItem("Contextual unitMenu Menu Item 3", 2, null);
-        unitMenu.addMenuItem("Contextual unitMenu Menu Item 4", 3, null);
-        screen.addElement(unitMenu);
-        
-        environmentMenu = new Menu(screen, Vector2f.ZERO, false) {
-            @Override
-            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-            }
-        };
-        environmentMenu.addMenuItem("Contextual environmentMenu Menu Item 1", 0, null);
-        environmentMenu.addMenuItem("Contextual environmentMenu Menu Item 2", 1, null);
-        environmentMenu.addMenuItem("Contextual environmentMenu Menu Item 3", 2, null);
-        environmentMenu.addMenuItem("Contextual environmentMenu Menu Item 4", 3, null);
-        screen.addElement(environmentMenu);
-    }
-    
     @Override
     protected void updateSystem(float tpf) {
+        menus.update();
 //        if (interactiveNode.element.getIsVisible()) {
 //            Vector3f value = cam.getScreenCoordinates(inspectedSpatialPosition);
 //            if (value.x > 0 && value.x < screen.getWidth()
@@ -127,43 +91,36 @@ public class RenderSubSystemFieldGUI extends EntitySystemAppState implements Hex
 
     @Override
     protected void addEntity(Entity e) {
-        RenderGUIComponent.EntityType field = e.get(RenderGUIComponent.class).getEntityType();
+        GUIRenderComponent.EntityType field = e.get(GUIRenderComponent.class).getEntityType();
         if(renderSystem.addSpatialToSubSystem(e.getId(), iNode.getName())){
             interactiveEntities.put(e.getId(), field);
         } else {
-            entityData.removeComponent(e.getId(), RenderGUIComponent.class);
+            entityData.removeComponent(e.getId(), GUIRenderComponent.class);
         }
     }
 
     @Override
     protected void updateEntity(Entity e) {
         /**
-         * We check if the spatial is on the screen. If not we remove the
-         * Component from this system.
-         */
-        if (e.get(CoreRenderComponent.class) == null) {
-            entityData.removeComponent(e.getId(), RenderGUIComponent.class);
-            return;
-        } 
-        /**
          * We check if the menu associated with the spatial is the same the
          * current, if not we change it.
          */
-        if (e.get(RenderGUIComponent.class).getEntityType() != interactiveEntities.get(e.getId())) {
-            interactiveEntities.put(e.getId(), e.get(RenderGUIComponent.class).getEntityType());
+        if (e.get(GUIRenderComponent.class).getEntityType() != interactiveEntities.get(e.getId())) {
+            interactiveEntities.put(e.getId(), e.get(GUIRenderComponent.class).getEntityType());
         }
     }
 
     @Override
     protected void removeEntity(Entity e) {
         renderSystem.removeSpatialFromSubSystem(e.getId());
+        interactiveEntities.remove(e.getId());
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
         for (EntityId id : interactiveEntities.keySet()) {
             HexPositionComponent posComp = entityData.getComponent(id, HexPositionComponent.class);
             if (posComp != null && posComp.getPosition().equals(event.getEventPosition())) {
-                openEntityActionMenu(id);
+                openEntityActionMenu(id, event.getEventPosition());
             }
         }
     }
@@ -194,37 +151,27 @@ public class RenderSubSystemFieldGUI extends EntitySystemAppState implements Hex
             for (EntityId id : interactiveEntities.keySet()) {
                 if (closest.getGeometry().getParent().getName().equals(renderSystem.getSpatialName(id))) {
                     hexMouseSystem.setDebugPosition(closest.getContactPoint());
+                    HexCoordinate pos = entityData.getComponent(id, HexPositionComponent.class).getPosition();
                     if(input.equals("L")){
-                        openEntityActionMenu(id);
+                        openEntityActionMenu(id, pos);
                     }
                     inspectedSpatialPosition = closest.getGeometry().getWorldTranslation();
-                    return new HexMapInputEvent(entityData.getComponent(id,
-                            HexPositionComponent.class).getPosition(), ray);
+                    return new HexMapInputEvent(pos, ray, closest);
                 }
             }
         }
         return null;
     }
     
-    private void openEntityActionMenu(EntityId id){
-        System.out.println("Kazzammm");
+    private void openEntityActionMenu(EntityId id, HexCoordinate pos){
+        MapData mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
+        menus.show(interactiveEntities.get(id), mapData.convertTileToWorldPosition(pos));
     }
     
-    RenderGUIComponent.EntityType inspectedEntity = null;
-    
-    public void setSelected(Spatial s){
-//        if(s.getControl(ToneControl.class) != null){
-//            EntityId id = MultiverseMain.getKeyByValue(interactiveEntities, s.getControl(ToneControl.class));
-//            hexMapSystem.setCursor(entityData.getComponent(id, HexPositionComponent.class).getPosition());
-//        }
-    }
-    
-    public void move(EntityId id, RenderGUIComponent.EntityType field){
+    public void move(EntityId id){
         if (!app.getStateManager().getState(HexMapMouseSystem.class).setCursorPulseMode(this)) {
             return;
         }
-        inspectedEntity = field;
-        screen.setUse3DSceneSupport(false);
         //Register the input for this system
         app.getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
         app.getInputManager().addListener(fieldInputListener, "Cancel");
@@ -249,5 +196,9 @@ public class RenderSubSystemFieldGUI extends EntitySystemAppState implements Hex
 //        }
 //        interactiveEntities.clear();
 //        screen.setUse3DSceneSupport(false);
+    }
+
+    public void remove() {
+        app.getStateManager().detach(this);
     }
 }

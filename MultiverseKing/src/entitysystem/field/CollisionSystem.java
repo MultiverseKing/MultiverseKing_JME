@@ -1,6 +1,6 @@
 package entitysystem.field;
 
-import entitysystem.render.RenderGUIComponent;
+import entitysystem.render.GUIRenderComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
@@ -82,7 +82,7 @@ public class CollisionSystem extends EntitySystemAppState {
         }
     }
 
-    public boolean isEmptyPosition(HexCoordinate castPosition, RenderGUIComponent.EntityType field) {
+    public boolean isEmptyPosition(HexCoordinate castPosition, GUIRenderComponent.EntityType field) {
         switch(field){
             case ENVIRONMENT:
                 return false;

@@ -1,8 +1,8 @@
 package entitysystem.tonegod;
 
-import static entitysystem.render.RenderGUIComponent.EntityType.ENVIRONMENT;
-import static entitysystem.render.RenderGUIComponent.EntityType.TITAN;
-import static entitysystem.render.RenderGUIComponent.EntityType.UNIT;
+import static entitysystem.render.GUIRenderComponent.EntityType.ENVIRONMENT;
+import static entitysystem.render.GUIRenderComponent.EntityType.TITAN;
+import static entitysystem.render.GUIRenderComponent.EntityType.UNIT;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -11,8 +11,8 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
 import com.simsilica.es.EntityId;
-import entitysystem.render.RenderGUIComponent;
-import entitysystem.render.RenderSubSystemFieldGUI;
+import entitysystem.render.GUIRenderComponent;
+import entitysystem.render.GUIRenderSystem;
 import hexsystem.HexMapMouseSystem;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Screen;
@@ -22,23 +22,23 @@ import tonegod.gui.core.Screen;
  * @author roah
  */
 public class ToneControl extends AbstractControl {
-    private final RenderSubSystemFieldGUI eSystem;
+    private final GUIRenderSystem eSystem;
     private final Screen screen;
     private final Camera cam;
     private Menu titanMenu = null;
     private Menu unitMenu = null;
     private Menu environmentMenu = null;
-    private RenderGUIComponent.EntityType field;
+    private GUIRenderComponent.EntityType field;
     private InteractiveNode interactiveNode;
     private EntityId entityId;
 
-    public ToneControl(RenderSubSystemFieldGUI eSystem, Screen screen, Camera cam) {
+    public ToneControl(GUIRenderSystem eSystem, Screen screen, Camera cam) {
         this.eSystem = eSystem;
         this.screen = screen;
         this.cam = cam;
     }
     
-    public ToneControl(EntityId entityId, RenderSubSystemFieldGUI eSystem, Screen screen, RenderGUIComponent.EntityType field, Camera cam) {
+    public ToneControl(EntityId entityId, GUIRenderSystem eSystem, Screen screen, GUIRenderComponent.EntityType field, Camera cam) {
         this.eSystem = eSystem;
         this.screen = screen;
         this.field = field;
@@ -92,7 +92,7 @@ public class ToneControl extends AbstractControl {
     }
     // </editor-fold>
     
-    public void updateMenuElement(RenderGUIComponent.EntityType field) {
+    public void updateMenuElement(GUIRenderComponent.EntityType field) {
         this.field = field;
         this.interactiveNode.setElement(getRenderMenu());
     }
@@ -153,7 +153,7 @@ public class ToneControl extends AbstractControl {
         return interactiveNode;
     }
 
-    public RenderGUIComponent.EntityType getField() {
+    public GUIRenderComponent.EntityType getField() {
         return field;
     }
     

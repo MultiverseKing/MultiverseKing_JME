@@ -3,7 +3,7 @@ package entitysystem.card;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import entitysystem.attribut.CardType;
+import entitysystem.attribut.SubType;
 import entitysystem.attribut.Faction;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
@@ -117,7 +117,7 @@ public class Hover extends Window {
         }
     }
 
-    public void setType(CardType type) {
+    public void setType(SubType type) {
         if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("typeIconHover")) {
             Element icon = getElementsAsMap().get("typeIconHover");
             icon.setColorMap("Textures/Cards/Icons/CardType/" + type.name() + ".png");

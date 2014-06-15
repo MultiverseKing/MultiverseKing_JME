@@ -1,8 +1,6 @@
 package entitysystem.render;
 
 import com.jme3.animation.AnimControl;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
@@ -21,7 +19,6 @@ import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Set;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.core.Screen;
 import utility.Rotation;
 import utility.SimpleMath;
 
@@ -36,7 +33,7 @@ import utility.SimpleMath;
  * should be handled seperately. Else there could be double data for the
  * position with inconsistencies between the different data.
  */
-public class RenderSystem extends EntitySystemAppState implements TileChangeListener {
+public class CoreRenderSystem extends EntitySystemAppState implements TileChangeListener {
 
     private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
     private SpatialInitializer spatialInitializer;
@@ -57,9 +54,25 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
     }
     
-    public void addControl(EntityId id, Control control) {
-        if (spatials.containsKey(id)) {
-            spatials.get(id).addControl(control);
+    public String getSpatialName(EntityId id){
+        return spatials.get(id).getName();
+    }
+    
+    public void addSystemNode(Node systemNode){
+        renderSystemNode.attachChild(systemNode);
+    }
+    
+    public boolean addSpatialToSubSystem(EntityId id, String systemNode){
+        if(spatials.get(id) != null){
+            ((Node)renderSystemNode.getChild(systemNode)).attachChild(spatials.get(id));
+            return true;
+        }
+        return false;
+    }
+    
+    public void removeSpatialFromSubSystem(EntityId id){
+        if(spatials.get(id) != null){
+            renderSystemNode.attachChild(spatials.get(id));
         }
     }
 
@@ -68,10 +81,9 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         app.getRootNode().attachChild(renderSystemNode);
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive); //<< diseable this to remove the shadow.
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
-//        initializeMenus();
         mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
         mapData.registerTileChangeListener(this);
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(CoreRenderComponent.class, HexPositionComponent.class);
     }
 
     /**
@@ -84,7 +96,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
 
     @Override
     public void addEntity(Entity e) {
-        RenderComponent renderComp = e.get(RenderComponent.class);
+        CoreRenderComponent renderComp = e.get(CoreRenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName());
         s.setName(renderComp.getName() + e.getId().toString());
         spatials.put(e.getId(), s);
@@ -93,6 +105,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         s.setLocalRotation(Rotation.getQuaternion(positionComp.getRotation()));
         renderSystemNode.attachChild(s);
     }
+    
 
     @Override
     protected void updateEntity(Entity e) {
@@ -100,18 +113,20 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
          * Update the spatial if it need to.
          */
         Spatial s = spatials.get(e.getId());
-        String eName = (String) (e.get(RenderComponent.class).getName() + e.getId().toString());
+        String eName = (String) (e.get(CoreRenderComponent.class).getName() + e.getId().toString());
         if (s == null) {
-            s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
+            s = spatialInitializer.initialize(e.get(CoreRenderComponent.class).getName());
             s.setName(eName);
             spatials.put(e.getId(), s);
             renderSystemNode.attachChild(s);
         } else if (!eName.equals(s.getName())) {
-            s = spatialInitializer.initialize(e.get(RenderComponent.class).getName());
+            s = spatialInitializer.initialize(e.get(CoreRenderComponent.class).getName());
             s.setName(eName);
-            renderSystemNode.detachChild(spatials.get(e.getId()));
+            Node parent = spatials.get(e.getId()).getParent();
+            spatials.get(e.getId()).removeFromParent();
             spatials.put(e.getId(), s);
-            renderSystemNode.attachChild(s);
+            parent.attachChild(s);
+            s.setName(eName);
         }
         /**
          * Update the translation and position if they need to. Rotation always
@@ -134,7 +149,12 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     @Override
     public void removeEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
-        renderSystemNode.detachChild(s);
+        if(s.getControl(ToneControl.class) != null){
+            entityData.removeComponent(e.getId(), RenderGUIComponent.class);
+            renderSystemNode.detachChild(s.getParent());
+        } else {
+            renderSystemNode.detachChild(s);
+        }
         spatials.remove(e.getId());
     }
 

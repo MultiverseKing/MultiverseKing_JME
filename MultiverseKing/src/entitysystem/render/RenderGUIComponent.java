@@ -1,4 +1,4 @@
-package entitysystem.field;
+package entitysystem.render;
 
 import com.simsilica.es.PersistentComponent;
 
@@ -7,7 +7,7 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class FieldGUIComponent implements PersistentComponent {
+public class RenderGUIComponent implements PersistentComponent {
 
     public enum EntityType {
         TITAN,
@@ -19,7 +19,7 @@ public class FieldGUIComponent implements PersistentComponent {
      */
     private EntityType entityType;
 
-    public FieldGUIComponent(EntityType entityType) {
+    public RenderGUIComponent(EntityType entityType) {
         this.entityType = entityType;
     }
 

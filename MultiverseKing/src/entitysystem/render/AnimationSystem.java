@@ -21,12 +21,12 @@ import entitysystem.attribut.Animation;
  */
 public class AnimationSystem extends EntitySystemAppState implements AnimEventListener {
 
-    private RenderSystem renderSystem;
+    private CoreRenderSystem renderSystem;
     private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();
 
     @Override
     protected EntitySet initialiseSystem() {
-        renderSystem = app.getStateManager().getState(RenderSystem.class);
+        renderSystem = app.getStateManager().getState(CoreRenderSystem.class);
 
         return entityData.getEntities(AnimationComponent.class);
     }

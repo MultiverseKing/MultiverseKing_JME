@@ -1,6 +1,6 @@
 package entitysystem.card;
 
-import entitysystem.attribut.CardType;
+import entitysystem.attribut.SubType;
 import entitysystem.attribut.Maintype;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
@@ -33,7 +33,7 @@ public class CardProperties {
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
-    private final CardType cardType;
+    private final SubType cardType;
     /**
      * Used to know the amount of time the player can have/play this card.
      * Balance stats mainly.
@@ -64,10 +64,10 @@ public class CardProperties {
      * @param rarity balance...
      */
     public CardProperties(JSONObject obj, String name) {
-        cardType = CardType.valueOf(obj.get("cardType").toString());
-        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
+        cardType = SubType.valueOf(obj.get("cardType").toString());
+        if (cardType == SubType.SPELL || cardType == SubType.SUMMON || cardType == SubType.TRAP) {
             this.mainType = Maintype.WORLD;
-        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
+        } else if (cardType == SubType.ABILITY || cardType == SubType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
@@ -85,10 +85,10 @@ public class CardProperties {
      * Constructor used for the editor mode.
      *
      */
-    public CardProperties(String name, int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
-        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP) {
+    public CardProperties(String name, int playCost, Faction faction, SubType cardType, Rarity rarity, ElementalAttribut element, String description) {
+        if (cardType == SubType.SPELL || cardType == SubType.SUMMON || cardType == SubType.TRAP) {
             this.mainType = Maintype.WORLD;
-        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
+        } else if (cardType == SubType.ABILITY || cardType == SubType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
@@ -151,7 +151,7 @@ public class CardProperties {
      * @see CardSubType
      * @return
      */
-    public CardType getCardSubType() {
+    public SubType getCardSubType() {
         return cardType;
     }
 

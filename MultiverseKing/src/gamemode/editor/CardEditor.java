@@ -13,12 +13,12 @@ import com.simsilica.es.EntityId;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
-import entitysystem.attribut.CardType;
-import static entitysystem.attribut.CardType.ABILITY;
-import static entitysystem.attribut.CardType.EQUIPEMENT;
-import static entitysystem.attribut.CardType.SPELL;
-import static entitysystem.attribut.CardType.SUMMON;
-import static entitysystem.attribut.CardType.TRAP;
+import entitysystem.attribut.SubType;
+import static entitysystem.attribut.SubType.ABILITY;
+import static entitysystem.attribut.SubType.EQUIPEMENT;
+import static entitysystem.attribut.SubType.SPELL;
+import static entitysystem.attribut.SubType.SUMMON;
+import static entitysystem.attribut.SubType.TRAP;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
@@ -28,11 +28,12 @@ import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
-import entitysystem.render.RenderComponent;
+import entitysystem.render.CoreRenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
-import entitysystem.field.FieldGUIComponent;
-import hexsystem.HexMapMouseInput;
+import entitysystem.render.RenderGUIComponent;
+import entitysystem.render.RenderSubSystemFieldGUI;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
 import hexsystem.MapData;
@@ -103,12 +104,12 @@ public class CardEditor implements HexMapInputListener {
          * Init the testingDoll.
          */
         entity.add(entityData.createEntity());
-        entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll"),
+        entityData.setComponents(entity.get(0), new CoreRenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
 //                new Vector2Int(0, 0)), Rotation.A),
                 new AnimationComponent(Animation.SUMMON),
-                new FieldGUIComponent(FieldGUIComponent.EntityType.TITAN),
+                new RenderGUIComponent(RenderGUIComponent.EntityType.TITAN),
                 new CollisionComponent((byte) 0));
 
     }
@@ -137,7 +138,7 @@ public class CardEditor implements HexMapInputListener {
             editorMain.populateReturnEditorMain(mainMenu);
         }
 
-        HexMapMouseInput mouseSystem = main.getStateManager().getState(HexMapMouseInput.class);
+        HexMapMouseSystem mouseSystem = main.getStateManager().getState(HexMapMouseSystem.class);
         if (mouseSystem != null) {
             mouseSystem.registerTileInputListener(this);
         }
@@ -240,7 +241,7 @@ public class CardEditor implements HexMapInputListener {
 
     private void addEntityCard(String name){
             EntityId cardId = entityData.createEntity();
-            entityData.setComponent(cardId, new RenderComponent(name));
+            entityData.setComponent(cardId, new CoreRenderComponent(name));
             entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
             entity.add(cardId);
     }
@@ -305,7 +306,7 @@ public class CardEditor implements HexMapInputListener {
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, CardType.SUMMON,
+        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, SubType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
         hover.setProperties(cardProperties);
         preview.addChild(hover);
@@ -398,7 +399,7 @@ public class CardEditor implements HexMapInputListener {
                 SubTypeMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - SubTypeMenu.getHeight());
             }
         };
-        subTypeButton.setText(CardType.SUMMON.name());
+        subTypeButton.setText(SubType.SUMMON.name());
         callerMenu.addChild(subTypeButton);
 
         /**
@@ -505,7 +506,6 @@ public class CardEditor implements HexMapInputListener {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-
             }
         };
         cast.setText("Cast test !");
@@ -535,7 +535,7 @@ public class CardEditor implements HexMapInputListener {
         Menu subType = new Menu(main.getScreen(), "generatorCardTypeMenu", new Vector2f(0, 30), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                CardType cardType = (CardType) value;
+                SubType cardType = (SubType) value;
                 Element genButton = main.getScreen().getElementById("generatorCardTypeButton");
                 if (!genButton.getText().equals(cardType.name())) {
                     genButton.setText(cardType.name());
@@ -545,8 +545,8 @@ public class CardEditor implements HexMapInputListener {
                 }
             }
         };
-        CardType[] cardSubTypeList = CardType.values();
-        for (CardType s : cardSubTypeList) {
+        SubType[] cardSubTypeList = SubType.values();
+        for (SubType s : cardSubTypeList) {
             subType.addMenuItem(s.name(), s, null);
         }
         main.getScreen().addElement(subType);
@@ -557,7 +557,7 @@ public class CardEditor implements HexMapInputListener {
      * Open a menu where card properties can be tweaked, it depend on the
      * subMenu loaded, who depend on the cardType.
      */
-    public void openCardTypeSubMenu(CardType cardType) {
+    public void openCardTypeSubMenu(SubType cardType) {
         Window subMenu;
         if (main.getScreen().getElementById("subMenu") != null) {
             subMenu = (Window) main.getScreen().getElementById("subMenu");

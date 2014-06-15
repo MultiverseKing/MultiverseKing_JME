@@ -12,15 +12,15 @@ import static entitysystem.attribut.CardRenderPosition.DECK;
 import static entitysystem.attribut.CardRenderPosition.FIELD;
 import static entitysystem.attribut.CardRenderPosition.HAND;
 import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
-import entitysystem.attribut.CardType;
+import entitysystem.attribut.SubType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
-import entitysystem.field.FieldGUIComponent;
+import entitysystem.render.RenderGUIComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
-import hexsystem.HexMapMouseInput;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
@@ -263,7 +263,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      */
     @Override
     protected void updateSystem(float tpf) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
     /**
@@ -302,20 +302,21 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      * @param card
      */
     private void castPreview(Card card) {
-        if (isCastedDebug == null) {
-            isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 155), new Vector2f(250, 20));
-            isCastedDebug.setMinDimensions(new Vector2f(200, 26));
-            isCastedDebug.setIgnoreMouse(true);
-        }
-        isCastedDebug.setText("        " + card.getCardName() + " preview cast !");
-        screen.addElement(isCastedDebug);
-        screen.removeElement(card);
         cardPreviewCast = card;
-        activateCard(null);
+        if(activateCard(null)){
+            if (isCastedDebug == null) {
+                isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 155), new Vector2f(250, 20));
+                isCastedDebug.setMinDimensions(new Vector2f(200, 26));
+                isCastedDebug.setIgnoreMouse(true);
+            }
+            isCastedDebug.setText("        " + card.getCardName() + " preview cast !");
+            screen.addElement(isCastedDebug);
+            screen.removeElement(card);
 
-        //Register the input for the card system
-        app.getStateManager().getState(HexMapMouseInput.class).registerTileInputListener(this);
-        app.getInputManager().addListener(cardInputListener, "Cancel");
+            //Register the input for the card system
+            app.getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
+            app.getInputManager().addListener(cardInputListener, "Cancel");
+        }
     }
 
     private void closePreview() {
@@ -323,7 +324,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(HexMapMouseInput.class).removeTileInputListener(this);
+        app.getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -333,7 +334,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
         closePreview();
     }
 
-    private void activateWorldCard(HexCoordinate castCoord, CardType type) {
+    private void activateWorldCard(HexCoordinate castCoord, SubType type) {
         switch (type) {
             case SPELL:
                 break;
@@ -347,7 +348,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                             cardRender.clone(CardRenderPosition.FIELD),
                             new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
-                            new FieldGUIComponent(FieldGUIComponent.EntityType.UNIT),
+                            new RenderGUIComponent(RenderGUIComponent.EntityType.UNIT),
                             unitLoader.getCollisionComp(), //Collision Comp
                             unitLoader.getuLife(), //life component
                             unitLoader.getMovementComp(), //stats component
@@ -368,7 +369,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      *
      * @param event result when a leftMouse event happen on hexMap.
      */
-    private void activateCard(HexMapInputEvent event) {
+    private boolean activateCard(HexMapInputEvent event) {
         /**
          * If a card is currently in Casting Preview we check we check if it can
          * be casted, If no card is currently activated we switch over all card
@@ -392,8 +393,8 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                          * We activate the pulse Mode, if not activated the cast
                          * is canceled.
                          */
-                        if (!app.getStateManager().getState(HexMapMouseInput.class).setCursorPulseMode(this)) {
-                            castCanceled();
+                        if (!app.getStateManager().getState(HexMapMouseSystem.class).setCursorPulseMode(this)) {
+                            return false;
                         }
                     } else {
                         /**
@@ -403,7 +404,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                          */
                         CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
                         if (collisionSystem != null) {
-                            if (collisionSystem.canBeCast(event.getEventPosition(),
+                            if (collisionSystem.isEmptyPosition(event.getEventPosition(),
                                     cardPreviewCast.getProperties().getCardSubType())) {
                                 activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
                                 closePreview();
@@ -420,6 +421,7 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
                     throw new UnsupportedOperationException(cardPreviewCast.getProperties().getCardMainType() + " isn't a supported Type.");
             }
         }
+        return true;
     }
     private ActionListener cardInputListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {

@@ -17,11 +17,11 @@ import entitysystem.EntityDataAppState;
 import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardSystem;
 import entitysystem.field.movement.MovementSystem;
-import entitysystem.render.RenderSystem;
+import entitysystem.render.CoreRenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.field.InteractiveFieldSystem;
+import entitysystem.render.RenderSubSystemFieldGUI;
 import hexsystem.HexSystemAppState;
-import hexsystem.HexMapMouseInput;
+import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -172,13 +172,13 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attachAll(
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
-                new HexMapMouseInput(),
-                new RenderSystem(),
+                new HexMapMouseSystem(),
+                new CoreRenderSystem(),
                 new MovementSystem(),
                 new CardSystem(),
                 new AnimationSystem(),
                 new CollisionSystem(),
-                new InteractiveFieldSystem(),
+                new RenderSubSystemFieldGUI(),
                 new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;

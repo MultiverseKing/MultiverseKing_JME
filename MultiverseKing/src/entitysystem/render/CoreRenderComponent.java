@@ -7,12 +7,12 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author Eike Foede, roah
  */
-public class RenderComponent implements PersistentComponent {
+public class CoreRenderComponent implements PersistentComponent {
     
     private String name;
     
 
-    public RenderComponent(String name) {
+    public CoreRenderComponent(String name) {
         this.name = name;
     }
 

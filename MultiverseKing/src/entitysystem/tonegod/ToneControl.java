@@ -1,21 +1,19 @@
 package entitysystem.tonegod;
 
-import static entitysystem.field.FieldGUIComponent.EntityType.ENVIRONMENT;
-import static entitysystem.field.FieldGUIComponent.EntityType.TITAN;
-import static entitysystem.field.FieldGUIComponent.EntityType.UNIT;
+import static entitysystem.render.RenderGUIComponent.EntityType.ENVIRONMENT;
+import static entitysystem.render.RenderGUIComponent.EntityType.TITAN;
+import static entitysystem.render.RenderGUIComponent.EntityType.UNIT;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.simsilica.es.EntityId;
-import entitysystem.field.FieldGUIComponent;
-import entitysystem.field.InteractiveFieldSystem;
+import entitysystem.render.RenderGUIComponent;
+import entitysystem.render.RenderSubSystemFieldGUI;
+import hexsystem.HexMapMouseSystem;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Screen;
 
@@ -24,23 +22,29 @@ import tonegod.gui.core.Screen;
  * @author roah
  */
 public class ToneControl extends AbstractControl {
+    private final RenderSubSystemFieldGUI eSystem;
+    private final Screen screen;
+    private final Camera cam;
     private Menu titanMenu = null;
     private Menu unitMenu = null;
     private Menu environmentMenu = null;
-    private final InteractiveFieldSystem eSystem;
-    private final EntityId entityId;
-    private final Screen screen;
-    private final Camera cam;
-    private FieldGUIComponent.EntityType field;
-    private InteractiveNode toneNode;
+    private RenderGUIComponent.EntityType field;
+    private InteractiveNode interactiveNode;
+    private EntityId entityId;
 
-    public ToneControl(EntityId entityId, InteractiveFieldSystem eSystem, Screen screen, FieldGUIComponent.EntityType field, Camera cam) {
+    public ToneControl(RenderSubSystemFieldGUI eSystem, Screen screen, Camera cam) {
+        this.eSystem = eSystem;
+        this.screen = screen;
+        this.cam = cam;
+    }
+    
+    public ToneControl(EntityId entityId, RenderSubSystemFieldGUI eSystem, Screen screen, RenderGUIComponent.EntityType field, Camera cam) {
         this.eSystem = eSystem;
         this.screen = screen;
         this.field = field;
         this.cam = cam;
         this.entityId = entityId;
-        this.toneNode = getINode(getRenderMenu());
+        this.interactiveNode = getINode(getRenderMenu());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Menu Method">
@@ -88,10 +92,12 @@ public class ToneControl extends AbstractControl {
     }
     // </editor-fold>
     
-    public void updateMenuElement(FieldGUIComponent.EntityType field) {
+    public void updateMenuElement(RenderGUIComponent.EntityType field) {
         this.field = field;
-        this.toneNode.setElement(getRenderMenu());
+        this.interactiveNode.setElement(getRenderMenu());
     }
+    
+    
     
     private Menu getRenderMenu() {
         switch (field) {
@@ -117,6 +123,7 @@ public class ToneControl extends AbstractControl {
 
     private InteractiveNode getINode(final Menu menu) {
         return new InteractiveNode(screen, this, menu) {
+            HexMapMouseSystem hexSystem;
             @Override
             public void onSpatialRightMouseDown(MouseButtonEvent evt) {
             }
@@ -124,6 +131,7 @@ public class ToneControl extends AbstractControl {
             @Override
             public void onSpatialRightMouseUp(MouseButtonEvent evt) {
                 menu.showMenu(null, screen.getMouseXY().x, screen.getMouseXY().y - menu.getHeight());
+                eSystem.setSelected(spatial);
             }
 
             @Override
@@ -135,37 +143,47 @@ public class ToneControl extends AbstractControl {
             }
         };
     }
-
-    public InteractiveNode getNode() {
-        return toneNode;
+    
+    public void showMenu(Vector3f origin) {
+        Vector3f value = cam.getScreenCoordinates(spatial.getWorldTranslation());
+        ((Menu)interactiveNode.getElement()).showMenu(null, value.x, value.y);
     }
 
-    public FieldGUIComponent.EntityType getField() {
+    public InteractiveNode getNode() {
+        return interactiveNode;
+    }
+
+    public RenderGUIComponent.EntityType getField() {
         return field;
     }
     
-    @Override
-    public void setSpatial(Spatial spatial) {
-        spatial.getParent().attachChild(toneNode);
-        toneNode.attachChild(spatial);
-        super.setSpatial(spatial);
-        toneNode.setDefaultMaterial(((Geometry) ((Node) spatial).getChild(0)).getMaterial());
-    }
+//    @Override
+//    public void setSpatial(Spatial spatial) {
+//        spatial.getParent().attachChild(interactiveNode);
+//        interactiveNode.attachChild(spatial);
+//        super.setSpatial(spatial);
+//        interactiveNode.setDefaultMaterial(((Geometry) ((Node) spatial).getChild(0)).getMaterial());
+//    }
 
+//    public void remove(){
+//        Node s = interactiveNode.getParent();
+//        s.detachChild(interactiveNode);
+//        s.attachChild(spatial);
+//    }
+    
     @Override
     protected void controlUpdate(float tpf) {
-        if (toneNode.element.getIsVisible()) {
+        if (interactiveNode.element.getIsVisible()) {
             Vector3f value = cam.getScreenCoordinates(spatial.getWorldTranslation());
             if (value.x > 0 && value.x < screen.getWidth()
                     && value.y > 0 && value.y < screen.getHeight()) {
-                toneNode.element.setPosition(new Vector2f(value.x, value.y));
+                interactiveNode.element.setPosition(new Vector2f(value.x, value.y));
             }
         }
     }
-
+    
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
     }
 
-    
 }

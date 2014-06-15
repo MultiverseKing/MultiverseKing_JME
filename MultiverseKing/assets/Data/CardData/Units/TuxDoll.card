@@ -7,7 +7,7 @@
    "description":"Testing Unit used on the editor",
    "unitsStats":{
       "life":50000,
-      "speed":100,
+      "speed":2,
       "movePoint":100,
       "ability":"None",
       "collision":[

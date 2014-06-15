@@ -15,10 +15,15 @@ import utility.ElementalAttribut;
  */
 public class MeshParameter {
 
+    public enum Shape {
+        SQUARE,
+        CIRCLE;
+    }
+    
     /**
      * Reference used to generate the parameter.
      */
-    private final MapData mapData;
+    private MapData mapData;
     /**
      * Mesh parameter needed to generate the mesh.
      */
@@ -40,21 +45,27 @@ public class MeshParameter {
     private int currentIndex;
 
     /**
-     * Need to be initialized before use.
-     *
-     * @param mapData
+     * Generate all parameter needed to create a grid from defined value.
+     * @param mapData Reference.
+     * @param chunkSize max radius.
+     * @param onlyGround generate only the top face ?
+     * @param chunkShape shape to use when generating the chunk.
      */
-    public MeshParameter(MapData mapData) {
+    public MeshParameter(MapData mapData, int chunkSize, boolean onlyGround, Shape chunkShape) {
         this.mapData = mapData;
+        switch(chunkShape){
+            case CIRCLE:
+                /** 
+                 * @todo: 
+                 */
+                break;
+            case SQUARE:
+                initializeSquare(chunkSize, onlyGround);
+                break;
+        }
     }
-
-    /**
-     * Call This before sending the param else it will fail.
-     *
-     * @param chunkSize
-     * @param onlyGround
-     */
-    public void initialize(int chunkSize, boolean onlyGround) {
+    
+    private void initializeSquare(int chunkSize, boolean onlyGround) {
         this.onlyGround = onlyGround;
         boolean[][] isVisited = new boolean[chunkSize][chunkSize];
         for (int y = 0; y < chunkSize; y++) {

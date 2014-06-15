@@ -71,8 +71,8 @@ public class ChunkControl extends AbstractControl {
         /**
          * Generate new parameter to generate the tile.
          */
-        MeshParameter meshParam = new MeshParameter(mapData);
-        meshParam.initialize(HexSettings.CHUNK_SIZE, false);
+        MeshParameter meshParam = new MeshParameter(mapData, HexSettings.CHUNK_SIZE, false, MeshParameter.Shape.SQUARE);
+//        meshParam.initialize(HexSettings.CHUNK_SIZE, false);
 
         /**
          * Generate the tile and attach them with the right texture. 1 object by

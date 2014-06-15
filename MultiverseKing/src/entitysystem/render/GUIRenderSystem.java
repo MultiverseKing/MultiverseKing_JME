@@ -1,5 +1,6 @@
 package entitysystem.render;
 
+import com.jme3.app.state.AppStateManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
@@ -19,6 +20,8 @@ import entitysystem.render.RenderSystem;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
+import hexsystem.chunksystem.MeshManager;
+import hexsystem.chunksystem.MeshParameter;
 import hexsystem.events.HexMapInputEvent;
 import kingofmultiverse.MultiverseMain;
 import kingofmultiverse.RTSCamera;
@@ -61,7 +64,7 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
             app.getStateManager().detach(this);
             return null;
         }
-        menus = new GUIFieldMenu(((MultiverseMain) app).getScreen(), 
+        menus = new GUIFieldMenu(((MultiverseMain) app).getScreen(), this,
                 app.getStateManager().getState(RTSCamera.class).getCamera());
 //        screen = ((MultiverseMain) app).getScreen();
 //        screen.setUse3DSceneSupport(true);
@@ -165,10 +168,13 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     
     private void openEntityActionMenu(EntityId id, HexCoordinate pos){
         MapData mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
-        menus.show(interactiveEntities.get(id), mapData.convertTileToWorldPosition(pos));
+        menus.show(id, interactiveEntities.get(id), mapData.convertTileToWorldPosition(pos));
     }
     
     public void move(EntityId id){
+//        MeshParameter param = new MeshParameter(app.getStateManager().getState(HexSystemAppState.class).getMapData());
+//        MeshManager mesh = new MeshManager();
+//        mesh.getMesh()
         if (!app.getStateManager().getState(HexMapMouseSystem.class).setCursorPulseMode(this)) {
             return;
         }
@@ -197,6 +203,13 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
 //        interactiveEntities.clear();
 //        screen.setUse3DSceneSupport(false);
     }
+
+    @Override
+    public void stateDetached(AppStateManager stateManager) {
+        super.stateDetached(stateManager); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
     public void remove() {
         app.getStateManager().detach(this);

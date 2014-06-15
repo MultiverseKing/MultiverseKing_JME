@@ -23,7 +23,7 @@ import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
 import entitysystem.card.CardRenderComponent;
-import entitysystem.card.CardSystem;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.card.Hover;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.position.HexPositionComponent;
@@ -31,8 +31,8 @@ import entitysystem.render.AnimationRenderComponent;
 import entitysystem.render.RenderComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.EntityDataAppState;
+import entitysystem.field.movement.MovementStatsComponent;
 import entitysystem.render.GUIRenderComponent;
-import entitysystem.render.GUIRenderSystem;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
@@ -109,6 +109,7 @@ public class CardEditor implements HexMapInputListener {
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
                 new AnimationRenderComponent(Animation.SUMMON),
                 new GUIRenderComponent(GUIRenderComponent.EntityType.TITAN),
+                new MovementStatsComponent((byte)5),
                 new CollisionComponent((byte) 0));
 
     }
@@ -154,7 +155,7 @@ public class CardEditor implements HexMapInputListener {
                     if (mainMenu.getElementsAsMap().containsKey("TestCardMenu")) {
                         mainMenu.removeChild(mainMenu.getElementsAsMap().get("TestCardMenu"));
                     }
-                    main.getStateManager().getState(CardSystem.class).hideCards();
+                    main.getStateManager().getState(CardRenderSystem.class).hideCards();
                     generatorMenu();
                 } else {
                     mainMenu.removeChild(mainMenu.getElementsAsMap().get("cardGeneratorW"));
@@ -176,11 +177,11 @@ public class CardEditor implements HexMapInputListener {
                     if (mainMenu.getElementsAsMap().containsKey("cardGeneratorW")) {
                         mainMenu.removeChild(mainMenu.getElementsAsMap().get("cardGeneratorW"));
                     }
-                    main.getStateManager().getState(CardSystem.class).showCards();
+                    main.getStateManager().getState(CardRenderSystem.class).showCards();
                     openTestCardMenu();
                 } else {
                     mainMenu.removeChild(mainMenu.getElementsAsMap().get("TestCardMenu"));
-                    main.getStateManager().getState(CardSystem.class).hideCards();
+                    main.getStateManager().getState(CardRenderSystem.class).hideCards();
                 }
             }
         };
@@ -233,7 +234,7 @@ public class CardEditor implements HexMapInputListener {
         removeCard.setText("Del");
         addRemoveCard.addChild(removeCard);
 
-        if (!main.getStateManager().getState(CardSystem.class).gotCardInHand()) {
+        if (!main.getStateManager().getState(CardRenderSystem.class).gotCardInHand()) {
             addEntityCard("Cendrea");
         }
     }
@@ -842,6 +843,7 @@ public class CardEditor implements HexMapInputListener {
                 main.getScreen().removeElement(main.getScreen().getElementById(s));
             }
         }
+        mainMenu.detachAllChildren();
         cleanupEntityTest();
     }
 

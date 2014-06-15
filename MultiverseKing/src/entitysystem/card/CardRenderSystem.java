@@ -38,7 +38,7 @@ import utility.Rotation;
  * hand(opposite side).
  * @author roah
  */
-public class CardSystem extends EntitySystemAppState implements HexMapInputListener {
+public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
@@ -371,9 +371,9 @@ public class CardSystem extends EntitySystemAppState implements HexMapInputListe
      */
     private boolean activateCard(HexMapInputEvent event) {
         /**
-         * If a card is currently in Casting Preview we check we check if it can
-         * be casted, If no card is currently activated we switch over all card
-         * Main type to know what preview to activate. (the entity will be
+         * If a card is currently in Casting Preview we check if it can
+         * be casted, No card is currently activated so we switch over all card
+         * type to know what preview to activate. (the entity will be
          * removed from this system automaticaly if he have to)
          */
         if (cardPreviewCast != null) {

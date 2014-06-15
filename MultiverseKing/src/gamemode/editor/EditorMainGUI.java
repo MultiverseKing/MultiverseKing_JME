@@ -5,7 +5,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import entitysystem.card.CardSystem;
+import entitysystem.card.CardRenderSystem;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -49,6 +49,7 @@ public class EditorMainGUI extends AbstractAppState {
         ButtonAdapter editorConfig = new ButtonAdapter(main.getScreen(), "Btn1", new Vector2f(15, 40)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                mainMenu.detachAllChildren();
                 mapEditorMenu = new MapEditor(main);
             }
         };
@@ -58,8 +59,9 @@ public class EditorMainGUI extends AbstractAppState {
         ButtonAdapter cardEditor = new ButtonAdapter(main.getScreen(), "Btn2", new Vector2f(15, 80)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                if (main.getStateManager().getState(CardSystem.class) == null) {
-                    main.getStateManager().attach(new CardSystem());
+                mainMenu.detachAllChildren();
+                if (main.getStateManager().getState(CardRenderSystem.class) == null) {
+                    main.getStateManager().attach(new CardRenderSystem());
                 }
                 cardEditorMenu = new CardEditor(main);
             }

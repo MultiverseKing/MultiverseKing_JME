@@ -85,9 +85,9 @@ public class Card extends ButtonAdapter {
     public void setHasFocus(boolean hasFocus) {
         super.setHasFocus(hasFocus);
         if (hasFocus) {
-            app.getStateManager().getState(CardSystem.class).hasFocus(this);
+            app.getStateManager().getState(CardRenderSystem.class).hasFocus(this);
         } else {
-            app.getStateManager().getState(CardSystem.class).lostFocus(this);
+            app.getStateManager().getState(CardRenderSystem.class).lostFocus(this);
         }
     }
 
@@ -116,7 +116,7 @@ public class Card extends ButtonAdapter {
     @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         super.onButtonMouseLeftUp(evt, toggled);
-        CardSystem renderSystem = app.getStateManager().getState(CardSystem.class);
+        CardRenderSystem renderSystem = app.getStateManager().getState(CardRenderSystem.class);
         renderSystem.isInCastArea(this);
         resetHandPosition();
     }

@@ -12,6 +12,11 @@ public class MovementStatsComponent implements PersistentComponent {
     private final byte movePoint;
     private final float moveSpeed;
 
+    public MovementStatsComponent(byte movePoint) {
+        moveSpeed = 1.5f;
+        this.movePoint = movePoint;
+    }
+    
     public MovementStatsComponent(float moveSpeed, byte movePoint) {
         this.movePoint = movePoint;
         this.moveSpeed = moveSpeed;
@@ -27,7 +32,7 @@ public class MovementStatsComponent implements PersistentComponent {
     }
 
     /**
-     * How fast the unit move on th field.
+     * How fast the unit move on the field.
      *
      * @return
      */

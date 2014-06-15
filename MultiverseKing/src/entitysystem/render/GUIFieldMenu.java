@@ -3,6 +3,7 @@ package entitysystem.render;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.simsilica.es.EntityId;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
@@ -13,18 +14,21 @@ import utility.HexCoordinate;
  */
 public class GUIFieldMenu {
 
+    private final GUIRenderSystem guiSystem;
     private final Screen screen;
     private final Menu[] menu = new Menu[3];
     private final Camera camera;
+    private EntityId inspectedEntityId = null;
     private Vector3f inspectedSpatialPosition;
     private byte menuIndex;
 //    private final Menu environmentMenu;
 //    private final Menu titanMenu;
 //    private final Menu unitMenu;
 
-    GUIFieldMenu(Screen screen, Camera camera) {
+    GUIFieldMenu(Screen screen, GUIRenderSystem system, Camera camera) {
         this.screen = screen;
         this.camera = camera;
+        this.guiSystem = system;
 
         /**
          * Titan Menu !
@@ -34,7 +38,8 @@ public class GUIFieldMenu {
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 switch (index) {
                     case 0:
-//                        eSystem.move(entityId, field);
+                        guiSystem.move(inspectedEntityId);
+                        return;
                 }
             }
         };
@@ -75,7 +80,8 @@ public class GUIFieldMenu {
         screen.addElement(menu[2]);
     }
 
-    void show(GUIRenderComponent.EntityType type, Vector3f pos) {
+    void show(EntityId id, GUIRenderComponent.EntityType type, Vector3f pos) {
+        inspectedEntityId = id;
         inspectedSpatialPosition = pos;
         Vector3f value = camera.getScreenCoordinates(pos);
         switch (type) {

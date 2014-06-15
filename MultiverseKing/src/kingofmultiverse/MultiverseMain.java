@@ -15,7 +15,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
 import entitysystem.render.AnimationRenderSystem;
-import entitysystem.card.CardSystem;
+import entitysystem.card.CardRenderSystem;
 import entitysystem.field.movement.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
@@ -69,6 +69,7 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLoader(MapDataLoader.class, "map");
 
         //Init general input 
+        super.inputManager.clearMappings();
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
@@ -175,7 +176,7 @@ public class MultiverseMain extends SimpleApplication {
                 new HexMapMouseSystem(),
                 new RenderSystem(),
                 new MovementSystem(),
-                new CardSystem(),
+                new CardRenderSystem(),
                 new AnimationRenderSystem(),
                 new CollisionSystem(),
                 new GUIRenderSystem(),

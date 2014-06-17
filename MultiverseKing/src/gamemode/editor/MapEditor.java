@@ -81,9 +81,9 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
         mainMenu.setIsResizable(false);
         mainMenu.getDragBar().setIsMovable(false);
         main.getScreen().addElement(mainMenu);
-        EditorMainGUI editorMain = main.getStateManager().getState(EditorMainGUI.class);
+        EditorMainAppState editorMain = main.getStateManager().getState(EditorMainAppState.class);
         if (editorMain != null) {
-            editorMain.populateReturnEditorMain(mainMenu);
+//            editorMain.populateReturnEditorMain(mainMenu);
         }
 
         /**

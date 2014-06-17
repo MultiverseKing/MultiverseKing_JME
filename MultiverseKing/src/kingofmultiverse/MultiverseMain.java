@@ -1,6 +1,6 @@
 package kingofmultiverse;
 
-import gamemode.editor.EditorMainGUI;
+import gamemode.editor.EditorMainAppState;
 import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -180,7 +180,7 @@ public class MultiverseMain extends SimpleApplication {
                 new AnimationRenderSystem(),
                 new CollisionSystem(),
                 new GUIRenderSystem(),
-                new EditorMainGUI(this)); //<< This call the Editor GUI SHould be called last.
+                new EditorMainAppState()); //<< This call the Editor GUI SHould be called last.
     }
 //    private boolean exemple = false;
 

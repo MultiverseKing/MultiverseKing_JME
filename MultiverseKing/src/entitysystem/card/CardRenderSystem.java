@@ -113,7 +113,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
-        return entityData.getEntities(CardRenderComponent.class);
+        return entityData.getEntities(CardRenderComponent.class, CardRenderComponent.class);
     }
 
     @Override

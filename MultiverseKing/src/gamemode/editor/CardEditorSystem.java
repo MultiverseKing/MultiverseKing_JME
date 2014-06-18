@@ -100,8 +100,7 @@ public class CardEditorSystem extends EntitySystemAppState {
     
     public void removeEntityCard() {
         if (entity.size() > 1) {
-            int i = 0;
-            i = FastMath.nextRandomInt(2, entity.size());
+            int i = FastMath.nextRandomInt(2, entity.size());
             i-=1;
             entityData.removeEntity(entity.get(i));
             entity.remove(entity.get(i));

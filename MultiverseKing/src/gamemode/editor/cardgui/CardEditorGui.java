@@ -4,7 +4,7 @@ import gamemode.editor.CardEditorSystem;
 import com.simsilica.es.EntityData;
 import entitysystem.card.Hover;
 import gamemode.editor.EditorMenu;
-import gamemode.editor.EditorWindow;
+import gamemode.editor.EditorMenuWindow;
 import hexsystem.MapData;
 import kingofmultiverse.MultiverseMain;
 
@@ -17,7 +17,7 @@ import kingofmultiverse.MultiverseMain;
 public final class CardEditorGui extends EditorMenu {
     private final CardEditorSystem cardEditorSystem;
     private final MultiverseMain main;
-    private EditorWindow current;
+    private EditorMenuWindow current;
     
     private EntityData entityData;
     private MapData mapData;
@@ -35,19 +35,28 @@ public final class CardEditorGui extends EditorMenu {
     
     @Override
     protected void onSelectedItemChange(int selectedIndex) {
-        if(current != null){
-            current.detachFromParent();
-//            screen.removeElement(screen.getElementById(current.getUID()));
-            current = null;
-        } else {
-            current = new GeneratorGUI(screen, this);
-        }
-//        switch(selectedIndex){
-//            case 0:
-//                current = new GeneratorGUI(screen, this);
-//            case 1:
-//                current = new TestCardGUI(screen, this, cardEditorSystem);
+//        if(current != null){
+//            current.detachFromParent();
+////            screen.removeElement(screen.getElementById(current.getUID()));
+//            current = null;
+//        } 
+//        else {
+//            current = new GeneratorGUI(screen, this);
 //        }
+        switch(selectedIndex){
+            case 0:
+                if(current != null && current instanceof TestCardGUI){
+                    current.detachFromParent();
+                }
+                current = new GeneratorGUI(screen, this);
+                break;
+            case 1:
+                if(current != null && current instanceof GeneratorGUI){
+                    current.detachFromParent();
+                }
+                current = new TestCardGUI(screen, this, cardEditorSystem);
+                break;
+        }
     }
     
 //    public void getMenuButton(){

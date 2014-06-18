@@ -1,15 +1,8 @@
 package gamemode.editor.cardgui;
 
-import com.jme3.input.event.MouseButtonEvent;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
-import entitysystem.attribut.SubType;
-import entitysystem.card.CardRenderSystem;
 import gamemode.editor.CardEditorSystem;
-import gamemode.editor.EditorWindow;
-import tonegod.gui.controls.buttons.Button;
-import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.windows.Window;
+import gamemode.editor.EditorMenuWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 
@@ -17,7 +10,7 @@ import tonegod.gui.core.ElementManager;
  *
  * @author roah
  */
-public final class TestCardGUI extends EditorWindow {
+public final class TestCardGUI extends EditorMenuWindow {
     private final CardEditorSystem system;
     
     /**
@@ -27,9 +20,9 @@ public final class TestCardGUI extends EditorWindow {
         super(screen, parent, "Test Card");
         this.system = system;
         
-        addButtonField("Add Card", "+1", 0);
-        addButtonField("Remove Card", "-1", 1);
-        
+        addButtonField("Add Card", "+1", 0, new Vector2f(0, -5));
+        addButtonField("Remove Card", "-1", 1, new Vector2f(getGridSize().x, -8));
+        show(getGridSize().x*2.1f, getGridSize().y*2.6f);
 //        float offset;
 //        if (mainMenu.getElementsAsMap().containsKey("CloseButtonWin")) {
 //            offset = mainMenu.getElementsAsMap().get("CloseButtonWin").getWidth();
@@ -81,8 +74,10 @@ public final class TestCardGUI extends EditorWindow {
         switch(index){
             case 0:
                 system.addEntityCard("Cendrea");
+                break;
             case 1:
                 system.removeEntityCard();
+                break;
         }
     }
     

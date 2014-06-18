@@ -5,7 +5,7 @@ import com.jme3.input.event.KeyInputEvent;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import entitysystem.attribut.SubType;
-import gamemode.editor.EditorWindow;
+import gamemode.editor.EditorMenuWindow;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.text.LabelElement;
@@ -18,7 +18,7 @@ import tonegod.gui.core.ElementManager;
  *
  * @author roah
  */
-public class GeneratorSubMenu extends EditorWindow {
+public class GeneratorSubMenu extends EditorMenuWindow {
     
     public GeneratorSubMenu(ElementManager screen, Element parent, SubType type) {
         super(screen, parent, "Properties");

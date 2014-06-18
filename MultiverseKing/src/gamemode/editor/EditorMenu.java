@@ -21,8 +21,6 @@ import tonegod.gui.core.ElementManager;
 public abstract class EditorMenu extends Element {
 
     private final EntitySystemAppState system;
-//    private final Element dragBar;
-//    private final Label systemName;
     private SelectList selectList;
 
     public EditorMenu(ElementManager screen, String UID, String titleName, EntitySystemAppState system) {
@@ -43,9 +41,13 @@ public abstract class EditorMenu extends Element {
          * Create SubMenu List for this System.
          */
         selectList = new SelectList(screen, new Vector2f(0, getHeight())) {
+            private int lastSelectedIndex = -1;
             @Override
             public void onChange() {
-                onSelectedItemChange((Integer) getListItem(getSelectedIndex()).getValue());
+                if(getSelectedIndex() != lastSelectedIndex) {
+                    lastSelectedIndex = getSelectedIndex();
+                    onSelectedItemChange((Integer) getListItem(getSelectedIndex()).getValue());
+                }
             }
         };
         addChild(selectList);
@@ -57,7 +59,6 @@ public abstract class EditorMenu extends Element {
     public void addItem(String caption, Integer value) {
         selectList.addListItem(caption, value);
         selectList.setDimensions(getWidth()-getAbsoluteX()-5, selectList.getListItems().size()*25);
-        System.out.println(getWidth());
         selectList.setPosition(0, -selectList.getListItems().size()*25);
         selectList.pack();
     }
@@ -86,8 +87,4 @@ public abstract class EditorMenu extends Element {
     }
 
     protected abstract void onSelectedItemChange(int selectedIndex);
-//    public void show(){
-//        populateReturnEditorMain();
-//        screen.addElement(this);
-//    }
 }

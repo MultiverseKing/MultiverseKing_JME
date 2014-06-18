@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gamemode.editor.cardgui;
 
 import com.jme3.input.event.MouseButtonEvent;
@@ -16,6 +12,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
+import tonegod.gui.core.Element;
+import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 import tonegod.gui.effects.Effect;
 import utility.ElementalAttribut;
 
@@ -24,20 +23,21 @@ import utility.ElementalAttribut;
  * @author roah
  */
 public class CardPreview {
+    private final Hover hover;
 
-    private void genPreview() {
+    public CardPreview(Screen screen, Element parent) {
         /**
          * Window used to show a preview of the card.
          */
-        ButtonAdapter preview = new ButtonAdapter(main.getScreen(), "geneneratorImgPreview", new Vector2f(genMenu.getWidth(), 0),
+        ButtonAdapter preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth()-140, 0),
                 new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if (!main.getScreen().getElementsAsMap().containsKey("loadImgMenu")) {
+                if (!((Screen)screen).getElementsAsMap().containsKey("loadImgMenu")) {
                     loadImgMenu();
                 }
-                Menu loadImgMenu = (Menu) main.getScreen().getElementById("loadImgMenu");
+                Menu loadImgMenu = (Menu) ((Screen)screen).getElementById("loadImgMenu");
                 loadImgMenu.showMenu(null, getAbsoluteX() + getDimensions().x, getAbsoluteY());
             }
 
@@ -69,11 +69,32 @@ public class CardPreview {
         preview.removeAllChildren();
         preview.setIsResizable(false);
         preview.setIsMovable(false);
-        hover = new Hover(main.getScreen(), new Vector2f(), preview.getDimensions());
+        hover = new Hover(screen, new Vector2f(), preview.getDimensions());
         CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, SubType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
         hover.setProperties(cardProperties);
         preview.addChild(hover);
-        genMenu.addChild(preview);
+        
+        parent.addChild(preview);
+    }
+    
+    void switchEAttribut(ElementalAttribut eAttribut) {
+        hover.setEAttribut(eAttribut);
+    }
+
+    void switchSubType(SubType subType) {
+        hover.setSubType(subType);
+    }
+
+    void switchFaction(Faction faction) {
+        hover.setFaction(faction);
+    }
+
+    void switchCost(int cost) {
+        hover.setCastCost(cost);
+    }
+
+    void switchName(String name) {
+        hover.setCardName(name);
     }
 }

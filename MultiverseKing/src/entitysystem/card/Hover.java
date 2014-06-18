@@ -90,7 +90,7 @@ public class Hover extends Window {
         addChild(cardNameLabel);
 
         cardNameLabel.setFont("Interface/Fonts/Purisa.fnt");
-        cardNameLabel.setPosition(new Vector2f(getDimensions().x * 0.2f, -10));
+        cardNameLabel.setPosition(new Vector2f(getDimensions().x * 0.18f, -10));
         cardNameLabel.setFontSize(17);
         cardNameLabel.setFontColor(ColorRGBA.White);
         cardNameLabel.setIgnoreMouse(true);
@@ -107,17 +107,22 @@ public class Hover extends Window {
     public void setCardName(String name) {
         if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("cardNameLabelHover")) {
             Element nameLabel = getElementsAsMap().get("cardNameLabelHover");
-            if (name.length() > 11) {
-                nameLabel.setFontSize(14);
-            } else {
+            if (name.length() < 9) {
                 nameLabel.setFontSize(17);
+                nameLabel.setPosition(new Vector2f(getDimensions().x * 0.18f, -10));
+            } else if(name.length() > 11){
+                nameLabel.setFontSize(14);
+                nameLabel.setPosition(new Vector2f(getDimensions().x * 0.14f, -10));
+            } else {
+                nameLabel.setFontSize(15);
+                nameLabel.setPosition(new Vector2f(getDimensions().x * 0.16f, -10));
             }
             nameLabel.setText(name);
 //            nameLabel.setIgnoreMouse(true);
         }
     }
 
-    public void setType(SubType type) {
+    public void setSubType(SubType type) {
         if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("typeIconHover")) {
             Element icon = getElementsAsMap().get("typeIconHover");
             icon.setColorMap("Textures/Cards/Icons/CardType/" + type.name() + ".png");
@@ -142,6 +147,10 @@ public class Hover extends Window {
         }
     }
 
+    public void setEAttribut(ElementalAttribut eAttribut){
+        getMaterial().setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/Cards/" + eAttribut.name() + ".png"));
+    }
+    
     private void updateProperties(CardProperties properties) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

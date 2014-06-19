@@ -1,5 +1,6 @@
 package gamemode.editor;
 
+import gamemode.editor.card.CardEditorSystem;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;

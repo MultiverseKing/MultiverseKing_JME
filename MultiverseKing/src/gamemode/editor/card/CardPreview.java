@@ -1,4 +1,4 @@
-package gamemode.editor.cardgui;
+package gamemode.editor.card;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
@@ -13,7 +13,6 @@ import java.io.FilenameFilter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
 import tonegod.gui.effects.Effect;
 import utility.ElementalAttribut;
@@ -24,12 +23,17 @@ import utility.ElementalAttribut;
  */
 public class CardPreview {
     private final Hover hover;
+    private final ButtonAdapter preview;
 
+    public Element getPreview() {
+        return preview;
+    }
+    
     public CardPreview(Screen screen, Element parent) {
         /**
          * Window used to show a preview of the card.
          */
-        ButtonAdapter preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth()-140, 0),
+        preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth()-140, 0),
                 new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {

@@ -305,7 +305,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         cardPreviewCast = card;
         if(activateCard(null)){
             if (isCastedDebug == null) {
-                isCastedDebug = new Window(screen, "CastDebug", new Vector2f(155, 155), new Vector2f(250, 20));
+                isCastedDebug = new Window(screen, "CastDebug", new Vector2f(275, 155), new Vector2f(250, 20));
                 isCastedDebug.setMinDimensions(new Vector2f(200, 26));
                 isCastedDebug.setIgnoreMouse(true);
             }

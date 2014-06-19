@@ -1,4 +1,4 @@
-package gamemode.editor;
+package gamemode.editor.card;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -15,7 +15,8 @@ import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationRenderComponent;
 import entitysystem.render.GUIRenderComponent;
 import entitysystem.render.RenderComponent;
-import gamemode.editor.cardgui.CardEditorGui;
+import gamemode.editor.EditorMainAppState;
+import gamemode.editor.card.CardEditorGui;
 import hexsystem.HexSettings;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;

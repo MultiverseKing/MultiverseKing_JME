@@ -1,4 +1,4 @@
-package gamemode.editor.cardgui;
+package gamemode.editor.card;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
@@ -17,38 +17,44 @@ import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
+import tonegod.gui.core.Screen;
 
 /**
  *
  * @author roah
  */
 public class SaveAndLoadGUI {
+    private final GeneratorGUI generatorGUI;
+    private Window cardLoader;
+    private Screen screen;
 
-    private void pupolate() {
+    public SaveAndLoadGUI(Screen screen, Element parent, GeneratorGUI generatorGUI) {
+        this.screen = screen;
+        this.generatorGUI = generatorGUI;
         /**
          * Window used to load and save card to/from file.
          */
-        Window cardLoader = new Window(main.getScreen(), "cardLoader",
-                new Vector2f(55, genMenu.getHeight()), new Vector2f(225, 50));
+        cardLoader = new Window(screen, "cardLoader",
+                new Vector2f(0, parent.getHeight()), new Vector2f(120, 85));
         cardLoader.removeAllChildren();
         cardLoader.setIgnoreMouse(true);
-        genMenu.addChild(cardLoader);
+        parent.addChild(cardLoader);
 
-        ButtonAdapter load = new ButtonAdapter(main.getScreen(), "loadCardButton", new Vector2f(10, 10)) {
+        ButtonAdapter load = new ButtonAdapter(screen, "loadCardButton", new Vector2f(10, 10)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if (!main.getScreen().getElementsAsMap().containsKey("loadCategory")) {
+                if (!((Screen)screen).getElementsAsMap().containsKey("loadCategory")) {
                     openLoadingMenu();
                 }
-                Menu loadMenu = (Menu) main.getScreen().getElementById("loadCategory");
+                Menu loadMenu = (Menu) screen.getElementById("loadCategory");
                 loadMenu.showMenu(null, getAbsoluteX(), getAbsoluteY() - loadMenu.getHeight());
             }
         };
         load.setText("Load");
         cardLoader.addChild(load);
 
-        ButtonAdapter save = new ButtonAdapter(main.getScreen(), "saveCardButton", new Vector2f(115, 10)) {
+        ButtonAdapter save = new ButtonAdapter(screen, "saveCardButton", new Vector2f(10, 45)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -74,7 +80,7 @@ public class SaveAndLoadGUI {
          * Menu listing all saved card.
          */
         folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/");
-        Menu categoryAll = new Menu(main.getScreen(), "categoryAll", new Vector2f(0, 0), false) {
+        Menu categoryAll = new Menu(screen, "categoryAll", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 loadCardPropertiesFromFile(value.toString());
@@ -91,13 +97,13 @@ public class SaveAndLoadGUI {
                 }
             }
         }
-        main.getScreen().addElement(categoryAll);
+        screen.addElement(categoryAll);
 
         /**
          * Menu listing all saved Ability card.
          */
         folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Ability");
-        Menu categoryAbility = new Menu(main.getScreen(), "categoryAbility", new Vector2f(0, 0), false) {
+        Menu categoryAbility = new Menu(screen, "categoryAbility", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 loadCardPropertiesFromFile(value.toString());
@@ -109,13 +115,13 @@ public class SaveAndLoadGUI {
             int index = s.lastIndexOf('.');
             categoryAbility.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
-        main.getScreen().addElement(categoryAbility);
+        screen.addElement(categoryAbility);
 
         /**
          * Menu listing all saved unit card.
          */
         folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Units");
-        Menu categoryUnit = new Menu(main.getScreen(), "categoryUnit", new Vector2f(0, 0), false) {
+        Menu categoryUnit = new Menu(screen, "categoryUnit", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 loadCardPropertiesFromFile(value.toString());
@@ -127,12 +133,12 @@ public class SaveAndLoadGUI {
             int index = s.lastIndexOf('.');
             categoryUnit.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
-        main.getScreen().addElement(categoryUnit);
+        screen.addElement(categoryUnit);
 
         /**
          * Root menu.
          */
-        final Menu loadCategory = new Menu(main.getScreen(), "loadCategory", new Vector2f(0, 0), false) {
+        final Menu loadCategory = new Menu(screen, "loadCategory", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
             }
@@ -141,75 +147,14 @@ public class SaveAndLoadGUI {
         loadCategory.addMenuItem("Unit", null, categoryUnit);
         loadCategory.addMenuItem("Ability", null, categoryAbility);
 
-        main.getScreen().addElement(loadCategory);
+        screen.addElement(loadCategory);
     }
 
     private void loadCardPropertiesFromFile(String cardName) {
-        System.out.println(cardName);
         EntityLoader loader = new EntityLoader();
         CardProperties load = loader.loadCardProperties(cardName);
-
         if (load != null) {
-            /**
-             * Load the card cost.
-             */
-            Spinner cost = (Spinner) main.getScreen().getElementById("generatorCostSpinner");
-            cost.setSelectedIndex(load.getPlayCost());
-            hover.setCastCost(load.getPlayCost());
-            /**
-             * Load the element Attribut.
-             */
-            main.getScreen().getElementById("generatorEAttributButton").setText(load.getElement().name());
-            main.getScreen().getElementById("cardPropertiesHover").setColorMap("Textures/Cards/" + load.getElement().name() + ".png");
-            /**
-             * Load the Faction Attribut.
-             */
-            main.getScreen().getElementById("generatorFactionButton").setText(load.getFaction().name());
-            hover.setFaction(load.getFaction());
-            /**
-             * Load the description Text.
-             */
-            main.getScreen().getElementById("generatorDescriptionButton").setText(load.getDescription());
-            /**
-             * Load the card type.
-             */
-            Element genButton = main.getScreen().getElementById("generatorCardTypeButton");
-            if (!genButton.getText().equals(load.getCardSubType().name())) {
-                genButton.setText(load.getCardSubType().name());
-                hover.setType(load.getCardSubType());
-                openCardTypeSubMenu(load.getCardSubType());
-            }
-            switch (load.getCardSubType()) {
-                case ABILITY:
-                    /**
-                     * @todo: Load ability SubMenu Data.
-                     */
-                    AbilityComponent abilityData = loader.loadAbility(cardName);
-                    main.getScreen().getElementById("powerButton").setText(Integer.toString(abilityData.getPower()));
-                    Spinner spin = (Spinner) main.getScreen().getElementById("unitCastCostSlider");
-                    spin.setSelectedIndex(abilityData.getSegment());
-                    break;
-                case EQUIPEMENT:
-                    /**
-                     * @todo: Load Equipement SubMenu Data.
-                     */
-                    break;
-                case SPELL:
-                    /**
-                     * @todo: Load Spell SubMenu Data.
-                     */
-                    break;
-                case TRAP:
-                    /**
-                     * @todo: Load Trap SubMenu Data.
-                     */
-                    break;
-                case SUMMON:
-                    /**
-                     * @todo: Load Summon SubMenu Data
-                     */
-                    break;
-            }
+            generatorGUI.loadProperties(cardName, load, loader);
         }
     }
 }

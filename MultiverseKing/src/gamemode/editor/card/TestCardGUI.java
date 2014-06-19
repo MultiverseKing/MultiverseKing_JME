@@ -1,10 +1,10 @@
-package gamemode.editor.cardgui;
+package gamemode.editor.card;
 
 import com.jme3.math.Vector2f;
-import gamemode.editor.CardEditorSystem;
 import gamemode.editor.EditorMenuWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.layouts.LayoutHint.VAlign;
 
 /**
  *
@@ -22,7 +22,8 @@ public final class TestCardGUI extends EditorMenuWindow {
         
         addButtonField("Add Card", "+1", 0, new Vector2f(0, -5));
         addButtonField("Remove Card", "-1", 1, new Vector2f(getGridSize().x, -8));
-        show(getGridSize().x*2.1f, getGridSize().y*2.6f);
+        show(getGridSize().x*2.1f, getGridSize().y*2.6f, VAlign.bottom);
+        getWindow().scale(0.8f);
 //        float offset;
 //        if (mainMenu.getElementsAsMap().containsKey("CloseButtonWin")) {
 //            offset = mainMenu.getElementsAsMap().get("CloseButtonWin").getWidth();

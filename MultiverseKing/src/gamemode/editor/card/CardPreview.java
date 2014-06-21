@@ -22,26 +22,27 @@ import utility.ElementalAttribut;
  * @author roah
  */
 public class CardPreview {
+
     private final Hover hover;
     private final ButtonAdapter preview;
 
     public Element getPreview() {
         return preview;
     }
-    
+
     public CardPreview(Screen screen, Element parent) {
         /**
          * Window used to show a preview of the card.
          */
-        preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth()-140, 0),
+        preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth() - 140, 0),
                 new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if (!((Screen)screen).getElementsAsMap().containsKey("loadImgMenu")) {
+                if (!((Screen) screen).getElementsAsMap().containsKey("loadImgMenu")) {
                     loadImgMenu();
                 }
-                Menu loadImgMenu = (Menu) ((Screen)screen).getElementById("loadImgMenu");
+                Menu loadImgMenu = (Menu) ((Screen) screen).getElementById("loadImgMenu");
                 loadImgMenu.showMenu(null, getAbsoluteX() + getDimensions().x, getAbsoluteY());
             }
 
@@ -78,10 +79,10 @@ public class CardPreview {
                 Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
         hover.setProperties(cardProperties);
         preview.addChild(hover);
-        
+
         parent.addChild(preview);
     }
-    
+
     void switchEAttribut(ElementalAttribut eAttribut) {
         hover.setEAttribut(eAttribut);
     }

@@ -2,18 +2,11 @@ package gamemode.editor.card;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import entitysystem.ability.AbilityComponent;
-import static entitysystem.attribut.SubType.ABILITY;
-import static entitysystem.attribut.SubType.EQUIPEMENT;
-import static entitysystem.attribut.SubType.SPELL;
-import static entitysystem.attribut.SubType.SUMMON;
-import static entitysystem.attribut.SubType.TRAP;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import java.io.File;
 import java.io.FilenameFilter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
@@ -24,11 +17,12 @@ import tonegod.gui.core.Screen;
  * @author roah
  */
 public class SaveAndLoadGUI {
-    private final GeneratorGUI generatorGUI;
+
+    private final GeneratorMenu generatorGUI;
     private Window cardLoader;
     private Screen screen;
 
-    public SaveAndLoadGUI(Screen screen, Element parent, GeneratorGUI generatorGUI) {
+    public SaveAndLoadGUI(Screen screen, Element parent, GeneratorMenu generatorGUI) {
         this.screen = screen;
         this.generatorGUI = generatorGUI;
         /**
@@ -44,7 +38,7 @@ public class SaveAndLoadGUI {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                if (!((Screen)screen).getElementsAsMap().containsKey("loadCategory")) {
+                if (!((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
                     openLoadingMenu();
                 }
                 Menu loadMenu = (Menu) screen.getElementById("loadCategory");
@@ -64,7 +58,7 @@ public class SaveAndLoadGUI {
         save.setText("Save");
         cardLoader.addChild(save);
     }
-    
+
     private void openLoadingMenu() {
         /**
          * Some variable to get files name.

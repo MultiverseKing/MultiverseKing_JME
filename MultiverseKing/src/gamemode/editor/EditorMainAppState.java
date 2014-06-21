@@ -6,12 +6,13 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import gamemode.editor.map.MapEditorSystem;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Window;
 
 /**
- * 
+ *
  * @author roah
  */
 public class EditorMainAppState extends AbstractAppState {
@@ -30,7 +31,7 @@ public class EditorMainAppState extends AbstractAppState {
         CreateMainWin();
     }
 
-    private void CreateMainWin(){
+    private void CreateMainWin() {
         if (main.getScreen().getElementById("mainWin") != null) {
             main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
         }
@@ -43,10 +44,10 @@ public class EditorMainAppState extends AbstractAppState {
         mainMenu.setWindowTitle("   Editor Menu");
         mainMenu.setIgnoreMouse(true);
         main.getScreen().addElement(mainMenu);
-        
+
         populateMainWindow();
     }
-    
+
     private void populateMainWindow() {
         /**
          * Button used to open the MapEditor.
@@ -54,9 +55,8 @@ public class EditorMainAppState extends AbstractAppState {
         ButtonAdapter editorConfig = new ButtonAdapter(main.getScreen(), "MapEditorBtn", new Vector2f(15, 40)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                /**
-                 * @todo
-                 */
+                remove();
+                main.getStateManager().attach(new MapEditorSystem(main));
             }
         };
         editorConfig.setText("Map Editor");
@@ -82,8 +82,8 @@ public class EditorMainAppState extends AbstractAppState {
         test.setText("Test Button");
         mainMenu.addChild(test);
     }
-    
-    private void remove(){
+
+    private void remove() {
         main.getStateManager().detach(this);
     }
 

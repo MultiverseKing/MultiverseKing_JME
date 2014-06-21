@@ -21,7 +21,7 @@ import tonegod.gui.core.layouts.LayoutHint.VAlign;
  * @author roah
  */
 public abstract class EditorMenuWindow {
-    
+
     protected final ElementManager screen;
     private Vector2f gridSize = new Vector2f(150, 40);
     private String name;
@@ -35,27 +35,27 @@ public abstract class EditorMenuWindow {
         this.name = name;
         this.parent = parent;
     }
-    
-    protected final void show(float sizeX, float sizeY, float posX, float posY){
+
+    protected final void show(float sizeX, float sizeY, float posX, float posY) {
         window = new Window(screen, getUID(), new Vector2f(posX, posY), new Vector2f(sizeX, sizeY));
-        window.setWindowTitle("     "+name);
+        window.setWindowTitle("     " + name);
         window.setIgnoreMouse(true);
         window.getDragBar().setIgnoreMouse(true);
         parent.addChild(window);
-        for(Element e : elementList.values()){
-            Vector2f pos = new Vector2f(e.getPosition().x, e.getPosition().y+window.getDragBarHeight());
+        for (Element e : elementList.values()) {
+            Vector2f pos = new Vector2f(e.getPosition().x, e.getPosition().y + window.getDragBarHeight());
             e.setPosition(pos);
             window.addChild(e);
         }
     }
-    
-    protected final void show(float sizeX, float sizeY, VAlign align){
-        switch(align){
+
+    protected final void show(float sizeX, float sizeY, VAlign align) {
+        switch (align) {
             case center:
-                show(sizeX, sizeY, parent.getDimensions().x+5, 0);
+                show(sizeX, sizeY, parent.getDimensions().x + 5, 0);
                 break;
             case bottom:
-                show(sizeX, sizeY, 0, parent.getDimensions().y+65);
+                show(sizeX, sizeY, 0, parent.getDimensions().y + 65);
                 break;
         }
     }
@@ -67,22 +67,23 @@ public abstract class EditorMenuWindow {
     protected Vector2f getGridSize() {
         return gridSize;
     }
-    
-    private String getUID(){
+
+    private String getUID() {
         return name.replaceAll("\\s", "");
     }
-    
-    public final void clear(){
-        for(Element e : elementList.values()){
+
+    public final void clear() {
+        for (Element e : elementList.values()) {
             screen.removeElement(e);
         }
     }
-    
-    public final void detachFromParent(){
-        if(parent != null && window != null){
+
+    public final void detachFromParent() {
+        if (parent != null && window != null) {
             parent.removeChild(window);
         }
     }
+
     /**
      * Add a button Field to this menu.
      *
@@ -100,18 +101,18 @@ public abstract class EditorMenuWindow {
         elementList.put(uid, generateLabel(labelName, position));
         generateButton(uid, triggerName, index);
     }
-    
-    protected final CheckBox getCheckBoxField(String labelName){
+
+    protected final CheckBox getCheckBoxField(String labelName) {
         return (CheckBox) elementList.get(generateUID(labelName));
     }
-    
-    protected final void addCheckBoxField(String labelName, boolean active, Vector2f position){
+
+    protected final void addCheckBoxField(String labelName, boolean active, Vector2f position) {
         String uid = generateUID(labelName);
-        CheckBox b = new CheckBox(screen, getUID()+uid+"CheckBox", position);
+        CheckBox b = new CheckBox(screen, getUID() + uid + "CheckBox", position);
         b.setLabelText(labelName);
         elementList.put(uid, b);
     }
-    
+
     /**
      * Add a spinner Element to this menu. value[0] = min, value[1] = max,
      * value[2] = step, value[3] = current.
@@ -125,15 +126,15 @@ public abstract class EditorMenuWindow {
         generateSpinner(labelName, uid, value);
     }
 
-    protected final Element getField(String labelName){
+    protected final Element getField(String labelName) {
         String uid = generateUID(labelName);
         return elementList.get(generateUID(uid));
     }
-    
-    protected final ButtonAdapter getTextField(String labelName){
-        return (ButtonAdapter) getField(labelName).getChildElementById(getUID()+generateUID(labelName)+"TextFieldButton");
+
+    protected final ButtonAdapter getTextField(String labelName) {
+        return (ButtonAdapter) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "TextFieldButton");
     }
-    
+
     /**
      * Add a Text Field element to this menu.
      *
@@ -145,7 +146,7 @@ public abstract class EditorMenuWindow {
         elementList.put(uid, generateLabel(labelName, position));
         generateTextField(uid, baseValue);
     }
-    
+
     /**
      * Add a Text Field element to this menu, limited to number as input.
      *
@@ -170,23 +171,23 @@ public abstract class EditorMenuWindow {
         elementList.put(uid, generateLabel(labelName, position));
         generateSelectBoxField(uid, baseValue, value);
     }
-       
-    private String generateUID(String labelName){
+
+    private String generateUID(String labelName) {
         return labelName.replaceAll("\\s", "");
     }
 
     private Label generateLabel(String labelName, Vector2f position) {
         Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                new Vector2f(position.x+10, position.y+10), 
-                new Vector2f(labelName.toCharArray().length*15, 35));
+                new Vector2f(position.x + 10, position.y + 10),
+                new Vector2f(labelName.toCharArray().length * 15, 35));
         label.setText(labelName + " : ");
         return label;
     }
 
-    protected final ButtonAdapter getNumericField(String labelName){
-        return (ButtonAdapter) getField(labelName).getChildElementById(getUID()+generateUID(labelName)+"NumericFieldButton");
+    protected final ButtonAdapter getNumericField(String labelName) {
+        return (ButtonAdapter) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "NumericFieldButton");
     }
-    
+
     private void generateNumericField(final String labelUID, int baseValue) {
         final String childUID = getUID() + labelUID;
         ButtonAdapter numButton = new ButtonAdapter(screen, childUID + "NumericFieldButton",
@@ -195,7 +196,7 @@ public abstract class EditorMenuWindow {
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 TextField field = new TextField(screen, getUID() + labelUID + "NumericField",
-                        new Vector2f(getPosition().x, getPosition().y+5),
+                        new Vector2f(getPosition().x, getPosition().y + 5),
                         new Vector2f(getWidth(), 30)) {
                     @Override
                     public void onKeyRelease(KeyInputEvent evt) {
@@ -221,6 +222,7 @@ public abstract class EditorMenuWindow {
         };
         numButton.setText(Integer.toString(baseValue));
         elementList.get(labelUID).addChild(numButton);
+        elementCurrentValue.put(generateUID(labelUID), baseValue);
     }
 
     private void generateTextField(final String labelUID, String baseValue) {
@@ -231,7 +233,7 @@ public abstract class EditorMenuWindow {
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 TextField field = new TextField(screen,
-                        new Vector2f(getPosition().x, getPosition().y+5),
+                        new Vector2f(getPosition().x, getPosition().y + 5),
                         new Vector2f(getWidth(), 30)) {
                     @Override
                     public void onKeyRelease(KeyInputEvent evt) {
@@ -252,14 +254,15 @@ public abstract class EditorMenuWindow {
         };
         textButton.setText(baseValue);
         elementList.get(labelUID).addChild(textButton);
+        elementCurrentValue.put(labelUID, baseValue);
     }
 
-    protected final SelectBox getSelectBoxField(String labelName){
-        return (SelectBox) getField(labelName).getChildElementById(getUID()+generateUID(labelName)+"BoxField");
+    protected final SelectBox getSelectBoxField(String labelName) {
+        return (SelectBox) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "BoxField");
     }
-    
+
     private void generateSelectBoxField(final String labelUID, Enum<?> baseValue, Enum[] value) {
-        SelectBox selectBox = new SelectBox(screen, getUID()+labelUID + "BoxField", new Vector2f(5, 35)) {
+        SelectBox selectBox = new SelectBox(screen, getUID() + labelUID + "BoxField", new Vector2f(5, 35)) {
             @Override
             public void onChange(int selectedIndex, Object value) {
                 elementCurrentValue.put(labelUID, value);
@@ -271,12 +274,13 @@ public abstract class EditorMenuWindow {
         }
         elementList.get(labelUID).addChild(selectBox);
         selectBox.setSelectedIndex(baseValue.ordinal());
+        elementCurrentValue.put(labelUID, baseValue);
     }
 
-    protected final Spinner getSpinnerField(String labelName){
-        return (Spinner) getField(labelName).getChildElementById(getUID()+generateUID(labelName)+"Spinner");
+    protected final Spinner getSpinnerField(String labelName) {
+        return (Spinner) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "Spinner");
     }
-    
+
     private void generateSpinner(final String labelName, final String labelUID, int[] value) {
         Spinner spinner = new Spinner(screen, getUID() + labelUID + "Spinner",
                 new Vector2f(elementList.get(labelUID).getWidth() - 12, 7), Spinner.Orientation.HORIZONTAL, true) {
@@ -289,10 +293,11 @@ public abstract class EditorMenuWindow {
         spinner.setStepIntegerRange(value[0], value[1], value[2]);
         spinner.setSelectedIndex(value[3]);
         elementList.get(labelUID).addChild(spinner);
+        elementCurrentValue.put(labelUID, value[3]);
     }
 
     private void generateButton(String name, String triggerName, final int index) {
-        ButtonAdapter button = new ButtonAdapter(screen, getUID() + name + "Button", 
+        ButtonAdapter button = new ButtonAdapter(screen, getUID() + name + "Button",
                 new Vector2f(5, 35), new Vector2f(130, 30)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -307,15 +312,19 @@ public abstract class EditorMenuWindow {
     protected final Object getFieldValue(String fieldName) {
         return elementCurrentValue.get(fieldName.replaceAll("\\s", ""));
     }
-    
+
     protected void onButtonTrigger(int index) {
     }
+
     protected void onTextFieldInput(String input) {
     }
+
     protected void onNumericFieldInput(Integer input) {
     }
+
     protected void onSelectBoxFieldChange(Enum value) {
     }
+
     protected void onSpinnerChange(String sTrigger, int currentIndex) {
     }
 }

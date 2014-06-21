@@ -26,34 +26,45 @@ public final class CardEditorGui extends EditorMenu {
     private float rightMenu = 245;
     private Hover hover;
     private ButtonAdapter close;
+    private int currentIndex;
 
     public CardEditorGui(MultiverseMain main, CardEditorSystem cardEditorSystem) {
         super(main.getScreen(), "CardEditorGui", "Card Editor", cardEditorSystem);
         this.main = main;
         this.cardEditorSystem = cardEditorSystem;
-        addItem("Generator", 0);
-        addItem("Test Card", 1);
-        populateReturnEditorMain();
+        addItem("Card Generator", 0);
+        addItem("Asset-Gen", 1);
+        addItem("FX-Builder", 2);
+        addItem("Test Card", 3);
+        populateEditor();
     }
 
     @Override
-    protected void onSelectedItemChange(int selectedIndex) {
-        switch (selectedIndex) {
+    protected void onSelectedItemChange(int index) {
+        if (current != null && currentIndex != index) {
+            current.detachFromParent();
+        } else if (current != null && currentIndex == index){
+            return;
+        }
+        switch (index) {
             case 0:
-                if (current != null && current instanceof TestCardGUI) {
-                    current.detachFromParent();
-                }
-                current = new GeneratorGUI(screen, this);
+                current = new GeneratorMenu(screen, this);
                 openClose(0);
                 break;
             case 1:
-                if (current != null && current instanceof GeneratorGUI) {
-                    current.detachFromParent();
-                }
-                current = new TestCardGUI(screen, this, cardEditorSystem);
+//                current = new GeneratorMenu(screen, this);
+                openClose(1);
+                break;
+            case 2:
+//                current = new GeneratorMenu(screen, this);
+                openClose(1);
+                break;
+            case 3:
+                current = new TestCardMenu(screen, this, cardEditorSystem);
                 openClose(1);
                 break;
         }
+        currentIndex = index;
     }
 
     private void openClose(int value) {
@@ -82,7 +93,7 @@ public final class CardEditorGui extends EditorMenu {
             }
 
         } else {
-            if(close != null){
+            if (close != null && close.getIsVisible()) {
                 close.hide();
             }
         }

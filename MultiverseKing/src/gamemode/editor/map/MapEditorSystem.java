@@ -1,9 +1,13 @@
-package gamemode.editor;
+package gamemode.editor.map;
 
+import com.jme3.app.Application;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
 import hexsystem.events.HexMapInputListener;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
+import gamemode.editor.EditorMainAppState;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexTile;
@@ -34,23 +38,26 @@ import utility.Vector2Int;
  *
  * @author Eike Foede, Roah
  */
-public class MapEditor implements TileChangeListener, HexMapInputListener {
+public class MapEditorSystem extends AbstractAppState implements TileChangeListener, HexMapInputListener {
 
     private final MultiverseMain main;
     private Window mainMenu = null;
     private MapData mapData;
     private HexCoordinate currentTilePosition;
-    private RadioButtonGroup tilePButtonGroup;
+    private MapEditorGUI mapEditorGui;
 
-    public MapEditor(MultiverseMain main) {
+    public MapEditorSystem(MultiverseMain main) {
         this.main = main;
-        initEditorGUI();
+    }
+
+    @Override
+    public void initialize(AppStateManager stateManager, Application app) {
+        super.initialize(stateManager, app);
+        mapEditorGui = new MapEditorGUI(main, this);
+        main.getScreen().addElement(mapEditorGui);
         initMap();
     }
 
-    /**
-     * Method called each time a left mouse action is done.
-     */
     public void leftMouseActionResult(HexMapInputEvent event) {
         openHexPropertiesWin(event.getEventPosition());
     }
@@ -72,42 +79,6 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
     }
 
     private void initEditorGUI() {
-        if (main.getScreen().getElementById("mainWin") != null) {
-            main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
-        }
-        mainMenu = new Window(main.getScreen(), "mainWin", new Vector2f(15f, 15f), new Vector2f(130, 40 * 5));
-        mainMenu.setWindowTitle("Map Editor");
-        mainMenu.setMinDimensions(new Vector2f(130, 130));
-        mainMenu.setIsResizable(false);
-        mainMenu.getDragBar().setIsMovable(false);
-        main.getScreen().addElement(mainMenu);
-        EditorMainAppState editorMain = main.getStateManager().getState(EditorMainAppState.class);
-        if (editorMain != null) {
-//            editorMain.populateReturnEditorMain(mainMenu);
-        }
-
-        /**
-         * Button used to change the current map elemental attribut.
-         *
-         * @todo show the window only if there is a field generated.
-         */
-        Button mapElement = new ButtonAdapter(main.getScreen(), "mapProperties", new Vector2f(15, 40)) {
-            @Override
-            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                super.onButtonMouseLeftUp(evt, toggled);
-                if (!mainMenu.getElementsAsMap().containsKey("EWindows") && !mapData.getAllChunkPos().isEmpty()) {
-                    removeWin();
-                    elementalWindow();
-                } else if (mainMenu.getElementsAsMap().containsKey("EWindows")) {
-                    mainMenu.removeChild(mainMenu.getElementsAsMap().get("EWindows"));
-                } else {
-                    System.err.println("No field loaded, load a field !");
-                }
-            }
-        };
-        mapElement.setText("Map Properties");
-        mainMenu.addChild(mapElement);
-
         /**
          * Open the Save and load context menu.
          */
@@ -127,19 +98,6 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
         mainMenu.addChild(saveLoad);
 
         /**
-         * Open the context menu to edit the room. load asset and stuff.
-         */
-        Button areaEdit = new ButtonAdapter(main.getScreen(), "AreaEdit", new Vector2f(15, 40 * 3)) {
-            @Override
-            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                super.onButtonMouseLeftUp(evt, toggled);
-                System.err.println("TODO");
-            }
-        };
-        areaEdit.setText("Area Edit");
-        mainMenu.addChild(areaEdit);
-
-        /**
          * Load a predefined void map from a File(same as the starting one).
          */
         Button reset = new ButtonAdapter(main.getScreen(), "reset", new Vector2f(15, 40 * 4)) {
@@ -156,127 +114,24 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
     }
 
     /**
-     * Context menu used to let you chose the element for map to change to.
-     */
-//    Window eWin;
-    public final void elementalWindow() {
-        final Window eWin = new Window(main.getScreen(), "EWindows",
-                new Vector2f(mainMenu.getWidth() + 10, 0), new Vector2f(340, FastMath.ceil(new Float(ElementalAttribut.getSize()) / 3 + 1) * 40 + 12));
-        eWin.removeAllChildren();
-        eWin.setIsResizable(false);
-        eWin.setIsMovable(false);
-
-        RadioButtonGroup elementG = new RadioButtonGroup(main.getScreen(), "EButtonGroup") {
-            @Override
-            public void onSelect(int index, Button value) {
-                if (index != ElementalAttribut.getSize()) {
-                    mapData.setMapElement(ElementalAttribut.convert((byte) index));
-                } else {
-                    main.getScreen().getElementById(mainMenu.getUID()).removeChild(eWin);
-                }
-            }
-        };
-        int offSetX = 0;
-        int offSetY = -1;
-        for (int i = 0; i < ElementalAttribut.getSize(); i++) {
-            if (i % 3 == 0) {
-                offSetX = 0;
-                offSetY++;
-            }
-            ButtonAdapter button = new ButtonAdapter(main.getScreen(),
-                    "EButton+" + ElementalAttribut.convert((byte) i), new Vector2f(10 + (110 * offSetX), 12 + (40 * offSetY)));
-            button.setText(ElementalAttribut.convert((byte) i).toString());
-            elementG.addButton(button);
-            offSetX++;
-        }
-        Button closeButton = new ButtonAdapter(main.getScreen(), "EClose", new Vector2f(10, 12 + (40 * (offSetY + 1))));
-        closeButton.setText("CLOSE");
-        elementG.addButton(closeButton);
-        elementG.setDisplayElement(eWin);
-
-        elementG.setSelected(mapData.getMapElement().ordinal());
-        mainMenu.addChild(eWin);
-    }
-
-    /**
      * Method used to open a window related to the selected hex.
      *
      * @param tile selected one.
      */
-    void openHexPropertiesWin(HexCoordinate tile) {
+    public void openHexPropertiesWin(HexCoordinate tile) {
         currentTilePosition = tile;
-        if (main.getScreen().getElementById("tileP") != null) {
-            tilePButtonGroup.setSelected(mapData.getTile(tile).getElement().ordinal());
-        } else {
-            tilePropertiesWin();
-        }
+        mapEditorGui.setSelectedTile(mapData.getTile(tile), tile);
     }
 
-    /**
-     * Context menu used to show the tile properties.
-     */
-    private void tilePropertiesWin() {
-        Window tileWin = new Window(main.getScreen(), "tileP", new Vector2f(main.getScreen().getWidth() - 180, 0),
-                new Vector2f(155f, 40 + (40 * (ElementalAttribut.getSize() + 1))));
-        tileWin.setWindowTitle("    Tile Properties");
-        tileWin.setIsResizable(false);
-        tileWin.getDragBar().setIsMovable(false);
-        mainMenu.addChild(tileWin);
-
-        tilePButtonGroup = new RadioButtonGroup(main.getScreen(), "tilePButtonGroup") {
-            @Override
-            public void onSelect(int index, Button value) {
-                if (index < ElementalAttribut.getSize()) {
-                    mapData.setTile(currentTilePosition, new HexTile(ElementalAttribut.convert((byte) index),
-                            (byte) mapData.getTile(currentTilePosition).getHeight()));
-                } else if (index == ElementalAttribut.getSize()) {
-                    main.getScreen().removeElement(main.getScreen().getElementById("tileP"));
-                }
-            }
-        };
-        /**
-         * Button used to change the element of a tile.
-         */
-        for (int i = 0; i < ElementalAttribut.getSize(); i++) {
-            ButtonAdapter button = new ButtonAdapter(main.getScreen(), "TButton+" + ElementalAttribut.convert((byte) i),
-                    new Vector2f(10, 40 + (40 * i)));
-            button.setText(ElementalAttribut.convert((byte) i).toString());
-            tilePButtonGroup.addButton(button);
-        }
-        Button closeButton = new ButtonAdapter(main.getScreen(), "TClose", new Vector2f(10, 40 + (40 * ElementalAttribut.getSize())));
-        closeButton.setText("CLOSE");
-        tilePButtonGroup.addButton(closeButton);
-
-        /**
-         * Button used to move up a selected tile.
-         */
-        Button upButton = new ButtonAdapter(main.getScreen(), "UP", new Vector2f(120, 40), new Vector2f(25, 50)) {
-            @Override
-            public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
-                super.onButtonMouseLeftDown(evt, toggled); //To change body of generated methods, choose Tools | Templates.
-                mapData.setTileHeight(currentTilePosition, (byte) (mapData.getTile(currentTilePosition).getHeight() + 1));
-            }
-        };
-//        upButton.setText("UP");
-        tileWin.addChild(upButton);
-
-        /**
-         * Button used to move down a selected tile.
-         */
-        Button downButton = new ButtonAdapter(main.getScreen(), "Down",
-                new Vector2f(120, (20 + (40 * ElementalAttribut.getSize()))), new Vector2f(25, 50)) {
-            @Override
-            public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
-                super.onButtonMouseLeftDown(evt, toggled); //To change body of generated methods, choose Tools | Templates.
-                mapData.setTileHeight(currentTilePosition, (byte) (mapData.getTile(currentTilePosition).getHeight() - 1));
-            }
-        };
-//        downButton.setText("DOWN");
-        tileWin.addChild(downButton);
-
-        tilePButtonGroup.setDisplayElement(tileWin);
-        tilePButtonGroup.setSelected(mapData.getTile(currentTilePosition).getElement().ordinal());
-
+    public void updateTileProperties(int height) {
+        mapData.setTileHeight(currentTilePosition, (byte) (mapData.getTile(currentTilePosition).getHeight() + height));
+    }
+    
+    public void updateTileProperties(ElementalAttribut eAttribut) {
+        updateTileProperties(new HexTile(eAttribut, (byte) mapData.getTile(currentTilePosition).getHeight()));
+    }
+    public void updateTileProperties(HexTile tile) {
+        mapData.setTile(currentTilePosition, tile);
     }
 
     private void saveLoadMenu() {
@@ -344,7 +199,7 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
                     if (folder.exists()) {
                         fileList(folder);
                     } else {
-                        Logger.getLogger(MapEditor.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
+                        Logger.getLogger(MapEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
                     }
                 } else {
                     saveLoad.removeChild(mainMenu.getChildElementById("filePreview"));
@@ -403,8 +258,19 @@ public class MapEditor implements TileChangeListener, HexMapInputListener {
         }
     }
 
+    @Override
     public void cleanup() {
+        main.getScreen().removeElement(mapEditorGui);
+        main.getStateManager().attach(new EditorMainAppState());
         mapData.removeTileChangeListener(this);
         main.getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
+    }
+
+    public void setMapElement(ElementalAttribut eAttribut) {
+        mapData.setMapElement(eAttribut);
+    }
+
+    public ElementalAttribut getCurrentMapElement() {
+        return mapData.getMapElement();
     }
 }

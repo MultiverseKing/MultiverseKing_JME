@@ -16,7 +16,6 @@ import entitysystem.render.AnimationRenderComponent;
 import entitysystem.render.GUIRenderComponent;
 import entitysystem.render.RenderComponent;
 import gamemode.editor.EditorMainAppState;
-import gamemode.editor.card.CardEditorGui;
 import hexsystem.HexSettings;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
@@ -53,7 +52,7 @@ public class CardEditorSystem extends EntitySystemAppState {
             }
         }
         cardEditorGui = new CardEditorGui((MultiverseMain) app, this);
-        ((MultiverseMain)app).getScreen().addElement(cardEditorGui);
+        ((MultiverseMain) app).getScreen().addElement(cardEditorGui);
 
         /**
          * Init the testingDoll.
@@ -98,11 +97,11 @@ public class CardEditorSystem extends EntitySystemAppState {
         entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
         entity.add(cardId);
     }
-    
+
     public void removeEntityCard() {
         if (entity.size() > 1) {
             int i = FastMath.nextRandomInt(2, entity.size());
-            i-=1;
+            i -= 1;
             entityData.removeEntity(entity.get(i));
             entity.remove(entity.get(i));
         }
@@ -120,8 +119,8 @@ public class CardEditorSystem extends EntitySystemAppState {
 
     @Override
     protected void cleanupSystem() {
-        ((MultiverseMain)app).getScreen().removeElement(cardEditorGui);
-        for(EntityId id : entity){
+        ((MultiverseMain) app).getScreen().removeElement(cardEditorGui);
+        for (EntityId id : entity) {
             entityData.removeEntity(id);
         }
         entity.clear();

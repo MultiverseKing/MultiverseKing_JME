@@ -6,7 +6,6 @@ import com.jme3.renderer.Camera;
 import com.simsilica.es.EntityId;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Screen;
-import utility.HexCoordinate;
 
 /**
  *
@@ -21,9 +20,6 @@ public class GUIFieldMenu {
     private EntityId inspectedEntityId = null;
     private Vector3f inspectedSpatialPosition;
     private byte menuIndex;
-//    private final Menu environmentMenu;
-//    private final Menu titanMenu;
-//    private final Menu unitMenu;
 
     GUIFieldMenu(Screen screen, GUIRenderSystem system, Camera camera) {
         this.screen = screen;

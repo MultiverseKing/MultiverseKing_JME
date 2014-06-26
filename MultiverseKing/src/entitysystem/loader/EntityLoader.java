@@ -1,6 +1,6 @@
 package entitysystem.loader;
 
-import entitysystem.card.CardProperties;
+import entitysystem.card.utility.CardProperties;
 import entitysystem.ability.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;

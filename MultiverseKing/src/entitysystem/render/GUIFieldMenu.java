@@ -32,11 +32,7 @@ public class GUIFieldMenu {
         menu[0] = new Menu(screen, Vector2f.ZERO, false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                switch (index) {
-                    case 0:
-                        guiSystem.move(inspectedEntityId);
-                        return;
-                }
+                guiSystem.setAction(inspectedEntityId, "Move");
             }
         };
         menu[0].addMenuItem(" Move        ", 0, null);

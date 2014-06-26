@@ -10,7 +10,6 @@ import com.simsilica.es.PersistentComponent;
 public class RenderComponent implements PersistentComponent {
     
     private String name;
-    
 
     public RenderComponent(String name) {
         this.name = name;

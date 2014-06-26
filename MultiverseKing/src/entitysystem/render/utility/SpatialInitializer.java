@@ -1,4 +1,4 @@
-package entitysystem.render;
+package entitysystem.render.utility;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.renderer.queue.RenderQueue;

@@ -14,9 +14,9 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import entitysystem.render.AnimationRenderSystem;
+import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
-import entitysystem.field.movement.MovementSystem;
+import entitysystem.field.position.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
 import entitysystem.render.GUIRenderSystem;
@@ -62,6 +62,7 @@ public class MultiverseMain extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        setPauseOnLostFocus(false);
         String userHome = System.getProperty("user.dir") + "/assets/MapData/";
         assetManager.registerLocator(userHome, ChunkDataLoader.class);
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
@@ -177,7 +178,7 @@ public class MultiverseMain extends SimpleApplication {
                 new RenderSystem(),
                 new MovementSystem(),
                 new CardRenderSystem(),
-                new AnimationRenderSystem(),
+                new AnimationSystem(),
                 new CollisionSystem(),
                 new GUIRenderSystem(),
                 new EditorMainAppState()); //<< This call the Editor GUI SHould be called last.

@@ -1,4 +1,4 @@
-package entitysystem.card;
+package entitysystem.card.utility;
 
 import entitysystem.attribut.SubType;
 import entitysystem.attribut.Maintype;

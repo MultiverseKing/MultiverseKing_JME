@@ -2,7 +2,7 @@ package gamemode.editor.card;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import entitysystem.card.CardProperties;
+import entitysystem.card.utility.CardProperties;
 import entitysystem.loader.EntityLoader;
 import java.io.File;
 import java.io.FilenameFilter;

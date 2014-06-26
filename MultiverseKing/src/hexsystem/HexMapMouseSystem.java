@@ -134,7 +134,6 @@ public class HexMapMouseSystem extends AbstractAppState {
         //Remove offset and set it to zero if hex_void_anim.png is not used
         float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
         cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
-        System.out.println(HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_OFFSET + " + " + z + 0.01f);
     }
 
     @Override

@@ -1,9 +1,11 @@
-package entitysystem.card;
+package entitysystem.card.utility;
 
+import entitysystem.card.utility.CardProperties;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.simsilica.es.EntityId;
+import entitysystem.card.CardRenderSystem;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
@@ -27,14 +29,14 @@ public class Card extends ButtonAdapter {
     /**
      * The name of this cards.
      */
-    String getCardName() {
+    public String getCardName() {
         return cardName;
     }
 
     /**
      * EntityId this card belong to.
      */
-    EntityId getCardEntityUID() {
+    public EntityId getCardEntityUID() {
         return this.UID;
     }
 
@@ -72,7 +74,7 @@ public class Card extends ButtonAdapter {
     /**
      * Put the card to his initiale position in the hand.
      */
-    void resetHandPosition() {
+    public void resetHandPosition() {
         setPosition(new Vector2f(220f + ((cardSize.x - 20) * handPosition), screen.getHeight() - this.getHeight() - 20));
     }
 
@@ -125,7 +127,7 @@ public class Card extends ButtonAdapter {
      *
      * @return current hand position of the card.
      */
-    int getHandPosition() {
+    public int getHandPosition() {
         return this.handPosition;
     }
 
@@ -134,7 +136,7 @@ public class Card extends ButtonAdapter {
      *
      * @param handPosition
      */
-    void sethandPosition(int handPosition) {
+    public void sethandPosition(int handPosition) {
         this.handPosition = handPosition;
     }
 

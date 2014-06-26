@@ -1,5 +1,6 @@
 package entitysystem.render;
 
+import entitysystem.utility.SubSystem;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
@@ -19,7 +20,7 @@ import entitysystem.attribut.Animation;
  *
  * @author roah
  */
-public class AnimationRenderSystem extends EntitySystemAppState implements AnimEventListener, SubSystem {
+public class AnimationSystem extends EntitySystemAppState implements AnimEventListener, SubSystem {
 
     private RenderSystem renderSystem;
     private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();
@@ -28,7 +29,7 @@ public class AnimationRenderSystem extends EntitySystemAppState implements AnimE
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
-        return entityData.getEntities(AnimationRenderComponent.class, RenderComponent.class);
+        return entityData.getEntities(AnimationComponent.class, RenderComponent.class);
     }
 
     @Override
@@ -40,13 +41,13 @@ public class AnimationRenderSystem extends EntitySystemAppState implements AnimE
     protected void addEntity(Entity e) {
         AnimControl control = renderSystem.getAnimControl(e.getId());
         if(control == null){
-            entityData.removeComponent(e.getId(), AnimationRenderComponent.class);
+            entityData.removeComponent(e.getId(), AnimationComponent.class);
             System.out.println(getClass().toString() + ": There is no Animation control for this entity.");
             return;
         } 
         control.addListener(this);
         AnimChannel channel = control.createChannel();
-        setPlay(channel, e.get(AnimationRenderComponent.class).getAnimation());
+        setPlay(channel, e.get(AnimationComponent.class).getAnimation());
 
         animControls.put(e.getId(), control);
     }
@@ -58,7 +59,7 @@ public class AnimationRenderSystem extends EntitySystemAppState implements AnimE
             addEntity(e);
             return;
         }
-        Animation toPlay = e.get(AnimationRenderComponent.class).getAnimation();
+        Animation toPlay = e.get(AnimationComponent.class).getAnimation();
         if (!animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
         }
@@ -92,13 +93,22 @@ public class AnimationRenderSystem extends EntitySystemAppState implements AnimE
      * @param anim animation to play.
      */
     private void setPlay(AnimChannel channel, Animation anim) {
-        if (anim == Animation.SUMMON) {
-            channel.setAnim(anim.toString());
-            channel.setLoopMode(LoopMode.DontLoop);
-        } else if (anim == Animation.IDLE || anim == Animation.WALK) {
-            channel.setAnim(Animation.IDLE.toString(), 0.50f);
-            channel.setLoopMode(LoopMode.Loop);
-            channel.setSpeed(1f);
+        switch(anim){
+            case IDLE:
+                channel.setAnim(anim.toString(), 0.50f);
+                channel.setLoopMode(LoopMode.Loop);
+                channel.setSpeed(1f);
+                break;
+            case SUMMON:
+                channel.setAnim(anim.toString());
+                channel.setLoopMode(LoopMode.DontLoop);
+                break;
+            case WALK:
+                channel.setAnim(anim.toString(), 0.50f);
+                channel.setLoopMode(LoopMode.Loop);
+                break;
+            default:
+                throw new UnsupportedOperationException(anim.name()+" Is not a supported animation type in : "+getClass().getName());
         }
     }
 
@@ -112,7 +122,7 @@ public class AnimationRenderSystem extends EntitySystemAppState implements AnimE
     public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
         if (animName.equals(Animation.SUMMON.toString())) {
             EntityId id = MultiverseMain.getKeyByValue(animControls, control);
-            entityData.setComponent(id, new AnimationRenderComponent(Animation.IDLE));
+            entityData.setComponent(id, new AnimationComponent(Animation.IDLE));
         }
     }
 

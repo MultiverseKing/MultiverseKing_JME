@@ -33,10 +33,10 @@ public class EntityDataAppState extends AbstractAppState {
         super.initialize(stateManager, app);
     }
 
-    /**
-     *
-     * @return
-     */
+    @Override
+    public void update(float tpf) {
+    }
+    
     public EntityData getEntityData() {
         return entityData;
     }

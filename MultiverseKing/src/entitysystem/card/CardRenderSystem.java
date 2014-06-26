@@ -1,5 +1,8 @@
 package entitysystem.card;
 
+import entitysystem.card.utility.Card;
+import entitysystem.card.utility.CardProperties;
+import entitysystem.card.utility.Hover;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
@@ -18,7 +21,7 @@ import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
 import entitysystem.render.GUIRenderComponent;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.AnimationRenderComponent;
+import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.events.HexMapInputEvent;
@@ -271,7 +274,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      *
      * @param card the mouse is.
      */
-    void hasFocus(Card card) {
+    public void hasFocus(Card card) {
         zOrder = card.getZOrder();
         screen.updateZOrder(card);
         hover.setProperties(card.getProperties());
@@ -283,13 +286,13 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      *
      * @param card who lost the focus.
      */
-    void lostFocus(Card card) {
+    public void lostFocus(Card card) {
         hover.removeAllChildren();
         card.removeChild(hover);
         card.setZOrder(zOrder);
     }
 
-    void isInCastArea(Card card) {
+    public void isInCastArea(Card card) {
         if (screen.getMouseXY().x > minCastArea.x && screen.getMouseXY().x < maxCastArea.x
                 && screen.getMouseXY().y > minCastArea.y && screen.getMouseXY().y < maxCastArea.y
                 && cardPreviewCast == null) {
@@ -346,7 +349,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                     entityData.setComponents(cardPreviewCast.getCardEntityUID(),
                             new HexPositionComponent(castCoord, Rotation.A),
                             cardRender.clone(CardRenderPosition.FIELD),
-                            new AnimationRenderComponent(Animation.SUMMON),
+                            new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
                             new GUIRenderComponent(GUIRenderComponent.EntityType.UNIT),
                             unitLoader.getCollisionComp(), //Collision Comp

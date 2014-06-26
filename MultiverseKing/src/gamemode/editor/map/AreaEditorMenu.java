@@ -43,7 +43,6 @@ public class AreaEditorMenu extends EditorMenuWindow {
                 } else {
                     tileWin.show();
                 }
-
                 break;
         }
     }

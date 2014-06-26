@@ -1,4 +1,4 @@
-package entitysystem.field.movement;
+package entitysystem.field.position;
 
 import com.simsilica.es.PersistentComponent;
 

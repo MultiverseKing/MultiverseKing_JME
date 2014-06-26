@@ -1,5 +1,6 @@
 package entitysystem.render;
 
+import entitysystem.utility.SubSystem;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
@@ -12,6 +13,7 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
+import entitysystem.field.position.MoveToComponent;
 import entitysystem.field.position.HexPositionComponent;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSystemAppState;
@@ -42,10 +44,12 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     private Node iNode;
     private GUIFieldMenu menus;
 //    private Screen screen;
-    private Camera cam;
+//    private Camera cam;
     private RenderSystem renderSystem = null;
     private HexMapMouseSystem hexMouseSystem = null;
-    private Vector3f inspectedSpatialPosition = null;
+//    private Vector3f inspectedSpatialPosition = null;
+    private EntityId inspectedId = null;
+    private String currentAction = null;
 
     @Override
     protected EntitySet initialiseSystem() {
@@ -58,9 +62,6 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         }
         menus = new GUIFieldMenu(((MultiverseMain) app).getScreen(), this,
                 app.getStateManager().getState(RTSCamera.class).getCamera());
-//        screen = ((MultiverseMain) app).getScreen();
-//        screen.setUse3DSceneSupport(true);
-//        cam = app.getStateManager().getState(RTSCamera.class).getCamera();
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this);
@@ -68,20 +69,10 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         hexMouseSystem.registerRayInputListener(this);
         return entityData.getEntities(GUIRenderComponent.class, RenderComponent.class);
     }
-
-    /**
-     * Initialize all needed Menu to work with.
-     */
+    
     @Override
     protected void updateSystem(float tpf) {
         menus.update();
-//        if (interactiveNode.element.getIsVisible()) {
-//            Vector3f value = cam.getScreenCoordinates(inspectedSpatialPosition);
-//            if (value.x > 0 && value.x < screen.getWidth()
-//                    && value.y > 0 && value.y < screen.getHeight()) {
-//                interactiveNode.element.setPosition(new Vector2f(value.x, value.y));
-//            }
-//        }
     }
 
     @Override
@@ -112,11 +103,8 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
-        for (EntityId id : interactiveEntities.keySet()) {
-            HexPositionComponent posComp = entityData.getComponent(id, HexPositionComponent.class);
-            if (posComp != null && posComp.getPosition().equals(event.getEventPosition())) {
-                openEntityActionMenu(id, event.getEventPosition());
-            }
+        if(currentAction != null){
+            confirmAction(event.getEventPosition());
         }
     }
 
@@ -124,10 +112,19 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
      * Used when the spatial is not selected directly
      */ 
     public void rightMouseActionResult(HexMapInputEvent event) {
+        if(currentAction == null){
+            for (EntityId id : interactiveEntities.keySet()) {
+                HexPositionComponent posComp = entityData.getComponent(id, HexPositionComponent.class);
+                if (posComp != null && posComp.getPosition().equals(event.getEventPosition())) {
+                    openEntityActionMenu(id, event.getEventPosition());
+                }
+            }
+        }
     }
 
     public HexMapInputEvent leftRayInputAction(Ray ray) {
-        return collisionTest(ray, "L");
+//        return collisionTest(ray, "L");
+        return null;
     }
 
     public HexMapInputEvent rightRayInputAction(Ray ray) {
@@ -142,15 +139,14 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         iNode.collideWith(ray, results);
         if (results.size() != 0 && results.size() > 0) {
             CollisionResult closest = results.getClosestCollision();
-
             for (EntityId id : interactiveEntities.keySet()) {
                 if (closest.getGeometry().getParent().getName().equals(renderSystem.getSpatialName(id))) {
                     hexMouseSystem.setDebugPosition(closest.getContactPoint());
                     HexCoordinate pos = entityData.getComponent(id, HexPositionComponent.class).getPosition();
-                    if(input.equals("L")){
+                    if(input.equals("R")){
                         openEntityActionMenu(id, pos);
                     }
-                    inspectedSpatialPosition = closest.getGeometry().getWorldTranslation();
+//                    inspectedSpatialPosition = closest.getGeometry().getWorldTranslation();
                     return new HexMapInputEvent(pos, ray, closest);
                 }
             }
@@ -163,26 +159,46 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         menus.show(id, interactiveEntities.get(id), mapData.convertTileToWorldPosition(pos));
     }
     
-    public void move(EntityId id){
+    public void setAction(EntityId id, String action){
 //        MeshParameter param = new MeshParameter(app.getStateManager().getState(HexSystemAppState.class).getMapData());
 //        MeshManager mesh = new MeshManager();
 //        mesh.getMesh()
-        if (!app.getStateManager().getState(HexMapMouseSystem.class).setCursorPulseMode(this)) {
+        if (!hexMouseSystem.setCursorPulseMode(this)) {
             return;
         }
+        inspectedId = id;
+        currentAction = action;
         //Register the input for this system
-        app.getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
+//        hexMouseSystem.registerTileInputListener(this);
         app.getInputManager().addListener(fieldInputListener, "Cancel");
     }
 
-    private void confirmedMove(HexCoordinate eventPosition) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void confirmAction(HexCoordinate eventPosition) {
+        if(currentAction.equals("Move")){
+            entityData.setComponent(inspectedId, new MoveToComponent(eventPosition));
+        }
+        unregisterInput();
+    }
+    
+    private void actionCancel(){
+        hexMouseSystem.setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
+        currentAction = null;
+        unregisterInput();
+    }
+    
+    private void unregisterInput(){
+        inspectedId = null;
+        currentAction = null;
+        hexMouseSystem.setCursorPulseMode(this);
+        //Unregister the input for this system
+//        hexMouseSystem.removeTileInputListener(this);
+        app.getInputManager().removeListener(fieldInputListener);
     }
     
     private ActionListener fieldInputListener = new ActionListener() {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("Cancel") && !keyPressed) {
-//                castCanceled();
+                actionCancel();
             }
         }
     };

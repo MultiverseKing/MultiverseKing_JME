@@ -2,7 +2,7 @@ package entitysystem.loader;
 
 import entitysystem.ability.AbilityComponent;
 import entitysystem.field.LifeComponent;
-import entitysystem.field.movement.MovementStatsComponent;
+import entitysystem.field.position.MovementStatsComponent;
 import entitysystem.field.CollisionComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

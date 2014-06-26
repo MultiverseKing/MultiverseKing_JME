@@ -3,7 +3,7 @@ package gamemode.editor.card;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.EntityData;
-import entitysystem.card.Hover;
+import entitysystem.card.utility.Hover;
 import gamemode.editor.EditorMenu;
 import gamemode.editor.EditorMenuWindow;
 import hexsystem.MapData;

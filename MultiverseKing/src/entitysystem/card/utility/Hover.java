@@ -1,4 +1,4 @@
-package entitysystem.card;
+package entitysystem.card.utility;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;

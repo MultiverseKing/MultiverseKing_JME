@@ -1,4 +1,4 @@
-package entitysystem.render;
+package entitysystem.utility;
 
 /**
  *

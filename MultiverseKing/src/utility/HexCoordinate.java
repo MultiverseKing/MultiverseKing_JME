@@ -151,7 +151,7 @@ public final class HexCoordinate {
     }
     
     /**
-     *
+     * Return the distance from this to the provided value.
      * @param other
      * @return
      */
@@ -160,6 +160,34 @@ public final class HexCoordinate {
                 + Math.abs(q + r - other.q - other.r)) / 2;
     }
 
+    /**
+     * Return the rotation to set from this to B.
+     * Same as lookAt.
+     * @param currentPos
+     * @param nextPos
+     * @return 
+     */
+    public Rotation getDirection(HexCoordinate targetPos) {
+        Vector3Int currentPos = getAsCubic();
+        Vector3Int nextPos = targetPos.getAsCubic();
+        
+        Vector3Int result = new Vector3Int(currentPos.x - nextPos.x, currentPos.y - nextPos.y, currentPos.z - nextPos.z);
+        if (result.z == 0 && result.x > 0) {
+            return Rotation.D;
+        } else if (result.z == 0 && result.x < 0) {
+            return Rotation.A;
+        } else if (result.y == 0 && result.x > 0) {
+            return Rotation.C;
+        } else if (result.y == 0 && result.x < 0) {
+            return Rotation.F;
+        } else if (result.x == 0 && result.y > 0) {
+            return Rotation.B;
+        } else if (result.x == 0 && result.y < 0) {
+            return Rotation.E;
+        }
+        return null;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof HexCoordinate) {

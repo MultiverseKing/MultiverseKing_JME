@@ -9,7 +9,7 @@ import static entitysystem.attribut.SubType.EQUIPEMENT;
 import static entitysystem.attribut.SubType.SPELL;
 import static entitysystem.attribut.SubType.SUMMON;
 import static entitysystem.attribut.SubType.TRAP;
-import entitysystem.card.CardProperties;
+import entitysystem.card.utility.CardProperties;
 import entitysystem.loader.EntityLoader;
 import gamemode.editor.EditorMenuWindow;
 import tonegod.gui.controls.lists.SelectBox;

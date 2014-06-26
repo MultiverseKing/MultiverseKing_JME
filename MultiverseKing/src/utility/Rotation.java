@@ -11,50 +11,40 @@ public enum Rotation {
     /**
      * Equivalent to X+.
      */
-    A,
+    A(new Quaternion(new Quaternion(new float[]{0, 1.5f, 0}))),
     /**
      * Equivalent to X+ Y+.
      */
-    B,
+    B(new Quaternion(new Quaternion(new float[]{0, .5f, 0}))),
     /**
      * Equivalent to X- Y+.
      */
-    C,
+    C(new Quaternion(new Quaternion(new float[]{0, .5f, 0}))),
     /**
      * Equivalent to X-.
      */
-    D,
+    D(new Quaternion(new Quaternion(new float[]{0, -1.5f, 0}))),
     /**
      * Equivalent to X- Y-.
      */
-    E,
+    E(new Quaternion(new Quaternion(new float[]{0, -2.5f, 0}))),
     /**
      * Equivalent to X+ Y-.
      */
-    F;
+    F(new Quaternion(new Quaternion(new float[]{0, 2.5f, 0})));
 
+    private Quaternion rotation;
+
+    private Rotation(Quaternion value) {
+        this.rotation = value;
+    }
+    
     /**
      * Convert a direction as a Quaternion.
      *
-     * @param value Rotation to convert.
      * @return Quaternion corresponding to that direction.
      */
-    public static Quaternion getQuaternion(Rotation value) {
-        switch (value) {
-            case A:
-                return new Quaternion(new Quaternion(new float[]{0, 1.5f, 0}));
-            case B:
-                return new Quaternion(new Quaternion(new float[]{0, .5f, 0}));
-            case C:
-                return new Quaternion(new Quaternion(new float[]{0, -.5f, 0}));
-            case D:
-                return new Quaternion(new Quaternion(new float[]{0, -1.5f, 0}));
-            case E:
-                return new Quaternion(new Quaternion(new float[]{0, -2.5f, 0}));
-            case F:
-                return new Quaternion(new Quaternion(new float[]{0, 2.5f, 0}));
-            default:
-                return null;
-        }
+    public Quaternion toQuaternion(){
+        return rotation;
     }
 }

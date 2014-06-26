@@ -10,9 +10,9 @@ import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.field.CollisionComponent;
-import entitysystem.field.movement.MovementStatsComponent;
+import entitysystem.field.position.MovementStatsComponent;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.render.AnimationRenderComponent;
+import entitysystem.render.AnimationComponent;
 import entitysystem.render.GUIRenderComponent;
 import entitysystem.render.RenderComponent;
 import gamemode.editor.EditorMainAppState;
@@ -85,9 +85,9 @@ public class CardEditorSystem extends EntitySystemAppState {
         entityData.setComponents(entity.get(0), new RenderComponent("TuxDoll"),
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
-                new AnimationRenderComponent(Animation.SUMMON),
+                new AnimationComponent(Animation.SUMMON),
                 new GUIRenderComponent(GUIRenderComponent.EntityType.TITAN),
-                new MovementStatsComponent((byte) 5),
+                new MovementStatsComponent(3f, (byte) 5),
                 new CollisionComponent((byte) 0));
     }
 

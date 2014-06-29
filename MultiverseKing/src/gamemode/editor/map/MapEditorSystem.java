@@ -247,6 +247,8 @@ public class MapEditorSystem extends AbstractAppState implements TileChangeListe
         saveLoad.addChild(error);
         error.hide();
     }
+    
+    
 
     private void removeWin() {
         Map<String, Element> map = mainMenu.getElementsAsMap();

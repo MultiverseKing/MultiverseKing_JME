@@ -35,7 +35,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         pathfinder.setMapData(app.getStateManager().getState(HexSystemAppState.class).getMapData());
         movements = new HashMap<EntityId, Movement>();
-        return entityData.getEntities(MovementStatsComponent.class, HexPositionComponent.class, MoveToComponent.class);
+        return entityData.getEntities(MovementComponent.class, HexPositionComponent.class, MoveToComponent.class);
     }
 
     /**
@@ -46,7 +46,7 @@ public class MovementSystem extends EntitySystemAppState {
     protected void updateSystem(float tpf) {
         for (Entity e : entities) {
             Movement movement = movements.get(e.getId());
-            float speed = e.get(MovementStatsComponent.class).getMoveSpeed();
+            float speed = e.get(MovementComponent.class).getMoveSpeed();
             if (movement.distanceMoved >= speed){
                 moveEntity(e, movement, speed);
                 movement.distanceMoved = 0;

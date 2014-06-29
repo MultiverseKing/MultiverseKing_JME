@@ -4,7 +4,7 @@ package entitysystem.attribut;
  * 
  * @author roah
  */
-public enum SubType {
+public enum CardType {
 
     /**
      * Used for card who affect the way unit behave under defined condition.
@@ -27,7 +27,11 @@ public enum SubType {
      * object got activated under difined condition.
      * (object can be unit... or, unit when sleepin then spell when activated...)
      */
-    TRAP;
+    TRAP,
+    /**
+     * This card Type can't be played directly during battle.
+     */
+    TITAN
     /**
      * Used for card who affect the way unit move on the field.
      */

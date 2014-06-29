@@ -13,7 +13,7 @@ public class AbilityComponent implements PersistentComponent {
 
     private final String name;
     private final int power;
-    private final byte activationSegment;
+    private final byte activationCost;
     private final byte activationRange;
     private final ElementalAttribut eAttribut;
     private final String description;
@@ -33,13 +33,13 @@ public class AbilityComponent implements PersistentComponent {
      * @param loadTime between activation.
      */
     public AbilityComponent(String name, byte activationRange, ElementalAttribut eAttribut,
-            byte activationSegment, int power, HashMap<Byte, ArrayList> hitCollision,
+            byte activationCost, int power, HashMap<Byte, ArrayList> hitCollision,
             boolean castFromSelf, String description) {
         this.name = name;
         this.activationRange = activationRange;
         this.hitCollision = hitCollision;
         this.eAttribut = eAttribut;
-        this.activationSegment = activationSegment;
+        this.activationCost = activationCost;
         this.power = power;
         this.castFromSelf = castFromSelf;
         this.description = description;
@@ -88,7 +88,7 @@ public class AbilityComponent implements PersistentComponent {
      * @return
      */
     public byte getSegment() {
-        return activationSegment;
+        return activationCost;
     }
 
     /**

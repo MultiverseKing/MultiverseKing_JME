@@ -19,7 +19,7 @@ import entitysystem.card.CardRenderSystem;
 import entitysystem.field.position.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.render.GUIRenderSystem;
+import entitysystem.field.gui.GUIRenderSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSettings;
@@ -120,7 +120,7 @@ public class MultiverseMain extends SimpleApplication {
 //        final int SHADOWMAP_SIZE = 1024;
 //        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
 //        dlsr.setLight(sun);
-//        viewPort.addProcessor(dlsr);ssssss
+//        viewPort.addProcessor(dlsr);
 
         /**
          * A white ambient light source.

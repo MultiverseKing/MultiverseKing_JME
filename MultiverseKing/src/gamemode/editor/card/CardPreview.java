@@ -5,7 +5,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
-import entitysystem.attribut.SubType;
+import entitysystem.attribut.CardType;
 import entitysystem.card.utility.CardProperties;
 import entitysystem.card.utility.Hover;
 import java.io.File;
@@ -75,7 +75,7 @@ public class CardPreview {
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(screen, new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, SubType.SUMMON,
+        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, CardType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
         hover.setProperties(cardProperties);
         preview.addChild(hover);
@@ -87,7 +87,7 @@ public class CardPreview {
         hover.setEAttribut(eAttribut);
     }
 
-    void switchSubType(SubType subType) {
+    void switchSubType(CardType subType) {
         hover.setSubType(subType);
     }
 

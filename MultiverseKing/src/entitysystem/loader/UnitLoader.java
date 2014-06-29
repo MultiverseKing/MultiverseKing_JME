@@ -1,9 +1,12 @@
 package entitysystem.loader;
 
+import com.simsilica.es.PersistentComponent;
 import entitysystem.ability.AbilityComponent;
-import entitysystem.field.LifeComponent;
-import entitysystem.field.position.MovementStatsComponent;
+import entitysystem.field.ATBComponent;
+import entitysystem.field.HealthComponent;
+import entitysystem.field.position.MovementComponent;
 import entitysystem.field.CollisionComponent;
+import entitysystem.field.SpeedComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -14,51 +17,120 @@ import org.json.simple.JSONObject;
  */
 public class UnitLoader {
 
-    private final MovementStatsComponent moveComp;
-    private final LifeComponent uLife;
-    private final AbilityComponent abilityComp;
-    private final CollisionComponent collision;
+    private final CollisionComponent collisionComponent;
+    private final InitialUnitStatsComponent initialUnitStatsComponent;
 
     UnitLoader(JSONObject data, EntityLoader eLoader) {
+        Number healthPoint = (Number) data.get("healthPoint");
+        Number atb = (Number) data.get("atb");
         Number speed = (Number) data.get("speed");
-        Number movePoint = (Number) data.get("movePoint");
-        Number life = (Number) data.get("life");
+        Number moveRange = (Number) data.get("moveRange");
+        Number moveSpeed = (Number) data.get("moveSpeed");
 
-        uLife = new LifeComponent(life.intValue());
-        moveComp = new MovementStatsComponent(speed.floatValue(), movePoint.byteValue());
-        abilityComp = eLoader.loadAbility(data.get("ability").toString());
+        JSONArray ability = (JSONArray) data.get("ability");
+        String[] abilityList = new String[ability.size()];
+        for (int i = 0; i < ability.size(); i++) {
+            abilityList[i] = ability.get(i).toString();
+        }
 
-        collision = new CollisionComponent(eLoader.getCollision((JSONArray) data.get("collision")));
+        initialUnitStatsComponent = new InitialUnitStatsComponent(
+                healthPoint.intValue(),
+                atb.byteValue(),
+                speed.floatValue(),
+                moveRange.byteValue(),
+                moveSpeed.floatValue(),
+                abilityList);
+
+        collisionComponent = new CollisionComponent(eLoader.getCollision((JSONArray) data.get("collision")));
     }
 
-    public CollisionComponent getCollisionComp() {
-        return collision;
+    public CollisionComponent getCollisionComponent() {
+        return collisionComponent;
     }
 
-    /**
-     * Stats data component of the unit.
-     *
-     * @return
-     */
-    public MovementStatsComponent getMovementComp() {
-        return moveComp;
+    public InitialUnitStatsComponent getInitialStatsComponent() {
+        return initialUnitStatsComponent;
     }
 
-    /**
-     * Life component of the unit.
-     *
-     * @return
-     */
-    public LifeComponent getuLife() {
-        return uLife;
-    }
+    public class InitialUnitStatsComponent implements PersistentComponent {
 
-    /**
-     * Ability component the unit have.
-     *
-     * @return
-     */
-    public AbilityComponent getAbilityComp() {
-        return abilityComp;
+        private final int healthPoint;
+        private final byte maxAtb;
+        private final float speed;
+        private final byte moveRange;
+        private final float moveSpeed;
+        private final String[] abilityList;
+
+        public InitialUnitStatsComponent(InitialUnitStatsComponent stats) {
+            this.healthPoint = stats.getHealthPoint();
+            this.maxAtb = stats.getMaxAtb();
+            this.speed = stats.getSpeed();
+            this.moveRange = stats.getMoveRange();
+            this.moveSpeed = stats.getMoveSpeed();
+            this.abilityList = stats.getAbilityList();
+        }
+
+        private InitialUnitStatsComponent(int healthPoint, byte maxAtb, float speed, byte moveRange, float moveSpeed, String[] abilityList) {
+            this.healthPoint = healthPoint;
+            this.maxAtb = maxAtb;
+            this.speed = speed;
+            this.moveRange = moveRange;
+            this.moveSpeed = moveSpeed;
+            this.abilityList = abilityList;
+        }
+
+        public int getHealthPoint() {
+            return healthPoint;
+        }
+
+        public HealthComponent getHealthComponent() {
+            return new HealthComponent(healthPoint);
+        }
+
+        public byte getMaxAtb() {
+            return maxAtb;
+        }
+
+        public ATBComponent getATBComponent() {
+            return new ATBComponent(maxAtb);
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public SpeedComponent getSpeedComponent() {
+            return new SpeedComponent(speed);
+        }
+
+        public byte getMoveRange() {
+            return moveRange;
+        }
+
+        public float getMoveSpeed() {
+            return moveSpeed;
+        }
+
+        public MovementComponent getMovementComponent() {
+            return new MovementComponent(moveRange, moveSpeed);
+        }
+
+        public String[] getAbilityList() {
+            return abilityList;
+        }
+
+        public AbilityComponent[] getAbilityComponent() {
+            EntityLoader loader = new EntityLoader();
+            AbilityComponent[] list = new AbilityComponent[abilityList.length];
+            int i = 0;
+            for (String s : abilityList) {
+                if (s.equals("null")) {
+                    return null;
+                }
+                list[i] = loader.loadAbility(s);
+                i++;
+            }
+            return list;
+        }
     }
 }

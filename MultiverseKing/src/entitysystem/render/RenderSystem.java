@@ -164,9 +164,9 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
             path.addListener(new MotionPathListener() {
                 public void onWayPointReach(MotionEvent control, int wayPointIndex) {
                     if (path.getNbWayPoints() == wayPointIndex + 1) {
-                        System.out.println("Finished !!!");
+//                        System.out.println("Finished !!!");
                     } else {
-                        System.err.println("Waypoint reached !!!");
+//                        System.err.println("Waypoint reached !!!");
                     }
                 }
             });
@@ -201,7 +201,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     private void removeSpatial(EntityId id) {
         Spatial s = spatials.get(id);
         if (s.getControl(MotionEvent.class) != null) {
-            s.getControl(MotionEvent.class).getPath().disableDebugShape();
+//            s.getControl(MotionEvent.class).getPath().disableDebugShape();
         }
         if (renderSystemNode.detachChild(s) == -1) {
             for (Node n : subSystemNode) {

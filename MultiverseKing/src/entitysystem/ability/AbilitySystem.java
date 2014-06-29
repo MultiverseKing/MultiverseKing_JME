@@ -5,7 +5,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.field.LoadSpeedComponent;
+import entitysystem.field.SpeedComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,13 +19,13 @@ public class AbilitySystem extends EntitySystemAppState {
 
     @Override
     protected EntitySet initialiseSystem() {
-        return entityData.getEntities(LoadSpeedComponent.class, AbilityComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(SpeedComponent.class, AbilityComponent.class, HexPositionComponent.class);
     }
 
     @Override
     protected void addEntity(Entity e) {
         AbilityManager aManager = new AbilityManager(e.get(AbilityComponent.class).getName(),
-                e.get(AbilityComponent.class).getSegment(), e.get(LoadSpeedComponent.class).getSpeed());
+                e.get(AbilityComponent.class).getSegment(), e.get(SpeedComponent.class).getSpeed());
         abilityManager.put(e.getId(), aManager);
     }
 

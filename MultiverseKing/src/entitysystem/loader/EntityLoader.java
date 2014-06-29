@@ -44,6 +44,15 @@ public class EntityLoader {
         return null;
     }
 
+    public TitanLoader loadTitanStats(String name){
+        String loadPath = path + "Titan/" + name + ".titan";
+        JSONObject obj = getData(loadPath);
+        if (obj != null) {
+            return new TitanLoader(obj, this);
+        }
+        return null;
+    }
+    
     /**
      * Load a card from his Name, and return all of his properties parsed.
      *

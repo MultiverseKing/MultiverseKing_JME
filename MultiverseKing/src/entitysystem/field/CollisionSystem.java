@@ -1,13 +1,12 @@
 package entitysystem.field;
 
-import entitysystem.render.GUIRenderComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
 import utility.HexCoordinate;
-import entitysystem.attribut.SubType;
+import entitysystem.attribut.CardType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -64,7 +63,7 @@ public class CollisionSystem extends EntitySystemAppState {
      * @param id entity to cast.
      * @return true if it can, false otherwise.
      */
-    public boolean isEmptyPosition(HexCoordinate castPosition, SubType cardType) {
+    public boolean isValidPosition(HexCoordinate castPosition, CardType cardType) {
         switch (cardType) {
             case SUMMON:
                 if (collisionLayer.containsKey((byte) 0)) {
@@ -79,19 +78,6 @@ public class CollisionSystem extends EntitySystemAppState {
                 return true;
             default:
                 throw new UnsupportedOperationException(cardType + " isn't a valid type for the field system.");
-        }
-    }
-
-    public boolean isEmptyPosition(HexCoordinate castPosition, GUIRenderComponent.EntityType field) {
-        switch(field){
-            case ENVIRONMENT:
-                return false;
-            case TITAN:
-                return checkCollision(new Byte((byte)0), castPosition);
-            case UNIT:
-                return checkCollision(new Byte((byte)0), castPosition);
-            default:
-                throw new UnsupportedOperationException(field + " isn't a valid type for the field system.");
         }
     }
 

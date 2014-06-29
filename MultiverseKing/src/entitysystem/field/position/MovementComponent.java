@@ -3,21 +3,21 @@ package entitysystem.field.position;
 import com.simsilica.es.PersistentComponent;
 
 /**
- * Entity unit, native stats.
+ * Entity movement stats.
  *
  * @author roah
  */
-public class MovementStatsComponent implements PersistentComponent {
+public class MovementComponent implements PersistentComponent {
 
     private final byte movePoint;
     private final float moveSpeed;
 
-    public MovementStatsComponent(byte movePoint) {
+    public MovementComponent(byte movePoint) {
         moveSpeed = 1.5f;
         this.movePoint = movePoint;
     }
     
-    public MovementStatsComponent(float moveSpeed, byte movePoint) {
+    public MovementComponent(byte movePoint, float moveSpeed) {
         this.movePoint = movePoint;
         this.moveSpeed = moveSpeed;
     }

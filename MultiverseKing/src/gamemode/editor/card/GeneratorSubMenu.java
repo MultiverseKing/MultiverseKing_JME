@@ -1,7 +1,7 @@
 package gamemode.editor.card;
 
 import com.jme3.math.Vector2f;
-import entitysystem.attribut.SubType;
+import entitysystem.attribut.CardType;
 import gamemode.editor.EditorMenuWindow;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
@@ -14,13 +14,13 @@ import tonegod.gui.core.layouts.LayoutHint.VAlign;
  */
 public class GeneratorSubMenu extends EditorMenuWindow {
 
-    private final SubType current;
+    private final CardType current;
 
-    public SubType getCurrent() {
+    public CardType getCurrent() {
         return current;
     }
 
-    public GeneratorSubMenu(ElementManager screen, Element parent, SubType type) {
+    public GeneratorSubMenu(ElementManager screen, Element parent, CardType type) {
         super(screen, parent, "Properties");
         current = type;
         switch (type) {

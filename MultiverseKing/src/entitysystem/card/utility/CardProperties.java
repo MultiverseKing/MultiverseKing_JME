@@ -1,6 +1,6 @@
 package entitysystem.card.utility;
 
-import entitysystem.attribut.SubType;
+import entitysystem.attribut.CardType;
 import entitysystem.attribut.Maintype;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
@@ -33,7 +33,7 @@ public class CardProperties {
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
-    private final SubType cardType;
+    private final CardType cardType;
     /**
      * Used to know the amount of time the player can have/play this card.
      * Balance stats mainly.
@@ -64,17 +64,21 @@ public class CardProperties {
      * @param rarity balance...
      */
     public CardProperties(JSONObject obj, String name) {
-        cardType = SubType.valueOf(obj.get("cardType").toString());
-        if (cardType == SubType.SPELL || cardType == SubType.SUMMON || cardType == SubType.TRAP) {
+        this.name = name;
+        cardType = CardType.valueOf(obj.get("cardType").toString());
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP || cardType == CardType.TITAN) {
             this.mainType = Maintype.WORLD;
-        } else if (cardType == SubType.ABILITY || cardType == SubType.EQUIPEMENT) {
+        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
         }
-        Number tmpValue = (Number) obj.get("playCost");
-        this.name = name;
-        playCost = tmpValue.intValue();
+        if(cardType == CardType.TITAN){
+            playCost = 0;
+        } else {
+            Number tmpValue = (Number) obj.get("playCost");
+            playCost = tmpValue.intValue();
+        }
         faction = Faction.valueOf((String) obj.get("faction"));
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
@@ -85,16 +89,20 @@ public class CardProperties {
      * Constructor used for the editor mode.
      *
      */
-    public CardProperties(String name, int playCost, Faction faction, SubType cardType, Rarity rarity, ElementalAttribut element, String description) {
-        if (cardType == SubType.SPELL || cardType == SubType.SUMMON || cardType == SubType.TRAP) {
+    public CardProperties(String name, int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
+        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP || cardType == CardType.TITAN) {
             this.mainType = Maintype.WORLD;
-        } else if (cardType == SubType.ABILITY || cardType == SubType.EQUIPEMENT) {
+        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
             this.mainType = Maintype.TITAN;
         } else {
             throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
         }
+        if(cardType == CardType.TITAN){
+            this.playCost = 0;
+        } else {
+            this.playCost = playCost;
+        }
         this.name = name;
-        this.playCost = playCost;
         this.faction = faction;
         this.cardType = cardType;
         this.rarity = rarity;
@@ -151,7 +159,7 @@ public class CardProperties {
      * @see CardSubType
      * @return
      */
-    public SubType getCardSubType() {
+    public CardType getCardSubType() {
         return cardType;
     }
 

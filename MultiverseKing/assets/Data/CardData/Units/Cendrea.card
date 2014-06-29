@@ -6,14 +6,18 @@
    "playCost":4,
    "description":"Should be named spider moonlord king...  don't ask...",
    "unitsStats":{
-      "life":100,
-      "speed":1.5,
-      "movePoint":1,
-      "ability":"PulseVoltage",
+      "healthPoint":100,
+      "atb":3,
+      "speed":10,
+      "moveRange":3,
+      "moveSpeed":1.5,
+      "ability":[
+         "PulseVoltage"
+      ],
       "collision":[
          {
-            "layer": 0,
-            "key" :[ "0|0" ]
+            "layer":0,
+            "key":["0|0"]
          }
       ]
    }

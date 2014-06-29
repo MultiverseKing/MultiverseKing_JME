@@ -15,11 +15,10 @@ import static entitysystem.attribut.CardRenderPosition.DECK;
 import static entitysystem.attribut.CardRenderPosition.FIELD;
 import static entitysystem.attribut.CardRenderPosition.HAND;
 import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
-import entitysystem.attribut.SubType;
+import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
-import entitysystem.render.GUIRenderComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
@@ -90,7 +89,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      *
      * @todo Render it on a better way.
      */
-    Window isCastedDebug;
+    Window castDebug;
     /**
      * Used to put a card on from of other when mose is over it.
      */
@@ -101,8 +100,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     private Vector2f minCastArea;
     private Vector2f maxCastArea;
     /**
-     * Save the card isCastedDebug on preview so we can put it back if not
-     * isCastedDebug, in case it isCastedDebug we remove it from cards.
+     * Save the card castDebug on preview so we can put it back if not
+     * casted, otherwise we remove it.
      */
     private Card cardPreviewCast;
 
@@ -307,13 +306,13 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     private void castPreview(Card card) {
         cardPreviewCast = card;
         if(activateCard(null)){
-            if (isCastedDebug == null) {
-                isCastedDebug = new Window(screen, "CastDebug", new Vector2f(275, 155), new Vector2f(250, 20));
-                isCastedDebug.setMinDimensions(new Vector2f(200, 26));
-                isCastedDebug.setIgnoreMouse(true);
+            if (castDebug == null) {
+                castDebug = new Window(screen, "CastDebug", new Vector2f(275, 155), new Vector2f(250, 20));
+                castDebug.setMinDimensions(new Vector2f(200, 26));
+                castDebug.setIgnoreMouse(true);
             }
-            isCastedDebug.setText("        " + card.getCardName() + " preview cast !");
-            screen.addElement(isCastedDebug);
+            castDebug.setText("        " + card.getCardName() + " preview cast !");
+            screen.addElement(castDebug);
             screen.removeElement(card);
 
             //Register the input for the card system
@@ -325,7 +324,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     private void closePreview() {
         activateCard(null);
         cardPreviewCast = null;
-        screen.removeElement(screen.getElementById(isCastedDebug.getUID()));
+        screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
         app.getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
@@ -337,12 +336,12 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         closePreview();
     }
 
-    private void activateWorldCard(HexCoordinate castCoord, SubType type) {
+    private void activateWorldCard(HexCoordinate castCoord, CardType type) {
         switch (type) {
             case SPELL:
                 break;
             case SUMMON:
-                CardRenderComponent cardRender = entityData.getComponent(cardPreviewCast.getCardEntityUID(), CardRenderComponent.class);
+                CardRenderComponent cardRender = entities.getEntity(cardPreviewCast.getCardEntityUID()).get(CardRenderComponent.class);
                 String name = cardRender.getName();
                 UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
                 if (unitLoader != null) {
@@ -351,11 +350,8 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                             cardRender.clone(CardRenderPosition.FIELD),
                             new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
-                            new GUIRenderComponent(GUIRenderComponent.EntityType.UNIT),
-                            unitLoader.getCollisionComp(), //Collision Comp
-                            unitLoader.getuLife(), //life component
-                            unitLoader.getMovementComp(), //stats component
-                            unitLoader.getAbilityComp());
+                            unitLoader.getCollisionComponent(),
+                            unitLoader.getInitialStatsComponent());
                 }
                 break;
             case TRAP:
@@ -407,7 +403,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                          */
                         CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
                         if (collisionSystem != null) {
-                            if (collisionSystem.isEmptyPosition(event.getEventPosition(),
+                            if (collisionSystem.isValidPosition(event.getEventPosition(),
                                     cardPreviewCast.getProperties().getCardSubType())) {
                                 activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
                                 closePreview();

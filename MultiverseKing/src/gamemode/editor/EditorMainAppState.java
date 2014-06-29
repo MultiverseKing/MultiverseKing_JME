@@ -6,6 +6,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import gamemode.editor.battle.BattleFieldTestSystem;
 import gamemode.editor.map.MapEditorSystem;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -78,8 +79,14 @@ public class EditorMainAppState extends AbstractAppState {
         /**
          * A random testing Button.
          */
-        ButtonAdapter test = new ButtonAdapter(main.getScreen(), "Btn3", new Vector2f(15, 120));
-        test.setText("Test Button");
+        ButtonAdapter test = new ButtonAdapter(main.getScreen(), "BattleFieldTest", new Vector2f(15, 120)){
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                remove();
+                main.getStateManager().attach(new BattleFieldTestSystem());
+            }
+        };
+        test.setText("Battle Test");
         mainMenu.addChild(test);
     }
 

@@ -6,11 +6,11 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class LoadSpeedComponent implements PersistentComponent {
+public class SpeedComponent implements PersistentComponent {
 
     private final float speed;
 
-    public LoadSpeedComponent(float speed) {
+    public SpeedComponent(float speed) {
         this.speed = speed;
     }
 

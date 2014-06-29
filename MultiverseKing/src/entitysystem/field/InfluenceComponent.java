@@ -8,16 +8,16 @@ import com.simsilica.es.PersistentComponent;
  */
 public class InfluenceComponent implements PersistentComponent {
 
-    private final int influenceArea;
+    private final byte range;
 
     /**
      * Size of the influence area arround the unit where you are able to summon
      * or control unit.
      *
-     * @param influenceArea
+     * @param range
      */
-    public InfluenceComponent(int influenceArea) {
-        this.influenceArea = influenceArea;
+    public InfluenceComponent(byte range) {
+        this.range = range;
     }
 
     /**
@@ -26,7 +26,7 @@ public class InfluenceComponent implements PersistentComponent {
      *
      * @return
      */
-    public int getInfluenceArea() {
-        return influenceArea;
+    public byte getRange() {
+        return range;
     }
 }

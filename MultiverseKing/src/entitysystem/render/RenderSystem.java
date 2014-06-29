@@ -72,9 +72,9 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         return node;
     }
 
-    public boolean addSpatialToSubSystem(EntityId id, String systemNode) {
+    public boolean addSpatialToSubSystem(EntityId id, Node systemNode) {
         if (spatials.get(id) != null) {
-            ((Node) renderSystemNode.getChild(systemNode)).attachChild(spatials.get(id));
+            ((Node) renderSystemNode.getChild(systemNode.getName())).attachChild(spatials.get(id));
             return true;
         }
         return false;

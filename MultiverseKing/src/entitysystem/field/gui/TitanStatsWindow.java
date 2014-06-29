@@ -1,5 +1,7 @@
 package entitysystem.field.gui;
 
+import com.simsilica.es.Entity;
+import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
 import tonegod.gui.core.ElementManager;
 
 /**
@@ -9,16 +11,16 @@ import tonegod.gui.core.ElementManager;
 public class TitanStatsWindow extends UnitStatsWindow {
     
     public TitanStatsWindow(ElementManager screen, GUIRenderSystem system) {
-        super(screen, "Titan", system);
-        setEntity();
+        super(screen, "Titan", system, 4);
     }
-    
-    private void setEntity() {
-        addField("Influence Range", system.getInfluenceRange());
-        addMinMaxField("Atb Burst", system.getAtbBurstValue());
-        addField("Atb Burst Speed", system.getAtbBurstSpeed());
-        addMinMaxField("Energy", system.getEnergyValue());
-        addField("Energy Refill Speed", system.getEnergyRefillSpeed());
-        addField("Weapon Slots", system.getWeaponSlotCount());
+
+    @Override
+    protected void showWindow(Entity e) {
+        InitialTitanStatsComponent comp = e.get(InitialTitanStatsComponent.class);
+        addField("Influence Range", comp.getInfluenceRange());
+        addMinMaxField("Atb Burst", comp.getMaxAtbBurst(), comp.getMaxAtbBurst());
+        addMinMaxField("Energy", comp.getMaxEnergy(), comp.getMaxEnergy());
+        addField("Weapon Slots", comp.getWeaponSlots());
+        super.showWindow(e);
     }
 }

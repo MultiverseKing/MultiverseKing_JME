@@ -84,7 +84,8 @@ public class BattleFieldTestSystem extends EntitySystemAppState {
                 new HexPositionComponent(new HexCoordinate(HexCoordinate.OFFSET, 
                         new Vector2Int(HexSettings.CHUNK_SIZE / 2, HexSettings.CHUNK_SIZE / 2)), Rotation.A),
                 new AnimationComponent(Animation.SUMMON),
-                load.getInitialStatsComponent());
+                load.getInitialStatsComponent(),
+                load.getInitialStatsComponent().getMovementComponent());
     }
     
     @Override
@@ -94,15 +95,13 @@ public class BattleFieldTestSystem extends EntitySystemAppState {
 
     @Override
     protected void removeEntity(Entity e) {
-        if(units.contains(e.getId()) && e.get(CardRenderComponent.class).getRenderPosition() != CardRenderPosition.FIELD){
+        if(units.contains(e.getId())){
             units.remove(e.getId());
         }
     }
 
     @Override
     protected void cleanupSystem() {
-        for(EntityId id : units){
-            entityData.removeEntity(id);
-        }
+        units.clear();
     }
 }

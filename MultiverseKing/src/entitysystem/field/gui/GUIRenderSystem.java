@@ -23,6 +23,7 @@ import hexsystem.events.HexMapInputEvent;
 import kingofmultiverse.MultiverseMain;
 import hexsystem.events.HexMapRayListener;
 import java.util.logging.Logger;
+import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
 
 /**
@@ -38,14 +39,12 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
 
     private Node iNode;
     private ActionMenu actionMenu;
-    private PropertiesMenu propertiesMenu;
-//    private Screen screen;
-//    private Camera cam;
+    private PropertiesWindow titanStatsWindow;
     private RenderSystem renderSystem = null;
     private HexMapMouseSystem hexMouseSystem = null;
-//    private Vector3f inspectedSpatialPosition = null;
     private int currentAction = -1;
     private EntityId inspectedId = null;
+    private Screen screen;
 
     @Override
     protected EntitySet initialiseSystem() {
@@ -56,7 +55,9 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
             app.getStateManager().detach(this);
             return null;
         }
-        propertiesMenu = new PropertiesMenu(this, ((MultiverseMain)app).getScreen());
+        screen = ((MultiverseMain)app).getScreen();
+        titanStatsWindow = new TitanStatsWindow(screen, this);
+        actionMenu = new ContextualTitanMenu(screen, this, app.getCamera());
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this);
@@ -67,11 +68,14 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     
     @Override
     protected void updateSystem(float tpf) {
-        actionMenu.update();
+        if(actionMenu != null){
+            actionMenu.update();
+        }
     }
 
     @Override
     protected void addEntity(Entity e) {
+        renderSystem.addSpatialToSubSystem(e.getId(), iNode);
     }
 
     @Override
@@ -80,6 +84,9 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
 
     @Override
     protected void removeEntity(Entity e) {
+        if(e.get(InitialTitanStatsComponent.class) == null){
+            renderSystem.removeSpatialFromSubSystem(e.getId());
+        }
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
@@ -93,8 +100,8 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         }
     }
 
-    /*
-     * Used when the spatial is not selected directly
+    /**
+     * Used when the spatial is not selected directly.
      */ 
     public void rightMouseActionResult(HexMapInputEvent event) {
         if(currentAction == -1){
@@ -106,7 +113,7 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     }
 
     private Entity checkEntities(HexCoordinate coord){
-        for (Entity e : entities.getAddedEntities()) {
+        for (Entity e : entities) {
             HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
             if (posComp != null && posComp.getPosition().equals(coord)) {
                 return e;
@@ -148,7 +155,8 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     }
     
     private void openEntityPropertiesMenu(Entity e){
-        propertiesMenu.show(e);
+        titanStatsWindow.show(e);
+//        screen.addElement(titanStatsWindow);
         inspectedId = e.getId();
     }
     
@@ -159,16 +167,12 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
     }
     
     public void setAction(EntityId id, Integer action){
-//        MeshParameter param = new MeshParameter(app.getStateManager().getState(HexSystemAppState.class).getMapData());
-//        MeshManager mesh = new MeshManager();
-//        mesh.getMesh()
         if (!hexMouseSystem.setCursorPulseMode(this)) {
             return;
         }
         inspectedId = id;
         currentAction = action;
         //Register the input for this system
-//        hexMouseSystem.registerTileInputListener(this);
         app.getInputManager().addListener(fieldInputListener, "Cancel");
     }
 
@@ -190,7 +194,6 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
         currentAction = -1;
         hexMouseSystem.setCursorPulseMode(this);
         //Unregister the input for this system
-//        hexMouseSystem.removeTileInputListener(this);
         app.getInputManager().removeListener(fieldInputListener);
     }
     
@@ -213,7 +216,7 @@ public class GUIRenderSystem extends EntitySystemAppState implements HexMapRayLi
 
     @Override
     public void stateDetached(AppStateManager stateManager) {
-        super.stateDetached(stateManager); //To change body of generated methods, choose Tools | Templates.
+        super.stateDetached(stateManager);
     }
     
     public void remove() {

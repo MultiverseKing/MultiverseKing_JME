@@ -44,8 +44,13 @@ public class EntityLoader {
         return null;
     }
 
+    /**
+     * 
+     * @param name
+     * @return return null if not found.
+     */
     public TitanLoader loadTitanStats(String name){
-        String loadPath = path + "Titan/" + name + ".titan";
+        String loadPath = path + "Titan/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new TitanLoader(obj, this);

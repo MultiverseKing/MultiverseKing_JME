@@ -1,0 +1,29 @@
+{
+   "faction":"NEUTRAL",
+   "cardType":"TITAN",
+   "rarity":"MULTIVERSE",
+   "eAttribut":"NULL",
+   "description":"Testing Unit used on the editor",
+   "unitsStats":{
+      "healthPoint":50000,
+      "atb":10,
+      "speed":10,
+      "moveRange":5,
+      "moveSpeed":2.8,
+      "ability":[
+         "null"
+      ],
+      "collision":[
+         {
+            "layer":0,
+            "key":["0|0"]
+         }
+      ]
+   },
+    "titanStats":{
+        "atbBurst":5,
+        "influenceRange":5,
+        "energy":100,
+        "weaponSlots":4
+    }
+}

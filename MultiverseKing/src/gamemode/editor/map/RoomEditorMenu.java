@@ -74,6 +74,9 @@ final class RoomEditorMenu extends EditorMenu {
 
     @Override
     protected void additionalFieldReturnTrigger() {
+        if(tileWidgetMenu != null && tileWidgetMenu.isVisible()){
+            tileWidgetMenu.removeFromScreen();
+        }
         ((MapEditorSystem) system).switchGui(MapEditorMode.NONE);
     }
 

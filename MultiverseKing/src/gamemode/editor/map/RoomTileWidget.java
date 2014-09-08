@@ -98,7 +98,9 @@ class RoomTileWidget extends CameraTrackWindow {
     @Override
     public void hide() {
         super.hide();
-        eWin.hide();
+        if(eWin != null && eWin.isVisible()){
+            eWin.hide();
+        }
     }
     
     void updateIcon(){
@@ -116,6 +118,10 @@ class RoomTileWidget extends CameraTrackWindow {
                 b.update(tpf);
             }
         }
+    }
+    
+    void removeFromScreen() {
+        screen.removeElement(screenElement);
     }
     
     HexCoordinate getSelectedTilePosition(){

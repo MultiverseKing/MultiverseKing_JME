@@ -126,10 +126,12 @@ public class HexMapMouseSystem extends AbstractAppState {
     }
 
     private void initCursor() {
-        cursor = main.getAssetManager().loadModel("Models/utility/animPlane.j3o");
-        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-        animShader.setInt("Speed", 16);
-        cursor.setMaterial(animShader);
+        if(cursor == null){
+            cursor = main.getAssetManager().loadModel("Models/utility/animPlane.j3o");
+            Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+            animShader.setInt("Speed", 16);
+            cursor.setMaterial(animShader);
+        }
         main.getRootNode().attachChild(cursor);
         //Remove offset and set it to zero if hex_void_anim.png is not used
         float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
@@ -266,26 +268,29 @@ public class HexMapMouseSystem extends AbstractAppState {
     
     public void setCursor(HexCoordinate tilePos) {
         moveCursor(tilePos);
-        enable = 1;
     }
     
-    Byte enable = 0;
+    public void clearCursor(){
+        if(cursor != null){
+            cursor.removeFromParent();
+        }
+        if(rayDebug != null){
+            rayDebug.removeFromParent();
+        }
+    }
+    
     private void moveCursor(HexCoordinate tilePos) {
-        if(enable <= 0){
-            if (cursor == null) {
-                initCursor();
-            }
-            Vector3f pos = tilePos.convertToWorldPosition();
-            cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_OFFSET
-                    + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
-            /**
-             * The cursor real position is not updated on pulseMode.
-             */
-            if (listenerPulseIndex == -1) {
-                lastHexPos = tilePos;
-            }
-        } else {
-            enable--;
+        if (cursor == null || cursor.getParent() == null) {
+            initCursor();
+        }
+        Vector3f pos = tilePos.convertToWorldPosition();
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_OFFSET
+                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+        /**
+         * The cursor real position is not updated on pulseMode.
+         */
+        if (listenerPulseIndex == -1) {
+            lastHexPos = tilePos;
         }
     }
 

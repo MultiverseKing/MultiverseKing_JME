@@ -233,6 +233,7 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
             clearArea();
         }
         ((MultiverseMain) app).getScreen().removeElement(currentGui);
+        ((MultiverseMain) app).getStateManager().getState(HexMapMouseSystem.class).clearCursor();
         app.getStateManager().attach(new EditorMainGui());
     }
 

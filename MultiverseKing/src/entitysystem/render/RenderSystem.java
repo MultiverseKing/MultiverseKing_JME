@@ -4,7 +4,6 @@ import entitysystem.utility.SubSystem;
 import entitysystem.render.utility.SpatialInitializer;
 import com.jme3.animation.AnimControl;
 import com.jme3.cinematic.MotionPath;
-import com.jme3.cinematic.MotionPathListener;
 import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
@@ -15,6 +14,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
+import entitysystem.render.utility.Curve;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
 import hexsystem.events.TileChangeEvent;
@@ -95,11 +95,6 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         mapData.registerTileChangeListener(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
-    /**
-     *
-     * @param tpf
-     */
-    int i = 1;
 
     @Override
     protected void updateSystem(float tpf) {
@@ -149,34 +144,26 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
 
     private void updateSpatialTransform(EntityId id) {
         HexPositionComponent positionComp = entities.getEntity(id).get(HexPositionComponent.class);
-        Vector3f targetPos = mapData.convertTileToWorldPosition(positionComp.getPosition());
         Spatial s = spatials.get(id);
         if (positionComp.getCurve() != null && s.getControl(MotionEvent.class) == null) {
+            Curve curve = entities.getEntity(id).get(HexPositionComponent.class).getCurve();
             final MotionPath path = new MotionPath();
             path.addWayPoint(spatials.get(id).getLocalTranslation());
-            path.addWayPoint(targetPos);
+            for(int i = 1; i < curve.getWaypoints().size(); i++){
+                path.addWayPoint(mapData.convertTileToWorldPosition(curve.getWaypoints().get(i)));
+            }
             path.enableDebugShape(app.getAssetManager(), renderSystemNode);
-            MotionEvent motionControl = new MotionEvent(s, path);
+            MotionEvent motionControl = new MotionEvent(s, path, curve.getSpeed()* (curve.getWaypoints().size()));
             motionControl.setDirectionType(MotionEvent.Direction.Path);
-            motionControl.setRotation(positionComp.getRotation().toQuaternion());
-            motionControl.setInitialDuration(positionComp.getCurve().getSpeed());
             motionControl.play();
-            path.addListener(new MotionPathListener() {
-                public void onWayPointReach(MotionEvent control, int wayPointIndex) {
-                    if (path.getNbWayPoints() == wayPointIndex + 1) {
-//                        System.out.println("Finished !!!");
-                    } else {
-//                        System.err.println("Waypoint reached !!!");
-                    }
-                }
-            });
         } else if (positionComp.getCurve() != null && s.getControl(MotionEvent.class) != null) {
-            MotionEvent motionControl = s.getControl(MotionEvent.class);
-            motionControl.getPath().disableDebugShape();
-            motionControl.getPath().removeWayPoint(motionControl.getPath().getNbWayPoints() - 2);
-            motionControl.getPath().addWayPoint(targetPos);
-            motionControl.getPath().enableDebugShape(app.getAssetManager(), renderSystemNode);
-            motionControl.play();
+//            MotionEvent motionControl = s.getControl(MotionEvent.class);
+//            motionControl.getPath().disableDebugShape();
+////            motionControl.getPath().setPathSplineType(Spline.SplineType.Linear);
+//            motionControl.getPath().removeWayPoint(motionControl.getPath().getNbWayPoints() - 2);
+//            motionControl.getPath().addWayPoint(targetPos);
+//            motionControl.getPath().enableDebugShape(app.getAssetManager(), renderSystemNode);
+//            motionControl.play();
         } else {
             if(s.getControl(MotionEvent.class) != null){
                 MotionEvent motionControl = s.getControl(MotionEvent.class);
@@ -186,7 +173,6 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
             s.setLocalTranslation(mapData.convertTileToWorldPosition(positionComp.getPosition()));
             s.setLocalRotation(positionComp.getRotation().toQuaternion());
         }
-//        System.out.println(s.getNumControls());
     }
 
     @Override
@@ -201,7 +187,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     private void removeSpatial(EntityId id) {
         Spatial s = spatials.get(id);
         if (s.getControl(MotionEvent.class) != null) {
-//            s.getControl(MotionEvent.class).getPath().disableDebugShape();
+            s.getControl(MotionEvent.class).getPath().disableDebugShape();
         }
         if (renderSystemNode.detachChild(s) == -1) {
             for (Node n : subSystemNode) {
@@ -212,10 +198,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
         spatials.remove(id);
     }
-
-    /**
-     *
-     */
+    
     @Override
     protected void cleanupSystem() {
         for (SubSystem s : subSystem) {
@@ -224,11 +207,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
-
-    /**
-     *
-     * @param event
-     */
+    
     public void tileChange(TileChangeEvent event) {
         Set<EntityId> key = spatials.keySet();
         for (EntityId id : key) {

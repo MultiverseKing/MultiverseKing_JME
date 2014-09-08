@@ -191,7 +191,7 @@ public class HexMapMouseSystem extends AbstractAppState {
         HexMapInputEvent event = callRayActionListeners(mouseInput, ray);
 
         if (event == null) {
-            main.getRootNode().getChild("mapNode").collideWith(ray, results);
+            main.getRootNode().getChild("hexMapNode").collideWith(ray, results);
             if (results.size() != 0) {
                 if (results.size() > 0) {
                     CollisionResult closest = results.getClosestCollision();

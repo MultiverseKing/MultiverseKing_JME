@@ -1,8 +1,5 @@
 package entitysystem.card;
 
-import entitysystem.card.utility.Card;
-import entitysystem.card.utility.CardProperties;
-import entitysystem.card.utility.Hover;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
@@ -106,6 +103,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     private Card cardPreviewCast;
 
     // </editor-fold>
+    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -307,7 +305,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         cardPreviewCast = card;
         if(activateCard(null)){
             if (castDebug == null) {
-                castDebug = new Window(screen, "CastDebug", new Vector2f(275, 155), new Vector2f(250, 20));
+                castDebug = new Window(screen, "CastDebug", new Vector2f(175, 155), new Vector2f(250, 20));
                 castDebug.setMinDimensions(new Vector2f(200, 26));
                 castDebug.setIgnoreMouse(true);
             }

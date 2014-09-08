@@ -16,6 +16,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.awt.im.InputContext;
+import java.util.Locale;
 
 /**
  *
@@ -504,18 +505,19 @@ public final class RTSCamera extends AbstractAppState {
 
     private void registerWithInput(InputManager inputManager) {
         this.inputManager = inputManager;
-
-        String local = InputContext.getInstance().getLocale().toString();
+        InputContext iContext = InputContext.getInstance();
+        String local = iContext.getLocale().toString();
         KeyTrigger negSide = new KeyTrigger(KeyInput.KEY_A);
         KeyTrigger posRot = new KeyTrigger(KeyInput.KEY_Q);
         KeyTrigger negFWD = new KeyTrigger(KeyInput.KEY_W);
 //        KeyTrigger negDistance = new KeyTrigger(KeyInput.KEY_Z);
-        if (local.equals("fr_FR")) {
+        if (local.equals("fr_FR") && iContext.isCompositionEnabled()) {
             negSide = new KeyTrigger(KeyInput.KEY_Q);
             posRot = new KeyTrigger(KeyInput.KEY_A);
             negFWD = new KeyTrigger(KeyInput.KEY_Z);
 //            negDistance = new KeyTrigger(KeyInput.KEY_W);
         }
+        
 
 
         if (up == UpVector.Y_UP) {

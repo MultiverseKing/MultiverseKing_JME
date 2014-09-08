@@ -3,6 +3,7 @@ package entitysystem.field.position;
 import com.simsilica.es.EntityComponent;
 import entitysystem.render.utility.Curve;
 import com.simsilica.es.PersistentComponent;
+import java.util.ArrayList;
 import utility.HexCoordinate;
 import utility.Rotation;
 
@@ -61,7 +62,7 @@ public class HexPositionComponent implements PersistentComponent {
     }
 
     /**
-     * Create a interpolateTo with modifiate rotation.
+     * Create a movement with modifiate rotation.
      *
      * @param rot new rotation.
      * @return the cloned component.
@@ -71,7 +72,7 @@ public class HexPositionComponent implements PersistentComponent {
     }
 
     /**
-     * Create a interpolateTo with modifiate position.
+     * Create a movement with modifiate position.
      *
      * @param pos new position.
      * @return the cloned component.
@@ -81,17 +82,24 @@ public class HexPositionComponent implements PersistentComponent {
     }
     
     /**
-     * Create an interpolation from this component position to another position.
+     * Create interpolation from this component.
      *
      * @param CurveType interpolation type.
-     * @param position destination Position.
      * @return the cloned component.
      */
-    public HexPositionComponent interpolateTo(Curve curve, HexCoordinate position) {
+    public HexPositionComponent movement(Curve curve) {
         return new HexPositionComponent(position, rotation, curve);
     }
 
     public EntityComponent cloneWithoutCurve() {
+        return new HexPositionComponent(position, rotation);
+    }
+
+    EntityComponent cloneWithoutCurve(HexCoordinate position) {
+        return new HexPositionComponent(position, rotation);
+    }
+    
+    EntityComponent cloneWithoutCurve(HexCoordinate position, Rotation rotation) {
         return new HexPositionComponent(position, rotation);
     }
 }

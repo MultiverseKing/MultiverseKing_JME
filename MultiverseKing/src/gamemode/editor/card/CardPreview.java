@@ -6,8 +6,8 @@ import com.jme3.math.Vector4f;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.attribut.CardType;
-import entitysystem.card.utility.CardProperties;
-import entitysystem.card.utility.Hover;
+import entitysystem.card.CardProperties;
+import entitysystem.card.Hover;
 import java.io.File;
 import java.io.FilenameFilter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -26,11 +26,11 @@ public class CardPreview {
     private final Hover hover;
     private final ButtonAdapter preview;
 
-    public Element getPreview() {
+    Element getPreview() {
         return preview;
     }
 
-    public CardPreview(Screen screen, Element parent) {
+    CardPreview(Screen screen, Element parent) {
         /**
          * Window used to show a preview of the card.
          */

@@ -1,6 +1,6 @@
 package kingofmultiverse;
 
-import gamemode.editor.EditorMainAppState;
+import gamemode.editor.EditorMainGui;
 import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -19,7 +19,7 @@ import entitysystem.card.CardRenderSystem;
 import entitysystem.field.position.MovementSystem;
 import entitysystem.render.RenderSystem;
 import entitysystem.field.CollisionSystem;
-import entitysystem.field.gui.GUIRenderSystem;
+import gamemode.battle.BattleGUISystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSettings;
@@ -176,33 +176,15 @@ public class MultiverseMain extends SimpleApplication {
                 new HexSystemAppState(this, mapData),
                 new HexMapMouseSystem(),
                 new RenderSystem(),
-                new MovementSystem(),
+//                new MovementSystem(),
                 new CardRenderSystem(),
-                new AnimationSystem(),
-                new CollisionSystem(),
-                new GUIRenderSystem(),
-                new EditorMainAppState()); //<< This call the Editor GUI SHould be called last.
+//                new AnimationSystem(),
+//                new CollisionSystem(),
+//                new BattleGUISystem(),
+                new EditorMainGui()); //<< This call the Editor GUI SHould be called last.
     }
-//    private boolean exemple = false;
-
-//    @Override
-//    public void simpleUpdate(float tpf) {
-//        super.update();
-//        if (exemple) {
-//            MapData md = stateManager.getState(HexSystemAppState.class).getMapData();
-//            md.addChunk(Vector2Int.ZERO, null);
-//            EntityData ed = stateManager.getState(EntityDataAppState.class).getEntityData();
-//            //Example: Initialise new character entity.
-//            EntityId characterId = ed.createEntity();
-//            ed.setComponents(characterId, new RenderComponent("Berserk"),
-//                    new HexPositionComponent(new HexCoordinate(HexCoordinate.AXIAL, 0, 0), Rotation.A),
-//                    new MovementStatsComponent(1f, (byte) 3),
-//                    new MoveToComponent(new HexCoordinate(HexCoordinate.OFFSET, 5, 5)));
-//
-//            exemple = false;
-//        }
-//    }
-    /**
+    
+   /**
      * Return the first founded key.
      *
      * @param map

@@ -21,7 +21,11 @@ public enum ElementalAttribut {
     /**
      *
      */
-    SHOCK,
+    VOLT,
+    /**
+     *
+     */
+    WATER,
     /**
      *
      */
@@ -38,8 +42,8 @@ public enum ElementalAttribut {
 
     /**
      * Convert a number to ElementalAttribut, if there is no convertion for the
-     * input number, the ElementalAttribut will be set to NULL, default ==
-     * ElementalAttribut.NULL; int 0 == ElementalAttribut.NULL;
+     * input number, the ElementalAttribut will be set to NULL, 
+     * default == ElementalAttribut.NULL;
      *
      * @param x number to convert.
      * @return converted int.
@@ -57,7 +61,10 @@ public enum ElementalAttribut {
                 result = ElementalAttribut.ICE;
                 break;
             case 3:
-                result = ElementalAttribut.SHOCK;
+                result = ElementalAttribut.VOLT;
+                break;
+            case 4:
+                result = ElementalAttribut.WATER;
                 break;
             default:
                 result = ElementalAttribut.NULL;

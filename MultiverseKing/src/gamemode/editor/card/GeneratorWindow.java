@@ -1,0 +1,201 @@
+package gamemode.editor.card;
+
+import com.jme3.math.Vector2f;
+import entitysystem.ability.AbilityComponent;
+import entitysystem.attribut.Faction;
+import entitysystem.attribut.CardType;
+import static entitysystem.attribut.CardType.ABILITY;
+import static entitysystem.attribut.CardType.EQUIPEMENT;
+import static entitysystem.attribut.CardType.SPELL;
+import static entitysystem.attribut.CardType.SUMMON;
+import static entitysystem.attribut.CardType.TRAP;
+import entitysystem.card.CardProperties;
+import entitysystem.loader.EntityLoader;
+import gamemode.editor.EditorWindow;
+import tonegod.gui.controls.lists.SelectBox;
+import tonegod.gui.controls.lists.Spinner;
+import tonegod.gui.core.Element;
+import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
+import tonegod.gui.core.layouts.LayoutHint.VAlign;
+import utility.ElementalAttribut;
+
+/**
+ *
+ * @author roah
+ */
+final class GeneratorWindow extends EditorWindow {
+
+    private boolean initialized = false;
+    private CardPreview cardPreview;
+    private GeneratorSubWindow currentSubMenu;
+    private final CardEditorLoaderWindow saveAndLoadGUI;
+
+    GeneratorWindow(ElementManager screen, Element parent) {
+        super(screen, parent, "Card Generator");
+        /**
+         * Part used to show/set the card Name.
+         */
+        addEditableTextField("Name", "TuxDoll", Vector2f.ZERO);
+        /**
+         * Part used to show/choose the cost needed to use the card.
+         */
+        addSpinnerField("Cost", new int[]{0, 20, 1, 0}, new Vector2f(1, 0), new Vector2f(50, 0));
+        /**
+         * Part used to show/choose the card faction.
+         */
+        addEditableSelectionField("Faction", Faction.NEUTRAL, Faction.values(), new Vector2f(0, 1));
+        /**
+         * Part used to show/choose the card Type.
+         */
+        addEditableSelectionField("Card Type", CardType.SUMMON, CardType.values(), new Vector2f(1, 1));
+        /**
+         * Part used to show/choose the card Element Attribut.
+         */
+        addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), new Vector2f(2, 1));
+        /**
+         * Part used to show/set the card Description text.
+         */
+        addEditableTextField("Description", "This is a Testing unit", new Vector2f(0, 2),new Vector2f(0,25));
+        Element el = getTextField("Description");
+        el.setPosition(el.getPosition().x - 75, el.getPosition().y);
+        el.setWidth(getGridSize().x * 2);
+        /**
+         * Part used to test out card.
+         */
+        addButtonField("Test Card", "Cast", 1, new Vector2f(0, 3.5f));
+        /**
+         * Part used to test out card.
+         */
+        addButtonField("SubType Properties", "Edit", 0, new Vector2f(1, 3.5f));
+        /**
+         *
+         */
+        show(3, 6.5f, VAlign.center);
+        cardPreview = new CardPreview((Screen) screen, getWindow());
+        saveAndLoadGUI = new CardEditorLoaderWindow((Screen) screen, cardPreview.getPreview(), this);
+        initialized = true;
+    }
+
+    @Override
+    protected void onSelectBoxFieldChange(Enum value) {
+        if (initialized) {
+            if (value instanceof Faction) {
+                /**
+                 * Change inspected Card Faction.
+                 */
+                cardPreview.switchFaction((Faction) value);
+            } else if (value instanceof CardType) {
+                /**
+                 * Change inspected Card CardType.
+                 */
+                cardPreview.switchSubType((CardType) value);
+            } else if (value instanceof ElementalAttribut) {
+                /**
+                 * Change inspected Card Element.
+                 */
+                cardPreview.switchEAttribut((ElementalAttribut) value);
+            }
+        }
+    }
+
+    @Override
+    protected void onSpinnerChange(String sTrigger, int currentIndex) {
+        if (sTrigger.equals("Cost")) {
+            /**
+             * Change the hover cost value.
+             */
+            cardPreview.switchCost(currentIndex);
+        }
+    }
+
+    @Override
+    protected void onButtonTrigger(int index) {
+        switch (index) {
+            case 0:
+                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
+                    currentSubMenu.detachFromParent();
+                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
+                    return;
+                }
+                currentSubMenu = new GeneratorSubWindow(screen, cardPreview.getPreview(), (CardType) getFieldValue("Card Type"));
+            case 1:
+            /**
+             * Activate the cards.
+             */
+        }
+    }
+
+    @Override
+    protected void onTextFieldInput(String input) {
+        cardPreview.switchName(input);
+    }
+
+    void loadProperties(String cardName, CardProperties properties, EntityLoader loader) {
+        /**
+         * Load the card Name.
+         */
+        getTextField("Name").setText(cardName);
+        /**
+         * Load the card cost.
+         */
+        Spinner cost = getSpinnerField("Cost");
+        cost.setSelectedIndex(properties.getPlayCost());
+        cardPreview.switchCost(properties.getPlayCost());
+        /**
+         * Load the element Attribut.
+         */
+        SelectBox box = getSelectBoxField("E.Attribut");
+        box.setSelectedByValue(properties.getElement(), true);
+//        cardPreview.switchEAttribut(properties.getElement());
+        /**
+         * Load the Faction Attribut.
+         */
+        box = getSelectBoxField("Faction");
+        box.setSelectedByValue(properties.getFaction(), true);
+//        cardPreview.switchFaction(properties.getFaction());
+        /**
+         * Load the description Text.
+         */
+        getTextField("Description").setText(properties.getDescription());
+        /**
+         * Load the card type.
+         */
+        box = getSelectBoxField("Card Type");
+        box.setSelectedByValue(properties.getCardSubType(), true);
+        onButtonTrigger(0);
+        switch (properties.getCardSubType()) {
+            case ABILITY:
+                /**
+                 * @todo: Load ability SubMenu Data.
+                 */
+                AbilityComponent abilityData = loader.loadAbility(cardName);
+                currentSubMenu.setPower(abilityData.getPower());
+                currentSubMenu.setUnitSegmentCost(abilityData.getSegment());
+                currentSubMenu.setActivationRange(abilityData.getActivationRange());
+                currentSubMenu.setCastFromSelf(abilityData.isCastFromSelf());
+                //Todo: collisionhit
+                break;
+            case EQUIPEMENT:
+                /**
+                 * @todo: Load Equipement SubMenu Data.
+                 */
+                break;
+            case SPELL:
+                /**
+                 * @todo: Load Spell SubMenu Data.
+                 */
+                break;
+            case TRAP:
+                /**
+                 * @todo: Load Trap SubMenu Data.
+                 */
+                break;
+            case SUMMON:
+                /**
+                 * @todo: Load Summon SubMenu Data
+                 */
+                break;
+        }
+    }
+}

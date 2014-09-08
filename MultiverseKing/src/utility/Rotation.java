@@ -19,7 +19,7 @@ public enum Rotation {
     /**
      * Equivalent to X- Y+.
      */
-    C(new Quaternion(new Quaternion(new float[]{0, .5f, 0}))),
+    C(new Quaternion(new Quaternion(new float[]{0, -0.5f, 0}))),
     /**
      * Equivalent to X-.
      */

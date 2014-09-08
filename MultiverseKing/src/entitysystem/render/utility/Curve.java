@@ -1,5 +1,8 @@
 package entitysystem.render.utility;
 
+import java.util.List;
+import utility.HexCoordinate;
+
 /**
  *
  * @author roah
@@ -7,9 +10,11 @@ package entitysystem.render.utility;
 public class Curve {
 
     private final float speed;
+    private final List<HexCoordinate> waypoints;
     private final CurveType curveType;
 
-    public Curve(CurveType curveType, float speed) {
+    public Curve(CurveType curveType, float speed, List<HexCoordinate> waypoints) {
+        this.waypoints = waypoints;
         this.curveType = curveType;
         this.speed = speed;
     }
@@ -22,8 +27,14 @@ public class Curve {
         return curveType;
     }
 
+    public List<HexCoordinate> getWaypoints() {
+        return waypoints;
+    }
+    
     public enum CurveType {
-
+        BEZIER,
+        EASE_IN,
+        EASE_OUT,
         LINEAR;
     }
 }

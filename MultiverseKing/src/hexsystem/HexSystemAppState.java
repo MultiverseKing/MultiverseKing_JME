@@ -52,7 +52,7 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
     public HexSystemAppState(SimpleApplication main, MapData mapData) {
         this.main = main;
         this.mapData = mapData;
-        mapNode = new Node("mapNode");
+        mapNode = new Node("hexMapNode");
     }
 
     /**
@@ -72,8 +72,6 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
          * This double the Vertice count.
          */
         mapNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-
-//        addAllChunks(); //to remove
     }
 
     /**
@@ -114,12 +112,5 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
             mapNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).update();
         }
 
-    }
-
-    private void addAllChunks() {
-        Set<Entry<Vector2Int, HexTile[][]>> chunks = mapData.getAllChunks();
-        for (Entry<Vector2Int, HexTile[][]> e : chunks) {
-            insertNewChunk(e.getKey());
-        }
     }
 }

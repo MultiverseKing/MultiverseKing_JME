@@ -193,12 +193,11 @@ public final class MapData {
             }
         }
     }
-
-    /**
-     * @param tilePos
-     * @param height
-     * @todo
-     */
+    
+    public void setTileEAttribut(HexCoordinate tilePos, ElementalAttribut eAttribut){
+        setTile(tilePos, getTile(tilePos).cloneChangedElement(eAttribut));
+    }
+        
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
@@ -327,18 +326,6 @@ public final class MapData {
                 (position.y * HexSettings.CHUNK_SIZE) * (float) (HexSettings.HEX_RADIUS * 1.5));
     }
 
-//    /**
-//     * Convert Hex grid position to world position. Convertion work with Odd-R
-//     * Offset grid type. (currently used grid type).
-//     *
-//     * @return tile world unit position.
-//     */
-//    public Vector3f convertHexCoordinateToWorldPosition(HexCoordinate tilePos) {
-//        Vector2Int offsetPos = tilePos.getAsOffset();
-//        return new Vector3f((offsetPos.x) * HexSettings.HEX_WIDTH
-//                + ((offsetPos.y & 1) == 0 ? 0 : HexSettings.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSettings.HEX_RADIUS * 1.5f);
-//    }
-
     /**
      * Convert Hex grid position to world position and check if the tile exist.
      * /!\ Return a value only if the tile exist. use getTileWorldPosition() if
@@ -395,8 +382,7 @@ public final class MapData {
         mapName = mdLoader.getMapName();
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
-        chunkData.clear();
-        chunkEvent(new ChunkChangeEvent(true));
+        clearCurrent();
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
@@ -414,9 +400,9 @@ public final class MapData {
             Logger.getLogger(MapData.class.getName()).log(Level.WARNING, "Invalid Path name");
             return false;
         }
+        this.mapName = mapName;
         try {
             if (saveChunk(Vector2Int.INFINITY)) {
-                this.mapName = mapName;
                 String userHome = System.getProperty("user.dir") + "/assets";
                 BinaryExporter exporter = BinaryExporter.getInstance();
                 MapDataLoader mdLoader = new MapDataLoader();
@@ -483,7 +469,7 @@ public final class MapData {
     }
 
     /**
-     * load the chunk from speciate folder, internal use.
+     * load the chunk from a specifiate folder, internal use.
      */
     private void loadChunk(Vector2Int position, String folder) {
         String chunkPath;
@@ -501,17 +487,16 @@ public final class MapData {
         }
     }
 
-    /**
-     *
-     * @return
-     */
+    public void clearCurrent() {
+        chunkPos.clear();
+        chunkData.clear();
+        chunkEvent(new ChunkChangeEvent(true));
+    }
+    
     public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks() {
         return chunkData.getAllChunks();
     }
-
-    /**
-     *
-     */
+    
     public void Cleanup() {
         //Todo remove all file from the temps folder
     }

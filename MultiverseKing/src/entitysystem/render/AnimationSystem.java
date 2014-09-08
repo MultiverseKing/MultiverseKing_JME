@@ -12,6 +12,7 @@ import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
+import gamemode.battle.TimeBreakComponent;
 
 /**
  * Handle how animation work when they got they cycle done or under defined
@@ -29,7 +30,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
-        return entityData.getEntities(AnimationComponent.class, RenderComponent.class);
+        return entityData.getEntities(AnimationComponent.class, RenderComponent.class, TimeBreakComponent.class);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
         AnimControl control = renderSystem.getAnimControl(e.getId());
         if(control == null){
             entityData.removeComponent(e.getId(), AnimationComponent.class);
-            System.out.println(getClass().toString() + ": There is no Animation control for this entity.");
+            System.err.println(getClass().toString() + ": There is no Animation control for " + e.get(RenderComponent.class).getName());
             return;
         } 
         control.addListener(this);
@@ -62,6 +63,11 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
         Animation toPlay = e.get(AnimationComponent.class).getAnimation();
         if (!animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
+        }
+        if(e.get(TimeBreakComponent.class).isTimeBreak()){
+            animControls.get(e.getId()).getChannel(0).setSpeed(0);
+        } else if(!e.get(TimeBreakComponent.class).isTimeBreak() && animControls.get(e.getId()).getChannel(0).getSpeed() == 0f) {
+            animControls.get(e.getId()).getChannel(0).setSpeed(1f);
         }
     }
 
@@ -93,25 +99,29 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
      * @param anim animation to play.
      */
     private void setPlay(AnimChannel channel, Animation anim) {
-        switch(anim){
-            case IDLE:
-                channel.setAnim(anim.toString(), 0.50f);
-                channel.setLoopMode(LoopMode.Loop);
-                channel.setSpeed(1f);
-                break;
-            case SUMMON:
-                channel.setAnim(anim.toString());
-                channel.setLoopMode(LoopMode.DontLoop);
-                break;
-            case WALK:
-                channel.setAnim(anim.toString(), 0.50f);
-                channel.setLoopMode(LoopMode.Loop);
-                break;
-            default:
-                throw new UnsupportedOperationException(anim.name()+" Is not a supported animation type in : "+getClass().getName());
+        if(channel.getControl().getAnimationNames().contains(anim.name())){
+            switch(anim){
+                case IDLE:
+                    channel.setAnim(anim.toString(), 0.50f);
+                    channel.setLoopMode(LoopMode.Loop);
+                    channel.setSpeed(1f);
+                    break;
+                case SUMMON:
+                    channel.setAnim(anim.toString());
+                    channel.setLoopMode(LoopMode.DontLoop);
+                    break;
+                case WALK:
+                    channel.setAnim(anim.toString(), 0.50f);
+                    channel.setLoopMode(LoopMode.Loop);
+                    break;
+                default:
+                    System.err.println(anim.name()+" Is not a supported animation type.");
+            }
+        } else if(anim.equals(Animation.SUMMON)){
+            setPlay(channel, Animation.IDLE);
         }
     }
-
+    
     /**
      * Called When an animation on a channel ended his life cycle.
      *
@@ -141,4 +151,5 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     public void remove() {
         app.getStateManager().detach(this);
     }
+
 }

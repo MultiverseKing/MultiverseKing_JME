@@ -39,7 +39,8 @@ class ElementalWidgetMenu extends CameraTrackWindow {
             screenElement.addChild(eIconContainer);
         }
         byte j = 0;
-        for (int i = 0; i < ElementalAttribut.values().length; i++) {
+        int i = 0;
+        while ( i < ElementalAttribut.values().length) {
             ElementalAttribut e = ElementalAttribut.convert(i);
             if (e.equals(ignoredEAttribut) || e.equals(ElementalAttribut.NULL)) {
                 j++;
@@ -79,7 +80,9 @@ class ElementalWidgetMenu extends CameraTrackWindow {
                     eIconContainer.addChild(ico);
                 }
             }
+            i++;
         }
+        screenElement.setDimensions(30 * (i - j) + 30,screenElement.getDimensions().y);
     }
 
     private void updateElementalIcon(ElementalAttribut currentEAttribut) {

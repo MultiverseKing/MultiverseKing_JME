@@ -26,7 +26,7 @@ public abstract class EditorMenu extends Element {
     private SelectList selectList = null;
 
     public EditorMenu(ElementManager screen, String UID, String titleName, EntitySystemAppState system) {
-        super(screen, UID, new Vector2f(15, 15), new Vector2f(130, 25),
+        super(screen, UID, new Vector2f(5, 5), new Vector2f(130, 25),
                 screen.getStyle("Window#Dragbar").getVector4f("resizeBorders"),
                 screen.getStyle("Window#Dragbar").getString("defaultImg"));
         this.setTextWrap(LineWrapMode.valueOf(screen.getStyle("Window#Dragbar").getString("textWrap")));

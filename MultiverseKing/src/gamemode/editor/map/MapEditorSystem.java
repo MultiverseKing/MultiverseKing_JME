@@ -241,8 +241,7 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
         app.getStateManager().attach(new EditorMainGui());
     }
 
-    enum MapEditorMode {
-
+    public enum MapEditorMode {
         ROOM,
         AREA,
         WORLD,

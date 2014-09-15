@@ -29,7 +29,7 @@ import utility.MouseRay;
  *
  * @author Eike Foede, roah
  */
-public class HexMapMouseSystem extends AbstractAppState {
+public final class HexMapMouseSystem extends AbstractAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -43,6 +43,19 @@ public class HexMapMouseSystem extends AbstractAppState {
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
 
+    public HexMapMouseSystem() {
+    }
+    public HexMapMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
+        registerRayInputListener(rayListener);
+        registerTileInputListener(inputListener);
+    }
+    public HexMapMouseSystem(HexMapRayListener rayListener) {
+        registerRayInputListener(rayListener);
+    }
+    public HexMapMouseSystem(HexMapInputListener inputListener) {
+        registerTileInputListener(inputListener);
+    }
+    
     public Spatial getRayDebug() {
         return rayDebug;
     }
@@ -51,8 +64,8 @@ public class HexMapMouseSystem extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application app) {
         this.main = (MultiverseMain) app;
         mapData = stateManager.getState(HexSystemAppState.class).getMapData();
-        initMarkDebug();
         initInput();
+        initMarkDebug();
     }
 
     /**
@@ -94,11 +107,19 @@ public class HexMapMouseSystem extends AbstractAppState {
     }
 
     /**
-     * Base input, it not depend on the gameMode or other thing if hexMap is
-     * instanced that mean Tiles is or will be instanced so this input too.
+     * Activate the input to interact with the grid.
      */
-    private void initInput() {
+    public void initInput() {
         main.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
+    }
+
+    /**
+     * Diseable the input used to interact with the grid.
+     */
+    public void removeInput() {
+        main.getInputManager().removeListener(tileActionListener);
+        clearCursor();
+        clearDebug();
     }
     private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -125,15 +146,23 @@ public class HexMapMouseSystem extends AbstractAppState {
         rayDebug.setMaterial(mark_mat);
     }
 
+    public void clearDebug() {
+        rayDebug.removeFromParent();
+    }
+
     private void initCursor() {
-        cursor = main.getAssetManager().loadModel("Models/utility/animPlane.j3o");
-        Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-        animShader.setInt("Speed", 16);
-        cursor.setMaterial(animShader);
-        main.getRootNode().attachChild(cursor);
+        if (cursor == null) {
+            cursor = main.getAssetManager().loadModel("Models/utility/animPlane.j3o");
+            Material animShader = main.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+            animShader.setInt("Speed", 16);
+            cursor.setMaterial(animShader);
+        }
+        if (!main.getRootNode().hasChild(cursor)) {
+            main.getRootNode().attachChild(cursor);
+        }
         //Remove offset and set it to zero if hex_void_anim.png is not used
-        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
-        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
+//        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
+//        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
     }
 
     @Override
@@ -199,11 +228,11 @@ public class HexMapMouseSystem extends AbstractAppState {
 
                     HexCoordinate newPos = convertMouseCollision(results);
 //                    if (newPos != null && !newPos.equals(lastHexPos)) {
-                        event = new HexMapInputEvent(newPos, ray, closest);
-                        moveCursor(newPos);
-                        callMouseActionListeners(mouseInput, event);
+                    event = new HexMapInputEvent(newPos, ray, closest);
+                    moveCursor(newPos);
+                    callMouseActionListeners(mouseInput, event);
 //                    }
-                } 
+                }
             } else {
                 //Error catching.
                 System.out.println("null raycast");
@@ -211,8 +240,8 @@ public class HexMapMouseSystem extends AbstractAppState {
             }
         } else {
 //            if (!event.getEventPosition().equals(lastHexPos)) {
-                moveCursor(event.getEventPosition());
-                callMouseActionListeners(mouseInput, event);
+            moveCursor(event.getEventPosition());
+            callMouseActionListeners(mouseInput, event);
 //            }
         }
     }
@@ -253,9 +282,9 @@ public class HexMapMouseSystem extends AbstractAppState {
         return event;
     }
 
-    public void setDebugPosition(Vector3f pos){
-        if(rayDebug != null){
-            if(main.getRootNode().hasChild(rayDebug)){
+    public void setDebugPosition(Vector3f pos) {
+        if (rayDebug != null) {
+            if (main.getRootNode().hasChild(rayDebug)) {
                 rayDebug.setLocalTranslation(pos);
             } else {
                 main.getRootNode().attachChild(rayDebug);
@@ -263,36 +292,36 @@ public class HexMapMouseSystem extends AbstractAppState {
             }
         }
     }
-    
+
     public void setCursor(HexCoordinate tilePos) {
         moveCursor(tilePos);
         enable = 1;
     }
-    
     Byte enable = 0;
+
     private void moveCursor(HexCoordinate tilePos) {
-        if(enable <= 0){
-            if (cursor == null) {
-                initCursor();
-            }
-            Vector3f pos = tilePos.convertToWorldPosition();
-            cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_OFFSET
-                    + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
-            /**
-             * The cursor real position is not updated on pulseMode.
-             */
-            if (listenerPulseIndex == -1) {
-                lastHexPos = tilePos;
-            }
-        } else {
-            enable--;
+//        if(enable <= 0){
+        initCursor();
+        Vector3f pos = tilePos.convertToWorldPosition();
+        cursor.setLocalTranslation(pos.x, mapData.getTile(tilePos).getHeight() * HexSettings.FLOOR_OFFSET
+                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+        /**
+         * The cursor real position is not updated on pulseMode.
+         */
+        if (listenerPulseIndex == -1) {
+            lastHexPos = tilePos;
+        }
+//        } else {
+//            enable--;
+//        }
+    }
+
+    public void clearCursor() {
+        if (cursor != null && main.getRootNode().hasChild(cursor)) {
+            cursor.removeFromParent();
         }
     }
 
-    /**
-     *
-     * @return
-     */
     private HexCoordinate convertMouseCollision(CollisionResults rayResults) {
         HexCoordinate tilePos;
         Vector3f pos;

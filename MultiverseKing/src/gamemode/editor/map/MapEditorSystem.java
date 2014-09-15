@@ -140,10 +140,15 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
      * @param currentMode
      */
     void switchGui(MapEditorMode newMode) {
-        if (currentMode == null || newMode != currentMode) {
+        if (newMode != currentMode) {
             if (currentGui != null
                     && ((MultiverseMain) app).getScreen().getElementById(currentGui.getUID()) != null) {
-                ((MultiverseMain) app).getScreen().removeElement(currentGui);
+                if(((MultiverseMain) app).getStateManager().getState(HexMapMouseSystem.class) != null){
+                    app.getStateManager().detach(app.getStateManager().getState(HexMapMouseSystem.class));
+//                    app.getStateManager().getState(HexMapMouseSystem.class).clearCursor();
+//                    app.getStateManager().getState(HexMapMouseSystem.class).clearDebug();
+                }
+                currentGui.removeFromScreen();
             }
             switch (newMode) {
                 case WORLD:
@@ -176,7 +181,7 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
     }
 
     private void initializeArea() {
-        ((MultiverseMain) app).getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
+        app.getStateManager().attach(new HexMapMouseSystem(this));
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(Vector2Int.ZERO, null);
@@ -186,7 +191,6 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
 
     private void clearArea() {
         mapData.removeTileChangeListener(this);
-        ((MultiverseMain) app).getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
         mapData.clearCurrent();
         initializeArea = false;
     }
@@ -232,7 +236,8 @@ public class MapEditorSystem extends EntitySystemAppState implements TileChangeL
         if (initializeArea) {
             clearArea();
         }
-        ((MultiverseMain) app).getScreen().removeElement(currentGui);
+        currentGui.removeFromScreen();
+//        ((MultiverseMain) app).getScreen().removeElement(currentGui);
         app.getStateManager().attach(new EditorMainGui());
     }
 

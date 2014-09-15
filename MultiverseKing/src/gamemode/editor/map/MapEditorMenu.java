@@ -42,7 +42,7 @@ class MapEditorMenu extends EditorMenu {
                 break;
         }
     }
-
+    
     @Override
     protected void onSelectedItemChange(int index) {
     }    

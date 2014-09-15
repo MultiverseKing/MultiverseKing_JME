@@ -20,10 +20,9 @@ final class RoomEditorMenu extends EditorMenu {
     private RoomTileWidget tileWidgetMenu;
 
     RoomEditorMenu(Screen screen, MapEditorSystem mapEditorSystem) {
-        super(screen, "AreaEditorMenu", "Area Editor", mapEditorSystem);
-        addAdditionalField("Area Loader");
-        addAdditionalField("Edit Assets");
-        addAdditionalField("Test E.Attribut");
+        super(screen, "RoomEditorMenu", "Room Editor", mapEditorSystem);
+        addAdditionalField("New Room");
+        addAdditionalField("Load Room");
         populateEditor();
     }
 
@@ -46,20 +45,14 @@ final class RoomEditorMenu extends EditorMenu {
             switch (value) {
                 case 0:
                     /**
-                     * Open the area loader to save or load an area.
+                     * Generate a new empty room following the parameter.
                      */
                     currentWindow = new MapEditorLoaderWindow(screen, this);
                     currentValue = value;
                     break;
                 case 1:
                     /**
-                     * Open the props editor.
-                     */
-                    break;
-                case 2:
-                    /**
-                     * Open the E.Attribut window to test other elements on the
-                     * current area.
+                     * Load a room from files.
                      */
                     break;
                 default:
@@ -113,6 +106,14 @@ final class RoomEditorMenu extends EditorMenu {
     public void update(float tpf) {
         if (tileWidgetMenu != null) {
             tileWidgetMenu.update(tpf);
+        }
+    }
+    
+    @Override
+    public void removeFromScreen() {
+        super.removeFromScreen();
+        if(tileWidgetMenu != null){
+            tileWidgetMenu.removeFromScreen();
         }
     }
 }

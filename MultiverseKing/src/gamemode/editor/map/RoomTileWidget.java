@@ -98,7 +98,9 @@ class RoomTileWidget extends CameraTrackWindow {
     @Override
     public void hide() {
         super.hide();
-        eWin.hide();
+        if(eWin != null){
+            eWin.hide();
+        }
     }
     
     void updateIcon(){
@@ -121,6 +123,8 @@ class RoomTileWidget extends CameraTrackWindow {
     HexCoordinate getSelectedTilePosition(){
         return selectedTilePosition;
     }
+    
+    
     
 //    private void genPropertiesWindow() {
 //        tileWin = new Window(screen, "tilePropertiesWin",
@@ -183,4 +187,12 @@ class RoomTileWidget extends CameraTrackWindow {
 //        tilePButtonGroup.setDisplayElement(tileWin);
 //        addChild(tileWin);
 //    }
+
+    @Override
+    public void removeFromScreen() {
+        super.removeFromScreen();
+        if(eWin != null){
+            eWin.removeFromScreen();
+        }
+    }
 }

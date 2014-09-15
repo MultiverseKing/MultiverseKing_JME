@@ -67,6 +67,10 @@ public abstract class CameraTrackWindow {
         }
     }
     
+    public void removeFromScreen(){
+        screen.removeElement(screenElement);
+    }
+    
     public String getUID(){
         return screenElement.getUID();
     }

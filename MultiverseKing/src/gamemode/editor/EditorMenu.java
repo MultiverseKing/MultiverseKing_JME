@@ -107,11 +107,15 @@ public abstract class EditorMenu extends Element {
     public AbstractAppState getSystem() {
         return system;
     }
+    
+    public void removeFromScreen(){
+        screen.removeElement(this);
+    }
 
     protected void additionalFieldReturnTrigger() {
         app.getStateManager().detach(system);
     }
-
+    
     public abstract void update(float tpf);
 
     protected abstract void onAdditionalFieldTrigger(int value);

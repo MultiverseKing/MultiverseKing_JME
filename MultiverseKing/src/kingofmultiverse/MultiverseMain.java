@@ -14,14 +14,9 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import entitysystem.render.AnimationSystem;
 import entitysystem.card.CardRenderSystem;
-import entitysystem.field.position.MovementSystem;
 import entitysystem.render.RenderSystem;
-import entitysystem.field.CollisionSystem;
-import gamemode.battle.BattleGUISystem;
 import hexsystem.HexSystemAppState;
-import hexsystem.HexMapMouseSystem;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;
 import hexsystem.loader.MapDataLoader;
@@ -174,7 +169,7 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attachAll(
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
-                new HexMapMouseSystem(),
+//                new HexMapMouseSystem(),
                 new RenderSystem(),
 //                new MovementSystem(),
                 new CardRenderSystem(),

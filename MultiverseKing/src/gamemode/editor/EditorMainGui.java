@@ -5,12 +5,18 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import gamemode.editor.map.MapEditorSystem;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import gamemode.editor.map.MapEditorSystem.MapEditorMode;
+import static gamemode.editor.map.MapEditorSystem.MapEditorMode.AREA;
+import static gamemode.editor.map.MapEditorSystem.MapEditorMode.NONE;
+import static gamemode.editor.map.MapEditorSystem.MapEditorMode.ROOM;
+import static gamemode.editor.map.MapEditorSystem.MapEditorMode.WORLD;
+import tonegod.gui.controls.menuing.MenuItem;
 
 /**
  *
@@ -20,8 +26,9 @@ public class EditorMainGui extends AbstractAppState {
 
     private MultiverseMain main;
     private Window mainMenuBar;
-    private Menu currentMenuSelector;
-    private EditorItem loadedSub;
+    private Menu currentMenuItem;
+    private EditorItem currentMenuValue;
+    private String currentSelectedMenuItem;
 
     public Window getMainMenu() {
         return mainMenuBar;
@@ -62,7 +69,7 @@ public class EditorMainGui extends AbstractAppState {
             mainMenuBar.addChild(editorMenuBtn);
             i++;
         }
-        currentMenuSelector = new Menu(main.getScreen(), false) {
+        currentMenuItem = new Menu(main.getScreen(), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 menuTrigger(value.toString());
@@ -73,27 +80,41 @@ public class EditorMainGui extends AbstractAppState {
                 super.hide();
                 hideAllSubmenus(true);
             }
+
+            @Override
+            public void setHighlight(int index) {
+                super.setHighlight(index);
+                currentSelectedMenuItem = getMenuItem(index).getValue().toString();
+            }
+            
             
         };
-        main.getScreen().addElement(currentMenuSelector);
+        main.getScreen().addElement(currentMenuItem);
     }
 
     private void openMenuItem(EditorItem menu) {
         boolean showMenu = true;
-        if (loadedSub != menu) {
-            currentMenuSelector.removeAllMenuItems();
+        if (currentMenuValue != menu) {
+            currentMenuItem.removeAllMenuItems();
             switch (menu) {
                 case CARD:
-                    currentMenuSelector.addMenuItem("Generator", menu + "_GEN", null);
-                    currentMenuSelector.addMenuItem("Test Menu", menu.toString() + "_TEST", null);
+                    currentMenuItem.addMenuItem("Generator", "GEN", null);
+                    currentMenuItem.addMenuItem("Test Menu", "TEST", null);
                     break;
                 case MAP:
                     Menu subMenu = new Menu(main.getScreen(), false) {
-                         @Override
-                         public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                             subMenuTrigger(value.toString());
-                         }
-                     };
+                        @Override
+                        public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                            //Does not work as submenu... why!?
+                        }
+
+                        @Override
+                        public void onMouseLeftReleased(MouseButtonEvent evt) {
+                            super.onMouseLeftReleased(evt);
+                            menuTrigger(getMenuItem(currentHighlightIndex).getValue().toString());
+                        }
+                        
+                    };
                     subMenu.addMenuItem("New", 0, null);
                     subMenu.addMenuItem("Load", 1, null);
                     /**
@@ -103,58 +124,89 @@ public class EditorMainGui extends AbstractAppState {
                     for (MapEditorMode mode : MapEditorMode.values()) {
                         if (mode != MapEditorMode.NONE) {
                             String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
-                            currentMenuSelector.addMenuItem("Edit " + output, menu + "_" + mode, subMenu);
+                            currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
                         }
                     }
                     break;
                 case SFX:
                     /**
-                     * @todo: Add the SFX-builder window to the screen. (should remove
-                     * other window?)
+                     * @todo: Add the SFX-builder window to the screen. (should
+                     * remove other window?)
                      */
                     showMenu = false;
                     break;
                 default:
                     throw new UnsupportedOperationException(menu + " is not a supported type.");
             }
+            currentMenuValue = menu;
         }
-        if (showMenu) {
+        if (showMenu && menu != EditorItem.SFX) {
             Element btn = mainMenuBar.getElementsAsMap().get(menu + "EditorBtn");
-            currentMenuSelector.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - currentMenuSelector.getHeight());
+            currentMenuItem.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - currentMenuItem.getHeight());
         }
     }
 
     private void menuTrigger(String value) {
-        String[] input = value.split("_");
-        EditorItem item = EditorItem.valueOf(input[0]);
-        switch (item) {
+        switch (currentMenuValue) {
             case CARD:
-                if (input[1].equals("GEN")) {
+                if (value.equals("GEN")) {
                     /**
                      * @todo: Add the card generator window to the screen.
                      */
-                } else if (input[1].equals("TEST")) {
+                } else if (value.equals("TEST")) {
                     /**
-                     * @todo: Add the card testing window to the screen.
-                     * Load a map if any are initialized.
-                     * if one is initialized, ask for :
-                     * - Save / not save / load / load empty
+                     * @todo: Add the card testing window to the screen. Load a
+                     * map if any are initialized. if one is initialized, ask
+                     * for : - Save / not save / load / load empty
                      */
                 } else {
-                    throw new UnsupportedOperationException(input[1] + " is not a supported mode.");
+                    return;
                 }
                 break;
             case MAP:
-                return;
+                MapEditorMode mode = MapEditorMode.valueOf(currentSelectedMenuItem);
+                switch (mode) {
+                    case WORLD:
+                        /**
+                         * @todo
+                         */
+                        if (value.equals("0")) {
+                        } else if (value.equals("1")) {
+                        } else {
+                            return;
+                        }
+                        break;
+                    case AREA:
+                        /**
+                         * @todo
+                         */
+                        if (value.equals("0")) {
+                        } else if (value.equals("1")) {
+                        } else {
+                            return;
+                        }
+                        break;
+                    case ROOM:
+                        /**
+                         * @todo
+                         */
+                        if (value.equals("0")) {
+                            main.getStateManager().attach(new MapEditorSystem());
+                        } else if (value.equals("1")) {
+                        } else {
+                            return;
+                        }
+                        break;
+                    case NONE:
+                        return;
+                    default:
+                        throw new UnsupportedOperationException(mode + " is not a supported type.");
+                }
             case SFX:
                 break;
             default:
-                throw new UnsupportedOperationException(item + " is not a supported type.");
+                throw new UnsupportedOperationException(currentMenuValue + " is not a supported type.");
         }
-    }
-    
-    private void subMenuTrigger(String value) {
-        
     }
 
     @Override

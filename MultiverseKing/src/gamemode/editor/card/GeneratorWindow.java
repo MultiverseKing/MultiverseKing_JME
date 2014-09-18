@@ -11,7 +11,7 @@ import static entitysystem.attribut.CardType.SUMMON;
 import static entitysystem.attribut.CardType.TRAP;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
-import gamemode.editor.EditorWindow;
+import gamemode.gui.EditorWindow;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
@@ -113,12 +113,12 @@ final class GeneratorWindow extends EditorWindow {
     protected void onButtonTrigger(int index) {
         switch (index) {
             case 0:
-                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
-                    currentSubMenu.removeFromScreen();
-                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
-                    return;
-                }
-                currentSubMenu = new GeneratorSubWindow(screen, cardPreview.getPreview(), (CardType) getFieldValue("Card Type"));
+//                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
+//                    currentSubMenu.removeFromScreen();
+//                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
+//                    return;
+//                }
+//                currentSubMenu = new GeneratorSubWindow(screen, cardPreview.getPreview(), (CardType) getFieldValue("Card Type"));
             case 1:
             /**
              * Activate the cards.
@@ -127,7 +127,7 @@ final class GeneratorWindow extends EditorWindow {
     }
 
     @Override
-    protected void onTextFieldInput(String UID, String input) {
+    protected void onTextFieldInput(String UID, String input, boolean isTrigger) {
         cardPreview.switchName(input);
     }
 

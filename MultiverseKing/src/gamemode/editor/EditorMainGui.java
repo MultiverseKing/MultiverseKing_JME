@@ -14,10 +14,10 @@ import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import gamemode.editor.map.RoomEditorSystem;
-import tonegod.gui.controls.menuing.MenuItem;
 
 /**
  * rootMenu of the Game Editor.
+ *
  * @author roah
  */
 public class EditorMainGui extends AbstractAppState implements DialogWindowListener {
@@ -70,15 +70,14 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
             i++;
         }
         currentMenuItem = new Menu(main.getScreen(), false) {
-            
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                if(getMenuItem(index).getSubMenu() != null){
+                if (getMenuItem(index).getSubMenu() != null) {
                     return;
                 }
                 menuTrigger(value.toString());
             }
-            
+
             @Override
             public void hide() {
                 super.hide();
@@ -164,7 +163,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
                 break;
             case MAP:
                 MapEditorMode mode = MapEditorMode.valueOf(currentSelectedMenuItem);
-                switch(mode){
+                switch (mode) {
                     case WORLD:
                         loadWorldEditorSystem(new Byte(value));
                         break;
@@ -172,7 +171,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
                         loadAreaEditorSystem(new Byte(value));
                         break;
                     case ROOM:
-                        if(usedSystem instanceof RoomEditorSystem == false){
+                        if (usedSystem instanceof RoomEditorSystem == false) {
                             main.getStateManager().detach(usedSystem);
                             usedSystem = null;
                         }
@@ -187,11 +186,11 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
                 throw new UnsupportedOperationException(currentMenuValue + " is not a supported type.");
         }
     }
-    
+
     private void loadRoomEditorSystem(byte value) {
         if (value == 0) {
             if (usedSystem != null) {
-                ((RoomEditorSystem)usedSystem).reloadRoom();
+                ((RoomEditorSystem) usedSystem).reloadRoom();
             } else {
                 usedSystem = new RoomEditorSystem();
                 main.getStateManager().attach(usedSystem);
@@ -200,11 +199,11 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
             /**
              * @todo: Load.
              */
-            if(currentDialogPopup != null){
+            if (currentDialogPopup != null) {
                 currentDialogPopup.removeFromScreen();
             }
             currentDialogPopup = new DialogPopup(main.getScreen(), "Load Room", this);
-            currentDialogPopup.addEditableTextField("Name", null, Vector2f.ZERO);
+            currentDialogPopup.addInputText("Name");
             currentDialogPopup.show();
         } else if (value == 2) {
             /**
@@ -212,18 +211,16 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
              */
         }
     }
-    
+
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
-        if(dialogUID.equals(currentDialogPopup.getUID())){
-            if(confirmOrCancel){
-                usedSystem = new RoomEditorSystem(currentDialogPopup.getTextField("Name").getText());
+        if (confirmOrCancel) {
+            if (dialogUID.equals("LoadRoom")) {
+                usedSystem = new RoomEditorSystem(currentDialogPopup.getInput("Name"));
                 main.getStateManager().attach(usedSystem);
-            } else {
-                
             }
         }
     }
-    
+
     private void loadAreaEditorSystem(Byte aByte) {
         System.err.println("Not Supported yet.");
     }
@@ -231,15 +228,12 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
     private void loadWorldEditorSystem(Byte aByte) {
         System.err.println("Not Supported yet.");
     }
-    
+
     @Override
     public void cleanup() {
         super.cleanup();
         main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
     }
-
-    
-
 
     private enum EditorItem {
 
@@ -247,6 +241,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
         CARD,
         SFX;
     }
+
     public enum MapEditorMode {
 
         ROOM,

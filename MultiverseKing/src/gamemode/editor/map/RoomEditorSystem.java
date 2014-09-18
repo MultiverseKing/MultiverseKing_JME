@@ -22,7 +22,7 @@ import utility.Vector2Int;
  */
 public final class RoomEditorSystem extends EntitySystemAppState implements TileChangeListener, HexMapInputListener{
     private MapData mapData;
-    private String editedMapName;
+    private String editedMapName = null;
 
     public RoomEditorSystem() {
     }

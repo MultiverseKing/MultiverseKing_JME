@@ -2,7 +2,7 @@ package gamemode.editor.map;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import gamemode.editor.EditorWindow;
+import gamemode.gui.EditorWindow;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;

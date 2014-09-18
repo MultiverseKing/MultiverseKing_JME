@@ -2,7 +2,7 @@ package gamemode.editor.card;
 
 import com.jme3.math.Vector2f;
 import entitysystem.attribut.CardType;
-import gamemode.editor.EditorWindow;
+import gamemode.gui.EditorWindow;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;

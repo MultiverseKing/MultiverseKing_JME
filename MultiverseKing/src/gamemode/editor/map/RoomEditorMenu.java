@@ -1,7 +1,7 @@
 package gamemode.editor.map;
 
 import gamemode.editor.EditorMenu;
-import gamemode.editor.EditorWindow;
+import gamemode.gui.EditorWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;

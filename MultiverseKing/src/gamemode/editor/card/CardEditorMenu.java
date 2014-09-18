@@ -5,7 +5,7 @@ import com.jme3.math.Vector2f;
 import com.simsilica.es.EntityData;
 import entitysystem.card.Hover;
 import gamemode.editor.EditorMenu;
-import gamemode.editor.EditorWindow;
+import gamemode.gui.EditorWindow;
 import hexsystem.MapData;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;

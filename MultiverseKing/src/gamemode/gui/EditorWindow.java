@@ -1,4 +1,4 @@
-package gamemode.editor;
+package gamemode.gui;
 
 import com.jme3.input.KeyInput;
 import com.jme3.input.event.KeyInputEvent;
@@ -27,7 +27,6 @@ public abstract class EditorWindow {
     private String name;
     private Element parent;
     private Window window;
-    private HashMap<String, Object> elementCurrentValue = new HashMap<String, Object>();
     private HashMap<String, Element> elementList = new HashMap<String, Element>();
     private int btnListCount = 0;
     /**
@@ -476,7 +475,6 @@ public abstract class EditorWindow {
                     public void onKeyRelease(KeyInputEvent evt) {
                         super.onKeyRelease(evt);
                         if (evt.getKeyCode() == KeyInput.KEY_RETURN) {
-                            elementCurrentValue.put(labelUID, Integer.decode(getText()));
                             screen.getElementById(childUID + "NumericFieldButton").setText(getText());
                             /**
                              * There, the System have to be call to know a
@@ -496,7 +494,6 @@ public abstract class EditorWindow {
         };
         numButton.setText(Integer.toString(baseValue));
         elementList.get(labelUID).addChild(numButton);
-        elementCurrentValue.put(generateUID(labelUID), baseValue);
     }
 
     private void generateTextField(final String labelUID, String baseValue) {
@@ -509,8 +506,9 @@ public abstract class EditorWindow {
             public void onKeyRelease(KeyInputEvent evt) {
                 super.onKeyRelease(evt);
                 if (evt.getKeyCode() == KeyInput.KEY_RETURN) {
-                    elementCurrentValue.put(getElementParent().getText(), getText());
-                    onTextFieldInput(labelUID, getText());
+                    onTextFieldInput(labelUID, getText(), true);
+                } else if(evt.getKeyCode() == KeyInput.KEY_ESCAPE){
+                    onTextFieldInput(labelUID, getText(), false);
                 }
             }
         };
@@ -521,14 +519,12 @@ public abstract class EditorWindow {
         }
 
         elementList.get(labelUID).addChild(field);
-        elementCurrentValue.put(labelUID, baseValue);
     }
 
     private void generateSelectBoxField(final String labelUID, Enum<?> baseValue, Enum[] value) {
         SelectBox selectBox = new SelectBox(screen, getUID() + labelUID + "BoxField", new Vector2f(5, 35)) {
             @Override
             public void onChange(int selectedIndex, Object value) {
-                elementCurrentValue.put(labelUID, value);
                 onSelectBoxFieldChange((Enum) value);
             }
         };
@@ -537,7 +533,6 @@ public abstract class EditorWindow {
         }
         elementList.get(labelUID).addChild(selectBox);
         selectBox.setSelectedIndex(baseValue.ordinal());
-        elementCurrentValue.put(labelUID, baseValue);
     }
 
     private void generateSpinner(final String labelName, final String labelUID, int[] value) {
@@ -545,29 +540,14 @@ public abstract class EditorWindow {
                 new Vector2f(elementList.get(labelUID).getWidth() - 12, 7), Spinner.Orientation.HORIZONTAL, true) {
             @Override
             public void onChange(int selectedIndex, String value) {
-                elementCurrentValue.put(labelUID, value);
                 onSpinnerChange(labelName, selectedIndex);
             }
         };
         spinner.setStepIntegerRange(value[0], value[1], value[2]);
         spinner.setSelectedIndex(value[3]);
         elementList.get(labelUID).addChild(spinner);
-        elementCurrentValue.put(labelUID, value[3]);
     }
-
-//    private ButtonAdapter generateButton(String name, String triggerName, final int index) {
-//        ButtonAdapter button = new ButtonAdapter(screen, getUID() + name + "Button",
-//                new Vector2f(5, 35), new Vector2f(triggerName.toCharArray().length * 10, 20)) {
-//            @Override
-//            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-//                super.onButtonMouseLeftUp(evt, toggled);
-//                onButtonTrigger(index);
-//            }
-//        };
-//        button.setText(triggerName);
-//        return button;
-//    }
-
+    
     private ButtonAdapter generateButton(String triggerName, final int index, Vector2f position, Vector2f offset) {
         ButtonAdapter button = new ButtonAdapter(screen, getUID() + triggerName + "Button",
                 new Vector2f((getGridSize().x * position.x) + 10 + offset.x,
@@ -608,17 +588,13 @@ public abstract class EditorWindow {
     protected final SelectBox getSelectBoxField(String labelName) {
         return (SelectBox) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "BoxField");
     }
-
-    protected final Object getFieldValue(String fieldName) {
-        return elementCurrentValue.get(fieldName.replaceAll("\\s", ""));
-    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Trigger Method">
     protected void onButtonTrigger(int index) {
     }
 
-    protected void onTextFieldInput(String UID, String input) {
+    protected void onTextFieldInput(String UID, String input, boolean triggerOn) {
     }
 
     protected void onNumericFieldInput(Integer input) {

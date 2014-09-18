@@ -25,10 +25,11 @@ public abstract class EditorMenu extends Element {
     private Window additionalFieldWindow;
     private SelectList selectList = null;
 
-    public EditorMenu(ElementManager screen, String UID, String titleName, EntitySystemAppState system) {
-        super(screen, UID, new Vector2f(5, 5), new Vector2f(130, 25),
+    public EditorMenu(ElementManager screen, String UID, String titleName, EntitySystemAppState system, Element parent) {
+        super(screen, UID, new Vector2f(parent.getAbsoluteWidth() + 5, parent.getAbsoluteHeight() + 5), new Vector2f(130, 25),
                 screen.getStyle("Window#Dragbar").getVector4f("resizeBorders"),
                 screen.getStyle("Window#Dragbar").getString("defaultImg"));
+        this.parent = parent;
         this.setTextWrap(LineWrapMode.valueOf(screen.getStyle("Window#Dragbar").getString("textWrap")));
         this.setTextAlign(BitmapFont.Align.valueOf(screen.getStyle("Window#Dragbar").getString("textAlign")));
         this.setTextVAlign(BitmapFont.VAlign.valueOf(screen.getStyle("Window#Dragbar").getString("textVAlign")));

@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * TODO: Rotation/Orientation; Picking/Raycasting; Comments
- *
- * @author Eike Foede
+ * Handle the render of all entities.
+ * HexGrid got his own render system.
+ * @author Eike Foede, roah
  */
 
 /*

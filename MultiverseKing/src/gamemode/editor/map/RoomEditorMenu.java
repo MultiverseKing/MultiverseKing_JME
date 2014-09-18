@@ -2,9 +2,9 @@ package gamemode.editor.map;
 
 import gamemode.editor.EditorMenu;
 import gamemode.editor.EditorWindow;
-import gamemode.editor.map.MapEditorSystem.MapEditorMode;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.windows.Window;
+import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
 
@@ -19,8 +19,8 @@ final class RoomEditorMenu extends EditorMenu {
     private Window tileWin;
     private RoomTileWidget tileWidgetMenu;
 
-    RoomEditorMenu(Screen screen, MapEditorSystem mapEditorSystem) {
-        super(screen, "RoomEditorMenu", "Room Editor", mapEditorSystem);
+    RoomEditorMenu(Screen screen, RoomEditorSystem mapEditorSystem, Element parent) {
+        super(screen, "RoomEditorMenu", "Room Editor", mapEditorSystem, parent);
         addAdditionalField("New Room");
         addAdditionalField("Load Room");
         populateEditor();
@@ -40,7 +40,7 @@ final class RoomEditorMenu extends EditorMenu {
         if (value != currentValue) {
             if (currentWindow != null && screen.getElementById(currentWindow.getWindow().getUID()) != null) {
 //                screen.removeElement(currentWindow.getWindow());
-                currentWindow.detachFromParent();
+                currentWindow.removeFromScreen();
             }
             switch (value) {
                 case 0:
@@ -65,11 +65,6 @@ final class RoomEditorMenu extends EditorMenu {
         }
     }
 
-    @Override
-    protected void additionalFieldReturnTrigger() {
-        ((MapEditorSystem) system).switchGui(MapEditorMode.NONE);
-    }
-
     /**
      * Open the context menu box to modifie the tile.
      *
@@ -91,7 +86,7 @@ final class RoomEditorMenu extends EditorMenu {
      */
     private void openWidgetMenu(HexCoordinate tilePos) {
         if (tileWidgetMenu == null) {
-            tileWidgetMenu = new RoomTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((MapEditorSystem) system), tilePos);
+            tileWidgetMenu = new RoomTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((RoomEditorSystem) system), tilePos);
         }
         tileWidgetMenu.show(tilePos);
     }
@@ -108,11 +103,11 @@ final class RoomEditorMenu extends EditorMenu {
             tileWidgetMenu.update(tpf);
         }
     }
-    
+
     @Override
     public void removeFromScreen() {
         super.removeFromScreen();
-        if(tileWidgetMenu != null){
+        if (tileWidgetMenu != null) {
             tileWidgetMenu.removeFromScreen();
         }
     }

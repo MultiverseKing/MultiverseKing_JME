@@ -49,19 +49,19 @@ class GeneratorSubWindow extends EditorWindow {
                  * target.
                  */
                 addCheckBoxField("Is Cast from Self", false, new Vector2f(0, 3.2f), new Vector2f(30, 0));
-                show(2, 5f, VAlign.center);
+                showConstrainToParent(new Vector2f(2, 5f), HAlign.right);
                 break;
             case EQUIPEMENT:
-                show(2, 3.5f, VAlign.center);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
                 break;
             case SPELL:
-                show(2, 3.5f, VAlign.center);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
                 break;
             case SUMMON:
-                show(2, 3.5f, VAlign.center);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
                 break;
             case TRAP:
-                show(2, 3.5f, VAlign.center);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
                 break;
             default:
                 throw new UnsupportedOperationException(type + " is not a supported type in : " + getClass().getName());

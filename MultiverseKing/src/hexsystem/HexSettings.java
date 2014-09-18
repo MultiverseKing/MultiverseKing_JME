@@ -3,6 +3,7 @@ package hexsystem;
 import com.jme3.math.FastMath;
 
 /**
+ * Contain parameters used to generate the room grid.
  * @todo Chunk size change during runtime.
  * @todo Map load from any chunk Size. (saved map can only work with the
  * chunkSize they have been created) loader work.

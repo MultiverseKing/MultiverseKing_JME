@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import utility.Vector2Int;
 
 /**
+ * Maths used to generate the room grid.
  * @todo improve method to not have the use of System.ArrayCopy
  * @author roah
  */

@@ -1,5 +1,6 @@
 package kingofmultiverse;
 
+import test.Player;
 import gamemode.editor.EditorMainGui;
 import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
@@ -14,8 +15,6 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import entitysystem.card.CardRenderSystem;
-import entitysystem.render.RenderSystem;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexSettings;
 import hexsystem.loader.ChunkDataLoader;

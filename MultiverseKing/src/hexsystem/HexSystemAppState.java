@@ -7,19 +7,16 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import hexsystem.chunksystem.ChunkControl;
-import hexsystem.chunksystem.MeshManager;
 import hexsystem.events.ChunkChangeEvent;
 import hexsystem.events.ChunkChangeListener;
 import hexsystem.events.TileChangeEvent;
 import hexsystem.events.TileChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
 import utility.Vector2Int;
 
 /**
- *
+ * Take care of updating the geometry accordingly to the data (room grid).
  * @author roah
  */
 public class HexSystemAppState extends AbstractAppState implements ChunkChangeListener, TileChangeListener {

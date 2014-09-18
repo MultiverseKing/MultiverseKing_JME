@@ -37,7 +37,7 @@ class MapEditorLoaderWindow extends EditorWindow {
         if (parent.getUID().equals("WorldEditorMenu")) {
         } else if (parent.getUID().equals("AreaEditorMenu")) {
         }
-        show(0.8f, 2.8f, VAlign.center);
+        showConstrainToParent(new Vector2f(0.8f, 2.8f), HAlign.right);
         initializeLoading();
     }
 
@@ -68,12 +68,12 @@ class MapEditorLoaderWindow extends EditorWindow {
     private void initializeLoading() {
         File folder = new File(System.getProperty("user.dir") + "/assets/Data/MapData/");
         if (!folder.exists()) {
-            Logger.getLogger(MapEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
+            Logger.getLogger(RoomEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
         }
         loadingList = new Menu(screen, "mapFileList", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                if (true || !app.getStateManager().getState(MapEditorSystem.class).loadMapForCurrent(value.toString())) {
+                if (true || !app.getStateManager().getState(RoomEditorSystem.class).loadCurrent(value.toString())) {
                     popupBox("     File not found.");
                 }
                 System.err.println("test load : " + value.toString());
@@ -111,7 +111,7 @@ class MapEditorLoaderWindow extends EditorWindow {
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if (textField.getText().length() >= 3) {
-                    if (app.getStateManager().getState(MapEditorSystem.class).saveMapForCurrent(textField.getText())) {
+                    if (app.getStateManager().getState(RoomEditorSystem.class).saveCurrent(textField.getText())) {
                         popupBox("     File Saved.");
                     } else {
                         popupBox("     Error file not saved.");

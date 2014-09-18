@@ -1,4 +1,4 @@
-package kingofmultiverse;
+package test;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -14,6 +14,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import kingofmultiverse.MultiverseMain;
 
 /**
  *

@@ -19,12 +19,12 @@ class RoomTileWidget extends CameraTrackWindow {
 
     private ArrayList<AnimatedButton> animatedButton = new ArrayList<AnimatedButton>();
     private ElementalWidgetMenu eWin = null;
-    private MapEditorSystem system;
+    private RoomEditorSystem system;
     private Element eAttributIco;
     private HexCoordinate selectedTilePosition;
 
     
-    RoomTileWidget(Screen screen, Camera camera, MapEditorSystem system, HexCoordinate tilePos) {
+    RoomTileWidget(Screen screen, Camera camera, RoomEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "tileWidgetMenu", Vector2f.ZERO,
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/EditorMap/rouage.png");

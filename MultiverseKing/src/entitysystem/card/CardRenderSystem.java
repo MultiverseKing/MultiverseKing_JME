@@ -19,7 +19,7 @@ import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
-import hexsystem.HexMapMouseSystem;
+import hexsystem.RoomMouseSystem;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import java.util.ArrayList;
@@ -314,7 +314,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
             screen.removeElement(card);
 
             //Register the input for the card system
-            app.getStateManager().getState(HexMapMouseSystem.class).registerTileInputListener(this);
+            app.getStateManager().getState(RoomMouseSystem.class).registerTileInputListener(this);
             app.getInputManager().addListener(cardInputListener, "Cancel");
         }
     }
@@ -324,7 +324,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(HexMapMouseSystem.class).removeTileInputListener(this);
+        app.getStateManager().getState(RoomMouseSystem.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -390,7 +390,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                          * We activate the pulse Mode, if not activated the cast
                          * is canceled.
                          */
-                        if (!app.getStateManager().getState(HexMapMouseSystem.class).setCursorPulseMode(this)) {
+                        if (!app.getStateManager().getState(RoomMouseSystem.class).setCursorPulseMode(this)) {
                             return false;
                         }
                     } else {

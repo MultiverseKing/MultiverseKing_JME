@@ -375,14 +375,15 @@ public final class MapData {
     public boolean loadMap(String name) {
         File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/" + name + "/" + name + ".map");
         if (file.isDirectory() || !file.exists()) {
-            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, null, new IOException(mapName + " can't be found."));
+            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, null, new IOException(name + " can't be found."));
             return false;
         }
         MapDataLoader mdLoader = (MapDataLoader) assetManager.loadAsset("/Data/MapData/" + name + "/" + name + ".map");
-        mapName = mdLoader.getMapName();
+        mapName = name;
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
         clearCurrent();
+        System.err.println(chunkPos.size());
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
@@ -406,8 +407,7 @@ public final class MapData {
                 String userHome = System.getProperty("user.dir") + "/assets";
                 BinaryExporter exporter = BinaryExporter.getInstance();
                 MapDataLoader mdLoader = new MapDataLoader();
-
-                mdLoader.setMapName(mapName);
+                
                 mdLoader.setMapElement(mapElement);
                 mdLoader.setChunkPos(chunkPos);
 

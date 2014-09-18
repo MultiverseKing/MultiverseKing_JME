@@ -71,7 +71,7 @@ final class GeneratorWindow extends EditorWindow {
         /**
          *
          */
-        show(3, 6.5f, VAlign.center);
+        showConstrainToParent(new Vector2f(3, 6.5f), null, HAlign.right);
         cardPreview = new CardPreview((Screen) screen, getWindow());
         saveAndLoadGUI = new CardEditorLoaderWindow((Screen) screen, cardPreview.getPreview(), this);
         initialized = true;
@@ -114,7 +114,7 @@ final class GeneratorWindow extends EditorWindow {
         switch (index) {
             case 0:
                 if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
-                    currentSubMenu.detachFromParent();
+                    currentSubMenu.removeFromScreen();
                 } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
                     return;
                 }
@@ -127,7 +127,7 @@ final class GeneratorWindow extends EditorWindow {
     }
 
     @Override
-    protected void onTextFieldInput(String input) {
+    protected void onTextFieldInput(String UID, String input) {
         cardPreview.switchName(input);
     }
 

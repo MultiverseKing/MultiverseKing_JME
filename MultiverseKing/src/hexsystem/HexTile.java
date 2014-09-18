@@ -9,7 +9,7 @@ import java.io.IOException;
 import utility.ElementalAttribut;
 
 /**
- *
+ * tile data used in room grid.
  * @author Eike Foede, Roah
  */
 public class HexTile implements Savable {

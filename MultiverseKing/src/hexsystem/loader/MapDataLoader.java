@@ -27,7 +27,6 @@ import utility.ElementalAttribut;
 public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
 
     private String rootPath;
-    private String mapName;
     private ElementalAttribut mapElement;
     private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
 
@@ -47,28 +46,11 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
 
     /**
      *
-     * @param name
-     */
-    public void setMapName(String name) {
-        this.mapName = name;
-    }
-
-    /**
-     *
      * @param chunkPos
      */
     public void setChunkPos(ArrayList<Vector2Int> chunkPos) {
         this.chunkPos = chunkPos;
     }
-
-    /**
-     *
-     * @return
-     */
-    public String getMapName() {
-        return mapName;
-    }
-
     /**
      *
      * @return
@@ -92,7 +74,6 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
      */
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
-        capsule.write(mapName, "mapName", "null");
         capsule.write(mapElement, "mapElement", ElementalAttribut.ICE);
         capsule.writeSavableArrayList(chunkPos, "chunkPos", new ArrayList<Vector2Int>());
     }
@@ -104,7 +85,6 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
      */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
-        mapName = capsule.readString("mapName", "null");
         mapElement = capsule.readEnum("mapElement", ElementalAttribut.class, ElementalAttribut.ICE);
         chunkPos = capsule.readSavableArrayList("chunkPos", new ArrayList<Vector2Int>());
     }

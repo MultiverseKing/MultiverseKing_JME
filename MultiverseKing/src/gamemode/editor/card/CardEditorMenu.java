@@ -9,6 +9,7 @@ import gamemode.editor.EditorWindow;
 import hexsystem.MapData;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.core.Element;
 
 /**
  * @todo : The GUI resolution should be consistant, gui scale should not depend
@@ -28,8 +29,8 @@ final class CardEditorMenu extends EditorMenu {
     private ButtonAdapter close;
     private int currentIndex;
 
-    CardEditorMenu(MultiverseMain main, CardEditorSystem cardEditorSystem) {
-        super(main.getScreen(), "CardEditorGui", "Card Editor", cardEditorSystem);
+    CardEditorMenu(MultiverseMain main, CardEditorSystem cardEditorSystem, Element parent) {
+        super(main.getScreen(), "CardEditorGui", "Card Editor", cardEditorSystem, parent);
         this.main = main;
         this.cardEditorSystem = cardEditorSystem;
         addItem("Card Generator", 0);
@@ -42,7 +43,7 @@ final class CardEditorMenu extends EditorMenu {
     @Override
     protected void onSelectedItemChange(int index) {
         if (current != null && currentIndex != index) {
-            current.detachFromParent();
+            current.removeFromScreen();
         } else if (current != null && currentIndex == index){
             return;
         }

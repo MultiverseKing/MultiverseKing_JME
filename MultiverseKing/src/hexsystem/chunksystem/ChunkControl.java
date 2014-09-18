@@ -16,7 +16,7 @@ import java.util.Set;
 import utility.ElementalAttribut;
 
 /**
- * control the chunk geometry, all tiles geometry.
+ * Directly control the chunk geometry, all tiles geometry.
  *
  * @author roah
  */

@@ -41,7 +41,7 @@ public class CardEditorSystem extends EntitySystemAppState {
 //                return null;
 //            }
 //        }
-        cardEditorGui = new CardEditorMenu((MultiverseMain) app, this);
+//        cardEditorGui = new CardEditorMenu((MultiverseMain) app, this, ); //@todo --<<<<<!!!
         ((MultiverseMain) app).getScreen().addElement(cardEditorGui);
 
         return entityData.getEntities(CardRenderComponent.class);

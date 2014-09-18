@@ -18,7 +18,7 @@ class ElementalWindow extends Window {
 
     private final RadioButtonGroup elementG;
 
-    ElementalWindow(final ElementManager screen, final MapEditorSystem system, Vector2f position) {
+    ElementalWindow(final ElementManager screen, final RoomEditorSystem system, Vector2f position) {
         super(screen, "TestEAttributWindow", position,
                 new Vector2f(340, FastMath.ceil(new Float(ElementalAttribut.getSize()) / 3 + 1) * 40 + 12));
 
@@ -61,7 +61,7 @@ class ElementalWindow extends Window {
         init(elementG, system);
     }
 
-    private void init(RadioButtonGroup elementG, MapEditorSystem system) {
+    private void init(RadioButtonGroup elementG, RoomEditorSystem system) {
         elementG.setDisplayElement(this);
         elementG.setSelected(system.getMapElement().ordinal());
     }

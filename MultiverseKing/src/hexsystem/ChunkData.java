@@ -8,8 +8,7 @@ import utility.Vector2Int;
 import utility.ElementalAttribut;
 
 /**
- * @todo Set a memory limit to avoid to much data. See ChunkDataOld
- * removeChunk();
+ * Contain all hex room data.
  * @author roah
  */
 class ChunkData {

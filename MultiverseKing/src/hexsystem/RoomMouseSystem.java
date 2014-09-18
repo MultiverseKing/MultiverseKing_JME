@@ -25,11 +25,11 @@ import utility.HexCoordinate;
 import utility.MouseRay;
 
 /**
- * WIP
+ * take care of all input hapening on the room grid.
  *
  * @author Eike Foede, roah
  */
-public final class HexMapMouseSystem extends AbstractAppState {
+public final class RoomMouseSystem extends AbstractAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -43,16 +43,16 @@ public final class HexMapMouseSystem extends AbstractAppState {
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
 
-    public HexMapMouseSystem() {
+    public RoomMouseSystem() {
     }
-    public HexMapMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
+    public RoomMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
         registerTileInputListener(inputListener);
     }
-    public HexMapMouseSystem(HexMapRayListener rayListener) {
+    public RoomMouseSystem(HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
     }
-    public HexMapMouseSystem(HexMapInputListener inputListener) {
+    public RoomMouseSystem(HexMapInputListener inputListener) {
         registerTileInputListener(inputListener);
     }
     

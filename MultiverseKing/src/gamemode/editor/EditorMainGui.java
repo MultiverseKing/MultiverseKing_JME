@@ -1,34 +1,34 @@
 package gamemode.editor;
 
+import gamemode.gui.DialogWindowListener;
+import gamemode.gui.DialogPopup;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import gamemode.editor.map.MapEditorSystem;
+import entitysystem.EntitySystemAppState;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
-import gamemode.editor.map.MapEditorSystem.MapEditorMode;
-import static gamemode.editor.map.MapEditorSystem.MapEditorMode.AREA;
-import static gamemode.editor.map.MapEditorSystem.MapEditorMode.NONE;
-import static gamemode.editor.map.MapEditorSystem.MapEditorMode.ROOM;
-import static gamemode.editor.map.MapEditorSystem.MapEditorMode.WORLD;
+import gamemode.editor.map.RoomEditorSystem;
 import tonegod.gui.controls.menuing.MenuItem;
 
 /**
- *
+ * rootMenu of the Game Editor.
  * @author roah
  */
-public class EditorMainGui extends AbstractAppState {
+public class EditorMainGui extends AbstractAppState implements DialogWindowListener {
 
     private MultiverseMain main;
     private Window mainMenuBar;
     private Menu currentMenuItem;
     private EditorItem currentMenuValue;
     private String currentSelectedMenuItem;
+    private EntitySystemAppState usedSystem;
+    private DialogPopup currentDialogPopup;
 
     public Window getMainMenu() {
         return mainMenuBar;
@@ -70,11 +70,15 @@ public class EditorMainGui extends AbstractAppState {
             i++;
         }
         currentMenuItem = new Menu(main.getScreen(), false) {
+            
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                if(getMenuItem(index).getSubMenu() != null){
+                    return;
+                }
                 menuTrigger(value.toString());
             }
-
+            
             @Override
             public void hide() {
                 super.hide();
@@ -86,8 +90,6 @@ public class EditorMainGui extends AbstractAppState {
                 super.setHighlight(index);
                 currentSelectedMenuItem = getMenuItem(index).getValue().toString();
             }
-            
-            
         };
         main.getScreen().addElement(currentMenuItem);
     }
@@ -113,7 +115,6 @@ public class EditorMainGui extends AbstractAppState {
                             super.onMouseLeftReleased(evt);
                             menuTrigger(getMenuItem(currentHighlightIndex).getValue().toString());
                         }
-                        
                     };
                     subMenu.addMenuItem("New", 0, null);
                     subMenu.addMenuItem("Load", 1, null);
@@ -122,10 +123,8 @@ public class EditorMainGui extends AbstractAppState {
                      */
 //                    subMenu.addMenuItem("Save", 2, null);
                     for (MapEditorMode mode : MapEditorMode.values()) {
-                        if (mode != MapEditorMode.NONE) {
-                            String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
-                            currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
-                        }
+                        String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
+                        currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
                     }
                     break;
                 case SFX:
@@ -165,42 +164,22 @@ public class EditorMainGui extends AbstractAppState {
                 break;
             case MAP:
                 MapEditorMode mode = MapEditorMode.valueOf(currentSelectedMenuItem);
-                switch (mode) {
+                switch(mode){
                     case WORLD:
-                        /**
-                         * @todo
-                         */
-                        if (value.equals("0")) {
-                        } else if (value.equals("1")) {
-                        } else {
-                            return;
-                        }
+                        loadWorldEditorSystem(new Byte(value));
                         break;
                     case AREA:
-                        /**
-                         * @todo
-                         */
-                        if (value.equals("0")) {
-                        } else if (value.equals("1")) {
-                        } else {
-                            return;
-                        }
+                        loadAreaEditorSystem(new Byte(value));
                         break;
                     case ROOM:
-                        /**
-                         * @todo
-                         */
-                        if (value.equals("0")) {
-                            main.getStateManager().attach(new MapEditorSystem());
-                        } else if (value.equals("1")) {
-                        } else {
-                            return;
+                        if(usedSystem instanceof RoomEditorSystem == false){
+                            main.getStateManager().detach(usedSystem);
+                            usedSystem = null;
                         }
+                        loadRoomEditorSystem(new Byte(value));
                         break;
-                    case NONE:
-                        return;
                     default:
-                        throw new UnsupportedOperationException(mode + " is not a supported type.");
+                        throw new UnsupportedOperationException(mode + " is not a supporter Type.");
                 }
             case SFX:
                 break;
@@ -208,17 +187,70 @@ public class EditorMainGui extends AbstractAppState {
                 throw new UnsupportedOperationException(currentMenuValue + " is not a supported type.");
         }
     }
+    
+    private void loadRoomEditorSystem(byte value) {
+        if (value == 0) {
+            if (usedSystem != null) {
+                ((RoomEditorSystem)usedSystem).reloadRoom();
+            } else {
+                usedSystem = new RoomEditorSystem();
+                main.getStateManager().attach(usedSystem);
+            }
+        } else if (value == 1) {
+            /**
+             * @todo: Load.
+             */
+            if(currentDialogPopup != null){
+                currentDialogPopup.removeFromScreen();
+            }
+            currentDialogPopup = new DialogPopup(main.getScreen(), "Load Room", this);
+            currentDialogPopup.addEditableTextField("Name", null, Vector2f.ZERO);
+            currentDialogPopup.show();
+        } else if (value == 2) {
+            /**
+             * @todo: Save.
+             */
+        }
+    }
+    
+    public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
+        if(dialogUID.equals(currentDialogPopup.getUID())){
+            if(confirmOrCancel){
+                usedSystem = new RoomEditorSystem(currentDialogPopup.getTextField("Name").getText());
+                main.getStateManager().attach(usedSystem);
+            } else {
+                
+            }
+        }
+    }
+    
+    private void loadAreaEditorSystem(Byte aByte) {
+        System.err.println("Not Supported yet.");
+    }
 
+    private void loadWorldEditorSystem(Byte aByte) {
+        System.err.println("Not Supported yet.");
+    }
+    
     @Override
     public void cleanup() {
         super.cleanup();
         main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
     }
 
+    
+
+
     private enum EditorItem {
 
         MAP,
         CARD,
         SFX;
+    }
+    public enum MapEditorMode {
+
+        ROOM,
+        AREA,
+        WORLD;
     }
 }

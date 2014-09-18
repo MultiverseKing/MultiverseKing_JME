@@ -10,7 +10,7 @@ import utility.Vector2Int;
 import utility.ElementalAttribut;
 
 /**
- *
+ * Used to generate the needed data used by the MeshManager.
  * @author roah
  */
 public class MeshParameter {

@@ -30,17 +30,26 @@ public class DialogPopup extends EditorWindow {
         addEditableTextField("Name", null, Vector2f.ZERO);
     }
 
+    public void addButton(String labelName){
+        addButtonField(labelName, Vector2f.ZERO);
+    }
+    
     @Override
-    protected void onButtonTrigger(int index) {
-        if (index == 0) {
+    protected void onButtonTrigger(String labelName) {
+        if (labelName.equals("Confirm")) {
             listener.onDialogTrigger(getUID(), true);
-        } else if (index == 1) {
+            clear();
+        } else if (labelName.equals("Cancel")) {
             listener.onDialogTrigger(getUID(), false);
+            clear();
         }
+    }
+
+    private void clear(){
         removeMapping();
         removeFromScreen();
     }
-
+    
     private void initKeyMapping() {
         screen.getApplication().getInputManager().addMapping("confirmDialog", new KeyTrigger(KeyInput.KEY_RETURN));
         screen.getApplication().getInputManager().addMapping("cancelDialog", new KeyTrigger(KeyInput.KEY_ESCAPE));
@@ -54,9 +63,9 @@ public class DialogPopup extends EditorWindow {
     private final ActionListener dialogPopupListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("confirmDialog") && !isPressed) {
-                onButtonTrigger(0);
+                onButtonTrigger("Confirm");
             } else if (name.equals("cancelDialog") && !isPressed) {
-                onButtonTrigger(1);
+                onButtonTrigger("Cancel");
             }
         }
     };
@@ -64,9 +73,9 @@ public class DialogPopup extends EditorWindow {
     @Override
     protected void onTextFieldInput(String UID, String input, boolean triggerOn) {
         if(triggerOn){
-            onButtonTrigger(0);
+            onButtonTrigger("Confirm");
         } else {
-            onButtonTrigger(1);
+            onButtonTrigger("Cancel");
         }
     }
 

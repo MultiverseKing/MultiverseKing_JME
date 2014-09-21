@@ -15,7 +15,7 @@ import utility.HexCoordinate;
  * Widget menu allowing modification on one tiles.
  * @author roah
  */
-class RoomTileWidget extends CameraTrackWindow {
+class AreaTileWidget extends CameraTrackWindow {
 
     private ArrayList<AnimatedButton> animatedButton = new ArrayList<AnimatedButton>();
     private ElementalWidgetMenu eWin = null;
@@ -24,7 +24,7 @@ class RoomTileWidget extends CameraTrackWindow {
     private HexCoordinate selectedTilePosition;
 
     
-    RoomTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
+    AreaTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "tileWidgetMenu", Vector2f.ZERO,
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/EditorMap/rouage.png");

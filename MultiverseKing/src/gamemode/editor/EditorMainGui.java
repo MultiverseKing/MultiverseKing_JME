@@ -202,6 +202,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
             }
             currentDialogPopup = new DialogPopup(main.getScreen(), "Load Area", this);
             currentDialogPopup.addInputText("Name");
+//            currentDialogPopup.addButton("From Files");
             currentDialogPopup.show();
         } else if (value == 2) {
             /**

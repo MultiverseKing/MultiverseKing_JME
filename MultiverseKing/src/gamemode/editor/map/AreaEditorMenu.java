@@ -12,14 +12,14 @@ import utility.HexCoordinate;
  *
  * @author roah
  */
-final class RoomEditorMenu extends EditorMenu {
+final class AreaEditorMenu extends EditorMenu {
 
     private EditorWindow currentWindow = null;
     private int currentValue = 10;
     private Window tileWin;
-    private RoomTileWidget tileWidgetMenu;
+    private AreaTileWidget tileWidgetMenu;
 
-    RoomEditorMenu(Screen screen, AreaEditorSystem mapEditorSystem, Element parent) {
+    AreaEditorMenu(Screen screen, AreaEditorSystem mapEditorSystem, Element parent) {
         super(screen, "RoomEditorMenu", "Room Editor", mapEditorSystem, parent);
         addAdditionalField("New Room");
         addAdditionalField("Load Room");
@@ -86,7 +86,7 @@ final class RoomEditorMenu extends EditorMenu {
      */
     private void openWidgetMenu(HexCoordinate tilePos) {
         if (tileWidgetMenu == null) {
-            tileWidgetMenu = new RoomTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((AreaEditorSystem) system), tilePos);
+            tileWidgetMenu = new AreaTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((AreaEditorSystem) system), tilePos);
         }
         tileWidgetMenu.show(tilePos);
     }

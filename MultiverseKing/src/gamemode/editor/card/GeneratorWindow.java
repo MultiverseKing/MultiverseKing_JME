@@ -63,11 +63,11 @@ final class GeneratorWindow extends EditorWindow {
         /**
          * Part used to test out card.
          */
-        addButtonField("Test Card", "Cast", 1, new Vector2f(0, 3.5f));
+        addButtonField("Test Card", "Cast", new Vector2f(0, 3.5f));
         /**
          * Part used to test out card.
          */
-        addButtonField("SubType Properties", "Edit", 0, new Vector2f(1, 3.5f));
+        addButtonField("SubType Properties", "Edit", new Vector2f(1, 3.5f));
         /**
          *
          */
@@ -110,19 +110,18 @@ final class GeneratorWindow extends EditorWindow {
     }
 
     @Override
-    protected void onButtonTrigger(int index) {
-        switch (index) {
-            case 0:
+    protected void onButtonTrigger(String triggerName) {
+        if (triggerName.equals("Cast")) {
+            /**
+             * Activate the cards.
+             */
+        }else if(triggerName.equals("Edit")){
 //                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
 //                    currentSubMenu.removeFromScreen();
 //                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
 //                    return;
 //                }
 //                currentSubMenu = new GeneratorSubWindow(screen, cardPreview.getPreview(), (CardType) getFieldValue("Card Type"));
-            case 1:
-            /**
-             * Activate the cards.
-             */
         }
     }
 
@@ -163,7 +162,7 @@ final class GeneratorWindow extends EditorWindow {
          */
         box = getSelectBoxField("Card Type");
         box.setSelectedByValue(properties.getCardSubType(), true);
-        onButtonTrigger(0);
+        onButtonTrigger("Edit");
         switch (properties.getCardSubType()) {
             case ABILITY:
                 /**

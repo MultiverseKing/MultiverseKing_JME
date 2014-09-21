@@ -230,8 +230,8 @@ public abstract class EditorWindow {
      * @param index returned index when trigger
      * @param position on the window grid.
      */
-    protected final void addButtonField(String labelName, String triggerName, int index, Vector2f position) {
-        addButtonField(labelName, triggerName, index, position, Vector2f.ZERO, true);
+    protected final void addButtonField(String labelName, String triggerName, Vector2f position) {
+        addButtonField(labelName, triggerName, position, Vector2f.ZERO, true);
     }
 
     /**
@@ -243,8 +243,8 @@ public abstract class EditorWindow {
      * @param position on the window grid.
      * @param offset value to add on top of the position.
      */
-    protected final void addButtonField(String labelName, String triggerName, int index, Vector2f position, Vector2f offset) {
-        addButtonField(labelName, triggerName, index, position, offset, true);
+    protected final void addButtonField(String labelName, String triggerName, Vector2f position, Vector2f offset) {
+        addButtonField(labelName, triggerName, position, offset, true);
     }
 
     /**
@@ -255,8 +255,8 @@ public abstract class EditorWindow {
      * @param position on the window grid.
      * @param offset value to add on top of the position.
      */
-    protected final void addButtonField(String triggerName, int index, Vector2f position, Vector2f offset) {
-        addButtonField(triggerName, triggerName, index, position, offset, false);
+    protected final void addButtonField(String triggerName, Vector2f position, Vector2f offset) {
+        addButtonField(triggerName, triggerName, position, offset, false);
     }
 
     /**
@@ -266,8 +266,8 @@ public abstract class EditorWindow {
      * @param index returned index when trigger
      * @param position on the window grid.
      */
-    protected final void addButtonField(String triggerName, int index, Vector2f position) {
-        addButtonField(triggerName, triggerName, index, position, new Vector2f(), false);
+    protected final void addButtonField(String triggerName, Vector2f position) {
+        addButtonField(triggerName, triggerName, position, new Vector2f(), false);
     }
 
     /**
@@ -278,18 +278,19 @@ public abstract class EditorWindow {
      * @param position on the window grid.
      * @param offset value to be added on top of the gridPosition.
      */
-    protected final void addButtonField(String labelName, String triggerName, int index, Vector2f position, Vector2f offset, boolean addLabel) {
+    protected final void addButtonField(String labelName, String triggerName, Vector2f position, Vector2f offset, boolean addLabel) {
         if (triggerName.contains("\\s")) {
             throw new UnsupportedOperationException("No space Regex allowed in the trigger Name.");
-        } else if (triggerName.toCharArray().length > 7) {
-            throw new UnsupportedOperationException("Char count in the trigger Name exceeds the allowed amount.");
-        }
+        } 
+//        else if (triggerName.toCharArray().length > 7) {
+//            throw new UnsupportedOperationException("Char count in the trigger Name exceeds the allowed amount of : "+7);
+//        }
         String uid = generateUID(labelName);
         if (addLabel) {
             elementList.put(uid, generateLabel(labelName, position, offset));
-            elementList.get(uid).addChild(generateButton(uid+triggerName, index, Vector2f.ZERO, Vector2f.ZERO));
+            elementList.get(uid).addChild(generateButton(uid+triggerName, Vector2f.ZERO, Vector2f.ZERO));
         } else {
-            elementList.put(uid, generateButton(triggerName, index, position, offset));
+            elementList.put(uid, generateButton(triggerName, position, offset));
         }
     }
 
@@ -300,7 +301,7 @@ public abstract class EditorWindow {
         int i = 0;
         float posX = 0f;
         for (String triggerName : triggersNames) {
-            ButtonAdapter btn = generateButton(triggerName, i, Vector2f.ZERO, Vector2f.ZERO);
+            ButtonAdapter btn = generateButton(triggerName, Vector2f.ZERO, Vector2f.ZERO);
             btn.setPosition(posX, btn.getPosition().y);
             posX += btn.getWidth();
 
@@ -548,7 +549,7 @@ public abstract class EditorWindow {
         elementList.get(labelUID).addChild(spinner);
     }
     
-    private ButtonAdapter generateButton(String triggerName, final int index, Vector2f position, Vector2f offset) {
+    private ButtonAdapter generateButton(final String triggerName, Vector2f position, Vector2f offset) {
         ButtonAdapter button = new ButtonAdapter(screen, getUID() + triggerName + "Button",
                 new Vector2f((getGridSize().x * position.x) + 10 + offset.x,
                 (getGridSize().y * position.y) + 10 + offset.y),
@@ -556,7 +557,7 @@ public abstract class EditorWindow {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                onButtonTrigger(index);
+                onButtonTrigger(getText());
             }
         };
         button.setText(triggerName);
@@ -591,7 +592,7 @@ public abstract class EditorWindow {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Trigger Method">
-    protected void onButtonTrigger(int index) {
+    protected void onButtonTrigger(String label) {
     }
 
     protected void onTextFieldInput(String UID, String input, boolean triggerOn) {

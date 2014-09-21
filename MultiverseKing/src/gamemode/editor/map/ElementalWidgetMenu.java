@@ -112,10 +112,10 @@ class ElementalWidgetMenu extends CameraTrackWindow {
 
     private void buttonTrigger(String button) {
         String element = button.split("Icon")[0];
-        system.setTileProperties(((RoomTileWidget) elementParent).getSelectedTilePosition(),
+        system.setTileProperties(((AreaTileWidget) elementParent).getSelectedTilePosition(),
                 ElementalAttribut.valueOf(element.toUpperCase()));
         updateElementalIcon(ElementalAttribut.valueOf(element.toUpperCase()));
-        ((RoomTileWidget) elementParent).updateIcon();
+        ((AreaTileWidget) elementParent).updateIcon();
         hide();
     }
 

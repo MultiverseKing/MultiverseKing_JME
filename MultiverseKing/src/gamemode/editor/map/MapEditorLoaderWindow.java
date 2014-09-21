@@ -30,8 +30,8 @@ class MapEditorLoaderWindow extends EditorWindow {
     MapEditorLoaderWindow(ElementManager screen, Element parent) {
         super(screen, parent, "Save & Load");
 
-        addButtonField("Load", 0, Vector2f.ZERO);
-        addButtonField("Save", 1, new Vector2f(0, 1));
+        addButtonField("Load", Vector2f.ZERO);
+        addButtonField("Save", new Vector2f(0, 1));
 
         if (parent.getUID().equals("WorldEditorMenu")) {
         } else if (parent.getUID().equals("AreaEditorMenu")) {
@@ -41,26 +41,17 @@ class MapEditorLoaderWindow extends EditorWindow {
     }
 
     @Override
-    protected void onButtonTrigger(int index) {
-        switch (index) {
-            case 0:
-                /**
-                 * Load
-                 */
+    protected void onButtonTrigger(String index) {
+        if(index.equals("Load")){
                 loadingList.showMenu(null, getField("Load").getAbsoluteX() + (loadingList.getWidth() / 1.6f), getField("Load").getAbsoluteY());
-                break;
-            case 1:
-                /**
-                 * Save
-                 */
-                if (saveWindow == null) {
-                    initializeSave();
-                } else if (saveWindow.getIsVisible()) {
-                    saveWindow.hide();
-                } else {
-                    saveWindow.show();
-                }
-                break;
+        } else if (index.equals("Save")){
+            if (saveWindow == null) {
+                initializeSave();
+            } else if (saveWindow.getIsVisible()) {
+                saveWindow.hide();
+            } else {
+                saveWindow.show();
+            }
         }
     }
 

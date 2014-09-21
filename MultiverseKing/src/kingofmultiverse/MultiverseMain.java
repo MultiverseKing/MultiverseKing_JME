@@ -62,6 +62,8 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
+        
+        assetManager.loadMaterial("Materials/debugMat.j3m");
 
         //Init general input 
         super.inputManager.clearMappings();

@@ -29,12 +29,12 @@ import utility.MouseRay;
  *
  * @author Eike Foede, roah
  */
-public final class RoomMouseSystem extends AbstractAppState {
+public final class AreaMouseSystem extends AbstractAppState {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private MultiverseMain main;
-    private ArrayList<HexMapInputListener> hexMapListeners = new ArrayList<HexMapInputListener>();
+    private ArrayList<HexMapInputListener> inputsListeners = new ArrayList<HexMapInputListener>();
     private ArrayList<HexMapRayListener> rayListeners = new ArrayList<HexMapRayListener>(3);
     private Spatial cursor;
     private Spatial rayDebug;
@@ -43,16 +43,16 @@ public final class RoomMouseSystem extends AbstractAppState {
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
 
-    public RoomMouseSystem() {
+    public AreaMouseSystem() {
     }
-    public RoomMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
+    public AreaMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
         registerTileInputListener(inputListener);
     }
-    public RoomMouseSystem(HexMapRayListener rayListener) {
+    public AreaMouseSystem(HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
     }
-    public RoomMouseSystem(HexMapInputListener inputListener) {
+    public AreaMouseSystem(HexMapInputListener inputListener) {
         registerTileInputListener(inputListener);
     }
     
@@ -74,7 +74,7 @@ public final class RoomMouseSystem extends AbstractAppState {
      * @param listener to register.
      */
     public void registerTileInputListener(HexMapInputListener listener) {
-        hexMapListeners.add(listener);
+        inputsListeners.add(listener);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class RoomMouseSystem extends AbstractAppState {
      * @param listener to register.
      */
     public void removeTileInputListener(HexMapInputListener listener) {
-        hexMapListeners.remove(listener);
+        inputsListeners.remove(listener);
     }
 
     /**
@@ -93,7 +93,7 @@ public final class RoomMouseSystem extends AbstractAppState {
      */
     public void registerRayInputListener(HexMapRayListener listener) {
         rayListeners.add(listener);
-        hexMapListeners.add(listener);
+        inputsListeners.add(listener);
     }
 
     /**
@@ -103,7 +103,7 @@ public final class RoomMouseSystem extends AbstractAppState {
      */
     public void removeRayInputListener(HexMapRayListener listener) {
         rayListeners.remove(listener);
-        hexMapListeners.remove(listener);
+        inputsListeners.remove(listener);
     }
 
     /**
@@ -127,7 +127,7 @@ public final class RoomMouseSystem extends AbstractAppState {
                 if (listenerPulseIndex == -1) {
                     castRay("L");
                 } else {
-                    hexMapListeners.get(listenerPulseIndex).leftMouseActionResult(
+                    inputsListeners.get(listenerPulseIndex).leftMouseActionResult(
                             new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), mouseRay.get3DRay(main), null));
                 }
             } else if (name.equals("Cancel") && !isPressed) {
@@ -188,10 +188,10 @@ public final class RoomMouseSystem extends AbstractAppState {
     public boolean setCursorPulseMode(HexMapInputListener listener) {
         if (listenerPulseIndex == -1) {
             //We keep track of the listener locking the input.
-            if (!hexMapListeners.contains(listener)) {
-                hexMapListeners.add(listener);
+            if (!inputsListeners.contains(listener)) {
+                inputsListeners.add(listener);
             }
-            listenerPulseIndex = hexMapListeners.indexOf(listener);
+            listenerPulseIndex = inputsListeners.indexOf(listener);
             lastScreenMousePos = main.getInputManager().getCursorPosition();
             return true;
         } else {
@@ -200,11 +200,11 @@ public final class RoomMouseSystem extends AbstractAppState {
              * the one who activated it. if it is the same we desable the pulse
              * mode.
              */
-            if (hexMapListeners.contains(listener) && hexMapListeners.indexOf(listener) == listenerPulseIndex) {
+            if (inputsListeners.contains(listener) && inputsListeners.indexOf(listener) == listenerPulseIndex) {
                 listenerPulseIndex = -1;
                 return true;
-            } else if (hexMapListeners.contains(listener) && hexMapListeners.indexOf(listener) != listenerPulseIndex) {
-                System.err.println("Pulse already locked by : " + hexMapListeners.get(listenerPulseIndex).getClass().toString()
+            } else if (inputsListeners.contains(listener) && inputsListeners.indexOf(listener) != listenerPulseIndex) {
+                System.err.println("Pulse already locked by : " + inputsListeners.get(listenerPulseIndex).getClass().toString()
                         + ". Lock request by : " + listener.toString());
                 return false;
             } else {
@@ -251,7 +251,7 @@ public final class RoomMouseSystem extends AbstractAppState {
      * @param event event to pass
      */
     private void callMouseActionListeners(String mouseInput, HexMapInputEvent event) {
-        for (HexMapInputListener l : hexMapListeners) {
+        for (HexMapInputListener l : inputsListeners) {
             if (mouseInput.contains("L")) {
                 l.leftMouseActionResult(event);
             } else if ((mouseInput.contains("R"))) {
@@ -295,9 +295,7 @@ public final class RoomMouseSystem extends AbstractAppState {
 
     public void setCursor(HexCoordinate tilePos) {
         moveCursor(tilePos);
-        enable = 1;
     }
-    Byte enable = 0;
 
     private void moveCursor(HexCoordinate tilePos) {
 //        if(enable <= 0){

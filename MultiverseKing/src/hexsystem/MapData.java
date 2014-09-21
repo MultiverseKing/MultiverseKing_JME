@@ -20,8 +20,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import utility.HexCoordinate;
@@ -31,6 +29,8 @@ import utility.ElementalAttribut;
 /**
  * This class holds the hex data of the map.
  *
+ * @todo: refresh method, when the mapElement is change but the chunk isn't on
+ * memory, the chunk when loaded should be refreshed to get the right element.
  * @todo move all converter to another class this will clean MapData.
  * @author Eike Foede, Roah
  */
@@ -78,7 +78,13 @@ public final class MapData {
         return chunkPos;
     }
 
-    //todo: refresh method, when the mapElement is change but the chunk isn't on memory, the chunk when loaded should be refreshed to get the right element.
+    /**
+     * @return true if there is data.
+     */
+    public boolean containTilesData() {
+        return !chunkData.isEmpty();
+    }
+
     /**
      *
      * @param eAttribut
@@ -193,11 +199,11 @@ public final class MapData {
             }
         }
     }
-    
-    public void setTileEAttribut(HexCoordinate tilePos, ElementalAttribut eAttribut){
+
+    public void setTileEAttribut(HexCoordinate tilePos, ElementalAttribut eAttribut) {
         setTile(tilePos, getTile(tilePos).cloneChangedElement(eAttribut));
     }
-        
+
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
     }
@@ -329,8 +335,8 @@ public final class MapData {
     /**
      * Convert Hex grid position to world position and check if the tile exist.
      * /!\ Return a value only if the tile exist. use getTileWorldPosition() if
-     * only a value is needed. 
-     * Convertion work with Odd-R Offset grid type.(currently used grid type).
+     * only a value is needed. Convertion work with Odd-R Offset grid
+     * type.(currently used grid type).
      *
      * @return tile world unit position if exist.
      */
@@ -339,7 +345,7 @@ public final class MapData {
         if (tileExist(hexPos)) {
             int height = tile.getHeight();
             Vector3f spat = hexPos.convertToWorldPosition();
-            return new Vector3f(spat.x, height*HexSettings.FLOOR_OFFSET, spat.z);
+            return new Vector3f(spat.x, height * HexSettings.FLOOR_OFFSET, spat.z);
         } else {
             System.err.println("There is no Tile on the position " + hexPos.toString());
             return null;
@@ -372,7 +378,7 @@ public final class MapData {
      * @param name of the map to load.
      * @return false if not located
      */
-    public boolean loadMap(String name) {
+    public boolean loadArea(String name) {
         File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/" + name + "/" + name + ".map");
         if (file.isDirectory() || !file.exists()) {
             Logger.getLogger(MapData.class.getName()).log(Level.WARNING, null, new IOException(name + " can't be found."));
@@ -394,7 +400,9 @@ public final class MapData {
     /**
      * Save the current map in a folder of the same name of the map.
      *
-     * @throws IOException
+     *
+     * @param mapName "RESET" && "TEMP" cannot be used for a map name since they
+     * are already be used internaly.
      */
     public boolean saveMap(String mapName) {
         if (mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("RESET") || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")) {
@@ -407,7 +415,7 @@ public final class MapData {
                 String userHome = System.getProperty("user.dir") + "/assets";
                 BinaryExporter exporter = BinaryExporter.getInstance();
                 MapDataLoader mdLoader = new MapDataLoader();
-                
+
                 mdLoader.setMapElement(mapElement);
                 mdLoader.setChunkPos(chunkPos);
 
@@ -492,11 +500,7 @@ public final class MapData {
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
     }
-    
-    public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks() {
-        return chunkData.getAllChunks();
-    }
-    
+
     public void Cleanup() {
         //Todo remove all file from the temps folder
     }

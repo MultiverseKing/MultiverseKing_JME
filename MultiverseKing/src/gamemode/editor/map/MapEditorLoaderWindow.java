@@ -14,7 +14,6 @@ import tonegod.gui.controls.text.TextField;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
-import tonegod.gui.core.layouts.LayoutHint.VAlign;
 
 /**
  * Used to load and save a map inside a files.
@@ -68,12 +67,12 @@ class MapEditorLoaderWindow extends EditorWindow {
     private void initializeLoading() {
         File folder = new File(System.getProperty("user.dir") + "/assets/Data/MapData/");
         if (!folder.exists()) {
-            Logger.getLogger(RoomEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
+            Logger.getLogger(AreaEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
         }
         loadingList = new Menu(screen, "mapFileList", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                if (true || !app.getStateManager().getState(RoomEditorSystem.class).loadCurrent(value.toString())) {
+                if (true || !app.getStateManager().getState(AreaEditorSystem.class).loadCurrent(value.toString())) {
                     popupBox("     File not found.");
                 }
                 System.err.println("test load : " + value.toString());
@@ -111,7 +110,7 @@ class MapEditorLoaderWindow extends EditorWindow {
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 if (textField.getText().length() >= 3) {
-                    if (app.getStateManager().getState(RoomEditorSystem.class).saveCurrent(textField.getText())) {
+                    if (app.getStateManager().getState(AreaEditorSystem.class).saveArea(textField.getText())) {
                         popupBox("     File Saved.");
                     } else {
                         popupBox("     Error file not saved.");

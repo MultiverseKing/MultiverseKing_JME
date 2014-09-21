@@ -70,7 +70,13 @@ public class DialogPopup extends EditorWindow {
         }
     }
 
-    
+    public boolean isVisible(){
+        if(getWindow() != null){
+            return getWindow().getIsVisible();
+        } else {
+            return false;
+        }
+    }
     
     public String getInput(String name) {
         return getTextField(name).getText();

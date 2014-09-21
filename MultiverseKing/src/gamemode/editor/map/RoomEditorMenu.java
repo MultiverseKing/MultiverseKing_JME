@@ -19,7 +19,7 @@ final class RoomEditorMenu extends EditorMenu {
     private Window tileWin;
     private RoomTileWidget tileWidgetMenu;
 
-    RoomEditorMenu(Screen screen, RoomEditorSystem mapEditorSystem, Element parent) {
+    RoomEditorMenu(Screen screen, AreaEditorSystem mapEditorSystem, Element parent) {
         super(screen, "RoomEditorMenu", "Room Editor", mapEditorSystem, parent);
         addAdditionalField("New Room");
         addAdditionalField("Load Room");
@@ -86,7 +86,7 @@ final class RoomEditorMenu extends EditorMenu {
      */
     private void openWidgetMenu(HexCoordinate tilePos) {
         if (tileWidgetMenu == null) {
-            tileWidgetMenu = new RoomTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((RoomEditorSystem) system), tilePos);
+            tileWidgetMenu = new RoomTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), ((AreaEditorSystem) system), tilePos);
         }
         tileWidgetMenu.show(tilePos);
     }

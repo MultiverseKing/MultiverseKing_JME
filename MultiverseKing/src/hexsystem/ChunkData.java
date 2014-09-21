@@ -74,7 +74,7 @@ class ChunkData {
     }
 
     void setAllTile(ElementalAttribut eAttribut) {
-        Set<Entry<Vector2Int, HexTile[][]>> chunkValue = getAllChunks();
+        Set<Entry<Vector2Int, HexTile[][]>> chunkValue = chunks.entrySet();
         for (Entry<Vector2Int, HexTile[][]> chunk : chunkValue) {
             HexTile[][] tiles = chunk.getValue();
             for (int j = 0; j < tiles.length; j++) {
@@ -92,9 +92,8 @@ class ChunkData {
     void clear() {
         chunks.clear();
     }
-
-    public Set<Entry<Vector2Int, HexTile[][]>> getAllChunks() {
-        return chunks.entrySet();
-
+    
+    boolean isEmpty(){
+        return chunks.isEmpty();
     }
 }

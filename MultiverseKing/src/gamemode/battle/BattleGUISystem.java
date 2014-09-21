@@ -17,7 +17,7 @@ import entitysystem.field.position.HexPositionComponent;
 import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
 import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
-import hexsystem.RoomMouseSystem;
+import hexsystem.AreaMouseSystem;
 import hexsystem.events.HexMapInputEvent;
 import kingofmultiverse.MultiverseMain;
 import hexsystem.events.HexMapRayListener;
@@ -37,7 +37,7 @@ import utility.HexCoordinate;
 public class BattleGUISystem extends EntitySystemAppState implements HexMapRayListener, SubSystem {
 
     private RenderSystem renderSystem;
-    private RoomMouseSystem hexMapMouseSystem;
+    private AreaMouseSystem hexMapMouseSystem;
     private Node iNode;
     private ContextualMenu actionMenu;
     private PropertiesWindow titanStatsWindow;
@@ -48,7 +48,7 @@ public class BattleGUISystem extends EntitySystemAppState implements HexMapRayLi
     @Override
     protected EntitySet initialiseSystem() {
         if (app.getStateManager().getState(RenderSystem.class) == null
-                || app.getStateManager().getState(RoomMouseSystem.class) == null) {
+                || app.getStateManager().getState(AreaMouseSystem.class) == null) {
             Logger.getLogger(BattleGUISystem.class.getName()).warning(
                     "This System need RenderSystem and HexMapMouseInputSystem to work, it is removed.");
             app.getStateManager().detach(this);
@@ -60,7 +60,7 @@ public class BattleGUISystem extends EntitySystemAppState implements HexMapRayLi
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this);
-        hexMapMouseSystem = app.getStateManager().getState(RoomMouseSystem.class);
+        hexMapMouseSystem = app.getStateManager().getState(AreaMouseSystem.class);
         hexMapMouseSystem.registerRayInputListener(this);
         
         return entityData.getEntities(InitialTitanStatsComponent.class, RenderComponent.class);

@@ -19,12 +19,12 @@ import utility.HexCoordinate;
  */
 class ElementalWidgetMenu extends CameraTrackWindow {
 
-    private final RoomEditorSystem system;
+    private final AreaEditorSystem system;
     private final CameraTrackWindow elementParent;
     private Element eIconContainer = null;
     private ElementalAttribut ignoredEAttribut;
 
-    ElementalWidgetMenu(ElementManager screen, Camera camera, RoomEditorSystem system, CameraTrackWindow parent, Vector2f position, Vector2f dimensions, String defaultImg) {
+    ElementalWidgetMenu(ElementManager screen, Camera camera, AreaEditorSystem system, CameraTrackWindow parent, Vector2f position, Vector2f dimensions, String defaultImg) {
         super(screen, camera, position);
         this.system = system;
         this.elementParent = parent;

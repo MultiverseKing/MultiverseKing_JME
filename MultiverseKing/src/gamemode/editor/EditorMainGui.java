@@ -13,7 +13,7 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
-import gamemode.editor.map.RoomEditorSystem;
+import gamemode.editor.map.AreaEditorSystem;
 
 /**
  * rootMenu of the Game Editor.
@@ -95,7 +95,8 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
 
     private void openMenuItem(EditorItem menu) {
         boolean showMenu = true;
-        if (currentMenuValue != menu) {
+        if (currentDialogPopup != null && !currentDialogPopup.isVisible() 
+                || currentMenuValue != menu) {
             currentMenuItem.removeAllMenuItems();
             switch (menu) {
                 case CARD:
@@ -168,14 +169,11 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
                         loadWorldEditorSystem(new Byte(value));
                         break;
                     case AREA:
-                        loadAreaEditorSystem(new Byte(value));
-                        break;
-                    case ROOM:
-                        if (usedSystem instanceof RoomEditorSystem == false) {
+                        if (usedSystem instanceof AreaEditorSystem == false) {
                             main.getStateManager().detach(usedSystem);
                             usedSystem = null;
                         }
-                        loadRoomEditorSystem(new Byte(value));
+                        loadAreaEditorSystem(new Byte(value));
                         break;
                     default:
                         throw new UnsupportedOperationException(mode + " is not a supporter Type.");
@@ -187,12 +185,12 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
         }
     }
 
-    private void loadRoomEditorSystem(byte value) {
+    private void loadAreaEditorSystem(byte value) {
         if (value == 0) {
             if (usedSystem != null) {
-                ((RoomEditorSystem) usedSystem).reloadRoom();
+                ((AreaEditorSystem) usedSystem).resetArea();
             } else {
-                usedSystem = new RoomEditorSystem();
+                usedSystem = new AreaEditorSystem();
                 main.getStateManager().attach(usedSystem);
             }
         } else if (value == 1) {
@@ -202,7 +200,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
             if (currentDialogPopup != null) {
                 currentDialogPopup.removeFromScreen();
             }
-            currentDialogPopup = new DialogPopup(main.getScreen(), "Load Room", this);
+            currentDialogPopup = new DialogPopup(main.getScreen(), "Load Area", this);
             currentDialogPopup.addInputText("Name");
             currentDialogPopup.show();
         } else if (value == 2) {
@@ -214,15 +212,15 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
 
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
-            if (dialogUID.equals("LoadRoom")) {
-                usedSystem = new RoomEditorSystem(currentDialogPopup.getInput("Name"));
-                main.getStateManager().attach(usedSystem);
+            if (dialogUID.equals("LoadArea")) {
+                if(usedSystem != null){
+                    ((AreaEditorSystem)usedSystem).load(currentDialogPopup.getInput("Name"));
+                } else {
+                    usedSystem = new AreaEditorSystem(currentDialogPopup.getInput("Name"));
+                    main.getStateManager().attach(usedSystem);
+                }
             }
         }
-    }
-
-    private void loadAreaEditorSystem(Byte aByte) {
-        System.err.println("Not Supported yet.");
     }
 
     private void loadWorldEditorSystem(Byte aByte) {
@@ -243,8 +241,6 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
     }
 
     public enum MapEditorMode {
-
-        ROOM,
         AREA,
         WORLD;
     }

@@ -6,12 +6,12 @@ import com.simsilica.es.PersistentComponent;
  * Component used for object on the Room field.
  * @author roah
  */
-public class RoomPropsComponent implements PersistentComponent {
+public class AreaPropsComponent implements PersistentComponent {
 
     private boolean isTrigger = false;
     private boolean isImmune = false;
 
-    public RoomPropsComponent() {
+    public AreaPropsComponent() {
     }
 
     /**
@@ -21,7 +21,7 @@ public class RoomPropsComponent implements PersistentComponent {
      * @param isImmune Define if the entity respond to undirect effect as when a
      * firebold hit it.
      */
-    public RoomPropsComponent(boolean isTrigger, boolean isImmune) {
+    public AreaPropsComponent(boolean isTrigger, boolean isImmune) {
         this.isTrigger = isTrigger;
         this.isImmune = isImmune;
     }

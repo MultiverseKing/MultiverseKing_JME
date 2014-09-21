@@ -6,7 +6,7 @@ import entitysystem.EntitySystemAppState;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import hexsystem.RoomMouseSystem;
+import hexsystem.AreaMouseSystem;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import hexsystem.events.TileChangeEvent;
@@ -20,30 +20,29 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public final class RoomEditorSystem extends EntitySystemAppState implements TileChangeListener, HexMapInputListener{
+public final class AreaEditorSystem extends EntitySystemAppState implements TileChangeListener, HexMapInputListener {
+
     private MapData mapData;
-    private String editedMapName = null;
+    private String editedAreaName = null;
 
-    public RoomEditorSystem() {
+    public AreaEditorSystem() {
     }
 
-    public RoomEditorSystem(String editedMapName) {
-        this.editedMapName = editedMapName;
+    public AreaEditorSystem(String editedMapName) {
+        this.editedAreaName = editedMapName;
     }
-    
+
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
-        if(editedMapName == null){
-            initializeRoom();
+        if (editedAreaName == null) {
+            initializeArea();
         } else {
-            mapData.loadMap(editedMapName);
+            load(editedAreaName);
         }
 
-        return entityData.getEntities(RoomPropsComponent.class);
+        return entityData.getEntities(AreaPropsComponent.class);
     }
-
-    
 
     // <editor-fold defaultstate="collapsed" desc="Tile propertie Getters && Setters">
     void setTileProperties(HexCoordinate coord, int height) {
@@ -74,44 +73,65 @@ public final class RoomEditorSystem extends EntitySystemAppState implements Tile
         return mapData.getMapElement();
     }
     // </editor-fold>
-    
-    public void initializeRoom() {
-        app.getStateManager().attach(new RoomMouseSystem(this));
+
+    public void initializeArea() {
+        app.getStateManager().attach(new AreaMouseSystem(this));
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(Vector2Int.ZERO, null);
         }
     }
 
-    public void reloadRoom() {
-        System.err.println("Not Supported yet.");
+    public void resetArea() {
+        clearArea();
+        initializeArea();
     }
 
-    private void clearRoom() {
+    private void clearArea() {
         mapData.removeTileChangeListener(this);
         mapData.clearCurrent();
     }
 
+    private boolean load() {
+        return mapData.loadArea(editedAreaName);
+    }
+        
+    public boolean load(String areaName) {
+        editedAreaName = areaName;
+        if(!load()){
+            editedAreaName = null;
+            return false;
+        }
+        return true;
+    }
+    
     /**
-     * Save Area or world following the current mode.
+     * Save Area.
      *
      * @return
      */
-    boolean saveCurrent(String name) {
+    boolean saveArea(String name) {
         mapData.saveMap(name);
         return true;
     }
 
     /**
-     * Load Area or World following the current mode and the provided name.
+     * Load Area.
      *
      * @return
      */
     boolean loadCurrent(String name) {
-        mapData.loadMap(name);
+        mapData.loadArea(name);
         return true;
     }
-    
+
+    /**
+     * @return True if there is something who can be saved.
+     */
+    public boolean isEmpty() {
+        return mapData.containTilesData();
+    }
+
     @Override
     protected void updateSystem(float tpf) {
     }

@@ -6,7 +6,6 @@ import gamemode.gui.EditorWindow;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
-import tonegod.gui.core.layouts.LayoutHint.VAlign;
 
 /**
  *
@@ -30,38 +29,38 @@ class GeneratorSubWindow extends EditorWindow {
                  * - segmentCost - activationRange - FXUsed - hitCollision -
                  * isCastOnSelf
                  */
-                addEditableNumericField("Power", 15, Vector2f.ZERO);
+                addEditableNumericField("Power", 15, HAlign.left);
                 /**
                  * Part used to show/set the segmentCost needed for the unit to
                  * cast the ability.
                  */
-                addSpinnerField("Segment Cost", new int[]{0, 20, 1, 0}, new Vector2f(0, 1));
+                addSpinnerField("Segment Cost", new int[]{0, 20, 1, 0}, HAlign.left);
                 Spinner spin = getSpinnerField("Segment Cost");
                 spin.setPosition(spin.getPosition().x - 50, spin.getPosition().y);
                 /**
                  * Part used to set the Activation range of the ability.
                  */
-                addSpinnerField("Activation Range", new int[]{0, 100, 1, 0}, new Vector2f(0, 2));
+                addSpinnerField("Activation Range", new int[]{0, 100, 1, 0}, HAlign.left);
                 spin = getSpinnerField("Activation Range");
                 spin.setPosition(spin.getPosition().x - 90, spin.getPosition().y);
                 /**
                  * Part used to know if the spell is cast from the coster or the
                  * target.
                  */
-                addCheckBoxField("Is Cast from Self", false, new Vector2f(0, 3.2f), new Vector2f(30, 0));
-                showConstrainToParent(new Vector2f(2, 5f), HAlign.right);
+                addCheckBoxField("Is Cast from Self", false, new Vector2f(30, 0));
+                showConstrainToParent(new Vector2f(2, 5f), HAlign.left);
                 break;
             case EQUIPEMENT:
-                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.left);
                 break;
             case SPELL:
-                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.left);
                 break;
             case SUMMON:
-                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.left);
                 break;
             case TRAP:
-                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.right);
+                showConstrainToParent(new Vector2f(2, 3.5f), HAlign.left);
                 break;
             default:
                 throw new UnsupportedOperationException(type + " is not a supported type in : " + getClass().getName());

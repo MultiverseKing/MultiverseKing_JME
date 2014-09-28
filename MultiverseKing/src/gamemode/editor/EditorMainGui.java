@@ -1,34 +1,34 @@
 package gamemode.editor;
 
-import gamemode.gui.DialogWindowListener;
-import gamemode.gui.DialogPopup;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import entitysystem.EntitySystemAppState;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import gamemode.editor.map.AreaEditorSystem;
+import gamemode.editor.map.LoadingPopup;
+import gamemode.editor.map.LoadingPopupListener;
+import gamemode.editor.map.MapEditorSystem;
 
 /**
  * rootMenu of the Game Editor.
  *
  * @author roah
  */
-public class EditorMainGui extends AbstractAppState implements DialogWindowListener {
+public class EditorMainGui extends AbstractAppState implements LoadingPopupListener {
 
     private MultiverseMain main;
     private Window mainMenuBar;
     private Menu currentMenuItem;
     private EditorItem currentMenuValue;
     private String currentSelectedMenuItem;
-    private EntitySystemAppState usedSystem;
-    private DialogPopup currentDialogPopup;
+    private MapEditorSystem usedSystem;
+    private LoadingPopup currentDialogPopup;
 
     public Window getMainMenu() {
         return mainMenuBar;
@@ -95,7 +95,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
 
     private void openMenuItem(EditorItem menu) {
         boolean showMenu = true;
-        if (currentDialogPopup != null && !currentDialogPopup.isVisible() 
+        if (currentDialogPopup != null && !currentDialogPopup.isVisible()
                 || currentMenuValue != menu) {
             currentMenuItem.removeAllMenuItems();
             switch (menu) {
@@ -187,6 +187,9 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
 
     private void loadAreaEditorSystem(byte value) {
         if (value == 0) {
+            /**
+             * Create new map.
+             */
             if (usedSystem != null) {
                 ((AreaEditorSystem) usedSystem).resetArea();
             } else {
@@ -195,14 +198,12 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
             }
         } else if (value == 1) {
             /**
-             * @todo: Load.
+             * Load saved map.
              */
             if (currentDialogPopup != null) {
                 currentDialogPopup.removeFromScreen();
             }
-            currentDialogPopup = new DialogPopup(main.getScreen(), "Load Area", this);
-            currentDialogPopup.addInputText("Name");
-//            currentDialogPopup.addButton("From Files");
+            currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Area", this);
             currentDialogPopup.show();
         } else if (value == 2) {
             /**
@@ -214,14 +215,26 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
             if (dialogUID.equals("LoadArea")) {
-                if(usedSystem != null){
-                    ((AreaEditorSystem)usedSystem).load(currentDialogPopup.getInput("Name"));
+                if (usedSystem != null) {
+                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getInput("Name"));
                 } else {
-                    usedSystem = new AreaEditorSystem(currentDialogPopup.getInput("Name"));
+                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getInput("Name"));
                     main.getStateManager().attach(usedSystem);
                 }
             }
         }
+    }
+
+    public boolean loadForCurrent(String dialogUID, String value) {
+        if (dialogUID.equals("LoadArea")) {
+            if (usedSystem != null) {
+                return ((AreaEditorSystem) usedSystem).load(value);
+            } else {
+                usedSystem = new AreaEditorSystem(currentDialogPopup, value);
+                main.getStateManager().attach(usedSystem);
+            }
+        }
+        return false;
     }
 
     private void loadWorldEditorSystem(Byte aByte) {
@@ -242,6 +255,7 @@ public class EditorMainGui extends AbstractAppState implements DialogWindowListe
     }
 
     public enum MapEditorMode {
+
         AREA,
         WORLD;
     }

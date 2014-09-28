@@ -17,7 +17,6 @@ import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
-import tonegod.gui.core.layouts.LayoutHint.VAlign;
 import utility.ElementalAttribut;
 
 /**
@@ -36,27 +35,27 @@ final class GeneratorWindow extends EditorWindow {
         /**
          * Part used to show/set the card Name.
          */
-        addEditableTextField("Name", "TuxDoll", Vector2f.ZERO);
+        addEditableTextField("Name", "TuxDoll", HAlign.left);
         /**
          * Part used to show/choose the cost needed to use the card.
          */
-        addSpinnerField("Cost", new int[]{0, 20, 1, 0}, new Vector2f(1, 0), new Vector2f(50, 0));
+        addSpinnerField("Cost", new int[]{0, 20, 1, 0}, HAlign.left);
         /**
          * Part used to show/choose the card faction.
          */
-        addEditableSelectionField("Faction", Faction.NEUTRAL, Faction.values(), new Vector2f(0, 1));
+        addEditableSelectionField("Faction", Faction.NEUTRAL, Faction.values(), HAlign.left);
         /**
          * Part used to show/choose the card Type.
          */
-        addEditableSelectionField("Card Type", CardType.SUMMON, CardType.values(), new Vector2f(1, 1));
+        addEditableSelectionField("Card Type", CardType.SUMMON, CardType.values(), HAlign.left);
         /**
          * Part used to show/choose the card Element Attribut.
          */
-        addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), new Vector2f(2, 1));
+        addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), HAlign.left);
         /**
          * Part used to show/set the card Description text.
          */
-        addEditableTextField("Description", "This is a Testing unit", new Vector2f(0, 2),new Vector2f(0,25));
+        addEditableTextField("Description", "This is a Testing unit", HAlign.left);
         Element el = getTextField("Description");
         el.setPosition(el.getPosition().x - 75, el.getPosition().y);
         el.setWidth(getGridSize().x * 2);
@@ -115,7 +114,7 @@ final class GeneratorWindow extends EditorWindow {
             /**
              * Activate the cards.
              */
-        }else if(triggerName.equals("Edit")){
+        } else if (triggerName.equals("Edit")) {
 //                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
 //                    currentSubMenu.removeFromScreen();
 //                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {

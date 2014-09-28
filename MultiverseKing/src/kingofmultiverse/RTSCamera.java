@@ -16,7 +16,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import java.awt.im.InputContext;
-import java.util.Locale;
 
 /**
  *
@@ -264,7 +263,6 @@ public final class RTSCamera extends AbstractAppState {
 //        mouseDragButton = mouseButtonName(dragButton);
 //        mouseRotationButton = mouseButtonName(rotationButton);
 //    }
-
     @Override
     public void update(final float tpf) {
 
@@ -470,7 +468,6 @@ public final class RTSCamera extends AbstractAppState {
 //    public float getTilt() {
 //        return tilt;
 //    }
-
     /**
      *
      * @param distance
@@ -494,7 +491,6 @@ public final class RTSCamera extends AbstractAppState {
 //    public void setTilt(float tilt) {
 //        this.tilt = tilt;
 //    }
-
     /**
      *
      * @return
@@ -517,7 +513,7 @@ public final class RTSCamera extends AbstractAppState {
             negFWD = new KeyTrigger(KeyInput.KEY_Z);
 //            negDistance = new KeyTrigger(KeyInput.KEY_W);
         }
-        
+
 
 
         if (up == UpVector.Y_UP) {
@@ -626,7 +622,7 @@ public final class RTSCamera extends AbstractAppState {
                 }
                 float speed = maxSpeedPerSecondOfAccell[DISTANCE] * maxAccellPeriod[DISTANCE] * WHEEL_SPEED;
                 offsetMoves[DISTANCE] += value * speed;
-            } 
+            }
 //            else if (name.contains("MOUSE")) {
 //                if (mouseRotation) {
 //                    int direction;

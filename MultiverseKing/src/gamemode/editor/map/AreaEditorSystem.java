@@ -2,7 +2,6 @@ package gamemode.editor.map;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexTile;
 import hexsystem.MapData;
@@ -20,16 +19,18 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public final class AreaEditorSystem extends EntitySystemAppState implements TileChangeListener, HexMapInputListener {
+public final class AreaEditorSystem extends MapEditorSystem implements TileChangeListener, HexMapInputListener {
 
+    private LoadingPopup dialCaller;
     private MapData mapData;
     private String editedAreaName = null;
 
     public AreaEditorSystem() {
     }
 
-    public AreaEditorSystem(String editedMapName) {
+    public AreaEditorSystem(LoadingPopup dialCaller, String editedMapName) {
         this.editedAreaName = editedMapName;
+        this.dialCaller = dialCaller;
     }
 
     @Override
@@ -37,8 +38,10 @@ public final class AreaEditorSystem extends EntitySystemAppState implements Tile
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
         if (editedAreaName == null) {
             initializeArea();
-        } else {
-            load(editedAreaName);
+        } else if (!load(editedAreaName)) {
+            /**
+             * @todo : When the area isn't found.
+             */
         }
 
         return entityData.getEntities(AreaPropsComponent.class);
@@ -95,33 +98,29 @@ public final class AreaEditorSystem extends EntitySystemAppState implements Tile
     private boolean load() {
         return mapData.loadArea(editedAreaName);
     }
-        
-    public boolean load(String areaName) {
-        editedAreaName = areaName;
-        if(!load()){
+
+    public boolean load(String name) {
+        editedAreaName = name;
+        if (!load()) {
+//            if(dialCaller != null){
+            dialCaller.popupBox("    " + name + " not found.");
+//            }
             editedAreaName = null;
             return false;
         }
         return true;
     }
-    
-    /**
-     * Save Area.
-     *
-     * @return
-     */
-    boolean saveArea(String name) {
-        mapData.saveMap(name);
-        return true;
+
+    private boolean save() {
+        return mapData.saveMap(editedAreaName);
     }
 
-    /**
-     * Load Area.
-     *
-     * @return
-     */
-    boolean loadCurrent(String name) {
-        mapData.loadArea(name);
+    public boolean save(String name) {
+        editedAreaName = name;
+        if (isEmpty() || !save()) {
+            editedAreaName = null;
+            return false;
+        }
         return true;
     }
 

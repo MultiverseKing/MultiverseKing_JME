@@ -24,6 +24,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     private LoadingPopup dialCaller;
     private MapData mapData;
     private String editedAreaName = null;
+    private AreaTileWidget tileWidgetMenu;
 
     public AreaEditorSystem() {
     }
@@ -36,12 +37,15 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
+        boolean initWidget = false;
         if (editedAreaName == null) {
             initializeArea();
-        } else if (!load(editedAreaName)) {
-            /**
-             * @todo : When the area isn't found.
-             */
+            initWidget = true;
+        } else if (load(editedAreaName)) {
+            initWidget = true;
+        }
+        if(initWidget){
+            
         }
 
         return entityData.getEntities(AreaPropsComponent.class);
@@ -133,6 +137,9 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     @Override
     protected void updateSystem(float tpf) {
+        if(tileWidgetMenu != null){
+            tileWidgetMenu.update(tpf);
+        }
     }
 
     @Override
@@ -160,10 +167,27 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
-        System.err.println("Not Supported yet.");
+        openWidgetMenu(event.getEventPosition());
     }
 
     public void rightMouseActionResult(HexMapInputEvent event) {
-        System.err.println("Not Supported yet.");
+        closeWidgetMenu();
+    }
+    /**
+     * Window related to the selected hex.
+     *
+     * @param coord of the selected hex
+     */
+    private void openWidgetMenu(HexCoordinate tilePos) {
+        if (tileWidgetMenu == null) {
+            tileWidgetMenu = new AreaTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), this, tilePos);
+        }
+        tileWidgetMenu.show(tilePos);
+    }
+
+    private void closeWidgetMenu() {
+        if (tileWidgetMenu != null && tileWidgetMenu.isVisible()) {
+            tileWidgetMenu.hide();
+        }
     }
 }

@@ -52,6 +52,11 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     // <editor-fold defaultstate="collapsed" desc="Tile propertie Getters && Setters">
+    /**
+     * 
+     * @param coord
+     * @param height how many to add
+     */
     void setTileProperties(HexCoordinate coord, int height) {
         mapData.setTileHeight(coord, (byte) (mapData.getTile(coord).getHeight() + height));
     }
@@ -182,7 +187,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         if (tileWidgetMenu == null) {
             tileWidgetMenu = new AreaTileWidget(((MultiverseMain) app).getScreen(), app.getCamera(), this, tilePos);
         }
-        tileWidgetMenu.show(tilePos);
+        tileWidgetMenu.show(tilePos, mapData.getTile(tilePos).getHeight());
     }
 
     private void closeWidgetMenu() {

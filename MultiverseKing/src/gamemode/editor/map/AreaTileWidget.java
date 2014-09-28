@@ -1,12 +1,14 @@
 package gamemode.editor.map;
 
 import com.jme3.input.event.MouseButtonEvent;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
 import gamemode.gui.AnimatedButton;
 import gamemode.gui.CameraTrackWindow;
 import java.util.ArrayList;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.HexCoordinate;
@@ -31,11 +33,11 @@ class AreaTileWidget extends CameraTrackWindow {
         this.system = system;
         this.selectedTilePosition = tilePos;
 
-        populateRightMenu();
+        populateMenu();
         screenElement.scale(0.7f);
     }
 
-    private void populateRightMenu() {
+    private void populateMenu() {
         Element rightMenu = new Element(screen, "tileWidgetRightMenu", new Vector2f(95, 10),
                 new Vector2f(85, 120), Vector4f.ZERO, "Textures/Icons/EditorMap/rightMenu.png");
 
@@ -55,6 +57,31 @@ class AreaTileWidget extends CameraTrackWindow {
         loadEAttributIcon(rightMenu);
         loadAssetIcon(rightMenu);
         screenElement.addChild(rightMenu);
+        
+        Element holder = new Element(screen, screenElement.getUID()+"btnHolder", new Vector2f(0, 10), offset, Vector4f.ZERO, null);
+        holder.setAsContainerOnly();
+        
+        ButtonAdapter upBtn = new ButtonAdapter(screen, screenElement.getUID() + "UpButton", Vector2f.ZERO, 
+                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/EditorMap/arrow.png"){
+
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                system.setTileProperties(selectedTilePosition, 1);
+            }
+        };
+        holder.addChild(upBtn);
+        
+        ButtonAdapter downBtn = new ButtonAdapter(screen, screenElement.getUID() + "DownButton", new Vector2f(45, -5), 
+                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/EditorMap/arrow.png"){
+
+            @Override
+            public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                system.setTileProperties(selectedTilePosition, -1);
+            }
+        };
+        downBtn.setLocalRotation(downBtn.getLocalRotation().fromAngles(0, 0, 180 * FastMath.DEG_TO_RAD));
+        holder.addChild(downBtn);
+        screenElement.addChild(holder);
     }
 
     private void loadEAttributIcon(Element menu) {

@@ -18,6 +18,7 @@ public abstract class CameraTrackWindow {
     protected final Camera camera;
     protected Vector2f offset;
     protected HexCoordinate inspectedSpatialPosition;
+    protected int inspectedSpatialHeight = Integer.MIN_VALUE;
     protected Element screenElement;
 
     public CameraTrackWindow(ElementManager screen, Camera camera) {
@@ -31,7 +32,7 @@ public abstract class CameraTrackWindow {
     
     public void update(float tpf) {
         if (screen.getElementById(screenElement.getUID()) != null && screenElement.getIsVisible()) {
-            Vector3f value = camera.getScreenCoordinates(inspectedSpatialPosition.convertToWorldPositionYAsFloor());
+            Vector3f value = camera.getScreenCoordinates((inspectedSpatialHeight == Integer.MIN_VALUE ? inspectedSpatialPosition.convertToWorldPositionYAsFloor() : inspectedSpatialPosition.convertToWorldPosition(inspectedSpatialHeight)));
             if (value.x > 0 && value.x < screen.getWidth()*0.9f
                     && value.y > 0 && value.y < screen.getHeight()*0.9f) {
                 screenElement.setPosition(new Vector2f(value.x+offset.x, value.y+offset.y));
@@ -46,13 +47,18 @@ public abstract class CameraTrackWindow {
             screen.addElement(screenElement);
         }
         inspectedSpatialPosition = pos;
-        Vector3f value = camera.getScreenCoordinates(pos.convertToWorldPositionYAsFloor());
+        Vector3f value = camera.getScreenCoordinates((inspectedSpatialHeight == Integer.MIN_VALUE ? pos.convertToWorldPositionYAsFloor() : pos.convertToWorldPosition(inspectedSpatialHeight)));
         if(screenElement instanceof Menu){
             ((Menu)screenElement).showMenu(null, value.x, value.y);
         } else {
             screenElement.setPosition(value.x, value.y);
             screenElement.show();
         }
+    }
+    
+    public void show(HexCoordinate pos, int height){
+        inspectedSpatialHeight = height;
+        show(pos);
     }
     
     public boolean isVisible(){

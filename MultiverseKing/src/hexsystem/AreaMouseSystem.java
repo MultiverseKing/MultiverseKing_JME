@@ -18,6 +18,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import hexsystem.events.HexMapRayListener;
 import hexsystem.events.TileChangeEvent;
+import hexsystem.events.TileChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import kingofmultiverse.MultiverseMain;
@@ -29,7 +30,7 @@ import utility.MouseRay;
  *
  * @author Eike Foede, roah
  */
-public final class AreaMouseSystem extends AbstractAppState {
+public final class AreaMouseSystem extends AbstractAppState implements TileChangeListener {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -64,6 +65,7 @@ public final class AreaMouseSystem extends AbstractAppState {
     public void initialize(AppStateManager stateManager, Application app) {
         this.main = (MultiverseMain) app;
         mapData = stateManager.getState(HexSystemAppState.class).getMapData();
+        mapData.registerTileChangeListener(this);
         initInput();
         initMarkDebug();
     }
@@ -340,11 +342,7 @@ public final class AreaMouseSystem extends AbstractAppState {
 
         return null;
     }
-
-    /**
-     *
-     * @param event
-     */
+    
     public void tileChange(TileChangeEvent event) {
         if (cursor == null) {
             initCursor();

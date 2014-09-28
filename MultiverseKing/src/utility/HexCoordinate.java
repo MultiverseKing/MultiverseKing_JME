@@ -140,13 +140,23 @@ public final class HexCoordinate {
     
     /**
      * Convert Hex grid position to world position.
-     * Take in account y as Floor so 
+     * Take in account y as Floor as 
      * this.y = (HexSettings.GROUND_HEIGHT*HexSettings.FLOOR_OFFSET)
      * @return tile world unit position.
      */
     public Vector3f convertToWorldPositionYAsFloor() {
         Vector3f result = convertToWorldPosition();
         result.y = result.y + (HexSettings.GROUND_HEIGHT*HexSettings.FLOOR_OFFSET);
+        return result;
+    }
+    /**
+     * Convert Hex grid position to world position.
+     * Take in account y as the given number.
+     * @return tile world unit position.
+     */
+    public Vector3f convertToWorldPosition(int height) {
+        Vector3f result = convertToWorldPosition();
+        result.y = result.y + (height*HexSettings.FLOOR_OFFSET);
         return result;
     }
     

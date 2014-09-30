@@ -5,7 +5,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import gamemode.editor.card.GeneratorWindow;
+import gamemode.editor.card.CardEditorWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
@@ -16,6 +16,7 @@ import gamemode.editor.map.LoadingPopup;
 import gamemode.editor.map.LoadingPopupListener;
 import gamemode.editor.map.MapEditorSystem;
 import gamemode.gui.EditorWindow;
+import tonegod.gui.core.Screen;
 
 /**
  * rootMenu of the Game Editor.
@@ -155,7 +156,16 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                     /**
                      * @todo: Add the card generator window to the screen.
                      */
-                    editorWindow = new GeneratorWindow(main.getScreen(), null);
+                    if(editorWindow == null){
+                        editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
+                    } else if(editorWindow instanceof CardEditorWindow == false){
+                        editorWindow.removeFromScreen();
+                        editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
+                    } else if (editorWindow.isVisible()){
+                        editorWindow.hide();
+                    } else {
+                        editorWindow.setVisible();
+                    }
                 } else if (value.equals("TEST")) {
                     /**
                      * @todo: Add the card testing window to the screen. Load a

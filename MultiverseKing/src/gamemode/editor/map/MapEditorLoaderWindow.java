@@ -33,7 +33,7 @@ class MapEditorLoaderWindow extends EditorWindow {
         if (parent.getUID().equals("WorldEditorMenu")) {
         } else if (parent.getUID().equals("AreaEditorMenu")) {
         }
-        showConstrainToParent(new Vector2f(0.8f, 2.8f), HAlign.right);
+        showConstrainToParent(null, HAlign.right);
 //        initializeLoading();
     }
 

@@ -1,6 +1,5 @@
 package gamemode.editor.card;
 
-import com.jme3.math.Vector2f;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.attribut.Faction;
 import entitysystem.attribut.CardType;
@@ -12,9 +11,9 @@ import static entitysystem.attribut.CardType.TRAP;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import gamemode.gui.EditorWindow;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
-import tonegod.gui.controls.text.TextField;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
@@ -24,14 +23,13 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-public final class GeneratorWindow extends EditorWindow {
+public final class CardEditorWindow extends EditorWindow {
 
-    private boolean initialized = false;
+    private boolean init = false;
     private CardPreview cardPreview;
     private GeneratorSubWindow currentSubMenu;
-    private final CardEditorLoaderWindow saveAndLoadGUI;
 
-    public GeneratorWindow(ElementManager screen, Element parent) {
+    public CardEditorWindow(ElementManager screen, Element parent) {
         super(screen, parent, "Card Edition", Align.Horizontal, 2);
         /**
          * Part used to show/set the card Name.
@@ -54,27 +52,24 @@ public final class GeneratorWindow extends EditorWindow {
          * Part used to show/choose the card Element Attribut.
          */
         addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), HAlign.left);
-        /**
-         * Part used to test out card.
-         */
-        addButtonField("SubType Properties", HAlign.full);
+        addSpace();
         /**
          * Part used to show/set the card Description text.
          */
         addEditableTextField("Description", "This is a Testing unit", HAlign.left, 2);
         /**
-         *
+         * 
          */
-//        showConstrainToParent(new Vector2f(3, 6.5f), null, HAlign.right);
-        show(null, null);
+        addButtonList("additionalField", new String[] {"Load", "Save", "SubType Properties", "Hide Preview"}, HAlign.full, 2);
+        
+        showConstrainToParent(VAlign.bottom, HAlign.left);
         cardPreview = new CardPreview((Screen) screen, getWindow());
-        saveAndLoadGUI = new CardEditorLoaderWindow((Screen) screen, cardPreview.getPreview(), this);
-        initialized = true;
+        init = true;
     }
 
     @Override
     protected void onSelectBoxFieldChange(Enum value) {
-        if (initialized) {
+        if(init){
             if (value instanceof Faction) {
                 /**
                  * Change inspected Card Faction.
@@ -106,17 +101,15 @@ public final class GeneratorWindow extends EditorWindow {
 
     @Override
     protected void onButtonTrigger(String triggerName) {
-        if (triggerName.equals("Cast")) {
-            /**
-             * Activate the cards.
-             */
-        } else if (triggerName.equals("Edit")) {
-//                if (currentSubMenu != null && !currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
-//                    currentSubMenu.removeFromScreen();
-//                } else if (currentSubMenu != null && currentSubMenu.getCurrent().equals((CardType) getFieldValue("Card Type"))) {
-//                    return;
-//                }
-//                currentSubMenu = new GeneratorSubWindow(screen, cardPreview.getPreview(), (CardType) getFieldValue("Card Type"));
+        if (triggerName.equals("Load")) {
+        } else if (triggerName.equals("Save")) {
+        } else if (triggerName.equals("Hide Preview")) {
+            cardPreview.getPreview().hide();
+            getButtonListButton("additionalField", "Hide Preview").setText("Show Preview");
+        } else if (triggerName.equals("Show Preview")) {
+            cardPreview.getPreview().show();
+            getButtonListButton("additionalField", "Hide Preview").setText("Hide Preview");
+        } else if (triggerName.equals("SubType Properties")) {
         }
     }
 
@@ -125,7 +118,6 @@ public final class GeneratorWindow extends EditorWindow {
         if(UID.equals("Name")){
             cardPreview.switchName(input);
         } else if(UID.equals("Description")){
-            return;
         }
     }
 

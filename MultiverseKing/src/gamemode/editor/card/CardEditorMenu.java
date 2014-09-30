@@ -49,7 +49,7 @@ final class CardEditorMenu extends EditorMenu {
         }
         switch (index) {
             case 0:
-                current = new GeneratorWindow(screen, this);
+                current = new CardEditorWindow(screen, this);
                 openClose(0);
                 break;
             case 1:

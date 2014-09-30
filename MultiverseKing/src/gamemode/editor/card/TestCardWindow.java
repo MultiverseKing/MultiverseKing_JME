@@ -23,7 +23,7 @@ final class TestCardWindow extends EditorWindow {
 
         addButtonField("Add Card", "+1", new Vector2f(0, -5));
         addButtonField("Remove Card", "-1", new Vector2f(getGridSize().x, -8));
-        showConstrainToParent(new Vector2f(getGridSize().x * 2.1f, getGridSize().y * 2.6f), VAlign.bottom);
+        showConstrainToParent(VAlign.bottom, null);
         getWindow().setPosition(new Vector2f(getWindow().getPosition().x,
                 getWindow().getPosition().y - screen.getElementById("ReturnButtonWin").getHeight() - 15));
         getWindow().scale(0.8f);

@@ -34,7 +34,7 @@ public class CardPreview {
         /**
          * Window used to show a preview of the card.
          */
-        preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getAbsoluteWidth() - 140, 0),
+        preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getDimensions().x, 0),
                 new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {

@@ -18,11 +18,11 @@ import tonegod.gui.core.Screen;
  */
 class CardEditorLoaderWindow {
 
-    private final GeneratorWindow generatorGUI;
+    private final CardEditorWindow generatorGUI;
     private Window cardLoader;
     private Screen screen;
 
-    CardEditorLoaderWindow(Screen screen, Element parent, GeneratorWindow generatorGUI) {
+    CardEditorLoaderWindow(Screen screen, Element parent, CardEditorWindow generatorGUI) {
         this.screen = screen;
         this.generatorGUI = generatorGUI;
         /**

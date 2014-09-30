@@ -6,6 +6,7 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.CheckBox;
@@ -29,9 +30,8 @@ public abstract class EditorWindow {
     private Vector2f gridSize;// = new Vector2f(230, 20);//min value X == 230
     private String name;
     private Element parent;
-    private Window window;
+    private Window window = null;
     private LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
-    private int btnListCount = 0;
     /**
      * Max element count on the selected alignment.
      */
@@ -101,10 +101,10 @@ public abstract class EditorWindow {
     /**
      * Show the window on a free position on the screen.
      *
-     * @param size
      * @param position
      */
-    private void show(Vector2f size, Vector2f position) {
+    public void show(Vector2f position) {
+        Vector2f size = getWindowSize();
         size.y += 25;
 //        window = new Window(screen, getUID(), new Vector2f(position.x - (size.x / 2f), position.y - (size.y / 2f)), size);
         window = new Window(screen, getUID(), position, size);
@@ -156,23 +156,12 @@ public abstract class EditorWindow {
      * @param vAlign Vertical alignement to use
      */
     protected final void show(VAlign vAlign, HAlign hAlign) {
-        int column, row;
-        if (windowElementAlignement == Align.Horizontal) {
-            column = elementAlignMaxCount;
-            row = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
-        } else if (windowElementAlignement == Align.Vertical) {
-            row = elementAlignMaxCount;
-            column = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
-        } else {
-            throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
-        }
-        Vector2f size = new Vector2f(column * gridSize.x + (spacement * 2), (row + 1) * gridSize.y);
-
+        Vector2f size = getWindowSize();
         Vector2f position = new Vector2f();
         if (vAlign == null && hAlign == null) {
             position.x = screen.getWidth() / 2 - size.x / 2;
             position.y = screen.getHeight() / 2 - size.y / 2;
-            show(size, position);
+            show(position);
         } else {
             if (vAlign != null) {
                 switch (vAlign) {
@@ -198,28 +187,8 @@ public abstract class EditorWindow {
                         throw new UnsupportedOperationException(hAlign + " Not implemented");
                 }
             }
-            show(size, position);
+            show(position);
         }
-    }
-
-    /**
-     * Show the window constraint to the parent following Horizontal alignement.
-     *
-     * @param size
-     * @param hAlign Horizontal alignement to use
-     */
-    protected final void showConstrainToParent(Vector2f size, HAlign hAlign) {
-        showConstrainToParent(size, null, hAlign);
-    }
-
-    /**
-     * Show the window constraint to the parent following Vectical alignement.
-     *
-     * @param size
-     * @param vAlign Vectical alignement to use
-     */
-    protected final void showConstrainToParent(Vector2f size, VAlign vAlign) {
-        showConstrainToParent(size, vAlign, null);
     }
 
     /**
@@ -230,20 +199,23 @@ public abstract class EditorWindow {
      * @param sizeY grid size on Y.
      * @param align window following the parent.
      */
-    protected final void showConstrainToParent(Vector2f size, VAlign vAlign, HAlign hAlign) {
+    protected final void showConstrainToParent(VAlign vAlign, HAlign hAlign) {
+        Vector2f size = getWindowSize();
         if (parent != null) {
             Vector2f position = new Vector2f();
             if (vAlign == null && hAlign == null) {
-                show(size, position);
+                show(position);
             } else {
                 if (vAlign != null) {
                     switch (vAlign) {
                         case bottom:
-                            position.y = parent.getDimensions().y + 65;
+                            position.y = parent.getDimensions().y;
                             break;
                         case top:
                             position.y = parent.getDimensions().y - 65;
                             break;
+                        case center:
+                            position.y = -(size.y - parent.getDimensions().y);
                         default:
                             throw new UnsupportedOperationException(vAlign + " Not implemented");
                     }
@@ -251,23 +223,68 @@ public abstract class EditorWindow {
                 if (hAlign != null) {
                     switch (hAlign) {
                         case left:
-                            position.x = -size.x;
+                            if (vAlign != null && vAlign.equals(VAlign.center)) {
+                                position.x = -size.x;
+                            }
                             break;
                         case right:
-                            position.x = parent.getDimensions().x + 5;
+                            if (vAlign != null && vAlign.equals(VAlign.center)) {
+                                position.x = parent.getDimensions().x;
+                            } else {
+                                position.x = parent.getDimensions().x - size.x;
+                            }
                             break;
                         default:
                             throw new UnsupportedOperationException(hAlign + " Not implemented");
                     }
+                } else {
+                    position.x = parent.getDimensions().x / 2 - size.x / 2;
                 }
-                show(size, position);
+                show(position);
             }
         } else {
             throw new UnsupportedOperationException("There is no parent to align the element to.");
         }
     }
-    // </editor-fold>
 
+    private Vector2f getWindowSize() {
+        int column, row;
+        if (windowElementAlignement == Align.Horizontal) {
+            column = elementAlignMaxCount;
+            row = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
+        } else if (windowElementAlignement == Align.Vertical) {
+            row = elementAlignMaxCount;
+            column = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
+        } else {
+            throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
+        }
+        return new Vector2f(column * gridSize.x + (spacement * 2), (row + 1) * (gridSize.y + 0.5f));
+    }
+
+    public void setVisible() {
+        if (window != null) {
+            window.show();
+        } else {
+            System.err.println(getUID() + "Can't be set to visible, window does not exist.");
+        }
+    }
+
+    public void hide() {
+        if (window != null) {
+            window.hide();
+        } else {
+            System.err.println(getUID() + "Can't be hided, window does not exist.");
+        }
+    }
+
+    public boolean isVisible() {
+        if (window != null) {
+            return window.getIsVisible();
+        }
+        return false;
+    }
+
+    // </editor-fold>
     public String getUID() {
         return generateUID(name);
     }
@@ -354,25 +371,53 @@ public abstract class EditorWindow {
         }
     }
 
-    protected final void addButtonList(String[] triggersNames, HAlign hAlign) {
-        String UID = name + "btnList" + btnListCount;
-        Element holder = new Element(screen, UID, Vector2f.ZERO, Vector2f.ZERO, Vector4f.ZERO, null);
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign) {
+        addButtonList(listUID, triggersNames, hAlign, 1);
+    }
+
+    /**
+     * Add a button List.
+     *
+     * @param triggersNames list of button to add.
+     * @param hAlign alignement of the button.
+     * @param fieldSize
+     */
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldSize) {
+        String UID = generateUID(listUID) + name + "btnList";
+        Element holder = new Element(screen, UID, new Vector2f(spacement, 10), Vector2f.ZERO, Vector4f.ZERO, null);
         holder.setAsContainerOnly();
         int i = 0;
         float posX = 0f;
+        float fillValue = 0;
+        ArrayList<ButtonAdapter> btnList = new ArrayList<ButtonAdapter>();
         for (String triggerName : triggersNames) {
-            ButtonAdapter btn = generateButton(triggerName, HAlign.left, Vector2f.ZERO);
-            btn.setPosition(posX, btn.getPosition().y);
-            posX += btn.getWidth();
+            btnList.add(generateButton(triggerName, HAlign.left, Vector2f.ZERO));
+            btnList.get(btnList.size() - 1).setPosition(posX, btnList.get(btnList.size() - 1).getPosition().y);
+            posX += btnList.get(btnList.size() - 1).getWidth();
+            fillValue += btnList.get(btnList.size() - 1).getWidth();
 
-            holder.addChild(btn);
+            holder.addChild(btnList.get(btnList.size() - 1));
             i++;
         }
         if (hAlign == HAlign.right) {
             holder.setPosition(gridSize.x - (posX + 10), holder.getPosition().y);
+        } else if (hAlign.equals(HAlign.full)) {
+            i = 0;
+            fillValue = (gridSize.x * fieldSize - fillValue) / triggersNames.length;
+            for (ButtonAdapter btn : btnList) {
+                btn.setDimensions(btn.getDimensions().x + fillValue, btn.getDimensions().y);
+                if (i != 0) {
+                    btn.setPosition(btn.getPosition().x + (fillValue * i), btn.getPosition().y);
+                }
+                i++;
+            }
         }
-        elementList.put(UID, holder);
-        btnListCount++;
+        elementList.put(generateUID(listUID), holder);
+        if (fieldSize > 1) {
+            for (i = fieldSize; i > 1; i--) {
+                addSpace();
+            }
+        }
     }
 
     /**
@@ -454,9 +499,8 @@ public abstract class EditorWindow {
     protected final void addEditableTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize, Vector2f offset) {
         Vector2Int size = Vector2Int.UNIT_XY;
         if (fieldSize != 0 && fieldSize > 0) {
-            int pos = (int) FastMath.ceil((float) (elementList.size()+1) / (float) elementAlignMaxCount);
-            pos = (int) ((float) (elementList.size()+1) / (float) pos);
-            System.err.println(pos);
+            int pos = (int) FastMath.ceil((float) (elementList.size() + 1) / (float) elementAlignMaxCount);
+            pos = (int) ((float) (elementList.size() + 1) / (float) pos);
             if (windowElementAlignement == Align.Horizontal) {
                 if (fieldSize + pos <= elementAlignMaxCount) {
                     size.x = fieldSize + pos - 1;
@@ -479,6 +523,7 @@ public abstract class EditorWindow {
 
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
+        System.err.println(size);
         generateTextField(uid, baseValue, size);
     }
 
@@ -590,7 +635,7 @@ public abstract class EditorWindow {
 
         TextField field = new TextField(screen, childUID + "TextField",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
-                new Vector2f((gridSize.x * fieldSize.x) - elementList.get(labelUID).getDimensions().x - spacement, gridSize.y )) {
+                new Vector2f((gridSize.x * fieldSize.x) - elementList.get(labelUID).getDimensions().x - spacement, gridSize.y * fieldSize.y)) {
             @Override
             public void onKeyRelease(KeyInputEvent evt) {
                 super.onKeyRelease(evt);
@@ -602,17 +647,23 @@ public abstract class EditorWindow {
             }
         };
         field.setType(TextField.Type.EXCLUDE_SPECIAL);
-//        field.setMaxLength(13);
         if (baseValue != null) {
             field.setText(baseValue);
         }
 
-        for(int i = fieldSize.y; i > 1; i--){
-            for(int j = elementAlignMaxCount; j>0; j--){
+        if (fieldSize.x > 1) {
+            for (int j = fieldSize.x; j > 1; j--) {
                 addSpace();
             }
         }
-        
+        if (fieldSize.y > 1) {
+            for (int i = fieldSize.y; i > 1; i--) {
+                for (int j = fieldSize.x; j > 0; j--) {
+                    addSpace();
+                }
+            }
+        }
+
         elementList.get(labelUID).addChild(field);
     }
 
@@ -652,7 +703,7 @@ public abstract class EditorWindow {
     }
 
     private ButtonAdapter generateButton(String labelName, final String triggerName, HAlign hAlign, Vector2f offset) {
-        ButtonAdapter button = new ButtonAdapter(screen, getUID() + triggerName + "Button",
+        ButtonAdapter button = new ButtonAdapter(screen, getUID() + generateUID(triggerName) + "Button",
                 Vector2f.ZERO, new Vector2f((labelName != null
                 ? gridSize.x - elementList.get(labelName).getDimensions().x - spacement
                 : (triggerName.toCharArray().length + 2) * 8) + spacement, gridSize.y)) {
@@ -684,6 +735,18 @@ public abstract class EditorWindow {
     // <editor-fold defaultstate="collapsed" desc="get Fields Method">
     protected final Element getField(String labelName) {
         return elementList.get(generateUID(labelName));
+    }
+
+    protected final Element getButtonListButton(String listUID, String buttonLabel) {
+        return getField(listUID).getChildElementById(getUID() + generateUID(buttonLabel) + "Button");
+    }
+
+    protected final ButtonAdapter getButtonField(String labelName, boolean gotLabel) {
+        if (gotLabel) {
+            return (ButtonAdapter) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "Button");
+        } else {
+            return (ButtonAdapter) elementList.get(generateUID(labelName));
+        }
     }
 
     protected final CheckBox getCheckBoxField(String labelName) {
@@ -728,7 +791,8 @@ public abstract class EditorWindow {
     public enum VAlign {
 
         top,
-        bottom;
+        bottom,
+        center;
     }
 
     public enum HAlign {

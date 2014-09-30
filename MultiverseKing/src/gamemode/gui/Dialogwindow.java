@@ -22,7 +22,7 @@ public class Dialogwindow extends EditorWindow {
     }
 
     public void show() {
-        addButtonList(new String[]{"Confirm", "Cancel"}, HAlign.right);
+        addButtonList("staticField", new String[]{"Confirm", "Cancel"}, HAlign.right);
         initKeyMapping();
         screen.getApplication().getInputManager().addListener(dialogPopupListener, new String[]{"confirmDialog", "cancelDialog"});
         super.show(null, null);

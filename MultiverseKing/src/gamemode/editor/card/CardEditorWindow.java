@@ -11,7 +11,6 @@ import static entitysystem.attribut.CardType.TRAP;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import gamemode.gui.EditorWindow;
-import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
@@ -58,10 +57,10 @@ public final class CardEditorWindow extends EditorWindow {
          */
         addEditableTextField("Description", "This is a Testing unit", HAlign.left, 2);
         /**
-         * 
+         *
          */
-        addButtonList("additionalField", new String[] {"Load", "Save", "SubType Properties", "Hide Preview"}, HAlign.full, 2);
-        
+        addButtonList("additionalField", new String[]{"Load", "Save", "SubType Properties", "Hide Preview"}, HAlign.full, 2);
+
         showConstrainToParent(VAlign.bottom, HAlign.left);
         cardPreview = new CardPreview((Screen) screen, getWindow());
         init = true;
@@ -69,7 +68,7 @@ public final class CardEditorWindow extends EditorWindow {
 
     @Override
     protected void onSelectBoxFieldChange(Enum value) {
-        if(init){
+        if (init) {
             if (value instanceof Faction) {
                 /**
                  * Change inspected Card Faction.
@@ -115,9 +114,9 @@ public final class CardEditorWindow extends EditorWindow {
 
     @Override
     protected void onTextFieldInput(String UID, String input, boolean isTrigger) {
-        if(UID.equals("Name")){
+        if (UID.equals("Name")) {
             cardPreview.switchName(input);
-        } else if(UID.equals("Description")){
+        } else if (UID.equals("Description")) {
         }
     }
 

@@ -44,8 +44,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         } else if (load(editedAreaName)) {
             initWidget = true;
         }
-        if(initWidget){
-            
+        if (initWidget) {
         }
 
         return entityData.getEntities(AreaPropsComponent.class);
@@ -53,7 +52,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     // <editor-fold defaultstate="collapsed" desc="Tile propertie Getters && Setters">
     /**
-     * 
+     *
      * @param coord
      * @param height how many to add
      */
@@ -142,7 +141,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     @Override
     protected void updateSystem(float tpf) {
-        if(tileWidgetMenu != null){
+        if (tileWidgetMenu != null) {
             tileWidgetMenu.update(tpf);
         }
     }
@@ -178,6 +177,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     public void rightMouseActionResult(HexMapInputEvent event) {
         closeWidgetMenu();
     }
+
     /**
      * Window related to the selected hex.
      *

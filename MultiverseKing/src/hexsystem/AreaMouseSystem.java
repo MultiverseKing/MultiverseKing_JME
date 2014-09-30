@@ -46,17 +46,20 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
 
     public AreaMouseSystem() {
     }
+
     public AreaMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
         registerTileInputListener(inputListener);
     }
+
     public AreaMouseSystem(HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
     }
+
     public AreaMouseSystem(HexMapInputListener inputListener) {
         registerTileInputListener(inputListener);
     }
-    
+
     public Spatial getRayDebug() {
         return rayDebug;
     }
@@ -342,7 +345,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
 
         return null;
     }
-    
+
     public void tileChange(TileChangeEvent event) {
         if (cursor == null) {
             initCursor();

@@ -16,7 +16,6 @@ import gamemode.editor.map.LoadingPopup;
 import gamemode.editor.map.LoadingPopupListener;
 import gamemode.editor.map.MapEditorSystem;
 import gamemode.gui.EditorWindow;
-import tonegod.gui.core.Screen;
 
 /**
  * rootMenu of the Game Editor.
@@ -156,12 +155,12 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                     /**
                      * @todo: Add the card generator window to the screen.
                      */
-                    if(editorWindow == null){
+                    if (editorWindow == null) {
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
-                    } else if(editorWindow instanceof CardEditorWindow == false){
+                    } else if (editorWindow instanceof CardEditorWindow == false) {
                         editorWindow.removeFromScreen();
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
-                    } else if (editorWindow.isVisible()){
+                    } else if (editorWindow.isVisible()) {
                         editorWindow.hide();
                     } else {
                         editorWindow.setVisible();

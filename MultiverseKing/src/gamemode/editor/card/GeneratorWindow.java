@@ -14,6 +14,7 @@ import entitysystem.loader.EntityLoader;
 import gamemode.gui.EditorWindow;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
+import tonegod.gui.controls.text.TextField;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
@@ -23,19 +24,20 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-final class GeneratorWindow extends EditorWindow {
+public final class GeneratorWindow extends EditorWindow {
 
     private boolean initialized = false;
     private CardPreview cardPreview;
     private GeneratorSubWindow currentSubMenu;
     private final CardEditorLoaderWindow saveAndLoadGUI;
 
-    GeneratorWindow(ElementManager screen, Element parent) {
-        super(screen, parent, "Card Generator");
+    public GeneratorWindow(ElementManager screen, Element parent) {
+        super(screen, parent, "Card Edition", Align.Horizontal, 2);
         /**
          * Part used to show/set the card Name.
          */
         addEditableTextField("Name", "TuxDoll", HAlign.left);
+        getTextField("Name").setMaxLength(13);
         /**
          * Part used to show/choose the cost needed to use the card.
          */
@@ -53,24 +55,18 @@ final class GeneratorWindow extends EditorWindow {
          */
         addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), HAlign.left);
         /**
+         * Part used to test out card.
+         */
+        addButtonField("SubType Properties", HAlign.full);
+        /**
          * Part used to show/set the card Description text.
          */
-        addEditableTextField("Description", "This is a Testing unit", HAlign.left);
-        Element el = getTextField("Description");
-        el.setPosition(el.getPosition().x - 75, el.getPosition().y);
-        el.setWidth(getGridSize().x * 2);
-        /**
-         * Part used to test out card.
-         */
-        addButtonField("Test Card", "Cast", new Vector2f(0, 3.5f));
-        /**
-         * Part used to test out card.
-         */
-        addButtonField("SubType Properties", "Edit", new Vector2f(1, 3.5f));
+        addEditableTextField("Description", "This is a Testing unit", HAlign.left, 2);
         /**
          *
          */
-        showConstrainToParent(new Vector2f(3, 6.5f), null, HAlign.right);
+//        showConstrainToParent(new Vector2f(3, 6.5f), null, HAlign.right);
+        show(null, null);
         cardPreview = new CardPreview((Screen) screen, getWindow());
         saveAndLoadGUI = new CardEditorLoaderWindow((Screen) screen, cardPreview.getPreview(), this);
         initialized = true;
@@ -126,7 +122,11 @@ final class GeneratorWindow extends EditorWindow {
 
     @Override
     protected void onTextFieldInput(String UID, String input, boolean isTrigger) {
-        cardPreview.switchName(input);
+        if(UID.equals("Name")){
+            cardPreview.switchName(input);
+        } else if(UID.equals("Description")){
+            return;
+        }
     }
 
     void loadProperties(String cardName, CardProperties properties, EntityLoader loader) {

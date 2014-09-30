@@ -5,6 +5,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import gamemode.editor.card.GeneratorWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
@@ -14,6 +15,7 @@ import gamemode.editor.map.AreaEditorSystem;
 import gamemode.editor.map.LoadingPopup;
 import gamemode.editor.map.LoadingPopupListener;
 import gamemode.editor.map.MapEditorSystem;
+import gamemode.gui.EditorWindow;
 
 /**
  * rootMenu of the Game Editor.
@@ -25,6 +27,7 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     private MultiverseMain main;
     private Window mainMenuBar;
     private Menu currentMenuItem;
+    private EditorWindow editorWindow;
     private EditorItem currentMenuValue;
     private String currentSelectedMenuItem;
     private MapEditorSystem usedSystem;
@@ -100,8 +103,8 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
             currentMenuItem.removeAllMenuItems();
             switch (menu) {
                 case CARD:
-                    currentMenuItem.addMenuItem("Generator", "GEN", null);
-                    currentMenuItem.addMenuItem("Test Menu", "TEST", null);
+                    currentMenuItem.addMenuItem("Edit Card", "EDIT", null);
+                    currentMenuItem.addMenuItem("Card Test", "TEST", null);
                     break;
                 case MAP:
                     Menu subMenu = new Menu(main.getScreen(), false) {
@@ -148,10 +151,11 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     private void menuTrigger(String value) {
         switch (currentMenuValue) {
             case CARD:
-                if (value.equals("GEN")) {
+                if (value.equals("EDIT")) {
                     /**
                      * @todo: Add the card generator window to the screen.
                      */
+                    editorWindow = new GeneratorWindow(main.getScreen(), null);
                 } else if (value.equals("TEST")) {
                     /**
                      * @todo: Add the card testing window to the screen. Load a
@@ -251,7 +255,8 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
 
         MAP,
         CARD,
-        SFX;
+        SFX,
+        BATTLE;
     }
 
     public enum MapEditorMode {

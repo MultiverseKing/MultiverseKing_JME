@@ -21,7 +21,7 @@ public class HexTile implements Savable {
      *
      */
     public HexTile() {
-        this.element = (byte) ElementalAttribut.NULL.ordinal();
+        this.element = (byte) ElementalAttribut.EARTH.ordinal();
         this.height = 0;
     }
 
@@ -82,7 +82,7 @@ public class HexTile implements Savable {
 //        capsule.readByte("height", height);
 //        capsule.readByte("element", element);
         height = (byte) capsule.readInt("height", 0);
-        element = (byte) capsule.readInt("element", ElementalAttribut.NULL.ordinal());
+        element = (byte) capsule.readInt("element", ElementalAttribut.EARTH.ordinal());
     }
 
     /**

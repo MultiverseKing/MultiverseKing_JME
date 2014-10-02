@@ -13,28 +13,25 @@ import com.jme3.math.FastMath;
 public final class HexSettings {
 
     /**
-     * Parameters used when generating the map. Radius to use when generating
-     * hex.
+     * Radius to use when generating hex.
      */
     public static final float HEX_RADIUS = 1;
     /**
-     * Parameters used when generating the map. Width of a generated hex.
+     * Width of a generated hex.
      */
     public static final float HEX_WIDTH = FastMath.sqrt(3) * HEX_RADIUS;
     /**
-     * Parameters used when generating the map. Number of hex contain in a
-     * chunk.
+     * Number of hex contain in a chunk.
      */
     public static final int CHUNK_SIZE = 16; //must be power of two
     /**
-     * Parameters used when generating the map. WU distance between two hex of
-     * different height.
+     * WU distance between two hex of different height.
      */
     public static final float FLOOR_OFFSET = 1f;
     /**
-     * Parameters used when generating the map. Offset value used to put the
-     * ground, to have underground without having to handle negative value,
-     * mainly help with the meshManager and how geometry is handle, generated.
+     * Offset value used to put the ground, to have underground without having
+     * to handle negative value, mainly help with the meshManager and 
+     * how geometry is handle, generated.
      */
     public static final byte GROUND_HEIGHT = 10;
     /**

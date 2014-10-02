@@ -1,8 +1,6 @@
 package entitysystem.card;
 
 import entitysystem.attribut.CardType;
-import entitysystem.attribut.Maintype;
-import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import org.json.simple.JSONObject;
 import utility.ElementalAttribut;
@@ -20,16 +18,6 @@ public class CardProperties {
      * Used to know how much ressource is needed to play the card.
      */
     private final int playCost;
-    /**
-     * Used as deck requirement restriction to synergize the background story
-     * and art-design to use.
-     */
-    private final Faction faction;
-    /**
-     * Used to know the outliner to use. Will be used later on to know wich card
-     * can be used to populate GameWorld.
-     */
-    private final Maintype mainType;
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
@@ -54,9 +42,7 @@ public class CardProperties {
 
     // </editor-fold>
     /**
-     * Create a new card type component, throw UnsupportedOperationException if
-     * the subType didn't match the mainType. WORLD subType == SPELL, SUMMON,
-     * TRAP. TITAN subType == AI, EQUIPEMENT, PATHFIND.
+     * Create a new card type component.
      *
      * @param playCost level needed to use the card.
      * @param faction constraint use.
@@ -66,20 +52,12 @@ public class CardProperties {
     public CardProperties(JSONObject obj, String name) {
         this.name = name;
         cardType = CardType.valueOf(obj.get("cardType").toString());
-        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP || cardType == CardType.TITAN) {
-            this.mainType = Maintype.WORLD;
-        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
-            this.mainType = Maintype.TITAN;
-        } else {
-            throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
-        }
         if(cardType == CardType.TITAN){
             playCost = 0;
         } else {
             Number tmpValue = (Number) obj.get("playCost");
             playCost = tmpValue.intValue();
         }
-        faction = Faction.valueOf((String) obj.get("faction"));
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
         description = (String) obj.get("description");
@@ -87,23 +65,14 @@ public class CardProperties {
 
     /**
      * Constructor used for the editor mode.
-     *
      */
-    public CardProperties(String name, int playCost, Faction faction, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
-        if (cardType == CardType.SPELL || cardType == CardType.SUMMON || cardType == CardType.TRAP || cardType == CardType.TITAN) {
-            this.mainType = Maintype.WORLD;
-        } else if (cardType == CardType.ABILITY || cardType == CardType.EQUIPEMENT) {
-            this.mainType = Maintype.TITAN;
-        } else {
-            throw new UnsupportedOperationException("This card type isn't Defined on " + this.toString());
-        }
+    public CardProperties(String name, int playCost, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
         if(cardType == CardType.TITAN){
             this.playCost = 0;
         } else {
             this.playCost = playCost;
         }
         this.name = name;
-        this.faction = faction;
         this.cardType = cardType;
         this.rarity = rarity;
         this.element = element;
@@ -115,8 +84,6 @@ public class CardProperties {
      */
     public CardProperties() {
         this.playCost = 0;
-        this.faction = null;
-        this.mainType = null;
         this.cardType = null;
         this.rarity = null;
         this.element = null;
@@ -135,31 +102,12 @@ public class CardProperties {
     }
 
     /**
-     * Faction restriction must be meet to use the card.
-     *
-     * @return Faction restriction to use this card.
-     */
-    public Faction getFaction() {
-        return faction;
-    }
-
-    /**
-     * Titan card type can only be used on "Titan", World card type can only be
-     * used on "Field". Currently only two type are supported.
-     *
-     * @return CardMainType the card belong too.
-     */
-    public Maintype getCardMainType() {
-        return mainType;
-    }
-
-    /**
      * Card subType properties.
      *
      * @see CardSubType
      * @return
      */
-    public CardType getCardSubType() {
+    public CardType getCardType() {
         return cardType;
     }
 

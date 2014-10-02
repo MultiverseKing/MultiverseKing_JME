@@ -137,6 +137,9 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                      */
                     showMenu = false;
                     break;
+                case BATTLE:
+                    showMenu = false;
+                    break;
                 default:
                     throw new UnsupportedOperationException(menu + " is not a supported type.");
             }
@@ -192,6 +195,8 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                         throw new UnsupportedOperationException(mode + " is not a supporter Type.");
                 }
             case SFX:
+                break;
+            case BATTLE:
                 break;
             default:
                 throw new UnsupportedOperationException(currentMenuValue + " is not a supported type.");

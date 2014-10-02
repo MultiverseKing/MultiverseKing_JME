@@ -42,7 +42,7 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         int i = 0;
         while ( i < ElementalAttribut.values().length) {
             ElementalAttribut e = ElementalAttribut.convert(i);
-            if (e.equals(ignoredEAttribut) || e.equals(ElementalAttribut.NULL)) {
+            if (e.equals(ignoredEAttribut)) {
                 j++;
             } else {
                 String eName = e.name().toLowerCase();

@@ -1,5 +1,6 @@
 package gamemode.gui;
 
+import com.jme3.font.BitmapFont;
 import com.jme3.input.KeyInput;
 import com.jme3.input.event.KeyInputEvent;
 import com.jme3.input.event.MouseButtonEvent;
@@ -317,7 +318,7 @@ public abstract class EditorWindow {
      * Add a button Field to this menu attach to a label. (no offset)
      */
     protected final void addButtonField(String labelName) {
-        addButtonField(labelName, labelName, HAlign.left, Vector2f.ZERO, true);
+        addButtonField(labelName, labelName, HAlign.full, Vector2f.ZERO, false);
     }
 
     /**
@@ -436,7 +437,7 @@ public abstract class EditorWindow {
      */
     protected final void addCheckBoxField(String labelName, boolean active, Vector2f offset) {
         String uid = generateUID(labelName);
-        CheckBox b = new CheckBox(screen, getUID() + uid + "CheckBox", Vector2f.ZERO);
+        CheckBox b = new CheckBox(screen, getUID() + uid + "CheckBox", new Vector2f(spacement + offset.x, spacement + offset.y));
         b.setLabelText(labelName);
         elementList.put(uid, b);
     }
@@ -523,7 +524,6 @@ public abstract class EditorWindow {
 
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
-        System.err.println(size);
         generateTextField(uid, baseValue, size);
     }
 
@@ -545,7 +545,7 @@ public abstract class EditorWindow {
     protected final void addEditableNumericField(String labelName, int baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
-        generateNumericField(uid, baseValue);
+        generateNumericField(uid, baseValue, hAlign);
     }
 
     /**
@@ -586,7 +586,7 @@ public abstract class EditorWindow {
             return label;
         } else if (hAlign.equals(HAlign.right)) {
             Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                    new Vector2f(gridSize.x - spacement - offset.x - (labelName.toCharArray().length * 8), offset.y + 8),
+                    new Vector2f(gridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y),
                     new Vector2f((labelName.toCharArray().length + 3) * 8, gridSize.y));
             label.setText(" : " + labelName);
             return label;
@@ -595,16 +595,16 @@ public abstract class EditorWindow {
         }
     }
 
-    private void generateNumericField(final String labelUID, int baseValue) {
+    private void generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {
         final String childUID = getUID() + labelUID;
         ButtonAdapter numButton = new ButtonAdapter(screen, childUID + "NumericFieldButton",
-                new Vector2f(elementList.get(labelUID).getDimensions().x + spacement, 5 + 2 + elementList.size())) {
+                Vector2f.ZERO, new Vector2f(gridSize.x - (elementList.get(labelUID).getDimensions().x + (spacement * 2)), gridSize.y)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 TextField field = new TextField(screen, getUID() + labelUID + "NumericField",
-                        new Vector2f(getPosition().x, getPosition().y + spacement),
-                        new Vector2f(getWidth(), 30)) {
+                        new Vector2f(getPosition().x, getPosition().y + (hAlign.equals(HAlign.left) ? spacement : 8)),
+                        new Vector2f(getWidth(), gridSize.y)) {
                     @Override
                     public void onKeyRelease(KeyInputEvent evt) {
                         super.onKeyRelease(evt);
@@ -621,11 +621,21 @@ public abstract class EditorWindow {
                     }
                 };
                 field.setType(TextField.Type.NUMERIC);
-                field.setMaxLength(3);
+                field.setMaxLength(4);
                 field.setText(getText());
                 getElementParent().addChild(field);
             }
         };
+        switch (hAlign) {
+            case full:
+                break;
+            case left:
+                numButton.setPosition(elementList.get(labelUID).getDimensions().x + spacement, 3);
+                break;
+            case right:
+                numButton.setPosition(-numButton.getDimensions().x - spacement, 4);
+                break;
+        }
         numButton.setText(Integer.toString(baseValue));
         elementList.get(labelUID).addChild(numButton);
     }

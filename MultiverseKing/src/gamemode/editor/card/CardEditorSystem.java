@@ -25,24 +25,11 @@ import utility.Vector2Int;
 public class CardEditorSystem extends EntitySystemAppState {
 
     private ArrayList<EntityId> entity = new ArrayList<EntityId>();
-    private CardEditorMenu cardEditorGui;
     private MapData mapData;
 
     @Override
     protected EntitySet initialiseSystem() {
         mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
-        /**
-         * Load the map and populate the Menu.
-         */
-//        if (mapData.getMapName() == null || !mapData.getMapName().equalsIgnoreCase("reset")) {
-//            if (!mapData.loadMap("Reset")) {
-//                Logger.getLogger(CardEditorGui.class.getName()).log(Level.WARNING, null, new IOException("Files missing."));
-//                app.getStateManager().detach(this);
-//                return null;
-//            }
-//        }
-//        cardEditorGui = new CardEditorMenu((MultiverseMain) app, this, ); //@todo --<<<<<!!!
-        ((MultiverseMain) app).getScreen().addElement(cardEditorGui);
 
         return entityData.getEntities(CardRenderComponent.class);
     }
@@ -98,7 +85,6 @@ public class CardEditorSystem extends EntitySystemAppState {
 
     @Override
     protected void cleanupSystem() {
-        ((MultiverseMain) app).getScreen().removeElement(cardEditorGui);
         for (EntityId id : entity) {
             entityData.removeEntity(id);
         }

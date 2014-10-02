@@ -4,7 +4,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import entitysystem.attribut.CardType;
-import entitysystem.attribut.Faction;
+import entitysystem.attribut.Rarity;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
@@ -31,14 +31,11 @@ public class Hover extends Window {
 
     public Hover(ElementManager screen, Vector2f position, Vector2f dimension) {
         super(screen, "cardPropertiesHover", position, dimension, Vector4f.ZERO,
-                "Textures/Cards/backgrounds/" + ElementalAttribut.NULL.name() + ".png");
+                "Textures/Cards/backgrounds/" + Rarity.COMMON.toString().toLowerCase() + ".png");
         this.removeAllChildren();
         this.setIgnoreMouse(true);
     }
-
-    /**
-     * @todo
-     */
+    
     public void setProperties(CardProperties properties) {
         if (getElementsAsMap().isEmpty()) {
             initProperties(properties);
@@ -63,24 +60,12 @@ public class Hover extends Window {
         /**
          * Window used to show the type of the card.
          */
-        Window typeIco = new Window(this.screen, "typeIconHover", Vector2f.ZERO,
-                new Vector2f(33, 30),
-                Vector4f.ZERO, "Textures/Icons/CardType/" + properties.getCardSubType().name() + ".png");
-        typeIco.removeAllChildren();
-        addChild(typeIco);
-        typeIco.setPosition(new Vector2f(getDimensions().x * 0.06f, getDimensions().y * 0.8f));
-        typeIco.setIgnoreMouse(true);
+        setSubType(properties.getCardType());
 
         /**
          * Window used to show the Faction of the card.
          */
-        Window factionIco = new Window(this.screen, "factionIconHover", Vector2f.ZERO,
-                new Vector2f(33, 30),
-                Vector4f.ZERO, "Textures/Icons/Faction/" + properties.getFaction().name() + ".png");
-        factionIco.removeAllChildren();
-        addChild(factionIco);
-        factionIco.setPosition(new Vector2f(getDimensions().x * 0.71f, getDimensions().y * 0.61f));
-        factionIco.setIgnoreMouse(true);
+        setEAttribut(properties.getElement());
 
         /**
          * Label used to show the name of the card.
@@ -96,11 +81,41 @@ public class Hover extends Window {
         cardNameLabel.setIgnoreMouse(true);
     }
 
-    public void setFaction(Faction faction) {
-        if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("factionIconHover")) {
-            Element icon = getElementsAsMap().get("factionIconHover");
-            icon.setColorMap("Textures/Icons/Faction/" + faction.name() + ".png");
-            icon.setIgnoreMouse(true);
+    public void setEAttribut(ElementalAttribut eAttribut) {
+        Element eWin;
+        if (getElementsAsMap().containsKey("elementalIconHover")) {
+            eWin = getElementsAsMap().get("elementalIconHover");
+            eWin.setColorMap("Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
+            eWin.setIgnoreMouse(true);
+        } else {
+            eWin = new Window(this.screen, "elementalIconHover", Vector2f.ZERO, Vector2f.ZERO,
+                    Vector4f.ZERO, "Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
+            eWin.removeAllChildren();
+            addChild(eWin);
+            eWin.setIgnoreMouse(true);
+        }
+        
+        eWin.setPosition(new Vector2f(getDimensions().x * 0.72f, getDimensions().y * 0.615f));
+        eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.15f);
+        switch(eAttribut){
+            case EARTH:
+//                eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.2f);
+                break;
+            case ICE:
+//                eWin.setDimensions(getDimensions().x * 0.22f, getDimensions().y * 0.22f);
+                break;
+            case NATURE:
+//                eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.2f);
+                break;
+            case VOLT:
+//                eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.2f);
+                break;
+            case WATER:
+//                eWin.setPosition(new Vector2f(getDimensions().x * 0.72f, getDimensions().y * 0.61f));
+//                eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().x * 0.2f);
+                break;
+            default:
+                throw new UnsupportedOperationException(eAttribut + " Is not a supported type.");
         }
     }
 
@@ -123,10 +138,33 @@ public class Hover extends Window {
     }
 
     public void setSubType(CardType type) {
-        if (!getElementsAsMap().isEmpty() && getElementsAsMap().containsKey("typeIconHover")) {
-            Element icon = getElementsAsMap().get("typeIconHover");
-            icon.setColorMap("Textures/Icons/CardType/" + type.name() + ".png");
-//            icon.setIgnoreMouse(true);
+        Element icon;
+        if (getElementsAsMap().containsKey("typeIconHover")) {
+            icon = getElementsAsMap().get("typeIconHover");
+            icon.setColorMap("Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
+        } else {
+            icon = new Window(this.screen, "typeIconHover", Vector2f.ZERO, Vector2f.ZERO, 
+                    Vector4f.ZERO, "Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
+            icon.removeAllChildren();
+            addChild(icon);
+            icon.setIgnoreMouse(true);
+        }
+        
+        icon.setPosition(new Vector2f(getDimensions().x * 0.075f, getDimensions().y * 0.8f));
+        icon.setDimensions(getDimensions().x * 0.22f, getDimensions().y * 0.15f);
+        switch(type){
+            case ABILITY:
+                break;
+            case EQUIPEMENT:
+                break;
+            case SUMMON:
+                icon.setPosition(new Vector2f(getDimensions().x * 0.079f, getDimensions().y * 0.8f));
+                icon.setDimensions(getDimensions().x * 0.21f, getDimensions().y * 0.15f);
+                break;
+            case TITAN:
+                break;
+            default:
+                throw new UnsupportedOperationException(type + " is not a supported type.");
         }
     }
 
@@ -147,8 +185,8 @@ public class Hover extends Window {
         }
     }
 
-    public void setEAttribut(ElementalAttribut eAttribut){
-        getMaterial().setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/Cards/backgrounds/" + eAttribut.name() + ".png"));
+    public void setRarity(Rarity rarity){
+        getMaterial().setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/Cards/backgrounds/" + rarity.name().toLowerCase() + ".png"));
     }
     
     private void updateProperties(CardProperties properties) {

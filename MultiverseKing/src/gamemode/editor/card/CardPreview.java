@@ -3,7 +3,6 @@ package gamemode.editor.card;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import entitysystem.attribut.Faction;
 import entitysystem.attribut.Rarity;
 import entitysystem.attribut.CardType;
 import entitysystem.card.CardProperties;
@@ -30,7 +29,7 @@ public class CardPreview {
         return preview;
     }
 
-    CardPreview(Screen screen, Element parent) {
+    CardPreview(Screen screen, Element parent, CardProperties cardProperties) {
         /**
          * Window used to show a preview of the card.
          */
@@ -50,7 +49,7 @@ public class CardPreview {
                 Menu imgMenu = new Menu(screen, "loadImgMenu", new Vector2f(), false) {
                     @Override
                     public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                        screen.getElementById("geneneratorImgPreview").setColorMap("Textures/Cards/Artworks/" + value);
+                        preview.setColorMap("Textures/Cards/Artworks/" + value);
                     }
                 };
                 FilenameFilter filter = new FilenameFilter() {
@@ -75,8 +74,6 @@ public class CardPreview {
         preview.setIsResizable(false);
         preview.setIsMovable(false);
         hover = new Hover(screen, new Vector2f(), preview.getDimensions());
-        CardProperties cardProperties = new CardProperties("TuxDoll", 0, Faction.NEUTRAL, CardType.SUMMON,
-                Rarity.COMMON, ElementalAttribut.NULL, "This is a Testing unit");
         hover.setProperties(cardProperties);
         preview.addChild(hover);
 
@@ -91,15 +88,18 @@ public class CardPreview {
         hover.setSubType(subType);
     }
 
-    void switchFaction(Faction faction) {
-        hover.setFaction(faction);
-    }
-
     void switchCost(int cost) {
         hover.setCastCost(cost);
     }
 
     void switchName(String name) {
         hover.setCardName(name);
+    }
+    void switchImg(String name) {
+        preview.setColorMap("Textures/Cards/Artworks/" + name+".png");
+    }
+
+    void switchRarity(Rarity rarity) {
+        hover.setRarity(rarity);
     }
 }

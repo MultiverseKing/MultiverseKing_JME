@@ -1,9 +1,10 @@
 package gamemode.editor.card;
 
-import com.jme3.math.Vector2f;
 import entitysystem.attribut.CardType;
+import static entitysystem.attribut.CardType.ABILITY;
+import static entitysystem.attribut.CardType.EQUIPEMENT;
+import static entitysystem.attribut.CardType.SUMMON;
 import gamemode.gui.EditorWindow;
-import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 
@@ -11,61 +12,54 @@ import tonegod.gui.core.ElementManager;
  *
  * @author roah
  */
-class GeneratorSubWindow extends EditorWindow {
+class CardEditorProperties extends EditorWindow {
 
-    private final CardType current;
+    private CardType current;
 
     CardType getCurrent() {
         return current;
     }
 
-    GeneratorSubWindow(ElementManager screen, Element parent, CardType type) {
+    CardEditorProperties(ElementManager screen, Element parent, CardType type) {
         super(screen, parent, "Properties");
         current = type;
-        switch (type) {
+
+        populateMenu();
+        showConstrainToParent(VAlign.bottom, HAlign.left);
+    }
+    
+    private void populateMenu() {
+        switch (current) {
             case ABILITY:
                 /**
-                 * Part used to show/set how many power have the ability. damage
-                 * - segmentCost - activationRange - FXUsed - hitCollision -
-                 * isCastOnSelf
+                 * Part used to show/set how many power have the ability.
+                 * FXUsed - hitCollision
                  */
-                addEditableNumericField("Power", 15, HAlign.left);
+                addEditableNumericField("Power", 15, HAlign.right);
                 /**
                  * Part used to show/set the segmentCost needed for the unit to
                  * cast the ability.
                  */
                 addSpinnerField("Segment Cost", new int[]{0, 20, 1, 0}, HAlign.left);
-                Spinner spin = getSpinnerField("Segment Cost");
-                spin.setPosition(spin.getPosition().x - 50, spin.getPosition().y);
                 /**
                  * Part used to set the Activation range of the ability.
                  */
                 addSpinnerField("Activation Range", new int[]{0, 100, 1, 0}, HAlign.left);
-                spin = getSpinnerField("Activation Range");
-                spin.setPosition(spin.getPosition().x - 90, spin.getPosition().y);
                 /**
                  * Part used to know if the spell is cast from the coster or the
                  * target.
                  */
-                addCheckBoxField("Is Cast from Self", false, new Vector2f(30, 0));
-                showConstrainToParent(null, HAlign.left);
+                addCheckBoxField("Is Cast from Self", false);
                 break;
             case EQUIPEMENT:
-                showConstrainToParent(null, HAlign.left);
-                break;
-            case SPELL:
-                showConstrainToParent(null, HAlign.left);
                 break;
             case SUMMON:
-                showConstrainToParent(null, HAlign.left);
                 break;
-            case TRAP:
-                showConstrainToParent(null, HAlign.left);
+            case TITAN:
                 break;
             default:
-                throw new UnsupportedOperationException(type + " is not a supported type in : " + getClass().getName());
+                throw new UnsupportedOperationException(current + " is not a supported type in : " + getClass().getName());
         }
-//        getWindow().scale(0.9f);
     }
 
     @Override

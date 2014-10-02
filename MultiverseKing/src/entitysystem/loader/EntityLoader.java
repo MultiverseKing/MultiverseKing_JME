@@ -4,8 +4,10 @@ import entitysystem.card.CardProperties;
 import entitysystem.ability.AbilityComponent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -26,7 +28,7 @@ import utility.Vector2Int;
  */
 public class EntityLoader {
 
-    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData/";
+    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData";
     private final JSONParser parser = new JSONParser();
 
     /**
@@ -36,7 +38,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        String loadPath = path + "Units/" + name + ".card";
+        String loadPath = path + "/Units/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new UnitLoader((JSONObject) obj.get("unitsStats"), this);
@@ -45,19 +47,51 @@ public class EntityLoader {
     }
 
     /**
-     * 
+     *
      * @param name
      * @return return null if not found.
      */
-    public TitanLoader loadTitanStats(String name){
-        String loadPath = path + "Titan/" + name + ".card";
+    public TitanLoader loadTitanStats(String name) {
+        String loadPath = path + "/Titan/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
             return new TitanLoader(obj, this);
         }
         return null;
     }
-    
+
+    /**
+     * Save a card from his Name.
+     *
+     * @param cardName to save.
+     * @return false if file not correctly saved.
+     */
+    public boolean saveCardProperties(CardProperties card, boolean override) {
+        File file;
+        String folder = "/" + card.getCardType().toString().toString().substring(0, 1)
+                + card.getCardType().toString().toString().substring(1).toLowerCase() + "/";
+        file = new File(path + folder + card.getName() + ".card");
+        if (file.exists() && !file.isDirectory() && !override) {
+            return false;
+        }
+        
+        JSONObject obj = new JSONObject();
+        obj.put("cardType", card.getCardType().toString());
+        
+        switch(card.getCardType()){
+            case ABILITY:
+                break;
+            case EQUIPEMENT:
+                break;
+            case SUMMON:
+                break;
+            case TITAN:
+                break;
+        }
+        
+        return setData(file, card);
+    }
+
     /**
      * Load a card from his Name, and return all of his properties parsed.
      *
@@ -66,7 +100,7 @@ public class EntityLoader {
      */
     public CardProperties loadCardProperties(String cardName) {
         String loadPath = null;
-        File[] files = new File(System.getProperty("user.dir") + "/assets/Data/CardData").listFiles();
+        File[] files = new File(path).listFiles();
         continu:
         for (File f : files) {
             if (f.isDirectory()) {
@@ -94,7 +128,7 @@ public class EntityLoader {
         if (name.equals("None")) {
             return null;
         }
-        String loadPath = path + "Ability/" + name + ".card";
+        String loadPath = path + "/Ability/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj == null) {
             return null;
@@ -127,6 +161,11 @@ public class EntityLoader {
         return collisionList;
     }
 
+    private boolean setData(File path, CardProperties card) {
+        
+        return true;
+    }
+    
     private JSONObject getData(String loadPath) {
         try {
             File file = new File(loadPath);

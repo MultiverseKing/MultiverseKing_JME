@@ -44,7 +44,7 @@ public class MultiverseMain extends SimpleApplication {
         app.start();
     }
     private Screen screen;
-    RTSCamera rtsCam;
+    private RTSCamera rtsCam;
 
     public Screen getScreen() {
         return screen;
@@ -62,7 +62,7 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLoader(ChunkDataLoader.class, "chk");
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
-        
+
         assetManager.loadMaterial("Materials/debugMat.j3m");
 
         //Init general input 
@@ -170,17 +170,17 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attachAll(
                 new EntityDataAppState(),
                 new HexSystemAppState(this, mapData),
-//                new HexMapMouseSystem(),
-//                new RenderSystem(),
-//                new MovementSystem(),
-//                new CardRenderSystem(),
-//                new AnimationSystem(),
-//                new CollisionSystem(),
-//                new BattleGUISystem(),
+                //                new HexMapMouseSystem(),
+                //                new RenderSystem(),
+                //                new MovementSystem(),
+                //                new CardRenderSystem(),
+                //                new AnimationSystem(),
+                //                new CollisionSystem(),
+                //                new BattleGUISystem(),
                 new EditorMainGui()); //<< This call the Editor GUI SHould be called last.
     }
-    
-   /**
+
+    /**
      * Return the first founded key.
      *
      * @param map

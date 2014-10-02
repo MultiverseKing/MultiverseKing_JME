@@ -7,7 +7,7 @@ package entitysystem.attribut;
 public enum CardType {
 
     /**
-     * Used for card who affect the way unit behave under defined condition.
+     * Used for card who generate an effect on the field.
      */
     ABILITY,
     /**
@@ -19,21 +19,7 @@ public enum CardType {
      */
     SUMMON,
     /**
-     * Used for card who generate an effect on the field.
-     */
-    SPELL,
-    /**
-     * Used for card who generate object on the field, 
-     * object got activated under difined condition.
-     * (object can be unit... or, unit when sleepin then spell when activated...)
-     */
-    TRAP,
-    /**
      * This card Type can't be played directly during battle.
      */
-    TITAN
-    /**
-     * Used for card who affect the way unit move on the field.
-     */
-//    PATHFIND;
+    TITAN;
 }

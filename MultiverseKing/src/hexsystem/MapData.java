@@ -84,11 +84,7 @@ public final class MapData {
     public boolean containTilesData() {
         return !chunkData.isEmpty();
     }
-
-    /**
-     *
-     * @param eAttribut
-     */
+    
     public void setMapElement(ElementalAttribut eAttribut) {
         mapElement = eAttribut;
         chunkData.setAllTile(mapElement);

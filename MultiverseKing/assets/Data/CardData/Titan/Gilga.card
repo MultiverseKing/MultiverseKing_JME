@@ -1,8 +1,7 @@
 {
-   "faction":"NEUTRAL",
    "cardType":"TITAN",
    "rarity":"MULTIVERSE",
-   "eAttribut":"NULL",
+   "eAttribut":"VOLT",
    "description":"Testing Unit used on the editor",
    "unitsStats":{
       "healthPoint":50000,

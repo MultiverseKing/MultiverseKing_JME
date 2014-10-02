@@ -11,13 +11,9 @@ public enum Rarity {
      */
     COMMON,
     /**
-     * 4 duplicate card limit by deck, 12 equipped card limit by world.
+     * 3 duplicate card limit by deck, 12 equipped card limit by world.
      */
     RARE,
-    /**
-     * 3 duplicate card limit by deck, 9 equipped card limit by world.
-     */
-    ULTRA_RARE,
     /**
      * No duplicate card, 5 equipped card limit by world.
      */
@@ -27,7 +23,7 @@ public enum Rarity {
      */
     UNIQUE,
     /**
-     * No duplicate card, 1 card by Galaxy, 1 use by battle.
+     * No duplicate card, 1 card by Galaxy, cannot be used by player during battle.
      */
     ANTIQUE,
     /**
@@ -35,7 +31,7 @@ public enum Rarity {
      */
     UNIVERSE,
     /**
-     *
+     * No duplicate card, 1 card by Multiverse, 1 use by battle.
      */
-    MULTIVERSE; // No duplicate card, 1 card by Multiverse, 1 use by battle.
+    MULTIVERSE;
 }

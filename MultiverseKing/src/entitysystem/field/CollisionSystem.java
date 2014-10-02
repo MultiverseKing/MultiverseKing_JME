@@ -65,17 +65,17 @@ public class CollisionSystem extends EntitySystemAppState {
      */
     public boolean isValidPosition(HexCoordinate castPosition, CardType cardType) {
         switch (cardType) {
+            case ABILITY:
+                return true;
+            case EQUIPEMENT:
+                return false;
             case SUMMON:
                 if (collisionLayer.containsKey((byte) 0)) {
                     return checkCollision(new Byte((byte)0), castPosition);
                 }
                 return true;
-            case TRAP:
-                //todo : What kind of trap is it ? does it need a walkable tile to be put on ?
+            case TITAN:
                 return false;
-            case SPELL:
-                //todo : instant cast even if the tile isn't walkable.
-                return true;
             default:
                 throw new UnsupportedOperationException(cardType + " isn't a valid type for the field system.");
         }

@@ -25,11 +25,7 @@ public enum ElementalAttribut {
     /**
      *
      */
-    WATER,
-    /**
-     *
-     */
-    NULL;
+    WATER;
     private static final byte SIZE = (byte) ElementalAttribut.values().length;
 
     /**
@@ -65,9 +61,6 @@ public enum ElementalAttribut {
                 break;
             case 4:
                 result = ElementalAttribut.WATER;
-                break;
-            default:
-                result = ElementalAttribut.NULL;
                 break;
         }
         return result;

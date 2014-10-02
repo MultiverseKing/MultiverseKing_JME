@@ -334,9 +334,11 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         closePreview();
     }
 
-    private void activateWorldCard(HexCoordinate castCoord, CardType type) {
+    private void activateCard(HexCoordinate castCoord, CardType type) {
         switch (type) {
-            case SPELL:
+            case ABILITY:
+                break;
+            case EQUIPEMENT:
                 break;
             case SUMMON:
                 CardRenderComponent cardRender = entities.getEntity(cardPreviewCast.getCardEntityUID()).get(CardRenderComponent.class);
@@ -352,7 +354,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
                             unitLoader.getInitialStatsComponent());
                 }
                 break;
-            case TRAP:
+            case TITAN:
                 break;
             default:
                 throw new UnsupportedOperationException(type.name() + " isn't a supported cardType.");
@@ -374,48 +376,33 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
          * removed from this system automaticaly if he have to)
          */
         if (cardPreviewCast != null) {
-            /**
-             *
-             */
-            switch (cardPreviewCast.getProperties().getCardMainType()) {
-                case TITAN:
-                    /**
-                     * todo if the player want to use the field and not fast
-                     * selection menu.
-                     */
-                    break;
-                case WORLD:
-                    if (event == null) {
-                        /**
-                         * We activate the pulse Mode, if not activated the cast
-                         * is canceled.
-                         */
-                        if (!app.getStateManager().getState(AreaMouseSystem.class).setCursorPulseMode(this)) {
-                            return false;
-                        }
+            if (event == null) {
+                /**
+                 * We activate the pulse Mode, if not activated the cast
+                 * is canceled.
+                 */
+                if (!app.getStateManager().getState(AreaMouseSystem.class).setCursorPulseMode(this)) {
+                    return false;
+                }
+            } else if(cardPreviewCast.getProperties().getCardType().equals(CardType.TITAN)) {
+                /**
+                 * We check if the collision system is currently
+                 * running, if it's not the card will be directly
+                 * casted.
+                 */
+                CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
+                if (collisionSystem != null) {
+                    if (collisionSystem.isValidPosition(event.getEventPosition(),
+                            cardPreviewCast.getProperties().getCardType())) {
+                        activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardType());
+                        closePreview();
                     } else {
-                        /**
-                         * We check if the collision system is currently
-                         * running, if it's not the card will be directly
-                         * casted.
-                         */
-                        CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
-                        if (collisionSystem != null) {
-                            if (collisionSystem.isValidPosition(event.getEventPosition(),
-                                    cardPreviewCast.getProperties().getCardSubType())) {
-                                activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                                closePreview();
-                            } else {
-                                castCanceled();
-                            }
-                        } else {
-                            activateWorldCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardSubType());
-                            closePreview();
-                        }
+                        castCanceled();
                     }
-                    break;
-                default:
-                    throw new UnsupportedOperationException(cardPreviewCast.getProperties().getCardMainType() + " isn't a supported Type.");
+                } else {
+                    activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardType());
+                    closePreview();
+                }
             }
         }
         return true;

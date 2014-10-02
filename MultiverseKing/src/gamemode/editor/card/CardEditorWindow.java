@@ -1,18 +1,20 @@
 package gamemode.editor.card;
 
+import com.jme3.math.Vector2f;
 import entitysystem.ability.AbilityComponent;
-import entitysystem.attribut.Faction;
 import entitysystem.attribut.CardType;
 import static entitysystem.attribut.CardType.ABILITY;
 import static entitysystem.attribut.CardType.EQUIPEMENT;
-import static entitysystem.attribut.CardType.SPELL;
 import static entitysystem.attribut.CardType.SUMMON;
-import static entitysystem.attribut.CardType.TRAP;
+import entitysystem.attribut.Rarity;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import gamemode.gui.EditorWindow;
+import java.io.File;
+import java.io.FilenameFilter;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
+import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
@@ -26,55 +28,52 @@ public final class CardEditorWindow extends EditorWindow {
 
     private boolean init = false;
     private CardPreview cardPreview;
-    private GeneratorSubWindow currentSubMenu;
+    private CardEditorProperties subMenu;
 
     public CardEditorWindow(ElementManager screen, Element parent) {
         super(screen, parent, "Card Edition", Align.Horizontal, 2);
+        CardProperties properties = new CardProperties("TuxDoll", 0, CardType.SUMMON,
+                Rarity.COMMON, ElementalAttribut.ICE, "This is a Testing unit");
         /**
          * Part used to show/set the card Name.
          */
-        addEditableTextField("Name", "TuxDoll", HAlign.left);
+        addEditableTextField("Name", properties.getName(), HAlign.left);
         getTextField("Name").setMaxLength(13);
         /**
          * Part used to show/choose the cost needed to use the card.
          */
         addSpinnerField("Cost", new int[]{0, 20, 1, 0}, HAlign.left);
         /**
-         * Part used to show/choose the card faction.
-         */
-        addEditableSelectionField("Faction", Faction.NEUTRAL, Faction.values(), HAlign.left);
-        /**
          * Part used to show/choose the card Type.
          */
-        addEditableSelectionField("Card Type", CardType.SUMMON, CardType.values(), HAlign.left);
+        addEditableSelectionField("Card Type", properties.getCardType(), CardType.values(), HAlign.left);
         /**
          * Part used to show/choose the card Element Attribut.
          */
-        addEditableSelectionField("E.Attribut", ElementalAttribut.NULL, ElementalAttribut.values(), HAlign.left);
+        addEditableSelectionField("E.Attribut", properties.getElement(), ElementalAttribut.values(), HAlign.left);
+        /**
+         * Part used to show/choose the card Rarity.
+         */
+        addEditableSelectionField("Rarity", properties.getRarity(), Rarity.values(), HAlign.left);
         addSpace();
         /**
          * Part used to show/set the card Description text.
          */
-        addEditableTextField("Description", "This is a Testing unit", HAlign.left, 2);
+        addEditableTextField("Description", properties.getDescription(), HAlign.left, 2);
         /**
          *
          */
         addButtonList("additionalField", new String[]{"Load", "Save", "SubType Properties", "Hide Preview"}, HAlign.full, 2);
 
         showConstrainToParent(VAlign.bottom, HAlign.left);
-        cardPreview = new CardPreview((Screen) screen, getWindow());
+        cardPreview = new CardPreview((Screen) screen, getWindow(), properties);
         init = true;
     }
 
     @Override
     protected void onSelectBoxFieldChange(Enum value) {
         if (init) {
-            if (value instanceof Faction) {
-                /**
-                 * Change inspected Card Faction.
-                 */
-                cardPreview.switchFaction((Faction) value);
-            } else if (value instanceof CardType) {
+            if (value instanceof CardType) {
                 /**
                  * Change inspected Card CardType.
                  */
@@ -84,6 +83,8 @@ public final class CardEditorWindow extends EditorWindow {
                  * Change inspected Card Element.
                  */
                 cardPreview.switchEAttribut((ElementalAttribut) value);
+            } else if (value instanceof Rarity) {
+                cardPreview.switchRarity((Rarity)value);
             }
         }
     }
@@ -101,7 +102,15 @@ public final class CardEditorWindow extends EditorWindow {
     @Override
     protected void onButtonTrigger(String triggerName) {
         if (triggerName.equals("Load")) {
+            if (!((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
+                openLoadingMenu();
+            }
+            Element btn = getButtonListButton("additionalField", "Load");
+            Menu loadMenu = (Menu) screen.getElementById("loadCategory");
+            loadMenu.showMenu(null, btn.getAbsoluteX(),
+                    btn.getAbsoluteY() - loadMenu.getHeight());
         } else if (triggerName.equals("Save")) {
+            saveCardProperties(false);
         } else if (triggerName.equals("Hide Preview")) {
             cardPreview.getPreview().hide();
             getButtonListButton("additionalField", "Hide Preview").setText("Show Preview");
@@ -109,6 +118,13 @@ public final class CardEditorWindow extends EditorWindow {
             cardPreview.getPreview().show();
             getButtonListButton("additionalField", "Hide Preview").setText("Hide Preview");
         } else if (triggerName.equals("SubType Properties")) {
+            if (subMenu == null) {
+                subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
+            } else if (subMenu.isVisible()) {
+                subMenu.hide();
+            } else {
+                subMenu.setVisible();
+            }
         }
     }
 
@@ -120,11 +136,12 @@ public final class CardEditorWindow extends EditorWindow {
         }
     }
 
-    void loadProperties(String cardName, CardProperties properties, EntityLoader loader) {
+    private void loadProperties(String cardName, CardProperties properties, EntityLoader loader) {
         /**
-         * Load the card Name.
+         * Load the card Name && img.
          */
         getTextField("Name").setText(cardName);
+        cardPreview.switchImg(cardName);
         /**
          * Load the card cost.
          */
@@ -136,13 +153,6 @@ public final class CardEditorWindow extends EditorWindow {
          */
         SelectBox box = getSelectBoxField("E.Attribut");
         box.setSelectedByValue(properties.getElement(), true);
-//        cardPreview.switchEAttribut(properties.getElement());
-        /**
-         * Load the Faction Attribut.
-         */
-        box = getSelectBoxField("Faction");
-        box.setSelectedByValue(properties.getFaction(), true);
-//        cardPreview.switchFaction(properties.getFaction());
         /**
          * Load the description Text.
          */
@@ -151,18 +161,22 @@ public final class CardEditorWindow extends EditorWindow {
          * Load the card type.
          */
         box = getSelectBoxField("Card Type");
-        box.setSelectedByValue(properties.getCardSubType(), true);
+        box.setSelectedByValue(properties.getCardType(), true);
         onButtonTrigger("Edit");
-        switch (properties.getCardSubType()) {
+        if (subMenu == null) {
+            subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
+        } else if (!subMenu.getCurrent().equals(properties.getCardType())) {
+            subMenu.removeFromScreen();
+            subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
+            subMenu.setVisible();
+        }
+        switch (properties.getCardType()) {
             case ABILITY:
-                /**
-                 * @todo: Load ability SubMenu Data.
-                 */
                 AbilityComponent abilityData = loader.loadAbility(cardName);
-                currentSubMenu.setPower(abilityData.getPower());
-                currentSubMenu.setUnitSegmentCost(abilityData.getSegment());
-                currentSubMenu.setActivationRange(abilityData.getActivationRange());
-                currentSubMenu.setCastFromSelf(abilityData.isCastFromSelf());
+                subMenu.setPower(abilityData.getPower());
+                subMenu.setUnitSegmentCost(abilityData.getSegment());
+                subMenu.setActivationRange(abilityData.getActivationRange());
+                subMenu.setCastFromSelf(abilityData.isCastFromSelf());
                 //Todo: collisionhit
                 break;
             case EQUIPEMENT:
@@ -170,21 +184,158 @@ public final class CardEditorWindow extends EditorWindow {
                  * @todo: Load Equipement SubMenu Data.
                  */
                 break;
-            case SPELL:
-                /**
-                 * @todo: Load Spell SubMenu Data.
-                 */
-                break;
-            case TRAP:
-                /**
-                 * @todo: Load Trap SubMenu Data.
-                 */
-                break;
             case SUMMON:
                 /**
                  * @todo: Load Summon SubMenu Data
                  */
                 break;
+            case TITAN:
+                /**
+                 * @todo: Load Spell SubMenu Data.
+                 */
+                break;
         }
+    }
+
+    private void openLoadingMenu() {
+        /**
+         * Some variable to get files name.
+         */
+        File folder;
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return (name.endsWith(".card"));
+            }
+        };
+
+        /**
+         * Menu listing all saved card.
+         */
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/");
+        Menu categoryAll = new Menu(screen, "categoryAll", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                loadCardPropertiesFromFile(value.toString());
+            }
+        };
+
+        File[] fList = folder.listFiles();
+        for (File f : fList) {
+            if (f.isDirectory()) {
+                String[] subF = f.list(filter);
+                for (String fi : subF) {
+                    int index = fi.lastIndexOf('.');
+                    categoryAll.addMenuItem(fi.substring(0, index), fi.substring(0, index), null);
+                }
+            }
+        }
+        screen.addElement(categoryAll);
+
+        /**
+         * Menu listing all saved Ability card.
+         */
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Ability");
+        Menu categoryAbility = new Menu(screen, "categoryAbility", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                loadCardPropertiesFromFile(value.toString());
+            }
+        };
+
+        String[] abilityList = folder.list(filter);
+        for (String s : abilityList) {
+            int index = s.lastIndexOf('.');
+            categoryAbility.addMenuItem(s.substring(0, index), s.substring(0, index), null);
+        }
+        screen.addElement(categoryAbility);
+
+        /**
+         * Menu listing all saved unit card.
+         */
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Summon");
+        Menu categorySummon = new Menu(screen, "categorySummon", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                loadCardPropertiesFromFile(value.toString());
+            }
+        };
+
+        String[] unitList = folder.list(filter);
+        for (String s : unitList) {
+            int index = s.lastIndexOf('.');
+            categorySummon.addMenuItem(s.substring(0, index), s.substring(0, index), null);
+        }
+        screen.addElement(categorySummon);
+        
+        /**
+         * Menu listing all saved equipment card.
+         */
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Equipement");
+        Menu categoryEquipement = new Menu(screen, "categoryEquipement", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                loadCardPropertiesFromFile(value.toString());
+            }
+        };
+
+        String[] equipement = folder.list(filter);
+        for (String s : equipement) {
+            int index = s.lastIndexOf('.');
+            categoryEquipement.addMenuItem(s.substring(0, index), s.substring(0, index), null);
+        }
+        screen.addElement(categoryEquipement);
+        
+        /**
+         * Menu listing all saved equipment card.
+         */
+        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Titan");
+        Menu categoryTitan = new Menu(screen, "categoryTitan", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+                loadCardPropertiesFromFile(value.toString());
+            }
+        };
+
+        String[] titan = folder.list(filter);
+        for (String s : titan) {
+            int index = s.lastIndexOf('.');
+            categoryTitan.addMenuItem(s.substring(0, index), s.substring(0, index), null);
+        }
+        screen.addElement(categoryTitan);
+
+        /**
+         * Root menu.
+         */
+        final Menu loadCategory = new Menu(screen, "loadCategory", new Vector2f(0, 0), false) {
+            @Override
+            public void onMenuItemClicked(int index, Object value, boolean isToggled) {
+            }
+        };
+        loadCategory.addMenuItem("All", null, categoryAll);
+        loadCategory.addMenuItem("Summon", null, categorySummon);
+        loadCategory.addMenuItem("Ability", null, categoryAbility);
+        loadCategory.addMenuItem("Equipement", null, categoryEquipement);
+        loadCategory.addMenuItem("Titan", null, categoryTitan);
+
+        screen.addElement(loadCategory);
+    }
+
+    private void loadCardPropertiesFromFile(String cardName) {
+        EntityLoader loader = new EntityLoader();
+        CardProperties load = loader.loadCardProperties(cardName);
+        if (load != null) {
+            loadProperties(cardName, load, loader);
+        }
+    }
+
+    private void saveCardProperties(boolean override) {
+        CardProperties card = new CardProperties(getTextField("Name").getText(),
+                getSpinnerField("Cost").getSelectedIndex(),
+                (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue(),
+                (Rarity) getSelectBoxField("Rarity").getSelectedListItem().getValue(),
+                (ElementalAttribut) getSelectBoxField("E.Attribut").getSelectedListItem().getValue(),
+                getTextField("Description").getText());
+        EntityLoader loader = new EntityLoader();
+//        loader.saveCardProperties(card);
     }
 }

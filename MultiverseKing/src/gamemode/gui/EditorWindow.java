@@ -1,6 +1,5 @@
 package gamemode.gui;
 
-import com.jme3.font.BitmapFont;
 import com.jme3.input.KeyInput;
 import com.jme3.input.event.KeyInputEvent;
 import com.jme3.input.event.MouseButtonEvent;
@@ -134,7 +133,8 @@ public abstract class EditorWindow {
                 throw new UnsupportedOperationException(windowElementAlignement + " : is not a supported type.");
             }
             if (e != null) {
-                Vector2f pos = new Vector2f(e.getPosition().x + (column * gridSize.x), e.getPosition().y + window.getDragBarHeight() + (row * gridSize.y));
+                Vector2f pos = new Vector2f(e.getPosition().x + (column * gridSize.x),
+                        + e.getPosition().y + window.getDragBarHeight() + (row * gridSize.y));
                 e.setPosition(pos);
                 window.addChild(e);
             }
@@ -259,7 +259,7 @@ public abstract class EditorWindow {
         } else {
             throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
         }
-        return new Vector2f(column * gridSize.x + (spacement * 2), (row + 1) * (gridSize.y + 0.5f));
+        return new Vector2f(column * gridSize.x + (spacement * 2), row * gridSize.y + (3 * row + 5));
     }
 
     public void setVisible() {
@@ -381,18 +381,38 @@ public abstract class EditorWindow {
      *
      * @param triggersNames list of button to add.
      * @param hAlign alignement of the button.
-     * @param fieldSize
+     * @param fieldGridSize gridSlot to use
      */
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldSize) {
-        String UID = generateUID(listUID) + name + "btnList";
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
+        String UID = generateUID(listUID) + getUID() + "labelList";
         Element holder = new Element(screen, UID, new Vector2f(spacement, 10), Vector2f.ZERO, Vector4f.ZERO, null);
         holder.setAsContainerOnly();
+        generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize);
+    }
+
+    /**
+     * Add a Text Field element to this menu, limited to number as input.
+     */
+    protected final void addNumericListField(String labelName, Integer[] baseValue, HAlign hAlign) {
+        String uid = generateUID(labelName) + getUID() + "numList";
+        Label holder = generateLabel(labelName, hAlign, Vector2f.ZERO);
+        generateList(uid, holder, baseValue, hAlign, "numList", 1);
+    }
+
+    private void generateList(String UID, Element holder, Object[] elements, HAlign hAlign, String type, int fieldGridSize) {
+
         int i = 0;
         float posX = 0f;
         float fillValue = 0;
         ArrayList<ButtonAdapter> btnList = new ArrayList<ButtonAdapter>();
-        for (String triggerName : triggersNames) {
-            btnList.add(generateButton(triggerName, HAlign.left, Vector2f.ZERO));
+        for (Object e : elements) {
+            if (type.equals("labelList")) {
+                btnList.add(generateButton(e.toString(), HAlign.left, Vector2f.ZERO));
+            } else if (type.equals("numList")) {
+                btnList.add(generateNumericField("numList" + i, i, hAlign));
+            } else {
+                throw new UnsupportedOperationException(type + " is not a supported type.");
+            }
             btnList.get(btnList.size() - 1).setPosition(posX, btnList.get(btnList.size() - 1).getPosition().y);
             posX += btnList.get(btnList.size() - 1).getWidth();
             fillValue += btnList.get(btnList.size() - 1).getWidth();
@@ -402,20 +422,23 @@ public abstract class EditorWindow {
         }
         if (hAlign == HAlign.right) {
             holder.setPosition(gridSize.x - (posX + 10), holder.getPosition().y);
-        } else if (hAlign.equals(HAlign.full)) {
+        } else if (hAlign.equals(HAlign.left) || hAlign.equals(HAlign.full)) {
             i = 0;
-            fillValue = (gridSize.x * fieldSize - fillValue) / triggersNames.length;
+            fillValue = (gridSize.x * fieldGridSize - fillValue - (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0)) / elements.length;
             for (ButtonAdapter btn : btnList) {
                 btn.setDimensions(btn.getDimensions().x + fillValue, btn.getDimensions().y);
-                if (i != 0) {
-                    btn.setPosition(btn.getPosition().x + (fillValue * i), btn.getPosition().y);
+                if (i == 0 && hAlign.equals(HAlign.left)) {
+                    btn.setPosition(btn.getPosition().x + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), btn.getPosition().y);
+                } else if (i != 0) {
+                    btn.setPosition(btn.getPosition().x + (fillValue * i)
+                            + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), btn.getPosition().y);
                 }
                 i++;
             }
         }
-        elementList.put(generateUID(listUID), holder);
-        if (fieldSize > 1) {
-            for (i = fieldSize; i > 1; i--) {
+        elementList.put(UID, holder);
+        if (fieldGridSize > 1) {
+            for (i = fieldGridSize; i > 1; i--) {
                 addSpace();
             }
         }
@@ -468,21 +491,21 @@ public abstract class EditorWindow {
     /**
      * Add a Text Field element to this menu.
      */
-    protected final void addEditableTextField(String labelName, String baseValue, HAlign hAlign) {
-        addEditableTextField(labelName, baseValue, hAlign, 0, Vector2f.ZERO);
+    protected final void addTextField(String labelName, String baseValue, HAlign hAlign) {
+        addTextField(labelName, baseValue, hAlign, 0, Vector2f.ZERO);
     }
 
     /**
      * Add a Text Field element to this menu.
      */
-    protected final void addEditableTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize) {
-        addEditableTextField(labelName, baseValue, hAlign, fieldSize, Vector2f.ZERO);
+    protected final void addTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize) {
+        addTextField(labelName, baseValue, hAlign, fieldSize, Vector2f.ZERO);
     }
 
     /**
      * Add a Text Field element to this menu.
      */
-    protected final void addEditableTextField(String labelName, String baseValue, HAlign hAlign, Vector2f offset) {
+    protected final void addTextField(String labelName, String baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
         generateTextField(uid, baseValue, Vector2Int.UNIT_XY);
@@ -497,7 +520,7 @@ public abstract class EditorWindow {
      * @param fieldSize the grid slot taken for the field.
      * @param offset value to be added on top of the gridPosition.
      */
-    protected final void addEditableTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize, Vector2f offset) {
+    protected final void addTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize, Vector2f offset) {
         Vector2Int size = Vector2Int.UNIT_XY;
         if (fieldSize != 0 && fieldSize > 0) {
             int pos = (int) FastMath.ceil((float) (elementList.size() + 1) / (float) elementAlignMaxCount);
@@ -530,8 +553,8 @@ public abstract class EditorWindow {
     /**
      * Add a Text Field element to this menu, limited to number as input.
      */
-    protected final void addEditableNumericField(String labelName, int baseValue, HAlign hAlign) {
-        addEditableNumericField(labelName, baseValue, hAlign, Vector2f.ZERO);
+    protected final void addNumericField(String labelName, int baseValue, HAlign hAlign) {
+        addNumericField(labelName, baseValue, hAlign, Vector2f.ZERO);
     }
 
     /**
@@ -542,17 +565,18 @@ public abstract class EditorWindow {
      * @param hAlign horizontal alignemenet to use.
      * @param offset value to be added on top of the gridPosition.
      */
-    protected final void addEditableNumericField(String labelName, int baseValue, HAlign hAlign, Vector2f offset) {
+    protected final void addNumericField(String labelName, int baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName, hAlign, offset));
-        generateNumericField(uid, baseValue, hAlign);
+        Label field = generateLabel(labelName, hAlign, offset);
+        elementList.put(uid, field);
+        field.addChild(generateNumericField(uid, baseValue, hAlign));
     }
 
     /**
      * Add a selectionList Element based on a enum to this menu.
      */
-    protected final void addEditableSelectionField(String labelName, Enum<?> baseValue, Enum[] value, HAlign hAlign) {
-        addEditableSelectionField(labelName, baseValue, value, hAlign, Vector2f.ZERO);
+    protected final void addSelectionField(String labelName, Enum<?> baseValue, Enum[] value, HAlign hAlign) {
+        addSelectionField(labelName, baseValue, value, hAlign, Vector2f.ZERO);
     }
 
     /**
@@ -564,7 +588,7 @@ public abstract class EditorWindow {
      * @param hAlign horizontal alignemenet to use.
      * @param offset value to be added on top of the gridPosition.
      */
-    protected final void addEditableSelectionField(String labelName, Enum<?> baseValue,
+    protected final void addSelectionField(String labelName, Enum<?> baseValue,
             Enum[] value, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
@@ -580,13 +604,13 @@ public abstract class EditorWindow {
     private Label generateLabel(String labelName, HAlign hAlign, Vector2f offset) {
         if (hAlign.equals(HAlign.left)) {
             Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                    new Vector2f(spacement + offset.x, offset.y + 2 + elementList.size()),
+                    new Vector2f(spacement + offset.x, offset.y + (1.5f * elementList.size())),
                     new Vector2f((labelName.toCharArray().length + 3) * 8, gridSize.y));
             label.setText(labelName + " : ");
             return label;
         } else if (hAlign.equals(HAlign.right)) {
             Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                    new Vector2f(gridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y),
+                    new Vector2f(gridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y + (1.5f * elementList.size())),
                     new Vector2f((labelName.toCharArray().length + 3) * 8, gridSize.y));
             label.setText(" : " + labelName);
             return label;
@@ -595,10 +619,10 @@ public abstract class EditorWindow {
         }
     }
 
-    private void generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {
+    private ButtonAdapter generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {
         final String childUID = getUID() + labelUID;
         ButtonAdapter numButton = new ButtonAdapter(screen, childUID + "NumericFieldButton",
-                Vector2f.ZERO, new Vector2f(gridSize.x - (elementList.get(labelUID).getDimensions().x + (spacement * 2)), gridSize.y)) {
+                Vector2f.ZERO, new Vector2f(gridSize.x - (((labelUID.toCharArray().length + 2) * 8) + (spacement * 2)), gridSize.y)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -630,14 +654,14 @@ public abstract class EditorWindow {
             case full:
                 break;
             case left:
-                numButton.setPosition(elementList.get(labelUID).getDimensions().x + spacement, 3);
+                numButton.setPosition(((labelUID.toCharArray().length + 2) * 8) + spacement, 4);
                 break;
             case right:
-                numButton.setPosition(-numButton.getDimensions().x - spacement, 4);
+                numButton.setPosition(-numButton.getDimensions().x + spacement, 4);
                 break;
         }
         numButton.setText(Integer.toString(baseValue));
-        elementList.get(labelUID).addChild(numButton);
+        return numButton;
     }
 
     private void generateTextField(final String labelUID, String baseValue, Vector2Int fieldSize) {
@@ -708,7 +732,7 @@ public abstract class EditorWindow {
         elementList.get(labelUID).addChild(spinner);
     }
 
-    private ButtonAdapter generateButton(final String triggerName, HAlign hAlign, Vector2f offset) {
+    private ButtonAdapter generateButton(String triggerName, HAlign hAlign, Vector2f offset) {
         return generateButton(null, triggerName, hAlign, offset);
     }
 
@@ -747,8 +771,12 @@ public abstract class EditorWindow {
         return elementList.get(generateUID(labelName));
     }
 
-    protected final Element getButtonListButton(String listUID, String buttonLabel) {
-        return getField(listUID).getChildElementById(getUID() + generateUID(buttonLabel) + "Button");
+    protected final Element getLabelListField(String listUID, String buttonLabel) {
+        return elementList.get(generateUID(listUID) + getUID() + "labelList").getChildElementById(getUID() + generateUID(buttonLabel) + "Button");
+    }
+
+    protected final Element getNumericListField(String listUID, int index) {
+        return elementList.get(generateUID(listUID) + getUID() + "numList").getChildElementById(getUID() + "numList" + index + "NumericFieldButton");
     }
 
     protected final ButtonAdapter getButtonField(String labelName, boolean gotLabel) {

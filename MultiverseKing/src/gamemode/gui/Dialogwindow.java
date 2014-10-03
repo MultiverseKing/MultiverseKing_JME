@@ -29,7 +29,7 @@ public class Dialogwindow extends EditorWindow {
     }
 
     public void addInputText(String labelName) {
-        addEditableTextField("Name", null, HAlign.left);
+        addTextField("Name", null, HAlign.left);
     }
 
     public void addButton(String labelName) {

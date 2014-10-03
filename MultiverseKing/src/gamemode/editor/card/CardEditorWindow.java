@@ -7,6 +7,7 @@ import static entitysystem.attribut.CardType.ABILITY;
 import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.attribut.Rarity;
+import entitysystem.card.AbilityProperties;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
 import gamemode.gui.EditorWindow;
@@ -37,7 +38,7 @@ public final class CardEditorWindow extends EditorWindow {
         /**
          * Part used to show/set the card Name.
          */
-        addEditableTextField("Name", properties.getName(), HAlign.left);
+        addTextField("Name", properties.getName(), HAlign.left);
         getTextField("Name").setMaxLength(13);
         /**
          * Part used to show/choose the cost needed to use the card.
@@ -46,20 +47,20 @@ public final class CardEditorWindow extends EditorWindow {
         /**
          * Part used to show/choose the card Type.
          */
-        addEditableSelectionField("Card Type", properties.getCardType(), CardType.values(), HAlign.left);
+        addSelectionField("Card Type", properties.getCardType(), CardType.values(), HAlign.left);
         /**
          * Part used to show/choose the card Element Attribut.
          */
-        addEditableSelectionField("E.Attribut", properties.getElement(), ElementalAttribut.values(), HAlign.left);
+        addSelectionField("E.Attribut", properties.getElement(), ElementalAttribut.values(), HAlign.left);
         /**
          * Part used to show/choose the card Rarity.
          */
-        addEditableSelectionField("Rarity", properties.getRarity(), Rarity.values(), HAlign.left);
+        addSelectionField("Rarity", properties.getRarity(), Rarity.values(), HAlign.left);
         addSpace();
         /**
          * Part used to show/set the card Description text.
          */
-        addEditableTextField("Description", properties.getDescription(), HAlign.left, 2);
+        addTextField("Description", properties.getDescription(), HAlign.left, 2);
         /**
          *
          */
@@ -84,7 +85,7 @@ public final class CardEditorWindow extends EditorWindow {
                  */
                 cardPreview.switchEAttribut((ElementalAttribut) value);
             } else if (value instanceof Rarity) {
-                cardPreview.switchRarity((Rarity)value);
+                cardPreview.switchRarity((Rarity) value);
             }
         }
     }
@@ -105,7 +106,7 @@ public final class CardEditorWindow extends EditorWindow {
             if (!((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
                 openLoadingMenu();
             }
-            Element btn = getButtonListButton("additionalField", "Load");
+            Element btn = getLabelListField("additionalField", "Load");
             Menu loadMenu = (Menu) screen.getElementById("loadCategory");
             loadMenu.showMenu(null, btn.getAbsoluteX(),
                     btn.getAbsoluteY() - loadMenu.getHeight());
@@ -113,10 +114,10 @@ public final class CardEditorWindow extends EditorWindow {
             saveCardProperties(false);
         } else if (triggerName.equals("Hide Preview")) {
             cardPreview.getPreview().hide();
-            getButtonListButton("additionalField", "Hide Preview").setText("Show Preview");
+            getLabelListField("additionalField", "Hide Preview").setText("Show Preview");
         } else if (triggerName.equals("Show Preview")) {
             cardPreview.getPreview().show();
-            getButtonListButton("additionalField", "Hide Preview").setText("Hide Preview");
+            getLabelListField("additionalField", "Hide Preview").setText("Hide Preview");
         } else if (triggerName.equals("SubType Properties")) {
             if (subMenu == null) {
                 subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
@@ -175,8 +176,7 @@ public final class CardEditorWindow extends EditorWindow {
                 AbilityComponent abilityData = loader.loadAbility(cardName);
                 subMenu.setPower(abilityData.getPower());
                 subMenu.setUnitSegmentCost(abilityData.getSegment());
-                subMenu.setActivationRange(abilityData.getActivationRange());
-                subMenu.setCastFromSelf(abilityData.isCastFromSelf());
+                subMenu.setActivationRange(abilityData.getRange());
                 //Todo: collisionhit
                 break;
             case EQUIPEMENT:
@@ -266,7 +266,7 @@ public final class CardEditorWindow extends EditorWindow {
             categorySummon.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
         screen.addElement(categorySummon);
-        
+
         /**
          * Menu listing all saved equipment card.
          */
@@ -284,7 +284,7 @@ public final class CardEditorWindow extends EditorWindow {
             categoryEquipement.addMenuItem(s.substring(0, index), s.substring(0, index), null);
         }
         screen.addElement(categoryEquipement);
-        
+
         /**
          * Menu listing all saved equipment card.
          */
@@ -329,13 +329,38 @@ public final class CardEditorWindow extends EditorWindow {
     }
 
     private void saveCardProperties(boolean override) {
-        CardProperties card = new CardProperties(getTextField("Name").getText(),
-                getSpinnerField("Cost").getSelectedIndex(),
-                (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue(),
-                (Rarity) getSelectBoxField("Rarity").getSelectedListItem().getValue(),
-                (ElementalAttribut) getSelectBoxField("E.Attribut").getSelectedListItem().getValue(),
-                getTextField("Description").getText());
-        EntityLoader loader = new EntityLoader();
-//        loader.saveCardProperties(card);
+        if (subMenu != null && subMenu.isVisible()) {
+            CardProperties card = new CardProperties(getTextField("Name").getText(),
+                    getSpinnerField("Cost").getSelectedIndex(),
+                    (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue(),
+                    (Rarity) getSelectBoxField("Rarity").getSelectedListItem().getValue(),
+                    (ElementalAttribut) getSelectBoxField("E.Attribut").getSelectedListItem().getValue(),
+                    getTextField("Description").getText());
+            EntityLoader loader = new EntityLoader();
+            switch (card.getCardType()) {
+                case ABILITY:
+                    loader.saveCardProperties(new AbilityProperties(card, subMenu.getProperties()), override);
+                    break;
+                case EQUIPEMENT:
+                    break;
+                case SUMMON:
+                    break;
+                case TITAN:
+                    break;
+            }
+            if (!override) {
+                if (!loader.saveCardProperties(card, override)) {
+                    /**
+                     * Open dialogBox "force save"
+                     */
+                }
+            } else {
+                loader.saveCardProperties(card, override);
+            }
+        } else {
+            /**
+             * Open dialogbox "nothing to save"
+             */
+        }
     }
 }

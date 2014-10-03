@@ -4,9 +4,11 @@ import entitysystem.attribut.CardType;
 import static entitysystem.attribut.CardType.ABILITY;
 import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
+import entitysystem.card.AbilityProperties;
 import gamemode.gui.EditorWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
+import utility.Vector2Int;
 
 /**
  *
@@ -35,7 +37,7 @@ class CardEditorProperties extends EditorWindow {
                  * Part used to show/set how many power have the ability.
                  * FXUsed - hitCollision
                  */
-                addEditableNumericField("Power", 15, HAlign.right);
+                addNumericField("Power", 15, HAlign.right);
                 /**
                  * Part used to show/set the segmentCost needed for the unit to
                  * cast the ability.
@@ -44,12 +46,7 @@ class CardEditorProperties extends EditorWindow {
                 /**
                  * Part used to set the Activation range of the ability.
                  */
-                addSpinnerField("Activation Range", new int[]{0, 100, 1, 0}, HAlign.left);
-                /**
-                 * Part used to know if the spell is cast from the coster or the
-                 * target.
-                 */
-                addCheckBoxField("Is Cast from Self", false);
+                addNumericListField("Range", new Integer[]{0, 0}, HAlign.left);
                 break;
             case EQUIPEMENT:
                 break;
@@ -80,11 +77,18 @@ class CardEditorProperties extends EditorWindow {
         getSpinnerField("Segment Cost").setSelectedIndex(cost);
     }
 
-    public void setActivationRange(int range) {
-        getSpinnerField("Activation Range").setSelectedIndex(range);
+    public void setActivationRange(Vector2Int range) {
+        getNumericListField("Range", 0).setText(String.valueOf(range.x));
+        getNumericListField("Range", 1).setText(String.valueOf(range.y));
     }
-
-    public void setCastFromSelf(boolean bool) {
-        getCheckBoxField("Is Cast from Self").setIsChecked(bool);
+    
+    /**
+     * @todo : Collision generation.
+     */
+    public AbilityProperties getProperties(){
+        Vector2Int range = new Vector2Int(Integer.valueOf(getNumericListField("Range", 0).getText()),
+                           Integer.valueOf(getNumericListField("Range", 1).getText()));
+        return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()), 
+                getSpinnerField("Segment Cost").getSelectedIndex(), range, null);
     }
 }

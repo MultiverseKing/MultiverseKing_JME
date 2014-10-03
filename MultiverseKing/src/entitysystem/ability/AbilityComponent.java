@@ -4,6 +4,7 @@ import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import utility.ElementalAttribut;
+import utility.Vector2Int;
 
 /**
  *
@@ -14,7 +15,7 @@ public class AbilityComponent implements PersistentComponent {
     private final String name;
     private final int power;
     private final byte activationCost;
-    private final byte activationRange;
+    private final Vector2Int range;
     private final ElementalAttribut eAttribut;
     private final String description;
     /**
@@ -22,7 +23,6 @@ public class AbilityComponent implements PersistentComponent {
      * target, Byte == Collision layer to use.
      */
     private final HashMap<Byte, ArrayList> hitCollision;
-    private final boolean castFromSelf;
 
     /**
      * Create a new ability for an entity unit.
@@ -32,16 +32,14 @@ public class AbilityComponent implements PersistentComponent {
      * @param eAttribut of the effect.
      * @param loadTime between activation.
      */
-    public AbilityComponent(String name, byte activationRange, ElementalAttribut eAttribut,
-            byte activationCost, int power, HashMap<Byte, ArrayList> hitCollision,
-            boolean castFromSelf, String description) {
+    public AbilityComponent(String name, Vector2Int range, ElementalAttribut eAttribut,
+            byte activationCost, int power, HashMap<Byte, ArrayList> hitCollision, String description) {
         this.name = name;
-        this.activationRange = activationRange;
+        this.range = range;
         this.hitCollision = hitCollision;
         this.eAttribut = eAttribut;
         this.activationCost = activationCost;
         this.power = power;
-        this.castFromSelf = castFromSelf;
         this.description = description;
     }
 
@@ -59,8 +57,8 @@ public class AbilityComponent implements PersistentComponent {
      *
      * @return
      */
-    public byte getActivationRange() {
-        return activationRange;
+    public Vector2Int getRange() {
+        return range;
     }
 
     /**
@@ -70,16 +68,6 @@ public class AbilityComponent implements PersistentComponent {
      */
     public HashMap<Byte, ArrayList> getHitCollision() {
         return hitCollision;
-    }
-
-    /**
-     * is the ability collision hit is relative to the caster unit or the target
-     * unit.
-     *
-     * @return
-     */
-    public boolean isCastFromSelf() {
-        return castFromSelf;
     }
 
     /**

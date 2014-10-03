@@ -2,12 +2,12 @@ package entitysystem.loader;
 
 import entitysystem.card.CardProperties;
 import entitysystem.ability.AbilityComponent;
+import entitysystem.card.AbilityProperties;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -73,13 +73,25 @@ public class EntityLoader {
         file = new File(path + folder + card.getName() + ".card");
         if (file.exists() && !file.isDirectory() && !override) {
             return false;
+        } else if (file.isDirectory()) {
+            return false;
         }
-        
+
         JSONObject obj = new JSONObject();
         obj.put("cardType", card.getCardType().toString());
-        
-        switch(card.getCardType()){
+        obj.put("rarity", card.getRarity().toString());
+        obj.put("eAttribut", card.getElement().toString());
+        obj.put("playCost", card.getPlayCost());
+        obj.put("description", card.getPlayCost());
+
+        JSONObject typeData = new JSONObject();
+        switch (card.getCardType()) {
             case ABILITY:
+                typeData.put("power", ((AbilityProperties) card).getPower());
+                typeData.put("range", ((AbilityProperties) card).getRange().toString());
+                typeData.put("segmentCost", ((AbilityProperties) card).getSegmentCost());
+                typeData.put("hitCollision", exportCollision(((AbilityProperties) card).getCollision()));
+                obj.put("ability", typeData);
                 break;
             case EQUIPEMENT:
                 break;
@@ -88,8 +100,8 @@ public class EntityLoader {
             case TITAN:
                 break;
         }
-        
-        return setData(file, card);
+
+        return setData(file, obj);
     }
 
     /**
@@ -137,17 +149,27 @@ public class EntityLoader {
         String description = obj.get("description").toString();
 
         JSONObject abilityData = (JSONObject) obj.get("ability");
-        Number damage = (Number) abilityData.get("power");
+        Number power = (Number) abilityData.get("power");
         Number segment = (Number) abilityData.get("segmentCost");
-        Number activationRange = (Number) abilityData.get("activationRange");
-        HashMap<Byte, ArrayList> hitCollision = getCollision((JSONArray) abilityData.get("hitCollision"));
+        HashMap<Byte, ArrayList> hitCollision = importCollision((JSONArray) abilityData.get("hitCollision"));
 
-        return new AbilityComponent(name, activationRange.byteValue(), eAttribut,
-                segment.byteValue(), damage.intValue(), hitCollision,
-                (Boolean) abilityData.get("castFromSelf"), description);
+        return new AbilityComponent(name, new Vector2Int(abilityData.get("range").toString()), eAttribut,
+                segment.byteValue(), power.intValue(), hitCollision, description);
     }
 
-    public HashMap<Byte, ArrayList> getCollision(JSONArray collisionData) {
+    JSONArray exportCollision(HashMap<Byte, ArrayList> collision) {
+        System.err.println(collision.size());
+        JSONArray collisionList = new JSONArray();
+        for (byte b : collision.keySet()) {
+            JSONObject layer = new JSONObject();
+            layer.put("layer", b);
+            layer.put("key", collision.get(b));
+            collisionList.add(layer);
+        }
+        return collisionList;
+    }
+
+    HashMap<Byte, ArrayList> importCollision(JSONArray collisionData) {
         HashMap<Byte, ArrayList> collisionList = new HashMap<Byte, ArrayList>(2);
         for (int i = 0; i < collisionData.size(); i++) {
             JSONObject value = (JSONObject) collisionData.get(i);
@@ -161,11 +183,28 @@ public class EntityLoader {
         return collisionList;
     }
 
-    private boolean setData(File path, CardProperties card) {
-        
-        return true;
+    private boolean setData(File f, JSONObject obj) {
+        FileWriter file;
+        try {
+            file = new FileWriter(f);
+            try {
+                file.write(obj.toJSONString());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            } finally {
+                file.flush();
+                file.close();
+            }
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            return false;
+        }
     }
-    
+
     private JSONObject getData(String loadPath) {
         try {
             File file = new File(loadPath);

@@ -18,8 +18,11 @@ import java.util.HashMap;
 public class CollisionSystem extends EntitySystemAppState {
 
     /**
-     * Byte == collision layer (unit, trap, object, spell etc...) 0 == unit 1 ==
-     * trap 2 == spell more than two is for customLayer or for special unit like
+     * Byte == collision layer (unit, trap, object, spell etc...) 
+     * 0 == unit 
+     * 1 == trap 
+     * 2 == spell 
+     * more than two is for customLayer or for special unit like
      * flying unit, an object can be on multiple layer at the same time.
      *
      * HashMap<HexCoordinate, EntityId> == entity position on that layer.

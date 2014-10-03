@@ -41,7 +41,7 @@ public class UnitLoader {
                 moveSpeed.floatValue(),
                 abilityList);
 
-        collisionComponent = new CollisionComponent(eLoader.getCollision((JSONArray) data.get("collision")));
+        collisionComponent = new CollisionComponent(eLoader.importCollision((JSONArray) data.get("collision")));
     }
 
     public CollisionComponent getCollisionComponent() {

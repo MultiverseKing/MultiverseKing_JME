@@ -15,7 +15,7 @@ import gamemode.editor.map.AreaEditorSystem;
 import gamemode.editor.map.LoadingPopup;
 import gamemode.editor.map.LoadingPopupListener;
 import gamemode.editor.map.MapEditorSystem;
-import gamemode.gui.EditorWindow;
+import gamemode.gui.LayoutWindow;
 
 /**
  * rootMenu of the Game Editor.
@@ -27,7 +27,7 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     private MultiverseMain main;
     private Window mainMenuBar;
     private Menu currentMenuItem;
-    private EditorWindow editorWindow;
+    private LayoutWindow editorWindow;
     private EditorItem currentMenuValue;
     private String currentSelectedMenuItem;
     private MapEditorSystem usedSystem;

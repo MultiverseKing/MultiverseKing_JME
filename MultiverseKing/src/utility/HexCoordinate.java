@@ -2,6 +2,8 @@ package utility;
 
 import com.jme3.math.Vector3f;
 import hexsystem.HexSettings;
+import hexsystem.HexTile;
+import java.util.ArrayList;
 
 /**
  *
@@ -30,27 +32,15 @@ public final class HexCoordinate {
     private static Vector2Int cubicToAxial(Vector3Int data) {
         return new Vector2Int(data.x, data.z);
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public Vector3Int getAsCubic() {
         return new Vector3Int(q, -q - r, r);
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public Vector2Int getAsOffset() {
         return new Vector2Int(q + (r - (r & 1)) / 2, r);
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public Vector2Int getAsAxial() {
         return new Vector2Int(q, r);
     }
@@ -62,12 +52,7 @@ public final class HexCoordinate {
         this.q = q;
         this.r = r;
     }
-
-    /**
-     *
-     * @param type
-     * @param pos
-     */
+    
     public HexCoordinate(int type, Vector2Int pos) {
         if (type == OFFSET) {
             pos = offsetToAxial(pos);
@@ -75,22 +60,11 @@ public final class HexCoordinate {
         q = pos.x;
         r = pos.y;
     }
-
-    /**
-     *
-     * @param type
-     * @param x
-     * @param y
-     */
+    
     public HexCoordinate(int type, int x, int y) {
         this(type, new Vector2Int(x, y));
     }
-
-    /**
-     *
-     * @param type
-     * @param pos
-     */
+    
     public HexCoordinate(int type, Vector3Int pos) {
         if (type != CUBIC) {
             throw new UnsupportedOperationException("Only TYPE_CUBIC expects a Vector3Int!");
@@ -99,22 +73,13 @@ public final class HexCoordinate {
         q = posAxial.x;
         r = posAxial.y;
     }
-
-    /**
-     * @return faf
-     */
+    
     @Override
     public String toString() {
         return q + "|" + r;
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public HexCoordinate[] getNeighbours() {
-        Class c = HexCoordinate.class;
-
         HexCoordinate[] neighbours = new HexCoordinate[]{
             new HexCoordinate(q + 1, r),
             new HexCoordinate(q + 1, r - 1),
@@ -202,20 +167,13 @@ public final class HexCoordinate {
     public boolean equals(Object obj) {
         if (obj instanceof HexCoordinate) {
             HexCoordinate coord = (HexCoordinate) obj;
-            Vector2Int axial = coord.getAsAxial();
-            if (axial.x == q && axial.y == r) {
+            if (coord.getAsAxial().x == q && coord.getAsAxial().y == r) {
                 return true;
             }
         }
         return false;
     }
-
-    /**
-     * It's important for use in HashMaps etc that equal HexCoordinates have the
-     * same hash value.
-     *
-     * @return
-     */
+    
     @Override
     public int hashCode() {
         return q * 2 ^ 16 + r;
@@ -223,10 +181,23 @@ public final class HexCoordinate {
 
     /**
      * Combine two position.
-     *
-     * @param value
      */
     public HexCoordinate add(HexCoordinate value) {
         return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
+    }
+    
+    /**
+     * Return all coordinate between this position and the max range.
+     * 
+     * @return list of coordinate
+     */
+    public ArrayList<HexCoordinate> getCoordinateInRange(int range) {
+        ArrayList<HexCoordinate> result = new ArrayList<HexCoordinate>();
+        for (int x = -range; x <= range; x++) {
+            for (int y = Math.max(-range, -x - range); y <= Math.min(range, range -x); y++) {
+                result.add(new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int(x+q, y+r)));
+            }
+        }
+        return result;
     }
 }

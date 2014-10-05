@@ -143,6 +143,7 @@ public final class CardEditorWindow extends EditorWindow {
          */
         getTextField("Name").setText(cardName);
         cardPreview.switchImg(cardName);
+        cardPreview.switchName(cardName);
         /**
          * Load the card cost.
          */

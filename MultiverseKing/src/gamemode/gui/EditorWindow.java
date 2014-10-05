@@ -6,15 +6,17 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
+import com.sun.org.apache.bcel.internal.generic.LADD;
+import static gamemode.gui.LayoutWindow.HAlign.full;
+import static gamemode.gui.LayoutWindow.HAlign.left;
+import static gamemode.gui.LayoutWindow.HAlign.right;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.CheckBox;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.text.TextField;
-import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import utility.Vector2Int;
@@ -23,288 +25,25 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public abstract class EditorWindow {
+public abstract class EditorWindow extends LayoutWindow {
 
-    protected final ElementManager screen;
-    private float spacement = 5;
-    private Vector2f gridSize;// = new Vector2f(230, 20);//min value X == 230
-    private String name;
-    private Element parent;
-    private Window window = null;
-    private LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
-    /**
-     * Max element count on the selected alignment.
-     */
-    private int elementAlignMaxCount;
-    private Align windowElementAlignement;
-
-    protected int getelementListCount() {
-        return elementList.size();
-    }
-
-    /**
-     * Generate a new window with: size (230, 20), Align.Horizontal && Element
-     * max count of 1.
-     *
-     * @param parent window
-     * @param name window name
-     */
+    // <editor-fold defaultstate="collapsed" desc="Constructor">
     public EditorWindow(ElementManager screen, Element parent, String name) {
-        this(screen, parent, name, new Vector2f(230, 20), Align.Horizontal, 1);
+        super(screen, parent, name);
     }
 
-    /**
-     * Generate a new window with: size (230, 20), Align.Horizontal && Element
-     * max count of 1.
-     *
-     * @param parent window
-     * @param name window name
-     */
     public EditorWindow(ElementManager screen, Element parent, String name, Align align, int alignElement) {
-        this(screen, parent, name, new Vector2f(230, 20), align, alignElement);
+        super(screen, parent, name, align, alignElement);
     }
 
-    /**
-     * Generate a new window with : Align.Horizontal && Element max count of 1.
-     *
-     * @param parent window
-     * @param gridSize element size on X and Y.
-     */
     public EditorWindow(ElementManager screen, Element parent, String name, Vector2f gridSize) {
-        this(screen, parent, name, gridSize, Align.Horizontal, 1);
+        super(screen, parent, name, gridSize);
     }
 
-    /**
-     *
-     * @param parent window
-     * @param gridSize element size on X and Y
-     * @param windowElementAlignement Alignement to use to position each
-     * element.
-     * @param elementAlignMaxCount element count on selected alignement.
-     */
     public EditorWindow(ElementManager screen, Element parent, String name, Vector2f gridSize, Align windowElementAlignement, int elementAlignMaxCount) {
-        this.screen = screen;
-        this.name = name;
-        this.parent = parent;
-        this.windowElementAlignement = windowElementAlignement;
-        this.elementAlignMaxCount = elementAlignMaxCount;
-        if (gridSize.x < 230) {
-            gridSize.x = 230;
-        }
-        if (gridSize.y < 20) {
-            gridSize.y = 20;
-        }
-        this.gridSize = gridSize;
+        super(screen, parent, name, gridSize, windowElementAlignement, elementAlignMaxCount);
     }
-
-    // <editor-fold defaultstate="collapsed" desc="Show Method">
-    /**
-     * Show the window on a free position on the screen.
-     *
-     * @param position
-     */
-    public void show(Vector2f position) {
-        Vector2f size = getWindowSize();
-        size.y += 25;
-//        window = new Window(screen, getUID(), new Vector2f(position.x - (size.x / 2f), position.y - (size.y / 2f)), size);
-        window = new Window(screen, getUID(), position, size);
-        window.setWindowTitle("   " + name);
-        window.setIgnoreMouse(true);
-        window.getDragBar().setIgnoreMouse(true);
-        if (parent == null) {
-            screen.addElement(window);
-        } else {
-            parent.addChild(window);
-        }
-        int row = 0;
-        int column = 0;
-        for (Element e : elementList.values()) {
-            if (windowElementAlignement == Align.Horizontal) {
-                if (column >= elementAlignMaxCount) {
-                    column = 0;
-                    row++;
-                }
-            } else if (windowElementAlignement == Align.Vertical) {
-                if (row >= elementAlignMaxCount) {
-                    row = 0;
-                    column++;
-                }
-            } else {
-                throw new UnsupportedOperationException(windowElementAlignement + " : is not a supported type.");
-            }
-            if (e != null) {
-                Vector2f pos = new Vector2f(e.getPosition().x + (column * gridSize.x),
-                        + e.getPosition().y + window.getDragBarHeight() + (row * gridSize.y));
-                e.setPosition(pos);
-                window.addChild(e);
-            }
-            if (windowElementAlignement == Align.Horizontal) {
-                column++;
-            } else if (windowElementAlignement == Align.Vertical) {
-                row++;
-            } else {
-                throw new UnsupportedOperationException(windowElementAlignement + " : is not a supported type.");
-            }
-        }
-    }
-
-    /**
-     * Show the window constraint to the screen anchor to the specifiate
-     * alignement, Set to null on both alignement to put the window on the
-     * center of the screen.
-     *
-     * @param hAlign Horizontal alignement to use
-     * @param vAlign Vertical alignement to use
-     */
-    protected final void show(VAlign vAlign, HAlign hAlign) {
-        Vector2f size = getWindowSize();
-        Vector2f position = new Vector2f();
-        if (vAlign == null && hAlign == null) {
-            position.x = screen.getWidth() / 2 - size.x / 2;
-            position.y = screen.getHeight() / 2 - size.y / 2;
-            show(position);
-        } else {
-            if (vAlign != null) {
-                switch (vAlign) {
-                    case bottom:
-                        position.y = screen.getHeight();
-                        break;
-                    case top:
-                        position.y = 0;
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(vAlign + " Not implemented");
-                }
-            }
-            if (hAlign != null) {
-                switch (hAlign) {
-                    case left:
-                        position.x = 0;
-                        break;
-                    case right:
-                        position.x = screen.getWidth();
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(hAlign + " Not implemented");
-                }
-            }
-            show(position);
-        }
-    }
-
-    /**
-     * Generate the window with a grid of sizeX and sizeY, constraint the
-     * position of the window to the parent position.
-     *
-     * @param sizeX grid size on X.
-     * @param sizeY grid size on Y.
-     * @param align window following the parent.
-     */
-    protected final void showConstrainToParent(VAlign vAlign, HAlign hAlign) {
-        Vector2f size = getWindowSize();
-        if (parent != null) {
-            Vector2f position = new Vector2f();
-            if (vAlign == null && hAlign == null) {
-                show(position);
-            } else {
-                if (vAlign != null) {
-                    switch (vAlign) {
-                        case bottom:
-                            position.y = parent.getDimensions().y;
-                            break;
-                        case top:
-                            position.y = parent.getDimensions().y - 65;
-                            break;
-                        case center:
-                            position.y = -(size.y - parent.getDimensions().y);
-                        default:
-                            throw new UnsupportedOperationException(vAlign + " Not implemented");
-                    }
-                }
-                if (hAlign != null) {
-                    switch (hAlign) {
-                        case left:
-                            if (vAlign != null && vAlign.equals(VAlign.center)) {
-                                position.x = -size.x;
-                            }
-                            break;
-                        case right:
-                            if (vAlign != null && vAlign.equals(VAlign.center)) {
-                                position.x = parent.getDimensions().x;
-                            } else {
-                                position.x = parent.getDimensions().x - size.x;
-                            }
-                            break;
-                        default:
-                            throw new UnsupportedOperationException(hAlign + " Not implemented");
-                    }
-                } else {
-                    position.x = parent.getDimensions().x / 2 - size.x / 2;
-                }
-                show(position);
-            }
-        } else {
-            throw new UnsupportedOperationException("There is no parent to align the element to.");
-        }
-    }
-
-    private Vector2f getWindowSize() {
-        int column, row;
-        if (windowElementAlignement == Align.Horizontal) {
-            column = elementAlignMaxCount;
-            row = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
-        } else if (windowElementAlignement == Align.Vertical) {
-            row = elementAlignMaxCount;
-            column = (int) FastMath.ceil((float) elementList.size() / (float) elementAlignMaxCount);
-        } else {
-            throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
-        }
-        return new Vector2f(column * gridSize.x + (spacement * 2), row * gridSize.y + (3 * row + 5));
-    }
-
-    public void setVisible() {
-        if (window != null) {
-            window.show();
-        } else {
-            System.err.println(getUID() + "Can't be set to visible, window does not exist.");
-        }
-    }
-
-    public void hide() {
-        if (window != null) {
-            window.hide();
-        } else {
-            System.err.println(getUID() + "Can't be hided, window does not exist.");
-        }
-    }
-
-    public boolean isVisible() {
-        if (window != null) {
-            return window.getIsVisible();
-        }
-        return false;
-    }
-
     // </editor-fold>
-    public String getUID() {
-        return generateUID(name);
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    protected Vector2f getGridSize() {
-        return gridSize;
-    }
-
-    public final void removeFromScreen() {
-        if (window != null && parent != null) {
-            parent.removeChild(window);
-        } else if (window != null && parent == null) {
-            screen.removeElement(window);
-        }
-    }
 
     // <editor-fold defaultstate="collapsed" desc="Add Method">
     /**
@@ -373,7 +112,15 @@ public abstract class EditorWindow {
     }
 
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign) {
-        addButtonList(listUID, triggersNames, hAlign, 1);
+        addButtonList(listUID, triggersNames, hAlign, 1, Vector2f.ZERO);
+    }
+
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, Vector2f offset) {
+        addButtonList(listUID, triggersNames, hAlign, 1, offset);
+    }
+
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
+        addButtonList(listUID, triggersNames, hAlign, fieldGridSize, Vector2f.ZERO);
     }
 
     /**
@@ -383,9 +130,9 @@ public abstract class EditorWindow {
      * @param hAlign alignement of the button.
      * @param fieldGridSize gridSlot to use
      */
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, Vector2f offset) {
         String UID = generateUID(listUID) + getUID() + "labelList";
-        Element holder = new Element(screen, UID, new Vector2f(spacement, 10), Vector2f.ZERO, Vector4f.ZERO, null);
+        Element holder = new Element(screen, UID, new Vector2f(offset.x, 4), Vector2f.ZERO, Vector4f.ZERO, null);
         holder.setAsContainerOnly();
         generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize);
     }
@@ -403,7 +150,7 @@ public abstract class EditorWindow {
 
         int i = 0;
         float posX = 0f;
-        float fillValue = 0;
+        float fillValue = spacement;
         ArrayList<ButtonAdapter> btnList = new ArrayList<ButtonAdapter>();
         for (Object e : elements) {
             if (type.equals("labelList")) {
@@ -420,11 +167,13 @@ public abstract class EditorWindow {
             holder.addChild(btnList.get(btnList.size() - 1));
             i++;
         }
-        if (hAlign == HAlign.right) {
-            holder.setPosition(gridSize.x - (posX + 10), holder.getPosition().y);
+        if (hAlign == HAlign.right && type.equals("numList")) {
+            holder.setPosition(layoutGridSize.x - (posX + 10), holder.getPosition().y);
+        } else if (hAlign == HAlign.right && type.equals("labelList")) {
+            holder.setPosition(layoutGridSize.x - posX, holder.getPosition().y);
         } else if (hAlign.equals(HAlign.left) || hAlign.equals(HAlign.full)) {
             i = 0;
-            fillValue = (gridSize.x * fieldGridSize - fillValue - (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0)) / elements.length;
+            fillValue = (layoutGridSize.x * fieldGridSize - fillValue - holder.getDimensions().x) / elements.length;
             for (ButtonAdapter btn : btnList) {
                 btn.setDimensions(btn.getDimensions().x + fillValue, btn.getDimensions().y);
                 if (i == 0 && hAlign.equals(HAlign.left)) {
@@ -492,7 +241,7 @@ public abstract class EditorWindow {
      * Add a Text Field element to this menu.
      */
     protected final void addTextField(String labelName, String baseValue, HAlign hAlign) {
-        addTextField(labelName, baseValue, hAlign, 0, Vector2f.ZERO);
+        addTextField(labelName, baseValue, hAlign, 1, Vector2f.ZERO);
     }
 
     /**
@@ -594,24 +343,20 @@ public abstract class EditorWindow {
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
         generateSelectBoxField(uid, baseValue, value);
     }
-
     // </editor-fold>
-    // <editor-fold defaultstate="collapsed" desc="Generate Method">
-    private String generateUID(String labelName) {
-        return labelName.replaceAll("\\s", "");
-    }
 
+    // <editor-fold defaultstate="collapsed" desc="Generate Method">
     private Label generateLabel(String labelName, HAlign hAlign, Vector2f offset) {
         if (hAlign.equals(HAlign.left)) {
             Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                    new Vector2f(spacement + offset.x, offset.y + (1.5f * elementList.size())),
-                    new Vector2f((labelName.toCharArray().length + 3) * 8, gridSize.y));
+                    new Vector2f(offset.x, offset.y),
+                    new Vector2f((labelName.toCharArray().length + 3) * 8, layoutGridSize.y));
             label.setText(labelName + " : ");
             return label;
         } else if (hAlign.equals(HAlign.right)) {
             Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
-                    new Vector2f(gridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y + (1.5f * elementList.size())),
-                    new Vector2f((labelName.toCharArray().length + 3) * 8, gridSize.y));
+                    new Vector2f(layoutGridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y),
+                    new Vector2f((labelName.toCharArray().length + 3) * 8, layoutGridSize.y));
             label.setText(" : " + labelName);
             return label;
         } else {
@@ -622,13 +367,13 @@ public abstract class EditorWindow {
     private ButtonAdapter generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {
         final String childUID = getUID() + labelUID;
         ButtonAdapter numButton = new ButtonAdapter(screen, childUID + "NumericFieldButton",
-                Vector2f.ZERO, new Vector2f(gridSize.x - (((labelUID.toCharArray().length + 2) * 8) + (spacement * 2)), gridSize.y)) {
+                Vector2f.ZERO, new Vector2f(layoutGridSize.x - (((labelUID.toCharArray().length + 2) * 8) + (spacement * 2)), layoutGridSize.y)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
                 TextField field = new TextField(screen, getUID() + labelUID + "NumericField",
-                        new Vector2f(getPosition().x, getPosition().y + (hAlign.equals(HAlign.left) ? spacement : 8)),
-                        new Vector2f(getWidth(), gridSize.y)) {
+                        new Vector2f(getPosition().x, getPosition().y + 8),
+                        new Vector2f(getWidth(), layoutGridSize.y)) {
                     @Override
                     public void onKeyRelease(KeyInputEvent evt) {
                         super.onKeyRelease(evt);
@@ -657,7 +402,7 @@ public abstract class EditorWindow {
                 numButton.setPosition(((labelUID.toCharArray().length + 2) * 8) + spacement, 4);
                 break;
             case right:
-                numButton.setPosition(-numButton.getDimensions().x + spacement, 4);
+                numButton.setPosition(-numButton.getDimensions().x, 4);
                 break;
         }
         numButton.setText(Integer.toString(baseValue));
@@ -669,7 +414,7 @@ public abstract class EditorWindow {
 
         TextField field = new TextField(screen, childUID + "TextField",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
-                new Vector2f((gridSize.x * fieldSize.x) - elementList.get(labelUID).getDimensions().x - spacement, gridSize.y * fieldSize.y)) {
+                new Vector2f((layoutGridSize.x * fieldSize.x) - elementList.get(labelUID).getDimensions().x - spacement, layoutGridSize.y * fieldSize.y)) {
             @Override
             public void onKeyRelease(KeyInputEvent evt) {
                 super.onKeyRelease(evt);
@@ -704,7 +449,7 @@ public abstract class EditorWindow {
     private void generateSelectBoxField(final String labelUID, Enum<?> baseValue, Enum[] value) {
         SelectBox selectBox = new SelectBox(screen, getUID() + labelUID + "BoxField",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
-                new Vector2f(gridSize.x - elementList.get(labelUID).getDimensions().x - spacement, gridSize.y)) {
+                new Vector2f(layoutGridSize.x - elementList.get(labelUID).getDimensions().x - spacement, layoutGridSize.y)) {
             @Override
             public void onChange(int selectedIndex, Object value) {
                 onSelectBoxFieldChange((Enum) value);
@@ -720,7 +465,7 @@ public abstract class EditorWindow {
     private void generateSpinner(final String labelName, final String labelUID, int[] value) {
         Spinner spinner = new Spinner(screen, getUID() + labelUID + "Spinner",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
-                new Vector2f(gridSize.x - elementList.get(labelUID).getDimensions().x - spacement, gridSize.y),
+                new Vector2f(layoutGridSize.x - elementList.get(labelUID).getDimensions().x - spacement, layoutGridSize.y),
                 Spinner.Orientation.HORIZONTAL, true) {
             @Override
             public void onChange(int selectedIndex, String value) {
@@ -739,8 +484,8 @@ public abstract class EditorWindow {
     private ButtonAdapter generateButton(String labelName, final String triggerName, HAlign hAlign, Vector2f offset) {
         ButtonAdapter button = new ButtonAdapter(screen, getUID() + generateUID(triggerName) + "Button",
                 Vector2f.ZERO, new Vector2f((labelName != null
-                ? gridSize.x - elementList.get(labelName).getDimensions().x - spacement
-                : (triggerName.toCharArray().length + 2) * 8) + spacement, gridSize.y)) {
+                ? layoutGridSize.x - elementList.get(labelName).getDimensions().x - spacement
+                : (triggerName.toCharArray().length + 2) * 8) + spacement, layoutGridSize.y)) {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -750,15 +495,15 @@ public abstract class EditorWindow {
         button.setText(triggerName);
         switch (hAlign) {
             case left:
-                button.setPosition(new Vector2f((labelName != null ? elementList.get(labelName).getDimensions().x - spacement : spacement + offset.x), 4 + offset.y));
+                button.setPosition(new Vector2f((labelName != null ? elementList.get(labelName).getDimensions().x - spacement : spacement + offset.x), 0));
                 return button;
             case right:
-                button.setPosition(new Vector2f(gridSize.x - (spacement + offset.x + button.getDimensions().x
-                        + (labelName != null ? elementList.get(labelName).getDimensions().x : 0)), 4 + offset.y));
+                button.setPosition(new Vector2f(layoutGridSize.x - (spacement + offset.x + button.getDimensions().x
+                        + (labelName != null ? elementList.get(labelName).getDimensions().x : 0)), 0));
                 return button;
             case full:
-                button.setDimensions(new Vector2f(gridSize.x - spacement, button.getDimensions().y));
-                button.setPosition(new Vector2f(spacement, offset.y + 5 + elementList.size()));
+                button.setDimensions(new Vector2f(layoutGridSize.x - spacement*2, layoutGridSize.y));
+                button.setPosition(new Vector2f(spacement, 4));
                 return button;
             default:
                 throw new UnsupportedOperationException(hAlign + " isn't supported.");
@@ -822,28 +567,6 @@ public abstract class EditorWindow {
     }
 
     protected void onSpinnerChange(String sTrigger, int currentIndex) {
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="Exposed Enum">
-    public enum VAlign {
-
-        top,
-        bottom,
-        center;
-    }
-
-    public enum HAlign {
-
-        left,
-        right,
-        full;
-    }
-
-    public enum Align {
-
-        Horizontal,
-        Vertical;
     }
     // </editor-fold>
 }

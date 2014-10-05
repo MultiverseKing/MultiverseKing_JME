@@ -17,6 +17,7 @@ import tonegod.gui.core.ElementManager;
 /**
  *
  * @author roah
+ * @deprecated replaced by EditorWindow && LayoutWindow
  */
 public abstract class EditorMenu extends Element {
 

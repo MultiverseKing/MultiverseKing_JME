@@ -84,42 +84,31 @@ public class Vector2Int implements Savable {
     public Vector2Int(Vector2f value) {
         this((int) value.x, (int) value.y);
     }
-
+    
     /**
-     *
-     * @param x
-     * @param y
+     * Math.floor on each param.
      */
+    public Vector2Int(float x, float y) {
+        this.x = (int) x;
+        this.y = (int) y;
+    }
+    
     public Vector2Int(int x, int y) {
         this.x = x;
         this.y = y;
     }
-
-    /**
-     *
-     * @param value
-     */
+    
     public Vector2Int(Vector2Int value) {
         this.x = value.x;
         this.y = value.y;
     }
-
-    /**
-     *
-     * @param ex
-     * @throws IOException
-     */
+    
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(this.x, "x", x);
         capsule.write(this.y, "y", y);
     }
-
-    /**
-     *
-     * @param im
-     * @throws IOException
-     */
+    
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
         capsule.readInt("x", this.x);

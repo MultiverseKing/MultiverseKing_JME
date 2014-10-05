@@ -3,6 +3,7 @@ package gamemode.editor.map;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import gamemode.gui.EditorWindow;
+import gamemode.gui.LayoutWindow.HAlign;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;

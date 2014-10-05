@@ -6,6 +6,7 @@ import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
 import gamemode.gui.EditorWindow;
+import gamemode.gui.HexGridWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
 import utility.Vector2Int;
@@ -17,6 +18,7 @@ import utility.Vector2Int;
 class CardEditorProperties extends EditorWindow {
 
     private CardType current;
+    private HexGridWindow hexWin;
 
     CardType getCurrent() {
         return current;
@@ -37,7 +39,7 @@ class CardEditorProperties extends EditorWindow {
                  * Part used to show/set how many power have the ability.
                  * FXUsed - hitCollision
                  */
-                addNumericField("Power", 15, HAlign.right);
+                addNumericField("Power", 15, HAlign.left);
                 /**
                  * Part used to show/set the segmentCost needed for the unit to
                  * cast the ability.
@@ -47,6 +49,7 @@ class CardEditorProperties extends EditorWindow {
                  * Part used to set the Activation range of the ability.
                  */
                 addNumericListField("Range", new Integer[]{0, 0}, HAlign.left);
+                addButtonField("Set collision");
                 break;
             case EQUIPEMENT:
                 break;
@@ -58,6 +61,16 @@ class CardEditorProperties extends EditorWindow {
                 throw new UnsupportedOperationException(current + " is not a supported type in : " + getClass().getName());
         }
     }
+
+    @Override
+    protected void onButtonTrigger(String label) {
+        if(label.equals("Set collision")){
+            hexWin = new HexGridWindow(screen, 5, getWindow());
+            hexWin.show();
+        }
+    }
+    
+    
 
     @Override
     protected void onNumericFieldInput(Integer input) {

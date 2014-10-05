@@ -1,7 +1,7 @@
 package gamemode.editor.map;
 
 import gamemode.editor.EditorMenu;
-import gamemode.gui.EditorWindow;
+import gamemode.gui.LayoutWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
@@ -14,7 +14,7 @@ import utility.HexCoordinate;
  */
 final class AreaEditorMenu extends EditorMenu {
 
-    private EditorWindow currentWindow = null;
+    private LayoutWindow currentWindow = null;
     private int currentValue = 10;
     private Window tileWin;
     private AreaTileWidget tileWidgetMenu;

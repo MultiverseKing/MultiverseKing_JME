@@ -4,7 +4,6 @@ import com.jme3.math.Vector2f;
 import gamemode.gui.EditorWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
-import tonegod.gui.core.layouts.LayoutHint.VAlign;
 
 /**
  *
@@ -22,7 +21,7 @@ final class TestCardWindow extends EditorWindow {
         this.system = system;
 
         addButtonField("Add Card", "+1", new Vector2f(0, -5));
-        addButtonField("Remove Card", "-1", new Vector2f(getGridSize().x, -8));
+        addButtonField("Remove Card", "-1", new Vector2f(getLayoutGridSize().x, -8));
         showConstrainToParent(VAlign.bottom, null);
         getWindow().setPosition(new Vector2f(getWindow().getPosition().x,
                 getWindow().getPosition().y - screen.getElementById("ReturnButtonWin").getHeight() - 15));

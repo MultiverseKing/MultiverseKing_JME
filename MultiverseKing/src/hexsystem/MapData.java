@@ -205,27 +205,6 @@ public final class MapData {
     }
 
     /**
-     * Return null field for inexisting hex.
-     *
-     * @todo not fully functional.
-     * @param position
-     * @param range
-     * @return
-     */
-    public HexTile[] getTileRange(HexCoordinate position, int range) {
-        Vector2Int axial = position.getAsAxial();
-        HexTile[] result = new HexTile[range * 6];
-        int i = 0;
-        for (int x = -range; x <= range; x++) {
-            for (int y = Math.max(-range, -x - range); y <= Math.min(range, range - y); y++) {
-                result[i] = getTile(new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int(x + axial.x, y + axial.y)));
-                i++;
-            }
-        }
-        return result;
-    }
-
-    /**
      * Get all tile around the defined position, return null for tile who
      * doesn't exist.
      *
@@ -237,7 +216,6 @@ public final class MapData {
         HexTile[] neighbours = new HexTile[coords.length];
         for (int i = 0; i < neighbours.length; i++) {
             neighbours[i] = getTile(coords[i]);
-
         }
         return neighbours;
     }

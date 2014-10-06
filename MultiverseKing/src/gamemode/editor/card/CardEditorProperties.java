@@ -65,8 +65,14 @@ class CardEditorProperties extends EditorWindow {
     @Override
     protected void onButtonTrigger(String label) {
         if(label.equals("Set collision")){
-            hexWin = new HexGridWindow(screen, 5, getWindow());
-            hexWin.show();
+            if(hexWin == null){
+                hexWin = new HexGridWindow(screen, 5, getWindow());
+                hexWin.show();
+            } else if(hexWin.isVisible()){
+                hexWin.hide();
+            } else if(!hexWin.isVisible()){
+                hexWin.setVisible();
+            }
         }
     }
     

@@ -6,7 +6,6 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import com.sun.org.apache.bcel.internal.generic.LADD;
 import static gamemode.gui.LayoutWindow.HAlign.full;
 import static gamemode.gui.LayoutWindow.HAlign.left;
 import static gamemode.gui.LayoutWindow.HAlign.right;
@@ -502,7 +501,7 @@ public abstract class EditorWindow extends LayoutWindow {
                         + (labelName != null ? elementList.get(labelName).getDimensions().x : 0)), 0));
                 return button;
             case full:
-                button.setDimensions(new Vector2f(layoutGridSize.x - spacement*2, layoutGridSize.y));
+                button.setDimensions(new Vector2f(layoutGridSize.x - spacement * 2, layoutGridSize.y));
                 button.setPosition(new Vector2f(spacement, 4));
                 return button;
             default:

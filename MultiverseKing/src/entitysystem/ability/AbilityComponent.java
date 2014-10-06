@@ -1,6 +1,7 @@
 package entitysystem.ability;
 
 import com.simsilica.es.PersistentComponent;
+import entitysystem.field.Collision;
 import java.util.ArrayList;
 import java.util.HashMap;
 import utility.ElementalAttribut;
@@ -15,14 +16,10 @@ public class AbilityComponent implements PersistentComponent {
     private final String name;
     private final int power;
     private final byte activationCost;
-    private final Vector2Int range;
+    private final Vector2Int castRange;
     private final ElementalAttribut eAttribut;
     private final String description;
-    /**
-     * HexCoordinate == where the hit happen relative to the caster unit or
-     * target, Byte == Collision layer to use.
-     */
-    private final HashMap<Byte, ArrayList> hitCollision;
+    private final Collision collision;
 
     /**
      * Create a new ability for an entity unit.
@@ -32,11 +29,11 @@ public class AbilityComponent implements PersistentComponent {
      * @param eAttribut of the effect.
      * @param loadTime between activation.
      */
-    public AbilityComponent(String name, Vector2Int range, ElementalAttribut eAttribut,
-            byte activationCost, int power, HashMap<Byte, ArrayList> hitCollision, String description) {
+    public AbilityComponent(String name, Vector2Int castRange, ElementalAttribut eAttribut,
+            byte activationCost, int power, Collision collision, String description) {
         this.name = name;
-        this.range = range;
-        this.hitCollision = hitCollision;
+        this.castRange = castRange;
+        this.collision = collision;
         this.eAttribut = eAttribut;
         this.activationCost = activationCost;
         this.power = power;
@@ -57,17 +54,15 @@ public class AbilityComponent implements PersistentComponent {
      *
      * @return
      */
-    public Vector2Int getRange() {
-        return range;
+    public Vector2Int getCastRange() {
+        return castRange;
     }
 
     /**
      * Where the ability will hit when activated.
-     *
-     * @return
      */
-    public HashMap<Byte, ArrayList> getHitCollision() {
-        return hitCollision;
+    public Collision getHitCollision() {
+        return collision;
     }
 
     /**

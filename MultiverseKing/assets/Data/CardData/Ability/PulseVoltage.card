@@ -7,11 +7,12 @@
    "ability":{
       "power":15,
       "segmentCost":1,
-      "range": "0|0",
-      "hitCollision":[
+      "castRange": "0|0",
+      "collision":[
          {
             "layer": 0,
-            "key" :[ "0|1", "0|-1", "1|0", "-1|0", "1|1", "-1|-1" ]
+            "areaRange": 1,
+            "key" :[ "0|0", "0|1", "0|-1", "1|0", "-1|0", "1|1", "-1|-1" ]
          }
       ]
    }

@@ -1,5 +1,7 @@
 package entitysystem.card;
 
+import entitysystem.field.Collision;
+import entitysystem.loader.EntityLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.JSONArray;
@@ -15,7 +17,7 @@ public class AbilityProperties extends CardProperties {
     private final int power;
     private final int segmentCost;
     private final Vector2Int range;
-    private final HashMap<Byte, ArrayList> collision;
+    private final Collision collision;
 
     public AbilityProperties(JSONObject obj, String name) {
         super(obj, name);
@@ -24,20 +26,11 @@ public class AbilityProperties extends CardProperties {
         segmentCost = ((Number) data.get("segmentCost")).intValue();
         range = new Vector2Int(data.get("activationRange").toString());
         
-        collision = new HashMap<Byte, ArrayList>();
-        JSONArray col = (JSONArray) data.get("hitCollision");
-        for (Object o : col) {
-            byte layer = ((Number) ((JSONObject) o).get("layer")).byteValue();
-            ArrayList<Vector2Int> key = new ArrayList<Vector2Int>();
-
-            for (Object k : ((JSONArray) ((JSONObject) o).get("key"))) {
-                key.add(new Vector2Int(k.toString()));
-            }
-            collision.put(layer, key);
-        }
+        EntityLoader eLoader = new EntityLoader();
+        collision = eLoader.importCollision((JSONArray) data.get("hitCollision"));
     }
 
-    public AbilityProperties(int power, int segmentCost, Vector2Int range, HashMap<Byte, ArrayList> collision) {
+    public AbilityProperties(int power, int segmentCost, Vector2Int range, Collision collision) {
         super();
         this.power = power;
         this.segmentCost = segmentCost;
@@ -45,7 +38,7 @@ public class AbilityProperties extends CardProperties {
         this.collision = collision;
     }
     
-    public AbilityProperties(CardProperties properties, int power, int segmentCost, Vector2Int range, HashMap<Byte, ArrayList> collision) {
+    public AbilityProperties(CardProperties properties, int power, int segmentCost, Vector2Int range, Collision collision) {
         super(properties.getName(), properties.getPlayCost(), properties.getCardType(), 
                 properties.getRarity(), properties.getElement(), properties.getDescription());
         this.power = power;
@@ -78,7 +71,7 @@ public class AbilityProperties extends CardProperties {
         return range;
     }
 
-    public HashMap<Byte, ArrayList> getCollision() {
+    public Collision getCollision() {
         return collision;
     }
 }

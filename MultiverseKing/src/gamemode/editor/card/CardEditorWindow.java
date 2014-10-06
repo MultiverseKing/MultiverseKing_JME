@@ -177,7 +177,7 @@ public final class CardEditorWindow extends EditorWindow {
                 AbilityComponent abilityData = loader.loadAbility(cardName);
                 subMenu.setPower(abilityData.getPower());
                 subMenu.setUnitSegmentCost(abilityData.getSegment());
-                subMenu.setActivationRange(abilityData.getRange());
+                subMenu.setCastRange(abilityData.getCastRange());
                 //Todo: collisionhit
                 break;
             case EQUIPEMENT:

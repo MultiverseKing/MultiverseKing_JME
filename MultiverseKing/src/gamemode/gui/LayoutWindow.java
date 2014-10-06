@@ -17,8 +17,8 @@ public abstract class LayoutWindow {
     protected final float spacement = 5;
     protected final Vector2f layoutGridSize;// = new Vector2f(230, 20);//min value X == 230
     private String name;
-    private Element parent;
-    private Window window = null;
+    protected Element parent;
+    protected Window window = null;
     protected LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
     /**
      * Max element count on the selected alignment.
@@ -76,12 +76,6 @@ public abstract class LayoutWindow {
         this.parent = parent;
         this.windowElementAlignement = windowElementAlignement;
         this.elementAlignMaxCount = elementAlignMaxCount;
-//        if (layoutGridSize.x < 230) {
-//            layoutGridSize.x = 230;
-//        }
-//        if (layoutGridSize.y < 20) {
-//            layoutGridSize.y = 20;
-//        }
         this.layoutGridSize = layoutGridSize;
     }
 
@@ -99,7 +93,11 @@ public abstract class LayoutWindow {
         Vector2f size = getWindowSize(isHexGrid);
         size.y += 25;
         window = new Window(screen, getUID(), position, size);
-        window.setWindowTitle("   " + name);
+        if(isHexGrid){
+            window.setWindowTitle(name);
+        }else {
+            window.setWindowTitle("   " + name);
+        }
         window.setIgnoreMouse(true);
         window.getDragBar().setIgnoreMouse(true);
         if (parent == null) {
@@ -125,10 +123,11 @@ public abstract class LayoutWindow {
             }
             if (e != null) {
                 Vector2f pos = new Vector2f(spacement + e.getPosition().x + (column * layoutGridSize.x) + 
-                        (row % 2 != 0 && isHexGrid ? layoutGridSize.x / 2 : 0),
+                        (row % 2 != 0 && isHexGrid ? layoutGridSize.x / 2 : 0) + 
+                        ((elementAlignMaxCount-1)/2 % 2 != 0 && isHexGrid ? -layoutGridSize.x / 2 : 0),
                         e.getPosition().y + window.getDragBarHeight() + 
-                        (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y)) + 
-                        (row * 1.9f) + (isHexGrid ? layoutGridSize.y * 0.8f / 3 : 0)
+                        (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y)) +
+                         row * 1.9f + (isHexGrid ? layoutGridSize.y * 0.7f / 3 : 0)
                 );
                 e.setPosition(pos);
                 window.addChild(e);
@@ -218,8 +217,6 @@ public abstract class LayoutWindow {
                         case top:
                             position.y = parent.getDimensions().y - 65;
                             break;
-                        case center:
-                            position.y = -(size.y - parent.getDimensions().y);
                         default:
                             throw new UnsupportedOperationException(vAlign + " Not implemented");
                     }
@@ -227,12 +224,12 @@ public abstract class LayoutWindow {
                 if (hAlign != null) {
                     switch (hAlign) {
                         case left:
-                            if (vAlign != null && vAlign.equals(VAlign.center)) {
+                            if (vAlign == null) {
                                 position.x = -size.x;
                             }
                             break;
                         case right:
-                            if (vAlign != null && vAlign.equals(VAlign.center)) {
+                            if (vAlign == null) {
                                 position.x = parent.getDimensions().x;
                             } else {
                                 position.x = parent.getDimensions().x - size.x;
@@ -262,8 +259,8 @@ public abstract class LayoutWindow {
         } else {
             throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
         }
-        return new Vector2f(column * layoutGridSize.x + (spacement * 2) + (isHexGrid ? layoutGridSize.x/2 : 0),
-                row * (isHexGrid ? layoutGridSize.y * 2.2f / 3 : layoutGridSize.y) + (3 * row + 5));
+        return new Vector2f(column * layoutGridSize.x + (spacement * 2) + (isHexGrid && elementAlignMaxCount%2==0 ? layoutGridSize.x/2 : 0),
+                (row+0.9f) * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y) + (isHexGrid ? row * 2f : 0));
     }
 
     public void setVisible() {
@@ -318,8 +315,7 @@ public abstract class LayoutWindow {
     public enum VAlign {
 
         top,
-        bottom,
-        center;
+        bottom;
     }
 
     public enum HAlign {

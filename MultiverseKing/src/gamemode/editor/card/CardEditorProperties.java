@@ -48,7 +48,7 @@ class CardEditorProperties extends EditorWindow {
                 /**
                  * Part used to set the Activation range of the ability.
                  */
-                addNumericListField("Range", new Integer[]{0, 0}, HAlign.left);
+                addNumericListField("Cast range", new Integer[]{0, 0}, HAlign.left);
                 addButtonField("Set collision");
                 break;
             case EQUIPEMENT:
@@ -66,7 +66,7 @@ class CardEditorProperties extends EditorWindow {
     protected void onButtonTrigger(String label) {
         if(label.equals("Set collision")){
             if(hexWin == null){
-                hexWin = new HexGridWindow(screen, 5, getWindow());
+                hexWin = new HexGridWindow(screen, 1, getWindow());
                 hexWin.show();
             } else if(hexWin.isVisible()){
                 hexWin.hide();
@@ -96,9 +96,9 @@ class CardEditorProperties extends EditorWindow {
         getSpinnerField("Segment Cost").setSelectedIndex(cost);
     }
 
-    public void setActivationRange(Vector2Int range) {
-        getNumericListField("Range", 0).setText(String.valueOf(range.x));
-        getNumericListField("Range", 1).setText(String.valueOf(range.y));
+    public void setCastRange(Vector2Int range) {
+        getNumericListField("Cast range", 0).setText(String.valueOf(range.x));
+        getNumericListField("Cast range", 1).setText(String.valueOf(range.y));
     }
     
     /**

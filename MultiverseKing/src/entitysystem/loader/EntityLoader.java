@@ -3,6 +3,8 @@ package entitysystem.loader;
 import entitysystem.card.CardProperties;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.card.AbilityProperties;
+import entitysystem.field.Collision;
+import entitysystem.field.Collision.CollisionData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -151,36 +153,38 @@ public class EntityLoader {
         JSONObject abilityData = (JSONObject) obj.get("ability");
         Number power = (Number) abilityData.get("power");
         Number segment = (Number) abilityData.get("segmentCost");
-        HashMap<Byte, ArrayList> hitCollision = importCollision((JSONArray) abilityData.get("hitCollision"));
+        Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
 
-        return new AbilityComponent(name, new Vector2Int(abilityData.get("range").toString()), eAttribut,
+        return new AbilityComponent(name, new Vector2Int(abilityData.get("castRange").toString()), eAttribut,
                 segment.byteValue(), power.intValue(), hitCollision, description);
     }
 
-    JSONArray exportCollision(HashMap<Byte, ArrayList> collision) {
-        System.err.println(collision.size());
+    public JSONArray exportCollision(Collision collision) {
         JSONArray collisionList = new JSONArray();
-        for (byte b : collision.keySet()) {
+        for (byte b : collision.getLayers()) {
             JSONObject layer = new JSONObject();
             layer.put("layer", b);
-            layer.put("key", collision.get(b));
+            layer.put("areaRange", collision.getCollisionLayer(b).getAreaRange());
+            layer.put("key", collision.getCollisionLayer(b).getCoord());
             collisionList.add(layer);
         }
         return collisionList;
     }
 
-    HashMap<Byte, ArrayList> importCollision(JSONArray collisionData) {
-        HashMap<Byte, ArrayList> collisionList = new HashMap<Byte, ArrayList>(2);
+    public Collision importCollision(JSONArray collisionData) {
+        Collision collision = new Collision();
         for (int i = 0; i < collisionData.size(); i++) {
             JSONObject value = (JSONObject) collisionData.get(i);
             Number layer = (Number) value.get("layer");
+            Number areaRange = (Number) value.get("areaRange");
             JSONArray key = (JSONArray) value.get("key");
-            collisionList.put(layer.byteValue(), new ArrayList<HexCoordinate>());
+            ArrayList<HexCoordinate> collisionCoord = new ArrayList<HexCoordinate>();
             for (int j = 0; j < key.size(); j++) {
-                collisionList.get(layer.byteValue()).add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) key.get(j))));
+                collisionCoord.add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) key.get(j))));
             }
+            collision.addLayer(layer.byteValue(), collision.new CollisionData(areaRange.byteValue(), collisionCoord));
         }
-        return collisionList;
+        return collision;
     }
 
     private boolean setData(File f, JSONObject obj) {

@@ -3,6 +3,8 @@ package gamemode.editor;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import gamemode.editor.card.CardEditorWindow;
@@ -42,8 +44,17 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
         super.initialize(stateManager, app);
         main = (MultiverseMain) app;
         CreateMainMenu();
+        initKeyMapping();
     }
 
+    private void initKeyMapping() {
+        if(!main.getScreen().getApplication().getInputManager().hasMapping("confirmDialog") &&
+                !main.getScreen().getApplication().getInputManager().hasMapping("cancelDialog")){
+            main.getScreen().getApplication().getInputManager().addMapping("confirmDialog", new KeyTrigger(KeyInput.KEY_RETURN));
+            main.getScreen().getApplication().getInputManager().addMapping("cancelDialog", new KeyTrigger(KeyInput.KEY_ESCAPE));
+        }
+    }
+    
     private void CreateMainMenu() {
         mainMenuBar = new Window(main.getScreen(), "mainWin", new Vector2f(5f, 5f), new Vector2f(main.getScreen().getWidth() - 10, 40));
         mainMenuBar.setMinDimensions(Vector2f.ZERO);
@@ -234,9 +245,9 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
         if (confirmOrCancel) {
             if (dialogUID.equals("LoadArea")) {
                 if (usedSystem != null) {
-                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getInput("Name"));
+                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getTextInput("Name"));
                 } else {
-                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getInput("Name"));
+                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getTextInput("Name"));
                     main.getStateManager().attach(usedSystem);
                 }
             }
@@ -262,6 +273,8 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     @Override
     public void cleanup() {
         super.cleanup();
+        main.getScreen().getApplication().getInputManager().deleteMapping("confirmDialog");
+        main.getScreen().getApplication().getInputManager().deleteMapping("cancelDialog");
         main.getScreen().removeElement(main.getScreen().getElementById("mainWin"));
     }
 

@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import tonegod.gui.controls.menuing.Menu;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 
 /**
  *
@@ -18,7 +18,7 @@ public class LoadingPopup extends Dialogwindow {
     private boolean isInitialized = false;
     private Menu loadingList;
 
-    public LoadingPopup(ElementManager screen, String WindowName, LoadingPopupListener listener) {
+    public LoadingPopup(Screen screen, String WindowName, LoadingPopupListener listener) {
         super(screen, WindowName, listener);
         addInputText("Name");
         addButton("Load from files.");

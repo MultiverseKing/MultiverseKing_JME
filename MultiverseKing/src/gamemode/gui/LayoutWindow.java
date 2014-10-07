@@ -5,7 +5,7 @@ import com.jme3.math.Vector2f;
 import java.util.LinkedHashMap;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 
 /**
  *
@@ -13,18 +13,18 @@ import tonegod.gui.core.ElementManager;
  */
 public abstract class LayoutWindow {
 
-    protected final ElementManager screen;
+    protected final Screen screen;
     protected final float spacement = 5;
     protected final Vector2f layoutGridSize;// = new Vector2f(230, 20);//min value X == 230
-    private String name;
+    protected final String name;
     protected Element parent;
     protected Window window = null;
     protected LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
     /**
      * Max element count on the selected alignment.
      */
-    protected final int elementAlignMaxCount;
-    protected final Align windowElementAlignement;
+    protected Align windowElementAlignement;
+    protected int elementAlignMaxCount;
 
     protected int getelementListCount() {
         return elementList.size();
@@ -37,7 +37,7 @@ public abstract class LayoutWindow {
      * @param parent window
      * @param name window name
      */
-    public LayoutWindow(ElementManager screen, Element parent, String name) {
+    public LayoutWindow(Screen screen, Element parent, String name) {
         this(screen, parent, name, new Vector2f(230, 20), Align.Horizontal, 1);
     }
 
@@ -48,7 +48,7 @@ public abstract class LayoutWindow {
      * @param parent window
      * @param name window name
      */
-    public LayoutWindow(ElementManager screen, Element parent, String name, Align align, int elementAlignMaxCount) {
+    public LayoutWindow(Screen screen, Element parent, String name, Align align, int elementAlignMaxCount) {
         this(screen, parent, name, new Vector2f(230, 20), align, elementAlignMaxCount);
     }
 
@@ -58,7 +58,7 @@ public abstract class LayoutWindow {
      * @param parent window
      * @param layoutGridSize element size on X and Y.
      */
-    public LayoutWindow(ElementManager screen, Element parent, String name, Vector2f layoutGridSize) {
+    public LayoutWindow(Screen screen, Element parent, String name, Vector2f layoutGridSize) {
         this(screen, parent, name, layoutGridSize, Align.Horizontal, 1);
     }
 
@@ -70,7 +70,7 @@ public abstract class LayoutWindow {
      * element.
      * @param elementAlignMaxCount element count on selected alignement.
      */
-    public LayoutWindow(ElementManager screen, Element parent, String name, Vector2f layoutGridSize, Align windowElementAlignement, int elementAlignMaxCount) {
+    public LayoutWindow(Screen screen, Element parent, String name, Vector2f layoutGridSize, Align windowElementAlignement, int elementAlignMaxCount) {
         this.screen = screen;
         this.name = name;
         this.parent = parent;
@@ -79,6 +79,17 @@ public abstract class LayoutWindow {
         this.layoutGridSize = layoutGridSize;
     }
 
+    protected final void updateAlign(Align windowElementAlignement){
+        this.windowElementAlignement = windowElementAlignement;
+    }
+    protected final void updateAlign(int elementAlignMaxCount){
+        this.elementAlignMaxCount = elementAlignMaxCount;
+    }
+    protected final void updateAlign(Align windowElementAlignement, int elementAlignMaxCount){
+        this.elementAlignMaxCount = elementAlignMaxCount;
+        this.windowElementAlignement = windowElementAlignement;
+    }
+    
     // <editor-fold defaultstate="collapsed" desc="Show Method">
     public final void show(Vector2f position) {
         show(position, false);
@@ -286,12 +297,16 @@ public abstract class LayoutWindow {
         return false;
     }
 
-    public final void removeFromScreen() {
+    public void removeFromScreen() {
+        window.removeAllChildren();
         if (window != null && parent != null) {
-            parent.removeChild(window);
+            parent.getElementsAsMap().remove(window.getUID());
+            screen.removeElement(window);
         } else if (window != null && parent == null) {
             screen.removeElement(window);
         }
+        window = null;
+        elementList.clear();
     }
 
     // </editor-fold>

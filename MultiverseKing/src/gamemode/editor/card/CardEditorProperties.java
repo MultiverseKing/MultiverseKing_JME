@@ -5,26 +5,29 @@ import static entitysystem.attribut.CardType.ABILITY;
 import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
+import gamemode.gui.DialogWindowListener;
+import gamemode.gui.Dialogwindow;
 import gamemode.gui.EditorWindow;
 import gamemode.gui.HexGridWindow;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 import utility.Vector2Int;
 
 /**
  *
  * @author roah
  */
-class CardEditorProperties extends EditorWindow {
+class CardEditorProperties extends EditorWindow implements DialogWindowListener {
 
     private CardType current;
     private HexGridWindow hexWin;
+    private Dialogwindow popup;
 
     CardType getCurrent() {
         return current;
     }
 
-    CardEditorProperties(ElementManager screen, Element parent, CardType type) {
+    CardEditorProperties(Screen screen, Element parent, CardType type) {
         super(screen, parent, "Properties");
         current = type;
 
@@ -49,7 +52,7 @@ class CardEditorProperties extends EditorWindow {
                  * Part used to set the Activation range of the ability.
                  */
                 addNumericListField("Cast range", new Integer[]{0, 0}, HAlign.left);
-                addButtonField("Set collision");
+                addButtonList("collision", new String[] {"Show Collision", "Set Radius"}, HAlign.left);
                 break;
             case EQUIPEMENT:
                 break;
@@ -64,19 +67,47 @@ class CardEditorProperties extends EditorWindow {
 
     @Override
     protected void onButtonTrigger(String label) {
-        if(label.equals("Set collision")){
-            if(hexWin == null){
-                hexWin = new HexGridWindow(screen, 1, getWindow());
+        if(label.equals("Show Collision")){
+            if(hexWin == null && popup == null){
+                popup = new Dialogwindow(screen, "Set Area Radius", this);
+                popup.addNumericField("Radius");
+                popup.show();
+            } else if(hexWin == null && popup != null){
+                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
                 hexWin.show();
             } else if(hexWin.isVisible()){
                 hexWin.hide();
             } else if(!hexWin.isVisible()){
                 hexWin.setVisible();
             }
+        } else if(label.equals("Set Radius")){
+            if(popup == null){
+                popup = new Dialogwindow(screen, "Set Area Radius", this);
+                popup.addNumericField("Radius");
+                popup.show();
+            } else if(!popup.isVisible()){
+                popup.setVisible();
+            }
         }
     }
-    
-    
+
+    public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
+        if(confirmOrCancel){
+            if(hexWin == null){
+                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
+                hexWin.show();
+            } else if(popup.getNumericInput("Radius") > 0 && 
+                    popup.getNumericInput("Radius") != hexWin.getRadius() && popup.getNumericInput("Radius") < 15 ) {
+                System.err.println("trigger");
+//                hexWin.reload(popup.getNumericInput("Radius"));
+                hexWin.removeFromScreen();
+                hexWin = null;
+                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
+                hexWin.show();
+            }
+        }
+        popup.hide();
+    }
 
     @Override
     protected void onNumericFieldInput(Integer input) {

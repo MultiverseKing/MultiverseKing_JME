@@ -17,7 +17,7 @@ import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.text.TextField;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 import utility.Vector2Int;
 
 /**
@@ -27,19 +27,19 @@ import utility.Vector2Int;
 public abstract class EditorWindow extends LayoutWindow {
 
     // <editor-fold defaultstate="collapsed" desc="Constructor">
-    public EditorWindow(ElementManager screen, Element parent, String name) {
+    public EditorWindow(Screen screen, Element parent, String name) {
         super(screen, parent, name);
     }
 
-    public EditorWindow(ElementManager screen, Element parent, String name, Align align, int alignElement) {
+    public EditorWindow(Screen screen, Element parent, String name, Align align, int alignElement) {
         super(screen, parent, name, align, alignElement);
     }
 
-    public EditorWindow(ElementManager screen, Element parent, String name, Vector2f gridSize) {
+    public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize) {
         super(screen, parent, name, gridSize);
     }
 
-    public EditorWindow(ElementManager screen, Element parent, String name, Vector2f gridSize, Align windowElementAlignement, int elementAlignMaxCount) {
+    public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize, Align windowElementAlignement, int elementAlignMaxCount) {
         super(screen, parent, name, gridSize, windowElementAlignement, elementAlignMaxCount);
     }
     // </editor-fold>
@@ -377,7 +377,7 @@ public abstract class EditorWindow extends LayoutWindow {
                     public void onKeyRelease(KeyInputEvent evt) {
                         super.onKeyRelease(evt);
                         if (evt.getKeyCode() == KeyInput.KEY_RETURN) {
-                            screen.getElementById(childUID + "NumericFieldButton").setText(getText());
+                            switchText(getText());
                             /**
                              * There, the System have to be call to know a
                              * change have been done.
@@ -387,11 +387,15 @@ public abstract class EditorWindow extends LayoutWindow {
                             getElementParent().removeChild(this);
                         }
                     }
+
                 };
                 field.setType(TextField.Type.NUMERIC);
                 field.setMaxLength(4);
                 field.setText(getText());
                 getElementParent().addChild(field);
+            }
+            private void switchText(String text) {
+                setText(text);
             }
         };
         switch (hAlign) {

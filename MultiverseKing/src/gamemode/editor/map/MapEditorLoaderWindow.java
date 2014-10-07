@@ -10,7 +10,7 @@ import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.text.TextField;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 
 /**
  * Used to load and save a map inside a files.
@@ -25,7 +25,7 @@ class MapEditorLoaderWindow extends EditorWindow {
     private Menu loadingList;
     private Window popup;
 
-    MapEditorLoaderWindow(ElementManager screen, Element parent) {
+    MapEditorLoaderWindow(Screen screen, Element parent) {
         super(screen, parent, "Save & Load");
 
         addButtonField("Load", HAlign.left);

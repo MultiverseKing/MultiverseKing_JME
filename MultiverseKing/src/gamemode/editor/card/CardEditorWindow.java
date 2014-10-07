@@ -17,7 +17,6 @@ import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
-import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
 import utility.ElementalAttribut;
 
@@ -31,7 +30,7 @@ public final class CardEditorWindow extends EditorWindow {
     private CardPreview cardPreview;
     private CardEditorProperties subMenu;
 
-    public CardEditorWindow(ElementManager screen, Element parent) {
+    public CardEditorWindow(Screen screen, Element parent) {
         super(screen, parent, "Card Edition", Align.Horizontal, 2);
         CardProperties properties = new CardProperties("TuxDoll", 0, CardType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.ICE, "This is a Testing unit");

@@ -5,7 +5,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector2f;
 import tonegod.gui.controls.windows.Window;
-import tonegod.gui.core.ElementManager;
+import tonegod.gui.core.Screen;
 
 /**
  *
@@ -15,15 +15,15 @@ public class Dialogwindow extends EditorWindow {
 
     protected final DialogWindowListener listener;
     private Window popup;
+    private boolean enabled = true;
 
-    public Dialogwindow(ElementManager screen, String WindowName, DialogWindowListener listener) {
+    public Dialogwindow(Screen screen, String WindowName, DialogWindowListener listener) {
         super(screen, null, WindowName);
         this.listener = listener;
     }
 
     public void show() {
         addButtonList("staticField", new String[]{"Confirm", "Cancel"}, HAlign.right);
-        initKeyMapping();
         screen.getApplication().getInputManager().addListener(dialogPopupListener, new String[]{"confirmDialog", "cancelDialog"});
         super.show(null, null);
     }
@@ -36,37 +36,36 @@ public class Dialogwindow extends EditorWindow {
         addButtonField(labelName, HAlign.full);
     }
 
+    public void addNumericField(String labelName) {
+        addNumericField(labelName, 0, HAlign.left);
+    }
+
     @Override
     protected void onButtonTrigger(String labelName) {
         if (labelName.equals("Confirm")) {
-            listener.onDialogTrigger(getUID(), true);
+            listener.onDialogTrigger(name, true);
         } else if (labelName.equals("Cancel")) {
-            listener.onDialogTrigger(getUID(), false);
-            clear();
+            listener.onDialogTrigger(name, false);
         }
     }
 
-    private void clear() {
+    @Override
+    public void removeFromScreen() {
         removeMapping();
-        removeFromScreen();
-    }
-
-    private void initKeyMapping() {
-        screen.getApplication().getInputManager().addMapping("confirmDialog", new KeyTrigger(KeyInput.KEY_RETURN));
-        screen.getApplication().getInputManager().addMapping("cancelDialog", new KeyTrigger(KeyInput.KEY_ESCAPE));
+        super.removeFromScreen();
     }
 
     private void removeMapping() {
         screen.getApplication().getInputManager().removeListener(dialogPopupListener);
-        screen.getApplication().getInputManager().deleteMapping("confirmDialog");
-        screen.getApplication().getInputManager().deleteMapping("cancelDialog");
     }
     private final ActionListener dialogPopupListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("confirmDialog") && !isPressed) {
-                onButtonTrigger("Confirm");
-            } else if (name.equals("cancelDialog") && !isPressed) {
-                onButtonTrigger("Cancel");
+            if (enabled) {
+                if (name.equals("confirmDialog") && !isPressed) {
+                    onButtonTrigger("Confirm");
+                } else if (name.equals("cancelDialog") && !isPressed) {
+                    onButtonTrigger("Cancel");
+                }
             }
         }
     };
@@ -80,6 +79,7 @@ public class Dialogwindow extends EditorWindow {
         }
     }
 
+    @Override
     public boolean isVisible() {
         if (getWindow() != null) {
             return getWindow().getIsVisible();
@@ -88,8 +88,12 @@ public class Dialogwindow extends EditorWindow {
         }
     }
 
-    public String getInput(String name) {
+    public String getTextInput(String name) {
         return getTextField(name).getText();
+    }
+
+    public int getNumericInput(String name) {
+        return Integer.valueOf(getNumericField(name).getText());
     }
 
     public void popupBox(String message) {
@@ -101,5 +105,9 @@ public class Dialogwindow extends EditorWindow {
             getWindow().addChild(popup);
         }
         popup.setText(message);
+    }
+
+    public void enable(boolean enabled) {
+        this.enabled = enabled;
     }
 }

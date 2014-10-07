@@ -47,7 +47,7 @@ final class AreaEditorMenu extends EditorMenu {
                     /**
                      * Generate a new empty room following the parameter.
                      */
-                    currentWindow = new MapEditorLoaderWindow(screen, this);
+                    currentWindow = new MapEditorLoaderWindow((Screen) screen, this);
                     currentValue = value;
                     break;
                 case 1:

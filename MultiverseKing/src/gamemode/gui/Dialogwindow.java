@@ -22,7 +22,7 @@ public class Dialogwindow extends EditorWindow {
         this.listener = listener;
     }
 
-    public void show() {
+    public final void show() {
         addButtonList("staticField", new String[]{"Confirm", "Cancel"}, HAlign.right);
         screen.getApplication().getInputManager().addListener(dialogPopupListener, new String[]{"confirmDialog", "cancelDialog"});
         super.show(null, null);
@@ -36,8 +36,8 @@ public class Dialogwindow extends EditorWindow {
         addButtonField(labelName, HAlign.full);
     }
 
-    public void addNumericField(String labelName) {
-        addNumericField(labelName, 0, HAlign.left);
+    public void addSpinnerField(String labelName) {
+        addSpinnerField(labelName, new int[]{1, 10, 1, 2}, HAlign.left);
     }
 
     @Override
@@ -92,10 +92,20 @@ public class Dialogwindow extends EditorWindow {
         return getTextField(name).getText();
     }
 
-    public int getNumericInput(String name) {
-        return Integer.valueOf(getNumericField(name).getText());
+    public int getInput(String name) {
+        return getSpinnerField(name).getSelectedIndex();
     }
 
+    @Override
+    public void hide() {
+        if(window != null && popup != null){
+            popup.removeFromParent();
+        }
+        super.hide();
+    }
+
+    
+    
     public void popupBox(String message) {
         if (popup == null) {
             popup = new Window(screen, getUID() + "popupBox", new Vector2f(0, getWindow().getHeight()), new Vector2f(getWindow().getWidth(), 25));

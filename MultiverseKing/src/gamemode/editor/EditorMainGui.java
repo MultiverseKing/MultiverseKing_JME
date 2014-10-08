@@ -233,7 +233,6 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                 currentDialogPopup.removeFromScreen();
             }
             currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Area", this);
-            currentDialogPopup.show();
         } else if (value == 2) {
             /**
              * @todo: Save.
@@ -243,11 +242,11 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
 
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
-            if (dialogUID.equals("LoadArea")) {
+            if (dialogUID.equals("Load Area")) {
                 if (usedSystem != null) {
-                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getTextInput("Name"));
+                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getInput());
                 } else {
-                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getTextInput("Name"));
+                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getInput());
                     main.getStateManager().attach(usedSystem);
                 }
             }

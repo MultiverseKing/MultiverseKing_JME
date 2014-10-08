@@ -16,7 +16,7 @@ public class HexGridWindow extends LayoutWindow {
     private int radius;
     
     public HexGridWindow(Screen screen, int radius, Element parent) {
-        super(screen, parent, "Collision "+radius, new Vector2f(25, 25), Align.Horizontal, radius*2+1);
+        super(screen, parent, "Collision", new Vector2f(25, 25), Align.Horizontal, radius*2+1);
         this.radius = radius;
         populateWin();
     }

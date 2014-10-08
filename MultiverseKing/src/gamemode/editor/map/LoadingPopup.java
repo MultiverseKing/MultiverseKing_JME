@@ -22,6 +22,7 @@ public class LoadingPopup extends Dialogwindow {
         super(screen, WindowName, listener);
         addInputText("Name");
         addButton("Load from files.");
+        show();
     }
 
     @Override
@@ -31,6 +32,7 @@ public class LoadingPopup extends Dialogwindow {
         } else if (labelName.equals("Load from files.") && isInitialized) {
             loadingList.showMenu(null, getField("Load from files.").getAbsoluteX(),
                     getField("Load from files.").getAbsoluteY() - loadingList.getHeight());
+        } else if (labelName.equals("Confirm") && getTextInput("Name").length() < 2) {
         } else {
             super.onButtonTrigger(labelName);
         }
@@ -62,5 +64,9 @@ public class LoadingPopup extends Dialogwindow {
         loadingList.showMenu(null, getField("Load from files.").getAbsoluteX(),
                 getField("Load from files.").getAbsoluteY() - loadingList.getHeight());
         isInitialized = true;
+    }
+
+    public String getInput() {
+        return getTextInput("Name");
     }
 }

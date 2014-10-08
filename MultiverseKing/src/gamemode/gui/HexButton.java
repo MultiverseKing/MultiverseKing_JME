@@ -31,7 +31,6 @@ public class HexButton extends Button {
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
         selected = !selected;
         setColorMap("Textures/Icons/WindowGrid/hexWindow_" + (selected ? "selected" : "empty") + ".png");
-        System.err.println(getUID());
     }
 
     @Override

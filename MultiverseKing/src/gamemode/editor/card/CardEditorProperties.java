@@ -51,7 +51,11 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
                 /**
                  * Part used to set the Activation range of the ability.
                  */
-                addNumericListField("Cast range", new Integer[]{0, 0}, HAlign.left);
+                int[] spinA = new int[]{0, 20, 1, 0};
+                int[] spinB = new int[]{0, 20, 1, 1};
+                int[][] spinList = new int[][] {spinA, spinB};
+                addSpinnerList("Cast range", spinList, HAlign.left);
+//                addNumericListField("Cast range", new Integer[]{0, 0}, HAlign.left);
                 addButtonList("collision", new String[] {"Show Collision", "Set Radius"}, HAlign.left);
                 break;
             case EQUIPEMENT:
@@ -79,7 +83,7 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
         } else if(label.equals("Set Radius")){
             if(popup == null){
                 popup = new Dialogwindow(screen, "Set Area Radius", this);
-                popup.addNumericField("Radius");
+                popup.addSpinnerField("Radius");
                 popup.show();
             } else if(!popup.isVisible()){
                 popup.setVisible();
@@ -90,11 +94,11 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if(confirmOrCancel){
             if(hexWin == null){
-                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
+                hexWin = new HexGridWindow(screen, popup.getInput("Radius"), getWindow());
                 hexWin.show();
-            } else if(popup.getNumericInput("Radius") > 0 && 
-                    popup.getNumericInput("Radius") != hexWin.getRadius() && popup.getNumericInput("Radius") < 15 ) {
-                hexWin.reload(popup.getNumericInput("Radius"));
+            } else if(popup.getInput("Radius") != hexWin.getRadius()) {
+                hexWin.reload(popup.getInput("Radius"));
+                popup.hide();
             }
         }
         popup.hide();
@@ -119,8 +123,8 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
     }
 
     public void setCastRange(Vector2Int range) {
-        getNumericListField("Cast range", 0).setText(String.valueOf(range.x));
-        getNumericListField("Cast range", 1).setText(String.valueOf(range.y));
+        getSpinnerListField("Cast range", 0).setText(String.valueOf(range.x));
+        getSpinnerListField("Cast range", 1).setText(String.valueOf(range.x));
     }
     
     /**

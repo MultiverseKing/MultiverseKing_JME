@@ -30,15 +30,15 @@ public abstract class EditorWindow extends LayoutWindow {
     public EditorWindow(Screen screen, Element parent, String name) {
         super(screen, parent, name);
     }
-
+    
     public EditorWindow(Screen screen, Element parent, String name, Align align, int alignElement) {
         super(screen, parent, name, align, alignElement);
     }
-
+    
     public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize) {
         super(screen, parent, name, gridSize);
     }
-
+    
     public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize, Align windowElementAlignement, int elementAlignMaxCount) {
         super(screen, parent, name, gridSize, windowElementAlignement, elementAlignMaxCount);
     }
@@ -109,15 +109,15 @@ public abstract class EditorWindow extends LayoutWindow {
             elementList.put(uid, generateButton(triggerName, hAlign, offset));
         }
     }
-
+    
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign) {
         addButtonList(listUID, triggersNames, hAlign, 1, new Vector2f());
     }
-
+    
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, Vector2f offset) {
         addButtonList(listUID, triggersNames, hAlign, 1, offset);
     }
-
+    
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
         addButtonList(listUID, triggersNames, hAlign, fieldGridSize, new Vector2f());
     }
@@ -130,7 +130,7 @@ public abstract class EditorWindow extends LayoutWindow {
      * @param fieldGridSize gridSlot to use
      */
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, Vector2f offset) {
-        String UID = generateUID(listUID) + getUID() + "labelList";
+        String UID = generateUID(listUID) + "labelList";
         Element holder = new Element(screen, UID, new Vector2f(offset.x, 4), new Vector2f(), Vector4f.ZERO, null);
         holder.setAsContainerOnly();
         generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize);
@@ -140,46 +140,65 @@ public abstract class EditorWindow extends LayoutWindow {
      * Add a Text Field element to this menu, limited to number as input.
      */
     protected final void addNumericListField(String labelName, Integer[] baseValue, HAlign hAlign) {
-        String uid = generateUID(labelName) + getUID() + "numList";
+        String uid = generateUID(labelName) + "numList";
         Label holder = generateLabel(labelName, hAlign, new Vector2f());
         generateList(uid, holder, baseValue, hAlign, "numList", 1);
     }
-
+    
+    protected final void addSpinnerList(String labelName, int[][] value, HAlign hAlign) {
+        String uid = generateUID(labelName) + "spinList";
+        Label holder = generateLabel(labelName, hAlign, new Vector2f());
+        generateList(uid, holder, value, hAlign, "spinList", 1);
+    }
+    
     private void generateList(String UID, Element holder, Object[] elements, HAlign hAlign, String type, int fieldGridSize) {
-
+        
         int i = 0;
         float posX = 0f;
         float fillValue = spacement;
-        ArrayList<ButtonAdapter> btnList = new ArrayList<ButtonAdapter>();
-        for (Object e : elements) {
+        ArrayList<Element> eList = new ArrayList<Element>();
+        for (Object o : elements) {
             if (type.equals("labelList")) {
-                btnList.add(generateButton(e.toString(), HAlign.left, new Vector2f()));
+                eList.add(generateButton(o.toString(), HAlign.left, new Vector2f()));
             } else if (type.equals("numList")) {
-                btnList.add(generateNumericField("numList" + i, i, hAlign));
+                eList.add(generateNumericField(UID + i, i, hAlign));
+            } else if (type.equals("spinList")) {
+                eList.add(generateSpinner(UID + i, null, (int[]) o));
             } else {
                 throw new UnsupportedOperationException(type + " is not a supported type.");
             }
-            btnList.get(btnList.size() - 1).setPosition(posX, btnList.get(btnList.size() - 1).getPosition().y);
-            posX += btnList.get(btnList.size() - 1).getWidth();
-            fillValue += btnList.get(btnList.size() - 1).getWidth();
-
-            holder.addChild(btnList.get(btnList.size() - 1));
+            eList.get(eList.size() - 1).setPosition(posX, eList.get(eList.size() - 1).getPosition().y);
+            posX += eList.get(eList.size() - 1).getWidth();
+            fillValue += eList.get(eList.size() - 1).getWidth();
+            
+            holder.addChild(eList.get(eList.size() - 1));
             i++;
         }
         if (hAlign == HAlign.right && type.equals("numList")) {
             holder.setPosition(layoutGridSize.x - (posX + 10), holder.getPosition().y);
         } else if (hAlign == HAlign.right && type.equals("labelList")) {
             holder.setPosition(layoutGridSize.x - posX, holder.getPosition().y);
+        } else if (type.equals("spinList") && fieldGridSize <= 1) {
+            fillValue = (layoutGridSize.x - fillValue) / elements.length;
+            i = 0;
+            int j = 1;
+            for (Element e : eList) {
+                e.setDimensions(e.getDimensions().x + fillValue - (e.getDimensions().y * 2), e.getDimensions().y);
+                e.setPosition(e.getPosition().x + fillValue * i + e.getDimensions().y, e.getPosition().y - layoutGridSize.y);
+                e.getChildElementById(e.getUID() + ":btnInc").setPosition(e.getDimensions().x, 0);
+                i++;
+            }
+            fieldGridSize++;
         } else if (hAlign.equals(HAlign.left) || hAlign.equals(HAlign.full)) {
             i = 0;
             fillValue = (layoutGridSize.x * fieldGridSize - fillValue - holder.getDimensions().x) / elements.length;
-            for (ButtonAdapter btn : btnList) {
-                btn.setDimensions(btn.getDimensions().x + fillValue, btn.getDimensions().y);
+            for (Element e : eList) {
+                e.setDimensions(e.getDimensions().x + fillValue, e.getDimensions().y);
                 if (i == 0 && hAlign.equals(HAlign.left)) {
-                    btn.setPosition(btn.getPosition().x + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), btn.getPosition().y);
+                    e.setPosition(e.getPosition().x + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), e.getPosition().y);
                 } else if (i != 0) {
-                    btn.setPosition(btn.getPosition().x + (fillValue * i)
-                            + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), btn.getPosition().y);
+                    e.setPosition(e.getPosition().x + (fillValue * i)
+                            + (hAlign.equals(HAlign.left) ? holder.getDimensions().x : 0), e.getPosition().y);
                 }
                 i++;
             }
@@ -233,7 +252,7 @@ public abstract class EditorWindow extends LayoutWindow {
     protected final void addSpinnerField(String labelName, int[] value, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
-        generateSpinner(labelName, uid, value);
+        elementList.get(uid).addChild(generateSpinner(labelName, uid, value));
     }
 
     /**
@@ -256,7 +275,7 @@ public abstract class EditorWindow extends LayoutWindow {
     protected final void addTextField(String labelName, String baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
-        generateTextField(uid, baseValue, new Vector2Int(1,1));
+        generateTextField(uid, baseValue, new Vector2Int(1, 1));
     }
 
     /**
@@ -269,7 +288,7 @@ public abstract class EditorWindow extends LayoutWindow {
      * @param offset value to be added on top of the gridPosition.
      */
     protected final void addTextField(String labelName, String baseValue, HAlign hAlign, int fieldSize, Vector2f offset) {
-        Vector2Int size = new Vector2Int(1,1);
+        Vector2Int size = new Vector2Int(1, 1);
         if (fieldSize != 0 && fieldSize > 0) {
             int pos = (int) FastMath.ceil((float) (elementList.size() + 1) / (float) elementAlignMaxCount);
             pos = (int) ((float) (elementList.size() + 1) / (float) pos);
@@ -292,7 +311,7 @@ public abstract class EditorWindow extends LayoutWindow {
                 }
             }
         }
-
+        
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset));
         generateTextField(uid, baseValue, size);
@@ -362,7 +381,7 @@ public abstract class EditorWindow extends LayoutWindow {
             throw new UnsupportedOperationException(hAlign + " : Cannot be used with a label or isn't implemented.");
         }
     }
-
+    
     private ButtonAdapter generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {
         final String childUID = getUID() + labelUID;
         ButtonAdapter numButton = new ButtonAdapter(screen, childUID + "NumericFieldButton",
@@ -387,13 +406,13 @@ public abstract class EditorWindow extends LayoutWindow {
                             getElementParent().removeChild(this);
                         }
                     }
-
                 };
                 field.setType(TextField.Type.NUMERIC);
                 field.setMaxLength(4);
                 field.setText(getText());
                 getElementParent().addChild(field);
             }
+            
             private void switchText(String text) {
                 setText(text);
             }
@@ -411,10 +430,10 @@ public abstract class EditorWindow extends LayoutWindow {
         numButton.setText(Integer.toString(baseValue));
         return numButton;
     }
-
+    
     private void generateTextField(final String labelUID, String baseValue, Vector2Int fieldSize) {
         final String childUID = getUID() + labelUID;
-
+        
         TextField field = new TextField(screen, childUID + "TextField",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
                 new Vector2f((layoutGridSize.x * fieldSize.x) - elementList.get(labelUID).getDimensions().x - spacement, layoutGridSize.y * fieldSize.y)) {
@@ -432,7 +451,7 @@ public abstract class EditorWindow extends LayoutWindow {
         if (baseValue != null) {
             field.setText(baseValue);
         }
-
+        
         if (fieldSize.x > 1) {
             for (int j = fieldSize.x; j > 1; j--) {
                 addSpace();
@@ -445,10 +464,10 @@ public abstract class EditorWindow extends LayoutWindow {
                 }
             }
         }
-
+        
         elementList.get(labelUID).addChild(field);
     }
-
+    
     private void generateSelectBoxField(final String labelUID, Enum<?> baseValue, Enum[] value) {
         SelectBox selectBox = new SelectBox(screen, getUID() + labelUID + "BoxField",
                 new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
@@ -464,11 +483,11 @@ public abstract class EditorWindow extends LayoutWindow {
         elementList.get(labelUID).addChild(selectBox);
         selectBox.setSelectedIndex(baseValue.ordinal());
     }
-
-    private void generateSpinner(final String labelName, final String labelUID, int[] value) {
-        Spinner spinner = new Spinner(screen, getUID() + labelUID + "Spinner",
-                new Vector2f(elementList.get(labelUID).getDimensions().x, 4),
-                new Vector2f(layoutGridSize.x - elementList.get(labelUID).getDimensions().x - spacement, layoutGridSize.y),
+    
+    private Spinner generateSpinner(final String labelName, final String labelUID, int[] value) {
+        Spinner spinner = new Spinner(screen, getUID() + (labelUID != null ? labelUID + "Spinner" : labelName),
+                new Vector2f((labelUID != null ? elementList.get(labelUID).getDimensions().x : 0), 4),
+                new Vector2f((labelUID != null ? layoutGridSize.x - elementList.get(labelUID).getDimensions().x - spacement : 0), layoutGridSize.y),
                 Spinner.Orientation.HORIZONTAL, true) {
             @Override
             public void onChange(int selectedIndex, String value) {
@@ -477,13 +496,13 @@ public abstract class EditorWindow extends LayoutWindow {
         };
         spinner.setStepIntegerRange(value[0], value[1], value[2]);
         spinner.setSelectedIndex(value[3]);
-        elementList.get(labelUID).addChild(spinner);
+        return spinner;
     }
-
+    
     private ButtonAdapter generateButton(String triggerName, HAlign hAlign, Vector2f offset) {
         return generateButton(null, triggerName, hAlign, offset);
     }
-
+    
     private ButtonAdapter generateButton(String labelName, final String triggerName, HAlign hAlign, Vector2f offset) {
         ButtonAdapter button = new ButtonAdapter(screen, getUID() + generateUID(triggerName) + "Button",
                 new Vector2f(), new Vector2f((labelName != null
@@ -518,15 +537,20 @@ public abstract class EditorWindow extends LayoutWindow {
     protected final Element getField(String labelName) {
         return elementList.get(generateUID(labelName));
     }
-
+    
     protected final Element getLabelListField(String listUID, String buttonLabel) {
-        return elementList.get(generateUID(listUID) + getUID() + "labelList").getChildElementById(getUID() + generateUID(buttonLabel) + "Button");
+        return elementList.get(generateUID(listUID) + "labelList").getChildElementById(getUID() + generateUID(buttonLabel) + "Button");
     }
-
+    
+    protected final Element getSpinnerListField(String listUID, int index) {
+        System.out.println(elementList.get(generateUID(listUID) + "spinList").getUID());
+        return elementList.get(generateUID(listUID) + "spinList").getChildElementById(getUID() + generateUID(listUID) + "spinList" + index);
+    }
+    
     protected final Element getNumericListField(String listUID, int index) {
-        return elementList.get(generateUID(listUID) + getUID() + "numList").getChildElementById(getUID() + "numList" + index + "NumericFieldButton");
+        return elementList.get(generateUID(listUID) + "numList").getChildElementById(getUID() + "numList" + index + "NumericFieldButton");
     }
-
+    
     protected final ButtonAdapter getButtonField(String labelName, boolean gotLabel) {
         if (gotLabel) {
             return (ButtonAdapter) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "Button");
@@ -534,23 +558,23 @@ public abstract class EditorWindow extends LayoutWindow {
             return (ButtonAdapter) elementList.get(generateUID(labelName));
         }
     }
-
+    
     protected final CheckBox getCheckBoxField(String labelName) {
         return (CheckBox) elementList.get(generateUID(labelName));
     }
-
+    
     protected final TextField getTextField(String labelName) {
         return (TextField) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "TextField");
     }
-
+    
     protected final ButtonAdapter getNumericField(String labelName) {
         return (ButtonAdapter) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "NumericFieldButton");
     }
-
+    
     protected final Spinner getSpinnerField(String labelName) {
         return (Spinner) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "Spinner");
     }
-
+    
     protected final SelectBox getSelectBoxField(String labelName) {
         return (SelectBox) getField(labelName).getChildElementById(getUID() + generateUID(labelName) + "BoxField");
     }
@@ -559,16 +583,16 @@ public abstract class EditorWindow extends LayoutWindow {
     // <editor-fold defaultstate="collapsed" desc="Trigger Method">
     protected void onButtonTrigger(String label) {
     }
-
+    
     protected void onTextFieldInput(String UID, String input, boolean triggerOn) {
     }
-
+    
     protected void onNumericFieldInput(Integer input) {
     }
-
+    
     protected void onSelectBoxFieldChange(Enum value) {
     }
-
+    
     protected void onSpinnerChange(String sTrigger, int currentIndex) {
     }
     // </editor-fold>

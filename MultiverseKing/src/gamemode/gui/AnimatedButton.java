@@ -30,7 +30,7 @@ public class AnimatedButton extends Element {
 
     public AnimatedButton(ElementManager screen, String UID, Vector2f position, Vector2f dimensions, String defaultImg, float timer, boolean reverseRotation) {
         super(screen, UID + "Hook", new Vector2f(position.x + (dimensions.x / 2), position.y + (dimensions.y / 2)),
-                Vector2f.ZERO, Vector4f.ZERO, null);
+                new Vector2f(), Vector4f.ZERO, null);
         endTimer = timer;
         this.reverseRotation = reverseRotation;
         buttonImg = new ButtonAdapter(screen, UID, new Vector2f(-dimensions.x / 2, -dimensions.y / 2), dimensions, Vector4f.ZERO, defaultImg) {

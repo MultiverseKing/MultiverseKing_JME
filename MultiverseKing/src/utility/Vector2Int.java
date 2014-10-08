@@ -16,10 +16,8 @@ import java.io.IOException;
  */
 public class Vector2Int implements Savable {
     
-    public static final Vector2Int ZERO = new Vector2Int(0, 0);
     public static final Vector2Int INFINITY = new Vector2Int(Integer.MAX_VALUE, Integer.MAX_VALUE);
     public static final Vector2Int NEG_INFINITY = new Vector2Int(Integer.MIN_VALUE, Integer.MIN_VALUE);
-    public static final Vector2Int UNIT_XY = new Vector2Int(1,1);
     public int x;
     public int y;
 

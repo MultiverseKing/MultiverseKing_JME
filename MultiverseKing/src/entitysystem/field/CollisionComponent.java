@@ -1,9 +1,8 @@
 package entitysystem.field;
 
+import com.jme3.math.Vector2f;
 import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import utility.HexCoordinate;
 import utility.Vector2Int;
 
@@ -24,7 +23,7 @@ public class CollisionComponent implements PersistentComponent {
     public CollisionComponent(Byte layer) {
         collision = new Collision();
         ArrayList<HexCoordinate> data = new ArrayList<HexCoordinate>();
-        data.add(new HexCoordinate(HexCoordinate.OFFSET, Vector2Int.ZERO));
+        data.add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int()));
         collision.addLayer((byte)0, collision.new CollisionData((byte)0, data));
     }
 

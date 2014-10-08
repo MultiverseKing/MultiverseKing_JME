@@ -27,7 +27,7 @@ public class HexGridWindow extends LayoutWindow {
                 new Vector2Int(radius, radius));
         for (int i = 0; i < FastMath.pow(radius*2+1, 2); i++) {
             if (isInRange(center, pos, radius)) {
-                elementList.put(pos.x + "|" + pos.y + "_"+radius, new HexButton(screen, pos.x + "|" + pos.y + "button"+ "_"+radius, Vector2f.ZERO, new Vector2f(25, 25)));
+                elementList.put(pos.x + "|" + pos.y + "_"+radius, new HexButton(screen, pos.x + "|" + pos.y + "button"+ "_"+radius, new Vector2f(), new Vector2f(25, 25)));
             } else {
                 elementList.put(pos.x + "|" + pos.y + "Space", null);
             }

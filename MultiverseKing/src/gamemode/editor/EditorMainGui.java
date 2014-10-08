@@ -57,7 +57,7 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     
     private void CreateMainMenu() {
         mainMenuBar = new Window(main.getScreen(), "mainWin", new Vector2f(5f, 5f), new Vector2f(main.getScreen().getWidth() - 10, 40));
-        mainMenuBar.setMinDimensions(Vector2f.ZERO);
+        mainMenuBar.setMinDimensions(new Vector2f());
         mainMenuBar.setHeight(30);
         mainMenuBar.setWindowTitle("Editor Menu |");
         mainMenuBar.setIgnoreMouse(true);

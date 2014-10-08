@@ -34,7 +34,7 @@ class ElementalWidgetMenu extends CameraTrackWindow {
 
     private void buildElementalIcon() {
         if (eIconContainer == null) {
-            eIconContainer = new Element(screen, "eAttributIconContainer", Vector2f.ZERO, Vector2f.ZERO, Vector4f.ZERO, null);
+            eIconContainer = new Element(screen, "eAttributIconContainer", new Vector2f(), new Vector2f(), Vector4f.ZERO, null);
             eIconContainer.setAsContainerOnly();
             screenElement.addChild(eIconContainer);
         }

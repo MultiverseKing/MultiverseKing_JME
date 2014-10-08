@@ -28,7 +28,7 @@ class AreaTileWidget extends CameraTrackWindow {
     
     AreaTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
-        super.screenElement = new Element(screen, "tileWidgetMenu", Vector2f.ZERO,
+        super.screenElement = new Element(screen, "tileWidgetMenu", new Vector2f(),
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/EditorMap/rouage.png");
         this.system = system;
         this.selectedTilePosition = tilePos;
@@ -61,7 +61,7 @@ class AreaTileWidget extends CameraTrackWindow {
         Element holder = new Element(screen, screenElement.getUID()+"btnHolder", new Vector2f(0, 10), offset, Vector4f.ZERO, null);
         holder.setAsContainerOnly();
         
-        ButtonAdapter upBtn = new ButtonAdapter(screen, screenElement.getUID() + "UpButton", Vector2f.ZERO, 
+        ButtonAdapter upBtn = new ButtonAdapter(screen, screenElement.getUID() + "UpButton", new Vector2f(), 
                 new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/EditorMap/arrow.png"){
 
             @Override

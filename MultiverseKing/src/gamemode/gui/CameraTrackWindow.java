@@ -22,7 +22,7 @@ public abstract class CameraTrackWindow {
     protected Element screenElement;
 
     public CameraTrackWindow(ElementManager screen, Camera camera) {
-        this(screen, camera, Vector2f.ZERO);
+        this(screen, camera, new Vector2f());
     }
     public CameraTrackWindow(ElementManager screen, Camera camera, Vector2f offset) {
         this.screen = screen;

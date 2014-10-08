@@ -89,7 +89,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         app.getStateManager().attach(new AreaMouseSystem(this));
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(Vector2Int.ZERO, null);
+            mapData.addChunk(new Vector2Int(), null);
         }
     }
 

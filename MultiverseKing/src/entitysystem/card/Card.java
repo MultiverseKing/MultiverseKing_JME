@@ -53,7 +53,7 @@ public class Card extends ButtonAdapter {
      * @param UID Entity this card belong to.
      */
     public Card(ElementManager screen, boolean rescale, String cardName, int handPosition, EntityId UID, CardProperties cardProperties) {
-        super(screen, UID.toString(), Vector2f.ZERO, new Vector2f(200f / (2.5f * (rescale ? 1 : 0)),
+        super(screen, UID.toString(), new Vector2f(), new Vector2f(200f / (2.5f * (rescale ? 1 : 0)),
                 300f / (2.5f * (rescale ? 1 : 0))), Vector4f.ZERO, "Textures/Cards/Artworks/" + cardName + ".png");
         this.rescaleValue = 2.5f; //if you change this change it in the super constructor above.
         this.isRescale = (rescale ? 1 : 0);

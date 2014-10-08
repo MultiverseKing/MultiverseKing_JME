@@ -26,7 +26,7 @@ public class Hover extends Window {
      * @param screen
      */
     public Hover(ElementManager screen) {
-        this(screen, new Vector2f(300f, 250f), Vector2f.ZERO);
+        this(screen, new Vector2f(300f, 250f), new Vector2f());
     }
 
     public Hover(ElementManager screen, Vector2f position, Vector2f dimension) {
@@ -88,7 +88,7 @@ public class Hover extends Window {
             eWin.setColorMap("Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
             eWin.setIgnoreMouse(true);
         } else {
-            eWin = new Window(this.screen, "elementalIconHover", Vector2f.ZERO, Vector2f.ZERO,
+            eWin = new Window(this.screen, "elementalIconHover", new Vector2f(), new Vector2f(),
                     Vector4f.ZERO, "Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
             eWin.removeAllChildren();
             addChild(eWin);
@@ -143,7 +143,7 @@ public class Hover extends Window {
             icon = getElementsAsMap().get("typeIconHover");
             icon.setColorMap("Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
         } else {
-            icon = new Window(this.screen, "typeIconHover", Vector2f.ZERO, Vector2f.ZERO, 
+            icon = new Window(this.screen, "typeIconHover", new Vector2f(), new Vector2f(), 
                     Vector4f.ZERO, "Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
             icon.removeAllChildren();
             addChild(icon);

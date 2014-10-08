@@ -36,7 +36,7 @@ public class CardEditorSystem extends EntitySystemAppState {
 
     void genTestMap() {
         if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(Vector2Int.ZERO, null);
+            mapData.addChunk(new Vector2Int(), null);
         }
 
         /**

@@ -52,7 +52,7 @@ public class BattleSystem extends EntitySystemAppState {
 //            }
 //        }
         if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(Vector2Int.ZERO, null);
+            mapData.addChunk(new Vector2Int(), null);
         }
         app.getStateManager().attachAll(new BattleGUISystem(), new CollisionSystem(), new AnimationSystem(), new MovementSystem());
         /**

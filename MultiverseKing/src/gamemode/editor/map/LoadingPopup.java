@@ -41,7 +41,7 @@ public class LoadingPopup extends Dialogwindow {
         if (!folder.exists()) {
             Logger.getLogger(AreaEditorSystem.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
         }
-        loadingList = new Menu(screen, "mapFileList", Vector2f.ZERO, new Vector2f(getField("Load from files.").getDimensions().x, getLayoutGridSize().y), false) {
+        loadingList = new Menu(screen, "mapFileList", new Vector2f(), new Vector2f(getField("Load from files.").getDimensions().x, getLayoutGridSize().y), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 if (!((LoadingPopupListener) listener).loadForCurrent(getUID(), value.toString())) {

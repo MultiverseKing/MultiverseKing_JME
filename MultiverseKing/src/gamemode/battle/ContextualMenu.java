@@ -20,7 +20,7 @@ abstract class ContextualMenu extends CameraTrackWindow {
     ContextualMenu(Screen screen, Camera camera, BattleGUISystem guiSystem) {
         super(screen, camera);
         this.system = guiSystem;
-        screenElement = new Menu(screen, Vector2f.ZERO, false) {
+        screenElement = new Menu(screen, new Vector2f(), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
                 system.setAction(inspectedEntityId, (Integer) value);

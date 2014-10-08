@@ -16,18 +16,18 @@ public class HexGridWindow extends LayoutWindow {
     private int radius;
     
     public HexGridWindow(Screen screen, int radius, Element parent) {
-        super(screen, parent, "Collision", new Vector2f(25, 25), Align.Horizontal, radius*2+1);
+        super(screen, parent, "Collision "+radius, new Vector2f(25, 25), Align.Horizontal, radius*2+1);
         this.radius = radius;
         populateWin();
     }
 
     private void populateWin(){
-        Vector2Int pos = Vector2Int.ZERO;
+        Vector2Int pos = new Vector2Int();
         HexCoordinate center = new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(radius, radius));
         for (int i = 0; i < FastMath.pow(radius*2+1, 2); i++) {
             if (isInRange(center, pos, radius)) {
-                elementList.put(pos.x + "|" + pos.y, new HexButton(screen, pos.x + "|" + pos.y + "button", Vector2f.ZERO, new Vector2f(25, 25)));
+                elementList.put(pos.x + "|" + pos.y + "_"+radius, new HexButton(screen, pos.x + "|" + pos.y + "button"+ "_"+radius, Vector2f.ZERO, new Vector2f(25, 25)));
             } else {
                 elementList.put(pos.x + "|" + pos.y + "Space", null);
             }

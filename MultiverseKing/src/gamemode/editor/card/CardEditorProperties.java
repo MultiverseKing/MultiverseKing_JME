@@ -68,12 +68,8 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
     @Override
     protected void onButtonTrigger(String label) {
         if(label.equals("Show Collision")){
-            if(hexWin == null && popup == null){
-                popup = new Dialogwindow(screen, "Set Area Radius", this);
-                popup.addNumericField("Radius");
-                popup.show();
-            } else if(hexWin == null && popup != null){
-                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
+            if(hexWin == null) {
+                hexWin = new HexGridWindow(screen, 2, getWindow());
                 hexWin.show();
             } else if(hexWin.isVisible()){
                 hexWin.hide();
@@ -98,12 +94,7 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
                 hexWin.show();
             } else if(popup.getNumericInput("Radius") > 0 && 
                     popup.getNumericInput("Radius") != hexWin.getRadius() && popup.getNumericInput("Radius") < 15 ) {
-                System.err.println("trigger");
-//                hexWin.reload(popup.getNumericInput("Radius"));
-                hexWin.removeFromScreen();
-                hexWin = null;
-                hexWin = new HexGridWindow(screen, popup.getNumericInput("Radius"), getWindow());
-                hexWin.show();
+                hexWin.reload(popup.getNumericInput("Radius"));
             }
         }
         popup.hide();

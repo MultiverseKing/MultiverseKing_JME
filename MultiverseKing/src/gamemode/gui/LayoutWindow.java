@@ -19,12 +19,12 @@ public abstract class LayoutWindow {
     protected final String name;
     protected Element parent;
     protected Window window = null;
-    protected LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
+    protected final LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
     /**
      * Max element count on the selected alignment.
      */
-    protected Align windowElementAlignement;
-    protected int elementAlignMaxCount;
+    protected Align windowElementAlignement = Align.Horizontal;
+    protected int elementAlignMaxCount = 1;
 
     protected int getelementListCount() {
         return elementList.size();

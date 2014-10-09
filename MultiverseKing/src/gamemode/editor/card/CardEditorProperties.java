@@ -5,6 +5,7 @@ import static entitysystem.attribut.CardType.ABILITY;
 import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
+import entitysystem.field.Collision;
 import gamemode.gui.DialogWindowListener;
 import gamemode.gui.Dialogwindow;
 import gamemode.gui.EditorWindow;
@@ -17,11 +18,10 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-class CardEditorProperties extends EditorWindow implements DialogWindowListener {
+class CardEditorProperties extends EditorWindow {
 
     private CardType current;
-    private HexGridWindow hexWin;
-    private Dialogwindow popup;
+    private CollisionWindow collisionWin;
 
     CardType getCurrent() {
         return current;
@@ -34,13 +34,13 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
         populateMenu();
         showConstrainToParent(VAlign.bottom, HAlign.left);
     }
-    
+
     private void populateMenu() {
         switch (current) {
             case ABILITY:
                 /**
-                 * Part used to show/set how many power have the ability.
-                 * FXUsed - hitCollision
+                 * Part used to show/set how many power have the ability. FXUsed
+                 * - hitCollision
                  */
                 addNumericField("Power", 15, HAlign.left);
                 /**
@@ -53,10 +53,9 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
                  */
                 int[] spinA = new int[]{0, 20, 1, 0};
                 int[] spinB = new int[]{0, 20, 1, 1};
-                int[][] spinList = new int[][] {spinA, spinB};
+                int[][] spinList = new int[][]{spinA, spinB};
                 addSpinnerList("Cast range", spinList, HAlign.left);
-//                addNumericListField("Cast range", new Integer[]{0, 0}, HAlign.left);
-                addButtonList("collision", new String[] {"Show Collision", "Set Radius"}, HAlign.left);
+                addButtonField("Show collision");
                 break;
             case EQUIPEMENT:
                 break;
@@ -71,37 +70,17 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
 
     @Override
     protected void onButtonTrigger(String label) {
-        if(label.equals("Show Collision")){
-            if(hexWin == null) {
-                hexWin = new HexGridWindow(screen, 2, getWindow());
-                hexWin.show();
-            } else if(hexWin.isVisible()){
-                hexWin.hide();
-            } else if(!hexWin.isVisible()){
-                hexWin.setVisible();
+        if (label.equals("Show collision")) {
+            if (collisionWin == null) {
+                collisionWin = new CollisionWindow(screen, getWindow(), (byte)1);
+            } else if (!collisionWin.isVisible()) {
+                collisionWin.setVisible();
             }
-        } else if(label.equals("Set Radius")){
-            if(popup == null){
-                popup = new Dialogwindow(screen, "Set Area Radius", this);
-                popup.addSpinnerField("Radius");
-                popup.show();
-            } else if(!popup.isVisible()){
-                popup.setVisible();
-            }
+            getButtonField("Show collision", false).setText("Hide collision");
+        } else if (label.equals("Hide collision") && collisionWin.isVisible()) {
+            collisionWin.hide();
+            getButtonField("Show collision", false).setText("Show collision");
         }
-    }
-
-    public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
-        if(confirmOrCancel){
-            if(hexWin == null){
-                hexWin = new HexGridWindow(screen, popup.getInput("Radius"), getWindow());
-                hexWin.show();
-            } else if(popup.getInput("Radius") != hexWin.getRadius()) {
-                hexWin.reload(popup.getInput("Radius"));
-                popup.hide();
-            }
-        }
-        popup.hide();
     }
 
     @Override
@@ -124,16 +103,19 @@ class CardEditorProperties extends EditorWindow implements DialogWindowListener 
 
     public void setCastRange(Vector2Int range) {
         getSpinnerListField("Cast range", 0).setText(String.valueOf(range.x));
-        getSpinnerListField("Cast range", 1).setText(String.valueOf(range.x));
+        getSpinnerListField("Cast range", 1).setText(String.valueOf(range.y));
     }
-    
-    /**
-     * @todo : Collision generation.
-     */
-    public AbilityProperties getProperties(){
+
+    public void setHitCollision(Collision collision){
+        if(collisionWin != null){
+            collisionWin.removeFromScreen();
+        }
+        collisionWin = new CollisionWindow(screen, getWindow(), collision);
+    }
+    public AbilityProperties getProperties() {
         Vector2Int range = new Vector2Int(Integer.valueOf(getNumericListField("Range", 0).getText()),
-                           Integer.valueOf(getNumericListField("Range", 1).getText()));
-        return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()), 
+                Integer.valueOf(getNumericListField("Range", 1).getText()));
+        return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()),
                 getSpinnerField("Segment Cost").getSelectedIndex(), range, null);
     }
 }

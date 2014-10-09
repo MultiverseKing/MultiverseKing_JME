@@ -524,8 +524,8 @@ public abstract class EditorWindow extends LayoutWindow {
                         + (labelName != null ? elementList.get(labelName).getDimensions().x : 0)), 0));
                 return button;
             case full:
-                button.setDimensions(new Vector2f(layoutGridSize.x - spacement * 2, layoutGridSize.y));
-                button.setPosition(new Vector2f(spacement, 4));
+                button.setDimensions(new Vector2f(layoutGridSize.x - spacement, layoutGridSize.y));
+                button.setPosition(new Vector2f(0, 4));
                 return button;
             default:
                 throw new UnsupportedOperationException(hAlign + " isn't supported.");
@@ -543,7 +543,6 @@ public abstract class EditorWindow extends LayoutWindow {
     }
     
     protected final Element getSpinnerListField(String listUID, int index) {
-        System.out.println(elementList.get(generateUID(listUID) + "spinList").getUID());
         return elementList.get(generateUID(listUID) + "spinList").getChildElementById(getUID() + generateUID(listUID) + "spinList" + index);
     }
     

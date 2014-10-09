@@ -13,10 +13,10 @@ import utility.Vector2Int;
  */
 public class HexGridWindow extends LayoutWindow {
 
-    private int radius;
+    private byte radius;
     
-    public HexGridWindow(Screen screen, int radius, Element parent) {
-        super(screen, parent, "Collision", new Vector2f(25, 25), Align.Horizontal, radius*2+1);
+    public HexGridWindow(Screen screen, byte radius, byte layer, Element parent) {
+        super(screen, parent, "Collision " + layer, new Vector2f(25, 25), Align.Horizontal, radius*2+1);
         this.radius = radius;
         populateWin();
     }
@@ -36,6 +36,7 @@ public class HexGridWindow extends LayoutWindow {
                 pos = new Vector2Int(0, pos.y + 1);
             }
         }
+        showConstrainToParent(VAlign.bottom, HAlign.left, true);
     }
     
     private boolean isInRange(HexCoordinate center, Vector2Int pos, int range) {
@@ -54,15 +55,15 @@ public class HexGridWindow extends LayoutWindow {
         return radius;
     }
     
-    public void show(){
-        showConstrainToParent(VAlign.bottom, HAlign.left, true);
+    public void setParent(Element parent){
+        this.parent = parent;
+        getWindow().setElementParent(parent);
     }
-
-    public void reload(int radius) {
+    
+    public void reload(byte radius) {
         this.radius = radius;
         removeFromScreen();
         updateAlign(radius*2+1);
         populateWin();
-        show();
     }
 }

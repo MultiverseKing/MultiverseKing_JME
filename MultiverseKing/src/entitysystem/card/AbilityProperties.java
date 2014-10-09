@@ -48,7 +48,7 @@ public class AbilityProperties extends CardProperties {
     }
 
     public AbilityProperties(CardProperties properties, AbilityProperties ability){
-        this(properties, ability.getPower(), ability.getSegmentCost(), ability.getRange(), ability.getCollision());
+        this(properties, ability.getPower(), ability.getSegmentCost(), ability.getCastRange(), ability.getCollision());
     }
     
     public AbilityProperties() {
@@ -67,7 +67,7 @@ public class AbilityProperties extends CardProperties {
         return segmentCost;
     }
 
-    public Vector2Int getRange() {
+    public Vector2Int getCastRange() {
         return range;
     }
 

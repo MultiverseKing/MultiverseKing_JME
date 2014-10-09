@@ -11,7 +11,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONArray;
@@ -90,7 +89,7 @@ public class EntityLoader {
         switch (card.getCardType()) {
             case ABILITY:
                 typeData.put("power", ((AbilityProperties) card).getPower());
-                typeData.put("range", ((AbilityProperties) card).getRange().toString());
+                typeData.put("castRange", ((AbilityProperties) card).getCastRange().toString());
                 typeData.put("segmentCost", ((AbilityProperties) card).getSegmentCost());
                 typeData.put("hitCollision", exportCollision(((AbilityProperties) card).getCollision()));
                 obj.put("ability", typeData);
@@ -164,7 +163,7 @@ public class EntityLoader {
         for (byte b : collision.getLayers()) {
             JSONObject layer = new JSONObject();
             layer.put("layer", b);
-            layer.put("areaRange", collision.getCollisionLayer(b).getAreaRange());
+            layer.put("areaRadius", collision.getCollisionLayer(b).getAreaRadius());
             layer.put("key", collision.getCollisionLayer(b).getCoord());
             collisionList.add(layer);
         }
@@ -176,7 +175,7 @@ public class EntityLoader {
         for (int i = 0; i < collisionData.size(); i++) {
             JSONObject value = (JSONObject) collisionData.get(i);
             Number layer = (Number) value.get("layer");
-            Number areaRange = (Number) value.get("areaRange");
+            Number areaRange = (Number) value.get("areaRadius");
             JSONArray key = (JSONArray) value.get("key");
             ArrayList<HexCoordinate> collisionCoord = new ArrayList<HexCoordinate>();
             for (int j = 0; j < key.size(); j++) {

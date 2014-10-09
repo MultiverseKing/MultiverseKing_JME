@@ -52,25 +52,41 @@ public class Collision {
     }
 
     public Byte[] getLayers() {
-        return (Byte[]) collisionLayer.keySet().toArray();
+        return collisionLayer.keySet().toArray(new Byte[collisionLayer.keySet().size()]);
     }
 
     public class CollisionData {
 
-        private final byte areaRange;
-        private final ArrayList<HexCoordinate> coord;
+        private byte areaRadius;
+        private ArrayList<HexCoordinate> coord;
 
+        public CollisionData(byte areaRange) {
+            this.areaRadius = areaRange;
+            this.coord = null;
+        }
         public CollisionData(byte areaRange, ArrayList<HexCoordinate> coord) {
-            this.areaRange = areaRange;
+            this.areaRadius = areaRange;
             this.coord = coord;
         }
 
-        public byte getAreaRange() {
-            return areaRange;
+        public byte getAreaRadius() {
+            return areaRadius;
         }
 
         public ArrayList<HexCoordinate> getCoord() {
             return coord;
+        }
+
+        public void setAreaRadius(byte radius) {
+            this.areaRadius = radius;
+        }
+        
+        public void addPosition(HexCoordinate pos){
+            coord.add(pos);
+        }
+        
+        public void removePosition(HexCoordinate pos){
+            coord.remove(pos);
         }
     }
 }

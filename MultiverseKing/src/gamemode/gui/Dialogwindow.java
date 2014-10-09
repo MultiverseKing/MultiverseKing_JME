@@ -1,8 +1,6 @@
 package gamemode.gui;
 
-import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector2f;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
@@ -36,8 +34,8 @@ public class Dialogwindow extends EditorWindow {
         addButtonField(labelName, HAlign.full);
     }
 
-    public void addSpinnerField(String labelName) {
-        addSpinnerField(labelName, new int[]{1, 10, 1, 2}, HAlign.left);
+    public void addSpinnerField(String labelName, int[] value) {
+        addSpinnerField(labelName, value, HAlign.left);
     }
 
     @Override
@@ -98,14 +96,12 @@ public class Dialogwindow extends EditorWindow {
 
     @Override
     public void hide() {
-        if(window != null && popup != null){
+        if (window != null && popup != null) {
             popup.removeFromParent();
         }
         super.hide();
     }
 
-    
-    
     public void popupBox(String message) {
         if (popup == null) {
             popup = new Window(screen, getUID() + "popupBox", new Vector2f(0, getWindow().getHeight()), new Vector2f(getWindow().getWidth(), 25));

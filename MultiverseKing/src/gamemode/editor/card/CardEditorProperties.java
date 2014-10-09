@@ -6,10 +6,7 @@ import static entitysystem.attribut.CardType.EQUIPEMENT;
 import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
 import entitysystem.field.Collision;
-import gamemode.gui.DialogWindowListener;
-import gamemode.gui.Dialogwindow;
 import gamemode.gui.EditorWindow;
-import gamemode.gui.HexGridWindow;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.Vector2Int;
@@ -72,7 +69,7 @@ class CardEditorProperties extends EditorWindow {
     protected void onButtonTrigger(String label) {
         if (label.equals("Show collision")) {
             if (collisionWin == null) {
-                collisionWin = new CollisionWindow(screen, getWindow(), (byte)1);
+                collisionWin = new CollisionWindow(screen, getWindow(), (byte) 1);
             } else if (!collisionWin.isVisible()) {
                 collisionWin.setVisible();
             }
@@ -106,16 +103,17 @@ class CardEditorProperties extends EditorWindow {
         getSpinnerListField("Cast range", 1).setText(String.valueOf(range.y));
     }
 
-    public void setHitCollision(Collision collision){
-        if(collisionWin != null){
+    public void setHitCollision(Collision collision) {
+        if (collisionWin != null) {
             collisionWin.removeFromScreen();
         }
         collisionWin = new CollisionWindow(screen, getWindow(), collision);
     }
+
     public AbilityProperties getProperties() {
         Vector2Int range = new Vector2Int(Integer.valueOf(getNumericListField("Range", 0).getText()),
                 Integer.valueOf(getNumericListField("Range", 1).getText()));
         return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()),
-                getSpinnerField("Segment Cost").getSelectedIndex(), range, null);
+                getSpinnerField("Segment Cost").getSelectedIndex(), range, collisionWin.getCollision());
     }
 }

@@ -4,18 +4,20 @@ import entitysystem.field.Collision;
 import gamemode.gui.DialogWindowListener;
 import gamemode.gui.Dialogwindow;
 import gamemode.gui.EditorWindow;
+import gamemode.gui.HexButtonListener;
 import gamemode.gui.HexGridWindow;
 import gamemode.gui.LayoutWindow;
 import java.util.ArrayList;
 import java.util.HashMap;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
+import utility.HexCoordinate;
 
 /**
  *
  * @author roah
  */
-public class CollisionWindow extends EditorWindow implements DialogWindowListener {
+public class CollisionWindow extends EditorWindow implements DialogWindowListener, HexButtonListener {
 
     private Collision collision;
     private HashMap<Character, HexGridWindow> hexWindow = new HashMap<Character, HexGridWindow>();
@@ -58,7 +60,8 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
             }
         } else if (hexWindow.containsKey(label.charAt(0))
                 && hexWindow.get(label.charAt(0)).getRadius() != collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius()) {
-            hexWindow.get(label.charAt(0)).reload(collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius());
+            hexWindow.get(label.charAt(0)).reload(collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius(), 
+                    collision.getCollisionLayer(Byte.valueOf(label)).getCoord());
             updateCurrent(label);
         } else if (hexWindow.containsKey(label.charAt(0))) {
             if (current != label.charAt(0)) {
@@ -75,7 +78,16 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
             }
             current = label.charAt(0);
         } else if (!hexWindow.containsKey(label.charAt(0))) {
-            hexWindow.put(label.charAt(0), new HexGridWindow(screen, collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius(), Byte.valueOf(label), getWindow()));
+            if(collision.getCollisionLayer(Byte.valueOf(label)).getCoord().isEmpty()){
+                hexWindow.put(label.charAt(0),
+                        new HexGridWindow(screen, collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius(),
+                        Byte.valueOf(label), getWindow(), this));
+            } else {
+                hexWindow.put(label.charAt(0),
+                        new HexGridWindow(screen, collision.getCollisionLayer(Byte.valueOf(label)).getAreaRadius(),
+                        Byte.valueOf(label), collision.getCollisionLayer(Byte.valueOf(label)).getCoord(), getWindow(), this));
+                
+            }
             updateCurrent(label);
         }
     }
@@ -96,17 +108,29 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
             w.setParent(getWindow());
         }
     }
-    
+
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel && dialogUID.equals("Edit layer")) {
-            if (collision.getCollisionLayer((byte) popup.getInput("Layer")) == null) {
-                collision.addLayer((byte) popup.getInput("Layer"), collision.new CollisionData((byte) popup.getInput("Radius")));
-            } else if (collision.getCollisionLayer((byte) popup.getInput("Layer")).getAreaRadius() != (byte) popup.getInput("Radius")) {
-                collision.getCollisionLayer((byte) popup.getInput("Layer")).setAreaRadius((byte) popup.getInput("Radius"));
+            if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")) == null) {
+                collision.addLayer((byte) popup.getSpinnerInput("Layer"), collision.new CollisionData((byte) popup.getSpinnerInput("Radius")));
+            } else if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).getAreaRadius() != (byte) popup.getSpinnerInput("Radius")) {
+                collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).setAreaRadius((byte) popup.getSpinnerInput("Radius"));
             }
             reload();
-            onButtonTrigger(Integer.toString(popup.getInput("Layer")));
+            onButtonTrigger(Integer.toString(popup.getSpinnerInput("Layer")));
         }
         popup.hide();
+    }
+
+    public Collision getCollision() {
+        return collision;
+    }
+
+    public void onButtonTrigger(HexCoordinate pos, boolean selected) {
+        if (selected) {
+            collision.getCollisionLayer(Byte.valueOf(String.valueOf(current))).addPosition(pos);
+        } else {
+            collision.getCollisionLayer(Byte.valueOf(String.valueOf(current))).removePosition(pos);
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.core.ElementManager;
+import utility.HexCoordinate;
 
 /**
  *
@@ -13,10 +14,16 @@ import tonegod.gui.core.ElementManager;
  */
 public class HexButton extends Button {
 
-    private boolean selected = false;
+    private boolean isSelected;
+    private HexButtonListener listener;
+    private final HexCoordinate coord;
 
-    public HexButton(ElementManager screen, String UID, Vector2f position, Vector2f dimensions) {
-        super(screen, UID, position, dimensions, Vector4f.ZERO, "Textures/Icons/WindowGrid/hexWindow_empty.png");
+    public HexButton(ElementManager screen, String UID, HexCoordinate coord, boolean isSelected, HexButtonListener listener) {
+        super(screen, UID, new Vector2f(), new Vector2f(25, 25), Vector4f.ZERO, "Textures/Icons/WindowGrid/hexWindow_empty.png");
+        this.isSelected = isSelected;
+        this.coord = coord;
+        this.listener = listener;
+        setColorMap("Textures/Icons/WindowGrid/hexWindow_" + (isSelected ? "selected" : "empty") + ".png");
     }
 
     @Override
@@ -29,17 +36,18 @@ public class HexButton extends Button {
 
     @Override
     public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-        selected = !selected;
+        isSelected = !isSelected;
         update();
     }
 
     public void isSelected(boolean selected) {
-        this.selected = selected;
+        this.isSelected = selected;
         update();
     }
     
     private void update(){
-        setColorMap("Textures/Icons/WindowGrid/hexWindow_" + (selected ? "selected" : "empty") + ".png");
+        setColorMap("Textures/Icons/WindowGrid/hexWindow_" + (isSelected ? "selected" : "empty") + ".png");
+        listener.onButtonTrigger(coord, isSelected);
     }
     
     @Override

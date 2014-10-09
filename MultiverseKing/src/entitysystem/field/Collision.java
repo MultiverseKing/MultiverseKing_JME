@@ -58,11 +58,10 @@ public class Collision {
     public class CollisionData {
 
         private byte areaRadius;
-        private ArrayList<HexCoordinate> coord;
+        private ArrayList<HexCoordinate> coord = new ArrayList<HexCoordinate>();
 
         public CollisionData(byte areaRange) {
             this.areaRadius = areaRange;
-            this.coord = null;
         }
         public CollisionData(byte areaRange, ArrayList<HexCoordinate> coord) {
             this.areaRadius = areaRange;

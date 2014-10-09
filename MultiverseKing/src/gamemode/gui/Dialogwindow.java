@@ -90,8 +90,8 @@ public class Dialogwindow extends EditorWindow {
         return getTextField(name).getText();
     }
 
-    public int getInput(String name) {
-        return getSpinnerField(name).getSelectedIndex();
+    public int getSpinnerInput(String name) {
+        return getSpinnerField(name).getSelectedIndex()+1;
     }
 
     @Override

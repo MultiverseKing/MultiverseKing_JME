@@ -19,7 +19,6 @@ import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.ElementalAttribut;
-import utility.Vector2Int;
 
 /**
  *
@@ -178,8 +177,7 @@ public final class CardEditorWindow extends EditorWindow {
                 subMenu.setPower(abilityData.getPower());
                 subMenu.setUnitSegmentCost(abilityData.getSegment());
                 subMenu.setCastRange(abilityData.getCastRange());
-//                subMenu.setHitCollision(abilityData.getHitCollision());
-                //Todo: collisionhit
+                subMenu.setHitCollision(abilityData.getHitCollision());
                 break;
             case EQUIPEMENT:
                 /**

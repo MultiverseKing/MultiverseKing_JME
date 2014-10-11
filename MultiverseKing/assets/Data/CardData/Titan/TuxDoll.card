@@ -1,6 +1,7 @@
 {
    "cardType":"TITAN",
    "rarity":"MULTIVERSE",
+   "visual": "Undefined",
    "eAttribut":"ICE",
    "description":"Testing Unit used on the editor",
    "unitsStats":{

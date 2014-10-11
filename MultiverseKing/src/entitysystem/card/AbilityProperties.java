@@ -2,8 +2,6 @@ package entitysystem.card;
 
 import entitysystem.field.Collision;
 import entitysystem.loader.EntityLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import utility.Vector2Int;
@@ -39,7 +37,7 @@ public class AbilityProperties extends CardProperties {
     }
     
     public AbilityProperties(CardProperties properties, int power, int segmentCost, Vector2Int range, Collision collision) {
-        super(properties.getName(), properties.getPlayCost(), properties.getCardType(), 
+        super(properties.getName(), properties.getVisual(), properties.getPlayCost(), properties.getCardType(), 
                 properties.getRarity(), properties.getElement(), properties.getDescription());
         this.power = power;
         this.segmentCost = segmentCost;

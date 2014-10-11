@@ -1,5 +1,6 @@
 {
    "cardType":"TITAN",
+   "visual": "Undefined",
    "rarity":"MULTIVERSE",
    "eAttribut":"VOLT",
    "description":"Testing Unit used on the editor",

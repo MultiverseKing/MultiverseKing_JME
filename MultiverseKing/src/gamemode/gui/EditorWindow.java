@@ -103,7 +103,7 @@ public abstract class EditorWindow extends LayoutWindow {
                 System.err.println("Label not allowed with HAlign.full for button. "
                         + labelName + " : labelName will be ignored for : " + triggerName + ".");
             }
-            elementList.put(uid, generateLabel(labelName, hAlign, offset));
+            elementList.put(uid, generateLabel(labelName, hAlign, offset, false));
             elementList.get(uid).addChild(generateButton(uid, uid + triggerName, hAlign, new Vector2f()));
         } else {
             elementList.put(uid, generateButton(triggerName, hAlign, offset));
@@ -141,13 +141,13 @@ public abstract class EditorWindow extends LayoutWindow {
      */
     protected final void addNumericListField(String labelName, Integer[] baseValue, HAlign hAlign) {
         String uid = generateUID(labelName) + "numList";
-        Label holder = generateLabel(labelName, hAlign, new Vector2f());
+        Label holder = generateLabel(labelName, hAlign, new Vector2f(), false);
         generateList(uid, holder, baseValue, hAlign, "numList", 1);
     }
     
     protected final void addSpinnerList(String labelName, int[][] value, HAlign hAlign) {
         String uid = generateUID(labelName) + "spinList";
-        Label holder = generateLabel(labelName, hAlign, new Vector2f());
+        Label holder = generateLabel(labelName, hAlign, new Vector2f(), false);
         generateList(uid, holder, value, hAlign, "spinList", 1);
     }
     
@@ -181,7 +181,6 @@ public abstract class EditorWindow extends LayoutWindow {
         } else if (type.equals("spinList") && fieldGridSize <= 1) {
             fillValue = (layoutGridSize.x - fillValue) / elements.length;
             i = 0;
-            int j = 1;
             for (Element e : eList) {
                 e.setDimensions(e.getDimensions().x + fillValue - (e.getDimensions().y * 2), e.getDimensions().y);
                 e.setPosition(e.getPosition().x + fillValue * i + e.getDimensions().y, e.getPosition().y - layoutGridSize.y);
@@ -251,7 +250,7 @@ public abstract class EditorWindow extends LayoutWindow {
      */
     protected final void addSpinnerField(String labelName, int[] value, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName, hAlign, offset));
+        elementList.put(uid, generateLabel(labelName, hAlign, offset, false));
         elementList.get(uid).addChild(generateSpinner(labelName, uid, value));
     }
 
@@ -274,7 +273,7 @@ public abstract class EditorWindow extends LayoutWindow {
      */
     protected final void addTextField(String labelName, String baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName, hAlign, offset));
+        elementList.put(uid, generateLabel(labelName, hAlign, offset, false));
         generateTextField(uid, baseValue, new Vector2Int(1, 1));
     }
 
@@ -313,7 +312,7 @@ public abstract class EditorWindow extends LayoutWindow {
         }
         
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName, hAlign, offset));
+        elementList.put(uid, generateLabel(labelName, hAlign, offset, false));
         generateTextField(uid, baseValue, size);
     }
 
@@ -334,7 +333,7 @@ public abstract class EditorWindow extends LayoutWindow {
      */
     protected final void addNumericField(String labelName, int baseValue, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
-        Label field = generateLabel(labelName, hAlign, offset);
+        Label field = generateLabel(labelName, hAlign, offset, false);
         elementList.put(uid, field);
         field.addChild(generateNumericField(uid, baseValue, hAlign));
     }
@@ -358,28 +357,42 @@ public abstract class EditorWindow extends LayoutWindow {
     protected final void addSelectionField(String labelName, Enum<?> baseValue,
             Enum[] value, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName, hAlign, offset));
+        elementList.put(uid, generateLabel(labelName, hAlign, offset, false));
         generateSelectBoxField(uid, baseValue, value);
+    }
+    
+    /**
+     * Add a selectionList Element based on a enum to this menu.
+     *
+     * @param labelName field name.
+     * @param baseValue first value to show.
+     * @param value all possible value.
+     * @param hAlign horizontal alignemenet to use.
+     * @param offset value to be added on top of the gridPosition.
+     */
+    protected final void addLabelField(String labelName, HAlign hAlign, Vector2f offset) {
+        String uid = generateUID(labelName);
+        elementList.put(uid, generateLabel(labelName, hAlign, offset, true));
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="Generate Method">
-    private Label generateLabel(String labelName, HAlign hAlign, Vector2f offset) {
+    private Label generateLabel(String labelName, HAlign hAlign, Vector2f offset, boolean labelOnly) {
+        Label label;
         if (hAlign.equals(HAlign.left)) {
-            Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
+            label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
                     new Vector2f(offset.x, offset.y),
                     new Vector2f((labelName.toCharArray().length + 3) * 8, layoutGridSize.y));
-            label.setText(labelName + " : ");
-            return label;
+            label.setText(labelName + (labelOnly ? "" : " : "));
         } else if (hAlign.equals(HAlign.right)) {
-            Label label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
+            label = new Label(screen, getUID() + labelName.replaceAll("\\s", "") + "Label",
                     new Vector2f(layoutGridSize.x - (spacement + offset.x + ((labelName.toCharArray().length + 2) * 8)), offset.y),
                     new Vector2f((labelName.toCharArray().length + 3) * 8, layoutGridSize.y));
-            label.setText(" : " + labelName);
-            return label;
+            label.setText((labelOnly ? "" : " : ") + labelName);
         } else {
             throw new UnsupportedOperationException(hAlign + " : Cannot be used with a label or isn't implemented.");
         }
+        return label;
     }
     
     private ButtonAdapter generateNumericField(final String labelUID, int baseValue, final HAlign hAlign) {

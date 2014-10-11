@@ -24,6 +24,7 @@ public class CardPreview {
 
     private final Hover hover;
     private final ButtonAdapter preview;
+    private String visual;
 
     Element getPreview() {
         return preview;
@@ -33,8 +34,9 @@ public class CardPreview {
         /**
          * Window used to show a preview of the card.
          */
+        this.visual = cardProperties.getVisual();
         preview = new ButtonAdapter(screen, "geneneratorImgPreview", new Vector2f(parent.getDimensions().x, 0),
-                new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/undefined.png") {
+                new Vector2f(140, 200), new Vector4f(), "Textures/Cards/Artworks/"+cardProperties.getVisual()+".png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
@@ -95,10 +97,15 @@ public class CardPreview {
     void switchName(String name) {
         hover.setCardName(name);
     }
-    void switchImg(String name) {
-        preview.setColorMap("Textures/Cards/Artworks/" + name+".png");
+    void switchImg(String visual) {
+        this.visual = visual;
+        preview.setColorMap("Textures/Cards/Artworks/" + visual+".png");
     }
 
+    public String getVisual(){
+        return visual;
+    }
+    
     void switchRarity(Rarity rarity) {
         hover.setRarity(rarity);
     }

@@ -39,6 +39,10 @@ public class CardProperties {
      * Used to show the card name.
      */
     private final String name;
+    /**
+     * Used to know the img to load for the card.
+     */
+    private final String visual;
 
     // </editor-fold>
     /**
@@ -58,6 +62,7 @@ public class CardProperties {
             Number tmpValue = (Number) obj.get("playCost");
             playCost = tmpValue.intValue();
         }
+        visual = (String) obj.get("visual");
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
         description = (String) obj.get("description");
@@ -66,7 +71,7 @@ public class CardProperties {
     /**
      * Constructor used for the editor mode.
      */
-    public CardProperties(String name, int playCost, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
+    public CardProperties(String name, String visual, int playCost, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
         if(cardType == CardType.TITAN){
             this.playCost = 0;
         } else {
@@ -77,6 +82,7 @@ public class CardProperties {
         this.rarity = rarity;
         this.element = element;
         this.description = description;
+        this.visual = visual;
     }
     
     /**
@@ -89,6 +95,7 @@ public class CardProperties {
         this.element = null;
         this.description = null;
         this.name = null;
+        this.visual = null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getter">
@@ -146,6 +153,14 @@ public class CardProperties {
      */
     public String getName() {
         return name;
+    }
+    /**
+     * The card img texture to use for this card.
+     *
+     * @return
+     */
+    public String getVisual() {
+        return visual;
     }
     // </editor-fold>
 }

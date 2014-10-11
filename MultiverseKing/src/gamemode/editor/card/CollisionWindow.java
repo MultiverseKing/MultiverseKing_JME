@@ -2,7 +2,7 @@ package gamemode.editor.card;
 
 import entitysystem.field.Collision;
 import gamemode.gui.DialogWindowListener;
-import gamemode.gui.Dialogwindow;
+import gamemode.gui.DialogWindow;
 import gamemode.gui.EditorWindow;
 import gamemode.gui.HexButtonListener;
 import gamemode.gui.HexGridWindow;
@@ -19,9 +19,9 @@ import utility.HexCoordinate;
  */
 public class CollisionWindow extends EditorWindow implements DialogWindowListener, HexButtonListener {
 
+    static DialogWindow popup;
     private Collision collision;
     private HashMap<Character, HexGridWindow> hexWindow = new HashMap<Character, HexGridWindow>();
-    private Dialogwindow popup;
     private char current = '0';
 
     public CollisionWindow(Screen screen, Element parent, byte areaRange) {
@@ -51,7 +51,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
     protected void onButtonTrigger(String label) {
         if (label.equals("Edit layer")) {
             if (popup == null) {
-                popup = new Dialogwindow(screen, "Edit layer", this);
+                popup = new DialogWindow(screen, "Edit layer", this);
                 popup.addSpinnerField("Layer", new int[]{0, 7, 1, 2});
                 popup.addSpinnerField("Radius", new int[]{2, 11, 1, 2});
                 popup.show();
@@ -112,9 +112,9 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel && dialogUID.equals("Edit layer")) {
             if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")) == null) {
-                collision.addLayer((byte) popup.getSpinnerInput("Layer"), collision.new CollisionData((byte) popup.getSpinnerInput("Radius")));
-            } else if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).getAreaRadius() != (byte) popup.getSpinnerInput("Radius")) {
-                collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).setAreaRadius((byte) popup.getSpinnerInput("Radius"));
+                collision.addLayer((byte) popup.getSpinnerInput("Layer"), collision.new CollisionData((byte) (popup.getSpinnerInput("Radius")+1)));
+            } else if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).getAreaRadius() != (byte) (popup.getSpinnerInput("Radius")+1)) {
+                collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).setAreaRadius((byte) (popup.getSpinnerInput("Radius")+1));
             }
             reload();
             onButtonTrigger(Integer.toString(popup.getSpinnerInput("Layer")));

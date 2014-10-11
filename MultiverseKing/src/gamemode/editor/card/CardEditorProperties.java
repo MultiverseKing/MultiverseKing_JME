@@ -7,6 +7,7 @@ import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
 import entitysystem.field.Collision;
 import gamemode.gui.EditorWindow;
+import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import utility.Vector2Int;
@@ -30,6 +31,7 @@ class CardEditorProperties extends EditorWindow {
 
         populateMenu();
         showConstrainToParent(VAlign.bottom, HAlign.left);
+        onButtonTrigger("Show collision");
     }
 
     private void populateMenu() {
@@ -66,17 +68,19 @@ class CardEditorProperties extends EditorWindow {
     }
 
     @Override
-    protected void onButtonTrigger(String label) {
-        if (label.equals("Show collision")) {
-            if (collisionWin == null) {
-                collisionWin = new CollisionWindow(screen, getWindow(), (byte) 1);
-            } else if (!collisionWin.isVisible()) {
-                collisionWin.setVisible();
+    protected final void onButtonTrigger(String label) {
+        if (current.equals(CardType.ABILITY)) {
+            if (label.equals("Show collision")) {
+                if (collisionWin == null) {
+                    collisionWin = new CollisionWindow(screen, getWindow(), (byte) 1);
+                } else if (!collisionWin.isVisible()) {
+                    collisionWin.setVisible();
+                }
+                getButtonField("Show collision", false).setText("Hide collision");
+            } else if (label.equals("Hide collision") && collisionWin.isVisible()) {
+                collisionWin.hide();
+                getButtonField("Show collision", false).setText("Show collision");
             }
-            getButtonField("Show collision", false).setText("Hide collision");
-        } else if (label.equals("Hide collision") && collisionWin.isVisible()) {
-            collisionWin.hide();
-            getButtonField("Show collision", false).setText("Show collision");
         }
     }
 
@@ -99,8 +103,8 @@ class CardEditorProperties extends EditorWindow {
     }
 
     public void setCastRange(Vector2Int range) {
-        getSpinnerListField("Cast range", 0).setText(String.valueOf(range.x));
-        getSpinnerListField("Cast range", 1).setText(String.valueOf(range.y));
+        ((Spinner) getSpinnerListField("Cast range", 0)).setSelectedIndex(range.x);
+        ((Spinner) getSpinnerListField("Cast range", 1)).setSelectedIndex(range.y);
     }
 
     public void setHitCollision(Collision collision) {
@@ -111,8 +115,8 @@ class CardEditorProperties extends EditorWindow {
     }
 
     public AbilityProperties getProperties() {
-        Vector2Int range = new Vector2Int(Integer.valueOf(getNumericListField("Range", 0).getText()),
-                Integer.valueOf(getNumericListField("Range", 1).getText()));
+        Vector2Int range = new Vector2Int(((Spinner) getSpinnerListField("Cast range", 0)).getSelectedIndex(),
+                ((Spinner) getSpinnerListField("Cast range", 1)).getSelectedIndex());
         return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()),
                 getSpinnerField("Segment Cost").getSelectedIndex(), range, collisionWin.getCollision());
     }

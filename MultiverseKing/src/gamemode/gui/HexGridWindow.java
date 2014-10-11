@@ -12,7 +12,7 @@ import utility.Vector2Int;
  *
  * @author roah
  */
-public class HexGridWindow extends LayoutWindow {
+public class HexGridWindow extends LayoutWindow implements HexButtonListener {
 
     private byte radius;
     private HexButtonListener listener;
@@ -22,7 +22,7 @@ public class HexGridWindow extends LayoutWindow {
     }
 
     public HexGridWindow(Screen screen, byte radius, byte layer, ArrayList<HexCoordinate> coordList, Element parent, HexButtonListener listener) {
-        super(screen, parent, "Collision " + layer, new Vector2f(25, 25), Align.Horizontal, radius * 2 + 1);
+        super(screen, parent, "Collision " + layer + ""+radius, new Vector2f(25, 25), Align.Horizontal, radius * 2 + 1);
         this.radius = radius;
         this.listener = listener;
         populateWin(coordList);
@@ -37,12 +37,12 @@ public class HexGridWindow extends LayoutWindow {
                 elementList.put(pos.x + "|" + pos.y + "_" + radius,
                         new HexButton(screen, pos.x + "|" + pos.y + "button" + "_" + radius,
                         new HexCoordinate(HexCoordinate.OFFSET, pos), 
-                        (coordList != null ? isSelected(new HexCoordinate(HexCoordinate.OFFSET, pos), coordList) : false), listener));
+                        (coordList != null ? isSelected(new HexCoordinate(HexCoordinate.OFFSET, pos), coordList) : false), this));
             } else {
                 elementList.put(pos.x + "|" + pos.y + "Space", null);
             }
             pos.x++;
-            if (pos.x >= radius * 2 + 1) {
+            if (pos.x > radius * 2) {
                 pos = new Vector2Int(0, pos.y + 1);
             }
         }
@@ -86,5 +86,10 @@ public class HexGridWindow extends LayoutWindow {
         removeFromScreen();
         updateAlign(radius * 2 + 1);
         populateWin(coordList);
+    }
+
+    public void onButtonTrigger(HexCoordinate pos, boolean selected) {
+        HexCoordinate out = new HexCoordinate(HexCoordinate.OFFSET, pos.getAsOffset().add(new Vector2Int(-radius, -radius)));
+        listener.onButtonTrigger(out, selected);
     }
 }

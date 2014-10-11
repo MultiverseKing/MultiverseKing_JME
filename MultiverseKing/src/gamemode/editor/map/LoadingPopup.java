@@ -1,7 +1,7 @@
 package gamemode.editor.map;
 
 import com.jme3.math.Vector2f;
-import gamemode.gui.Dialogwindow;
+import gamemode.gui.DialogWindow;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -13,7 +13,7 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class LoadingPopup extends Dialogwindow {
+public class LoadingPopup extends DialogWindow {
 
     private boolean isInitialized = false;
     private Menu loadingList;

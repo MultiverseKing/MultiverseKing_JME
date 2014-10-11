@@ -67,7 +67,7 @@ public class EntityLoader {
      * @param cardName to save.
      * @return false if file not correctly saved.
      */
-    public boolean saveCardProperties(CardProperties card, boolean override) {
+    public boolean saveCardProperties(String type, JSONObject typeData, CardProperties card, boolean override) {
         File file;
         String folder = "/" + card.getCardType().toString().toString().substring(0, 1)
                 + card.getCardType().toString().toString().substring(1).toLowerCase() + "/";
@@ -80,29 +80,25 @@ public class EntityLoader {
 
         JSONObject obj = new JSONObject();
         obj.put("cardType", card.getCardType().toString());
+        obj.put("visual", card.getVisual());
         obj.put("rarity", card.getRarity().toString());
         obj.put("eAttribut", card.getElement().toString());
         obj.put("playCost", card.getPlayCost());
-        obj.put("description", card.getPlayCost());
+        obj.put("description", card.getDescription());
 
-        JSONObject typeData = new JSONObject();
-        switch (card.getCardType()) {
-            case ABILITY:
-                typeData.put("power", ((AbilityProperties) card).getPower());
-                typeData.put("castRange", ((AbilityProperties) card).getCastRange().toString());
-                typeData.put("segmentCost", ((AbilityProperties) card).getSegmentCost());
-                typeData.put("hitCollision", exportCollision(((AbilityProperties) card).getCollision()));
-                obj.put("ability", typeData);
-                break;
-            case EQUIPEMENT:
-                break;
-            case SUMMON:
-                break;
-            case TITAN:
-                break;
-        }
-
+        obj.put(type, typeData);
         return setData(file, obj);
+    }
+    
+
+    public boolean saveAbility(AbilityProperties abilityProperties, boolean override) {
+        JSONObject typeData = new JSONObject();
+        typeData.put("power", abilityProperties.getPower());
+        typeData.put("castRange", abilityProperties.getCastRange().toString());
+        typeData.put("segmentCost", abilityProperties.getSegmentCost());
+        typeData.put("collision", exportCollision(abilityProperties.getCollision()));
+        
+        return saveCardProperties("ability", typeData, abilityProperties, override);
     }
 
     /**
@@ -164,7 +160,11 @@ public class EntityLoader {
             JSONObject layer = new JSONObject();
             layer.put("layer", b);
             layer.put("areaRadius", collision.getCollisionLayer(b).getAreaRadius());
-            layer.put("key", collision.getCollisionLayer(b).getCoord());
+            JSONArray key = new JSONArray();
+            for(HexCoordinate coord : collision.getCollisionLayer(b).getCoord()){
+                key.add(coord.getAsOffset().toString());
+            }
+            layer.put("key", key);
             collisionList.add(layer);
         }
         return collisionList;
@@ -203,7 +203,6 @@ public class EntityLoader {
             return true;
         } catch (IOException ex) {
             Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
             return false;
         }
     }

@@ -9,19 +9,19 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class Dialogwindow extends EditorWindow {
+public class DialogWindow extends EditorWindow {
 
     protected final DialogWindowListener listener;
     private Window popup;
     private boolean enabled = true;
 
-    public Dialogwindow(Screen screen, String WindowName, DialogWindowListener listener) {
+    public DialogWindow(Screen screen, String WindowName, DialogWindowListener listener) {
         super(screen, null, WindowName);
         this.listener = listener;
     }
 
     public final void show() {
-        addButtonList("staticField", new String[]{"Confirm", "Cancel"}, HAlign.right);
+        addButtonList(getUID()+"btnField", new String[]{"Confirm", "Cancel"}, HAlign.right);
         screen.getApplication().getInputManager().addListener(dialogPopupListener, new String[]{"confirmDialog", "cancelDialog"});
         super.show(null, null);
     }
@@ -36,6 +36,10 @@ public class Dialogwindow extends EditorWindow {
 
     public void addSpinnerField(String labelName, int[] value) {
         addSpinnerField(labelName, value, HAlign.left);
+    }
+
+    public void showText(String string) {
+        addLabelField(string, HAlign.left, new Vector2f());
     }
 
     @Override
@@ -91,7 +95,7 @@ public class Dialogwindow extends EditorWindow {
     }
 
     public int getSpinnerInput(String name) {
-        return getSpinnerField(name).getSelectedIndex()+1;
+        return getSpinnerField(name).getSelectedIndex();
     }
 
     @Override

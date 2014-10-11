@@ -27,7 +27,7 @@ public class Collision {
      * @param collisionData data belong to that layer.
      * @return false if the layer already exist.
      */
-    public boolean addLayer(byte layer, CollisionData collisionData) {
+    public final boolean addLayer(byte layer, CollisionData collisionData) {
         if (collisionLayer.containsKey(layer)) {
             return false;
         }

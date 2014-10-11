@@ -1,5 +1,6 @@
 {
    "cardType":"ABILITY",
+   "visual":"PulseVoltage",
    "rarity":"COMMON",
    "eAttribut":"VOLT",
    "playCost":3,

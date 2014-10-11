@@ -300,8 +300,8 @@ public abstract class LayoutWindow {
     }
 
     public void removeFromScreen() {
-        window.removeAllChildren();
         if (window != null && parent != null) {
+            window.removeAllChildren();
             parent.getElementsAsMap().remove(window.getUID());
             screen.removeElement(window);
         } else if (window != null && parent == null) {

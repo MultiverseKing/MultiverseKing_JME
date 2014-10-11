@@ -10,6 +10,8 @@ import entitysystem.attribut.Rarity;
 import entitysystem.card.AbilityProperties;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
+import gamemode.gui.DialogWindow;
+import gamemode.gui.DialogWindowListener;
 import gamemode.gui.EditorWindow;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -17,6 +19,7 @@ import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
+import tonegod.gui.core.ElementManager;
 import tonegod.gui.core.Screen;
 import utility.ElementalAttribut;
 
@@ -24,15 +27,16 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-public final class CardEditorWindow extends EditorWindow {
+public final class CardEditorWindow extends EditorWindow implements DialogWindowListener{
 
     private boolean init = false;
     private CardPreview cardPreview;
     private CardEditorProperties subMenu;
+    private DialogWindow dialPopup;
 
     public CardEditorWindow(Screen screen, Element parent) {
         super(screen, parent, "Card Edition", Align.Horizontal, 2);
-        CardProperties properties = new CardProperties("TuxDoll", 0, CardType.SUMMON,
+        CardProperties properties = new CardProperties("TuxDoll", "Undefined", 0, CardType.SUMMON,
                 Rarity.COMMON, ElementalAttribut.ICE, "This is a Testing unit");
         /**
          * Part used to show/set the card Name.
@@ -102,9 +106,10 @@ public final class CardEditorWindow extends EditorWindow {
     @Override
     protected void onButtonTrigger(String triggerName) {
         if (triggerName.equals("Load")) {
-            if (!((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
-                openLoadingMenu();
-            }
+            if (((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
+                clearLoadingMenu();
+            } 
+            openLoadingMenu();
             Element btn = getLabelListField("additionalField", "Load");
             Menu loadMenu = (Menu) screen.getElementById("loadCategory");
             loadMenu.showMenu(null, btn.getAbsoluteX(),
@@ -141,8 +146,8 @@ public final class CardEditorWindow extends EditorWindow {
          * Load the card Name && img.
          */
         getTextField("Name").setText(cardName);
-        cardPreview.switchImg(cardName);
         cardPreview.switchName(cardName);
+        cardPreview.switchImg(properties.getVisual());
         /**
          * Load the card cost.
          */
@@ -320,6 +325,15 @@ public final class CardEditorWindow extends EditorWindow {
         screen.addElement(loadCategory);
     }
 
+    private void clearLoadingMenu(){
+        ((Screen) screen).removeElement(screen.getElementById("loadCategory"));
+        ((Screen) screen).removeElement(screen.getElementById("categoryTitan"));
+        ((Screen) screen).removeElement(screen.getElementById("categoryEquipement"));
+        ((Screen) screen).removeElement(screen.getElementById("categorySummon"));
+        ((Screen) screen).removeElement(screen.getElementById("categoryAbility"));
+        ((Screen) screen).removeElement(screen.getElementById("categoryAll"));
+    }
+    
     private void loadCardPropertiesFromFile(String cardName) {
         EntityLoader loader = new EntityLoader();
         CardProperties load = loader.loadCardProperties(cardName);
@@ -330,7 +344,7 @@ public final class CardEditorWindow extends EditorWindow {
 
     private void saveCardProperties(boolean override) {
         if (subMenu != null && subMenu.isVisible()) {
-            CardProperties card = new CardProperties(getTextField("Name").getText(),
+            CardProperties card = new CardProperties(getTextField("Name").getText(), cardPreview.getVisual(),
                     getSpinnerField("Cost").getSelectedIndex(),
                     (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue(),
                     (Rarity) getSelectBoxField("Rarity").getSelectedListItem().getValue(),
@@ -339,7 +353,15 @@ public final class CardEditorWindow extends EditorWindow {
             EntityLoader loader = new EntityLoader();
             switch (card.getCardType()) {
                 case ABILITY:
-                    loader.saveCardProperties(new AbilityProperties(card, subMenu.getProperties()), override);
+                    if(!loader.saveAbility(new AbilityProperties(card, subMenu.getProperties()), override) && !override){
+                        if(dialPopup != null){
+                            dialPopup.setVisible();
+                        } else {
+                            dialPopup = new DialogWindow(screen, "Override File", this);
+                            dialPopup.showText(card.getName() + " already exist, override ?");
+                            dialPopup.show();
+                        }
+                    }
                     break;
                 case EQUIPEMENT:
                     break;
@@ -348,19 +370,17 @@ public final class CardEditorWindow extends EditorWindow {
                 case TITAN:
                     break;
             }
-            if (!override) {
-                if (!loader.saveCardProperties(card, override)) {
-                    /**
-                     * Open dialogBox "force save"
-                     */
-                }
-            } else {
-                loader.saveCardProperties(card, override);
-            }
         } else {
             /**
              * Open dialogbox "nothing to save"
              */
         }
+    }
+
+    public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
+        if(dialogUID.equals("Override File") && confirmOrCancel){
+            saveCardProperties(true);
+        }
+        dialPopup.hide();
     }
 }

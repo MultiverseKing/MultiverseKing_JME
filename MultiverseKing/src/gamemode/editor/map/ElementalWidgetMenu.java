@@ -118,10 +118,4 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         ((AreaTileWidget) elementParent).updateIcon();
         hide();
     }
-
-    @Override
-    public void removeFromScreen() {
-        super.removeFromScreen();
-        screen.removeElement(eIconContainer);
-    }
 }

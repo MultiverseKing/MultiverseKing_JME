@@ -35,7 +35,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
     private MultiverseMain main;
-    private ArrayList<HexMapInputListener> inputsListeners = new ArrayList<HexMapInputListener>();
+    private ArrayList<HexMapInputListener> inputListeners = new ArrayList<HexMapInputListener>();
     private ArrayList<HexMapRayListener> rayListeners = new ArrayList<HexMapRayListener>(3);
     private Spatial cursor;
     private Spatial rayDebug;
@@ -69,8 +69,20 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
         this.main = (MultiverseMain) app;
         mapData = stateManager.getState(HexSystemAppState.class).getMapData();
         mapData.registerTileChangeListener(this);
-        initInput();
-        initMarkDebug();
+        /**
+         * Activate the input to interact with the grid.
+         */
+        main.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
+        /**
+         * Activate the RaycastDebug.
+         */
+        if (rayDebug == null) {
+            Sphere sphere = new Sphere(30, 30, 0.2f);
+            rayDebug = new Geometry("DebugRayCast", sphere);
+            Material mark_mat = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+            mark_mat.setColor("Color", ColorRGBA.Red);
+            rayDebug.setMaterial(mark_mat);
+        }
     }
 
     /**
@@ -79,7 +91,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
      * @param listener to register.
      */
     public void registerTileInputListener(HexMapInputListener listener) {
-        inputsListeners.add(listener);
+        inputListeners.add(listener);
     }
 
     /**
@@ -88,7 +100,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
      * @param listener to register.
      */
     public void removeTileInputListener(HexMapInputListener listener) {
-        inputsListeners.remove(listener);
+        inputListeners.remove(listener);
     }
 
     /**
@@ -98,7 +110,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
      */
     public void registerRayInputListener(HexMapRayListener listener) {
         rayListeners.add(listener);
-        inputsListeners.add(listener);
+        inputListeners.add(listener);
     }
 
     /**
@@ -108,14 +120,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
      */
     public void removeRayInputListener(HexMapRayListener listener) {
         rayListeners.remove(listener);
-        inputsListeners.remove(listener);
-    }
-
-    /**
-     * Activate the input to interact with the grid.
-     */
-    public void initInput() {
-        main.getInputManager().addListener(tileActionListener, new String[]{"Confirm", "Cancel"});
+        inputListeners.remove(listener);
     }
 
     /**
@@ -132,7 +137,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
                 if (listenerPulseIndex == -1) {
                     castRay("L");
                 } else {
-                    inputsListeners.get(listenerPulseIndex).leftMouseActionResult(
+                    inputListeners.get(listenerPulseIndex).leftMouseActionResult(
                             new HexMapInputEvent(mapData.convertWorldToGridPosition(cursor.getLocalTranslation()), mouseRay.get3DRay(main), null));
                 }
             } else if (name.equals("Cancel") && !isPressed) {
@@ -142,14 +147,6 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
             }
         }
     };
-
-    private void initMarkDebug() {
-        Sphere sphere = new Sphere(30, 30, 0.2f);
-        rayDebug = new Geometry("DebugRayCast", sphere);
-        Material mark_mat = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        mark_mat.setColor("Color", ColorRGBA.Red);
-        rayDebug.setMaterial(mark_mat);
-    }
 
     public void clearDebug() {
         rayDebug.removeFromParent();
@@ -193,10 +190,10 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
     public boolean setCursorPulseMode(HexMapInputListener listener) {
         if (listenerPulseIndex == -1) {
             //We keep track of the listener locking the input.
-            if (!inputsListeners.contains(listener)) {
-                inputsListeners.add(listener);
+            if (!inputListeners.contains(listener)) {
+                inputListeners.add(listener);
             }
-            listenerPulseIndex = inputsListeners.indexOf(listener);
+            listenerPulseIndex = inputListeners.indexOf(listener);
             lastScreenMousePos = main.getInputManager().getCursorPosition();
             return true;
         } else {
@@ -205,11 +202,11 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
              * the one who activated it. if it is the same we desable the pulse
              * mode.
              */
-            if (inputsListeners.contains(listener) && inputsListeners.indexOf(listener) == listenerPulseIndex) {
+            if (inputListeners.contains(listener) && inputListeners.indexOf(listener) == listenerPulseIndex) {
                 listenerPulseIndex = -1;
                 return true;
-            } else if (inputsListeners.contains(listener) && inputsListeners.indexOf(listener) != listenerPulseIndex) {
-                System.err.println("Pulse already locked by : " + inputsListeners.get(listenerPulseIndex).getClass().toString()
+            } else if (inputListeners.contains(listener) && inputListeners.indexOf(listener) != listenerPulseIndex) {
+                System.err.println("Pulse already locked by : " + inputListeners.get(listenerPulseIndex).getClass().toString()
                         + ". Lock request by : " + listener.toString());
                 return false;
             } else {
@@ -256,7 +253,7 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
      * @param event event to pass
      */
     private void callMouseActionListeners(String mouseInput, HexMapInputEvent event) {
-        for (HexMapInputListener l : inputsListeners) {
+        for (HexMapInputListener l : inputListeners) {
             if (mouseInput.contains("L")) {
                 l.leftMouseActionResult(event);
             } else if ((mouseInput.contains("R"))) {
@@ -359,5 +356,12 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
     @Override
     public void cleanup() {
         super.cleanup();
+        if (cursor != null) {
+            cursor.removeFromParent();
+        }
+        rayDebug.removeFromParent();
+        listenerPulseIndex = -1;
+        main.getInputManager().removeListener(tileActionListener);
+        mapData.removeTileChangeListener(this);
     }
 }

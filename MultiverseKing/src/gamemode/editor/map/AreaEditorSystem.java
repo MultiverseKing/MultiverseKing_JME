@@ -37,14 +37,10 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
-        boolean initWidget = false;
         if (editedAreaName == null) {
             initializeArea();
-            initWidget = true;
-        } else if (load(editedAreaName)) {
-            initWidget = true;
-        }
-        if (initWidget) {
+        } else {
+            load(editedAreaName);
         }
 
         return entityData.getEntities(AreaPropsComponent.class);
@@ -86,7 +82,9 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     // </editor-fold>
 
     public void initializeArea() {
-        app.getStateManager().attach(new AreaMouseSystem(this));
+        if(app.getStateManager().getState(AreaMouseSystem.class) == null){
+            app.getStateManager().attach(new AreaMouseSystem(this));
+        }
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(new Vector2Int(), null);
@@ -94,13 +92,8 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     public void resetArea() {
-        clearArea();
+        mapData.Cleanup();
         initializeArea();
-    }
-
-    private void clearArea() {
-        mapData.removeTileChangeListener(this);
-        mapData.clearCurrent();
     }
 
     private boolean load() {
@@ -161,13 +154,10 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         System.err.println("Not Supported yet.");
     }
 
-    @Override
-    protected void cleanupSystem() {
-        System.err.println("Not Supported yet.");
-    }
-
     public void tileChange(TileChangeEvent event) {
-        System.err.println("Not Supported yet.");
+        if(tileWidgetMenu.isVisible()){
+//            openWidgetMenu(event.getTilePos());
+        }
     }
 
     public void leftMouseActionResult(HexMapInputEvent event) {
@@ -193,6 +183,17 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     private void closeWidgetMenu() {
         if (tileWidgetMenu != null && tileWidgetMenu.isVisible()) {
             tileWidgetMenu.hide();
+        }
+    }
+
+    @Override
+    protected void cleanupSystem() {
+        mapData.Cleanup();
+        if(app.getStateManager().getState(AreaMouseSystem.class) != null){
+            app.getStateManager().detach(app.getStateManager().getState(AreaMouseSystem.class));
+        }
+        if (tileWidgetMenu != null) {
+            tileWidgetMenu.removeFromScreen();
         }
     }
 }

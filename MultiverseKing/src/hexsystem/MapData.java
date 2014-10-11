@@ -362,7 +362,7 @@ public final class MapData {
         mapName = name;
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
-        clearCurrent();
+        Cleanup();
         System.err.println(chunkPos.size());
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
@@ -469,16 +469,13 @@ public final class MapData {
         }
     }
 
-    public void clearCurrent() {
+    public void Cleanup() {
+        //Todo remove all file from the temps folder
         chunkPos.clear();
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
     }
-
-    public void Cleanup() {
-        //Todo remove all file from the temps folder
-    }
-
+    
     /**
      * Remove listener from event on tile.
      *

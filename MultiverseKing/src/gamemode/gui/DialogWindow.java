@@ -38,6 +38,10 @@ public class DialogWindow extends EditorWindow {
         addSpinnerField(labelName, value, HAlign.left);
     }
 
+    public void addLabelField(String labelText){
+        addLabelField(labelText, HAlign.left, new Vector2f());
+    }
+    
     public void showText(String string) {
         addLabelField(string, HAlign.left, new Vector2f());
     }
@@ -101,7 +105,7 @@ public class DialogWindow extends EditorWindow {
     @Override
     public void hide() {
         if (window != null && popup != null) {
-            popup.removeFromParent();
+            popup.getElementParent().removeChild(popup);
         }
         super.hide();
     }

@@ -89,7 +89,7 @@ public class CardEditorSystem extends EntitySystemAppState {
             entityData.removeEntity(id);
         }
         entity.clear();
-        mapData.clearCurrent();
+        mapData.Cleanup();
         app.getStateManager().attach(new EditorMainGui());
     }
 }

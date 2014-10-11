@@ -17,6 +17,7 @@ import gamemode.editor.map.AreaEditorSystem;
 import gamemode.editor.map.LoadingPopup;
 import gamemode.editor.map.LoadingPopupListener;
 import gamemode.editor.map.MapEditorSystem;
+import gamemode.gui.DialogWindow;
 import gamemode.gui.LayoutWindow;
 
 /**
@@ -33,7 +34,7 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
     private EditorItem currentMenuValue;
     private String currentSelectedMenuItem;
     private MapEditorSystem usedSystem;
-    private LoadingPopup currentDialogPopup;
+    private DialogWindow currentDialogPopup;
 
     public Window getMainMenu() {
         return mainMenuBar;
@@ -149,6 +150,11 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
                     showMenu = false;
                     break;
                 case BATTLE:
+                    if (usedSystem != null) {
+                        currentDialogPopup =  new DialogWindow(main.getScreen(), "Warning !", this);
+                        currentDialogPopup.addLabelField("Current system will be removed.");
+                        currentDialogPopup.show();
+                    }
                     showMenu = false;
                     break;
                 default:
@@ -221,7 +227,9 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
             /**
              * Create new map.
              */
-            if (usedSystem != null) {
+            if(usedSystem != null && !main.getStateManager().hasState(usedSystem)){
+                main.getStateManager().attach(usedSystem);
+            }else if (usedSystem != null) {
                 ((AreaEditorSystem) usedSystem).resetArea();
             } else {
                 usedSystem = new AreaEditorSystem();
@@ -246,13 +254,16 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
         if (confirmOrCancel) {
             if (dialogUID.equals("Load Area")) {
                 if (usedSystem != null) {
-                    ((AreaEditorSystem) usedSystem).load(currentDialogPopup.getInput());
+                    ((AreaEditorSystem) usedSystem).load(((LoadingPopup)currentDialogPopup).getInput());
                 } else {
-                    usedSystem = new AreaEditorSystem(currentDialogPopup, currentDialogPopup.getInput());
+                    usedSystem = new AreaEditorSystem(((LoadingPopup)currentDialogPopup), ((LoadingPopup)currentDialogPopup).getInput());
                     main.getStateManager().attach(usedSystem);
                 }
+            } else if(dialogUID.equals("Warning !")){
+                main.getStateManager().detach(usedSystem);
             }
         }
+        currentDialogPopup.removeFromScreen();
     }
 
     public boolean loadForCurrent(String dialogUID, String value) {
@@ -260,7 +271,7 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
             if (usedSystem != null) {
                 return ((AreaEditorSystem) usedSystem).load(value);
             } else {
-                usedSystem = new AreaEditorSystem(currentDialogPopup, value);
+                usedSystem = new AreaEditorSystem((LoadingPopup) currentDialogPopup, value);
                 main.getStateManager().attach(usedSystem);
             }
         }

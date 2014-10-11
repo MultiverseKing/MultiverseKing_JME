@@ -156,9 +156,11 @@ public class EditorMainGui extends AbstractAppState implements LoadingPopupListe
             }
             currentMenuValue = menu;
         }
-        if (showMenu && menu != EditorItem.SFX) {
-            Element btn = mainMenuBar.getElementsAsMap().get(menu + "EditorBtn");
-            currentMenuItem.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - currentMenuItem.getHeight());
+        if (showMenu) {
+            if(menu != EditorItem.SFX && menu != EditorItem.BATTLE){
+                Element btn = mainMenuBar.getElementsAsMap().get(menu + "EditorBtn");
+                currentMenuItem.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - currentMenuItem.getHeight());
+            }
         }
     }
 

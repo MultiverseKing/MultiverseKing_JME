@@ -1,6 +1,6 @@
 {
    "cardType":"SUMMON",
-   "visual":Cendrea",
+   "visual":"Cendrea",
    "rarity":"COMMON",
    "eAttribut":"EARTH",
    "playCost":4,

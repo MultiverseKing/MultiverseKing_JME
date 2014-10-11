@@ -9,7 +9,7 @@ import utility.HexCoordinate;
 import utility.Vector2Int;
 
 /**
- *
+ * @todo update the center and all collision when the radius is updated.
  * @author roah
  */
 public class HexGridWindow extends LayoutWindow implements HexButtonListener {

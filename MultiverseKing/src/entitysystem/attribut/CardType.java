@@ -15,7 +15,7 @@ public enum CardType {
      */
     EQUIPEMENT,
     /**
-     * Used for card who generate unit on the field.
+     * Used for card who generate object on the field.
      */
     SUMMON,
     /**

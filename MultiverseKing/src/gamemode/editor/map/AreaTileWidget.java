@@ -29,7 +29,7 @@ class AreaTileWidget extends CameraTrackWindow {
     AreaTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "tileWidgetMenu", new Vector2f(),
-                new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/EditorMap/rouage.png");
+                new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/MapWidget/rouage.png");
         this.system = system;
         this.selectedTilePosition = tilePos;
 
@@ -39,17 +39,17 @@ class AreaTileWidget extends CameraTrackWindow {
 
     private void populateMenu() {
         Element rightMenu = new Element(screen, "tileWidgetRightMenu", new Vector2f(95, 10),
-                new Vector2f(85, 120), Vector4f.ZERO, "Textures/Icons/EditorMap/rightMenu.png");
+                new Vector2f(85, 120), Vector4f.ZERO, "Textures/Icons/MapWidget/rightMenu.png");
 
         animatedButton.add(new AnimatedButton(screen, "rouageRightMenuTop",
-                new Vector2f(14, 7), new Vector2f(62, 62), "Textures/Icons/EditorMap/rouageRight.png", 1.5f, true) {
+                new Vector2f(14, 7), new Vector2f(62, 62), "Textures/Icons/MapWidget/rouageRight.png", 1.5f, true) {
             @Override
             public void MouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 setElementalMenuIcon();
             }
         });
         animatedButton.add(new AnimatedButton(screen, "rouageRightMenuBottom",
-                new Vector2f(7, 65), new Vector2f(48, 48), "Textures/Icons/EditorMap/rouageRight.png", 1.5f));
+                new Vector2f(7, 65), new Vector2f(48, 48), "Textures/Icons/MapWidget/rouageRight.png", 1.5f));
 
         for (AnimatedButton b : animatedButton) {
             rightMenu.addChild(b);
@@ -62,7 +62,7 @@ class AreaTileWidget extends CameraTrackWindow {
         holder.setAsContainerOnly();
         
         ButtonAdapter upBtn = new ButtonAdapter(screen, screenElement.getUID() + "UpButton", new Vector2f(), 
-                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/EditorMap/arrow.png"){
+                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/MapWidget/arrow.png"){
 
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -72,7 +72,7 @@ class AreaTileWidget extends CameraTrackWindow {
         holder.addChild(upBtn);
         
         ButtonAdapter downBtn = new ButtonAdapter(screen, screenElement.getUID() + "DownButton", new Vector2f(45, -5), 
-                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/EditorMap/arrow.png"){
+                new Vector2f(45,45), Vector4f.ZERO, "Textures/Icons/MapWidget/arrow.png"){
 
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
@@ -94,7 +94,7 @@ class AreaTileWidget extends CameraTrackWindow {
         
     private void loadAssetIcon(Element menu) {
         Element assetIco = new Element(screen, "tileWidgetAssetIco", new Vector2f(16, -45),
-                new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/EditorMap/closeChest.png");
+                new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/MapWidget/closeChest.png");
         assetIco.scale(0.20f);
         assetIco.setIgnoreMouse(true);
         menu.addChild(assetIco);
@@ -102,7 +102,7 @@ class AreaTileWidget extends CameraTrackWindow {
 
     private void setElementalMenuIcon() {
         if (eWin == null) {
-            eWin = new ElementalWidgetMenu(screen, camera, system, this, new Vector2f(100, 45), new Vector2f(150, 50), "Textures/Icons/EditorMap/emptyMenu.png");
+            eWin = new ElementalWidgetMenu(screen, camera, system, this, new Vector2f(100, 45), new Vector2f(150, 50), "Textures/Icons/MapWidget/emptyMenu.png");
             eWin.show(inspectedSpatialPosition, system.getTileEAttribut(selectedTilePosition));
         } else if (eWin.isVisible()) {
             eWin.hide();

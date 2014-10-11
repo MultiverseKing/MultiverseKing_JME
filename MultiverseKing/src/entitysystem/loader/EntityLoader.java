@@ -42,7 +42,7 @@ public class EntityLoader {
         String loadPath = path + "/Units/" + name + ".card";
         JSONObject obj = getData(loadPath);
         if (obj != null) {
-            return new UnitLoader((JSONObject) obj.get("unitsStats"), this);
+            return new UnitLoader((JSONObject) obj.get("unitStats"), this);
         }
         return null;
     }

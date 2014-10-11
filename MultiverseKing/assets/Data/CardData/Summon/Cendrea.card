@@ -5,7 +5,7 @@
    "eAttribut":"EARTH",
    "playCost":4,
    "description":"Should be named spider moonlord king...  don't ask...",
-   "unitsStats":{
+   "unitStats":{
       "healthPoint":100,
       "atb":3,
       "speed":10,

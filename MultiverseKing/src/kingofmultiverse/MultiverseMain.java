@@ -1,7 +1,7 @@
 package kingofmultiverse;
 
 import test.Player;
-import gamemode.editor.EditorMainGui;
+import gamemode.gui.EditorMainGUI;
 import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -45,6 +45,7 @@ public class MultiverseMain extends SimpleApplication {
     }
     private Screen screen;
     private RTSCamera rtsCam;
+    private EditorMainGUI rootGUI;
 
     public Screen getScreen() {
         return screen;
@@ -169,15 +170,16 @@ public class MultiverseMain extends SimpleApplication {
 
         stateManager.attachAll(
                 new EntityDataAppState(),
-                new HexSystemAppState(this, mapData),
+                new HexSystemAppState(mapData)
                 //                new HexMapMouseSystem(),
                 //                new RenderSystem(),
                 //                new MovementSystem(),
                 //                new CardRenderSystem(),
                 //                new AnimationSystem(),
                 //                new CollisionSystem(),
-                //                new BattleGUISystem(),
-                new EditorMainGui()); //<< This call the Editor GUI SHould be called last.
+                //                new BattleGUISystem()
+                );
+        rootGUI = new EditorMainGUI(this);  //<< This call the Editor GUI SHould be called last.
     }
 
     /**

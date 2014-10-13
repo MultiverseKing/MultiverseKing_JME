@@ -10,7 +10,7 @@ import tonegod.gui.core.Screen;
  */
 class TitanMenu extends ContextualMenu {
 
-    TitanMenu(Screen screen, BattleGUISystem guiSystem, Camera camera) {
+    TitanMenu(Screen screen, BattleSystem guiSystem, Camera camera) {
         super(screen, camera, guiSystem);
         ((Menu) screenElement).addMenuItem(" Move        ", 0, null);
         ((Menu) screenElement).addMenuItem(" Ability     ", 1, null);

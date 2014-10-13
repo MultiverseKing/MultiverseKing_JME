@@ -9,7 +9,6 @@ import entitysystem.EntitySystemAppState;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.render.RenderComponent;
-import gamemode.editor.EditorMainGui;
 import hexsystem.HexSettings;
 import hexsystem.HexSystemAppState;
 import hexsystem.MapData;
@@ -19,7 +18,7 @@ import utility.HexCoordinate;
 import utility.Vector2Int;
 
 /**
- *
+ * @todo update
  * @author roah
  */
 public class CardEditorSystem extends EntitySystemAppState {
@@ -90,6 +89,6 @@ public class CardEditorSystem extends EntitySystemAppState {
         }
         entity.clear();
         mapData.Cleanup();
-        app.getStateManager().attach(new EditorMainGui());
+//        app.getStateManager().attach(new EditorMainGUI());
     }
 }

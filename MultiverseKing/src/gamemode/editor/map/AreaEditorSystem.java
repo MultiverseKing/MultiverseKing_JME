@@ -1,11 +1,13 @@
 package gamemode.editor.map;
 
+import gamemode.gui.LoadingPopup;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
+import entitysystem.EntitySystemAppState;
 import hexsystem.HexSystemAppState;
 import hexsystem.HexTile;
 import hexsystem.MapData;
-import hexsystem.AreaMouseSystem;
+import hexsystem.AreaMouseInputSystem;
 import hexsystem.events.HexMapInputEvent;
 import hexsystem.events.HexMapInputListener;
 import hexsystem.events.TileChangeEvent;
@@ -21,28 +23,23 @@ import utility.Vector2Int;
  */
 public final class AreaEditorSystem extends MapEditorSystem implements TileChangeListener, HexMapInputListener {
 
-    private LoadingPopup dialCaller;
     private MapData mapData;
-    private String editedAreaName = null;
     private AreaTileWidget tileWidgetMenu;
-
-    public AreaEditorSystem() {
+    private LoadingPopup popup = null;
+    
+    public AreaEditorSystem(LoadingPopup popup) {
+        this.popup = popup;
     }
 
-    public AreaEditorSystem(LoadingPopup dialCaller, String editedMapName) {
-        this.editedAreaName = editedMapName;
-        this.dialCaller = dialCaller;
+    public AreaEditorSystem() {
     }
 
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
-        if (editedAreaName == null) {
-            initializeArea();
-        } else {
-            load(editedAreaName);
+        if(popup == null || !load(popup)){
+            generateEmptyArea();
         }
-
         return entityData.getEntities(AreaPropsComponent.class);
     }
 
@@ -81,9 +78,9 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
     // </editor-fold>
 
-    public void initializeArea() {
-        if(app.getStateManager().getState(AreaMouseSystem.class) == null){
-            app.getStateManager().attach(new AreaMouseSystem(this));
+    public void generateEmptyArea() {
+        if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
+            app.getStateManager().attach(new AreaMouseInputSystem(this));
         }
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
@@ -91,38 +88,28 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         }
     }
 
-    public void resetArea() {
+    public void reloadSystem() {
         mapData.Cleanup();
-        initializeArea();
+        generateEmptyArea();
     }
 
-    private boolean load() {
-        return mapData.loadArea(editedAreaName);
+    public boolean load(LoadingPopup popup) {
+        if(popup.getInput() != null){
+            if (mapData.loadArea(popup.getInput())) {
+                return true;
+            } else {
+                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
+                return false;
+            }
+        }
+        return false;
     }
 
-    public boolean load(String name) {
-        editedAreaName = name;
-        if (!load()) {
-//            if(dialCaller != null){
-            dialCaller.popupBox("    " + name + " not found.");
-//            }
-            editedAreaName = null;
+    public boolean save(LoadingPopup popup) {
+        if (isEmpty() || !mapData.saveArea(popup.getInput())) {
             return false;
         }
-        return true;
-    }
-
-    private boolean save() {
-        return mapData.saveMap(editedAreaName);
-    }
-
-    public boolean save(String name) {
-        editedAreaName = name;
-        if (isEmpty() || !save()) {
-            editedAreaName = null;
-            return false;
-        }
-        return true;
+        return false;
     }
 
     /**
@@ -155,7 +142,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     public void tileChange(TileChangeEvent event) {
-        if(tileWidgetMenu.isVisible()){
+        if (tileWidgetMenu.isVisible()) {
 //            openWidgetMenu(event.getTilePos());
         }
     }
@@ -189,8 +176,8 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected void cleanupSystem() {
         mapData.Cleanup();
-        if(app.getStateManager().getState(AreaMouseSystem.class) != null){
-            app.getStateManager().detach(app.getStateManager().getState(AreaMouseSystem.class));
+        if (app.getStateManager().getState(AreaMouseInputSystem.class) != null) {
+            app.getStateManager().detach(app.getStateManager().getState(AreaMouseInputSystem.class));
         }
         if (tileWidgetMenu != null) {
             tileWidgetMenu.removeFromScreen();

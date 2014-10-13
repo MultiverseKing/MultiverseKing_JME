@@ -94,7 +94,18 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         ignoredEAttribut = currentEAttribut;
     }
 
+    void show(HexCoordinate hexPosition, ElementalAttribut currentEAttribut, int height) {
+        inspectedSpatialHeight = height;
+        show(hexPosition, currentEAttribut, true);
+    }
+    
     void show(HexCoordinate hexPosition, ElementalAttribut currentEAttribut) {
+        show(hexPosition, currentEAttribut, false);
+    }
+    void show(HexCoordinate hexPosition, ElementalAttribut currentEAttribut, boolean hasHeight) {
+        if(!hasHeight){
+            inspectedSpatialHeight = Integer.MIN_VALUE;
+        }
         if (eIconContainer == null) {
             ignoredEAttribut = currentEAttribut;
             buildElementalIcon();
@@ -112,10 +123,14 @@ class ElementalWidgetMenu extends CameraTrackWindow {
 
     private void buttonTrigger(String button) {
         String element = button.split("Icon")[0];
-        system.setTileProperties(((AreaTileWidget) elementParent).getSelectedTilePosition(),
+        system.setTileProperties(((AreaTileWidget) elementParent).getInspectedSpatialPosition(),
                 ElementalAttribut.valueOf(element.toUpperCase()));
         updateElementalIcon(ElementalAttribut.valueOf(element.toUpperCase()));
         ((AreaTileWidget) elementParent).updateIcon();
         hide();
+    }
+    
+    void setInspectedSpatialHeight(int height){
+        inspectedSpatialHeight = height;
     }
 }

@@ -23,15 +23,15 @@ class AreaTileWidget extends CameraTrackWindow {
     private ElementalWidgetMenu eWin = null;
     private AreaEditorSystem system;
     private Element eAttributIco;
-    private HexCoordinate selectedTilePosition;
-
+//    private HexCoordinate selectedTilePosition;
     
     AreaTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "tileWidgetMenu", new Vector2f(),
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/MapWidget/rouage.png");
         this.system = system;
-        this.selectedTilePosition = tilePos;
+        super.inspectedSpatialPosition = tilePos;
+//        this.selectedTilePosition = tilePos;
 
         populateMenu();
         screenElement.scale(0.7f);
@@ -66,7 +66,7 @@ class AreaTileWidget extends CameraTrackWindow {
 
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(selectedTilePosition, 1);
+                system.setTileProperties(inspectedSpatialPosition, 1);
             }
         };
         holder.addChild(upBtn);
@@ -76,7 +76,7 @@ class AreaTileWidget extends CameraTrackWindow {
 
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(selectedTilePosition, -1);
+                system.setTileProperties(inspectedSpatialPosition, -1);
             }
         };
         downBtn.setLocalRotation(downBtn.getLocalRotation().fromAngles(0, 0, 180 * FastMath.DEG_TO_RAD));
@@ -86,7 +86,7 @@ class AreaTileWidget extends CameraTrackWindow {
 
     private void loadEAttributIcon(Element menu) {
         eAttributIco = new Element(screen, "tileWidgetEAttributIco", new Vector2f(20, 10),
-                new Vector2f(50, 50), Vector4f.ZERO, "Textures/Icons/EAttributs/"+ system.getTileEAttribut(selectedTilePosition).name().toLowerCase() +".png");
+                new Vector2f(50, 50), Vector4f.ZERO, "Textures/Icons/EAttributs/"+ system.getTileEAttribut(inspectedSpatialPosition).name().toLowerCase() +".png");
 //        eAttributIco.scale(0.20f);
         eAttributIco.setIgnoreMouse(true);
         menu.addChild(eAttributIco);
@@ -103,19 +103,26 @@ class AreaTileWidget extends CameraTrackWindow {
     private void setElementalMenuIcon() {
         if (eWin == null) {
             eWin = new ElementalWidgetMenu(screen, camera, system, this, new Vector2f(100, 45), new Vector2f(150, 50), "Textures/Icons/MapWidget/emptyMenu.png");
-            eWin.show(inspectedSpatialPosition, system.getTileEAttribut(selectedTilePosition));
+            if(inspectedSpatialHeight != Integer.MIN_VALUE){
+                eWin.show(inspectedSpatialPosition, system.getTileEAttribut(inspectedSpatialPosition), inspectedSpatialHeight);
+            } else {
+                eWin.show(inspectedSpatialPosition, system.getTileEAttribut(inspectedSpatialPosition));
+            }
         } else if (eWin.isVisible()) {
             eWin.hide();
         } else {
-            eWin.show(inspectedSpatialPosition, system.getTileEAttribut(selectedTilePosition));
+            if(inspectedSpatialHeight != Integer.MIN_VALUE){
+                eWin.show(inspectedSpatialPosition, system.getTileEAttribut(inspectedSpatialPosition), inspectedSpatialHeight);
+            } else {
+                eWin.show(inspectedSpatialPosition, system.getTileEAttribut(inspectedSpatialPosition));
+            }
         }
         screen.updateZOrder(screenElement);
     }
 
     @Override
     public void show(HexCoordinate tilePos) {
-        this.selectedTilePosition = tilePos;
-        super.show(selectedTilePosition);
+        super.show(tilePos);
         updateIcon();
         if(eWin != null && eWin.isVisible()){
             eWin.hide();
@@ -131,13 +138,13 @@ class AreaTileWidget extends CameraTrackWindow {
     }
     
     void updateIcon(){
-        eAttributIco.setColorMap("Textures/Icons/EAttributs/"+ system.getTileEAttribut(selectedTilePosition).name().toLowerCase() +".png");
+        eAttributIco.setColorMap("Textures/Icons/EAttributs/"+ system.getTileEAttribut(inspectedSpatialPosition).name().toLowerCase() +".png");
     }
     
     @Override
     public void update(float tpf) {
         super.update(tpf);
-        if (eWin != null && screen.getElementById(eWin.getUID()) != null && eWin.isVisible()) {
+        if (eWin != null && eWin.isVisible()) {
             eWin.update(tpf);
         }
         if (!animatedButton.isEmpty()) {
@@ -146,12 +153,6 @@ class AreaTileWidget extends CameraTrackWindow {
             }
         }
     }
-    
-    HexCoordinate getSelectedTilePosition(){
-        return selectedTilePosition;
-    }
-    
-    
     
 //    private void genPropertiesWindow() {
 //        tileWin = new Window(screen, "tilePropertiesWin",

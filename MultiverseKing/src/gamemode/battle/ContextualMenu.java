@@ -14,10 +14,10 @@ import utility.HexCoordinate;
  */
 abstract class ContextualMenu extends CameraTrackWindow {
 
-    private final BattleGUISystem system;
+    private final BattleSystem system;
     private EntityId inspectedEntityId = null;
 
-    ContextualMenu(Screen screen, Camera camera, BattleGUISystem guiSystem) {
+    ContextualMenu(Screen screen, Camera camera, BattleSystem guiSystem) {
         super(screen, camera);
         this.system = guiSystem;
         screenElement = new Menu(screen, new Vector2f(), false) {

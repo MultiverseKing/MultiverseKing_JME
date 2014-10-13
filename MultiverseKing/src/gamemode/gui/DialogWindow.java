@@ -14,7 +14,7 @@ public class DialogWindow extends EditorWindow {
     protected final DialogWindowListener listener;
     private Window popup;
     private boolean enabled = true;
-
+    
     public DialogWindow(Screen screen, String WindowName, DialogWindowListener listener) {
         super(screen, null, WindowName);
         this.listener = listener;

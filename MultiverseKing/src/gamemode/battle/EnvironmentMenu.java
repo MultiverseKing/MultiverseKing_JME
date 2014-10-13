@@ -10,7 +10,7 @@ import tonegod.gui.core.Screen;
  */
 class EnvironmentMenu extends ContextualMenu {
 
-    EnvironmentMenu(Screen screen, BattleGUISystem guiSystem, Camera camera) {
+    EnvironmentMenu(Screen screen, BattleSystem guiSystem, Camera camera) {
         super(screen, camera, guiSystem);
         ((Menu) screenElement).addMenuItem("Contextual environmentMenu Menu Item 1", 0, null);
         ((Menu) screenElement).addMenuItem("Contextual environmentMenu Menu Item 2", 1, null);

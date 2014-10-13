@@ -4,7 +4,7 @@
    "rarity":"MULTIVERSE",
    "eAttribut":"VOLT",
    "description":"Testing Unit used on the editor",
-   "unitsStats":{
+   "unitStats":{
       "healthPoint":50000,
       "atb":10,
       "speed":10,
@@ -16,6 +16,7 @@
       "collision":[
          {
             "layer":0,
+            "areaRadius": 2,
             "key":["0|0"]
          }
       ]

@@ -10,7 +10,7 @@ import tonegod.gui.core.ElementManager;
  */
 class TitanStatsWindow extends UnitStatsWindow {
 
-    TitanStatsWindow(ElementManager screen, BattleGUISystem system) {
+    TitanStatsWindow(ElementManager screen, BattleSystem system) {
         super(screen, "Titan", system, 4);
     }
 

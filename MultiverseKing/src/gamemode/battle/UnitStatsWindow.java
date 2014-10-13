@@ -13,11 +13,11 @@ import tonegod.gui.core.ElementManager;
  */
 class UnitStatsWindow extends PropertiesWindow {
 
-    UnitStatsWindow(ElementManager screen, BattleGUISystem system) {
+    UnitStatsWindow(ElementManager screen, BattleSystem system) {
         this(screen, "Unit", system, 5);
     }
 
-    UnitStatsWindow(ElementManager screen, String UID, BattleGUISystem system, int maxField) {
+    UnitStatsWindow(ElementManager screen, String UID, BattleSystem system, int maxField) {
         super(screen, UID, system, maxField + 5);
     }
 

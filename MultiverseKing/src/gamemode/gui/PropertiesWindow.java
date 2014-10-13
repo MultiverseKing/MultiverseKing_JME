@@ -2,7 +2,7 @@ package gamemode.gui;
 
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
-import gamemode.battle.BattleGUISystem;
+import gamemode.battle.BattleSystem;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.ElementManager;
@@ -13,11 +13,11 @@ import utility.Vector2Int;
  * @author roah
  */
 public abstract class PropertiesWindow extends Window {
-    protected final BattleGUISystem system;
+    protected final BattleSystem system;
     protected String windowTitle = "Properties : ";
     private int fieldCount = 0;
     
-    public PropertiesWindow(ElementManager screen, String UID, BattleGUISystem system, int maxField) {
+    public PropertiesWindow(ElementManager screen, String UID, BattleSystem system, int maxField) {
         super(screen, UID + "PropertiesWindow", new Vector2f(screen.getWidth()-260, 10), new Vector2f(250, 30*maxField));
         setIgnoreMouse(true);
         setUseCollapseButton(true);

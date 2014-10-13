@@ -363,7 +363,6 @@ public final class MapData {
         mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
         Cleanup();
-        System.err.println(chunkPos.size());
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
             chunkEvent(new ChunkChangeEvent(chunkPos.get(i)));
@@ -378,7 +377,7 @@ public final class MapData {
      * @param mapName "RESET" && "TEMP" cannot be used for a map name since they
      * are already be used internaly.
      */
-    public boolean saveMap(String mapName) {
+    public boolean saveArea(String mapName) {
         if (mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("RESET") || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")) {
             Logger.getLogger(MapData.class.getName()).log(Level.WARNING, "Invalid Path name");
             return false;

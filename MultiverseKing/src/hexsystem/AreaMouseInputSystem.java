@@ -30,7 +30,7 @@ import utility.MouseRay;
  *
  * @author Eike Foede, roah
  */
-public final class AreaMouseSystem extends AbstractAppState implements TileChangeListener {
+public final class AreaMouseInputSystem extends AbstractAppState implements TileChangeListener {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -44,19 +44,19 @@ public final class AreaMouseSystem extends AbstractAppState implements TileChang
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
 
-    public AreaMouseSystem() {
+    public AreaMouseInputSystem() {
     }
 
-    public AreaMouseSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
+    public AreaMouseInputSystem(HexMapInputListener inputListener, HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
         registerTileInputListener(inputListener);
     }
 
-    public AreaMouseSystem(HexMapRayListener rayListener) {
+    public AreaMouseInputSystem(HexMapRayListener rayListener) {
         registerRayInputListener(rayListener);
     }
 
-    public AreaMouseSystem(HexMapInputListener inputListener) {
+    public AreaMouseInputSystem(HexMapInputListener inputListener) {
         registerTileInputListener(inputListener);
     }
 

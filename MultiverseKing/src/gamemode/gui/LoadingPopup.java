@@ -1,7 +1,7 @@
-package gamemode.editor.map;
+package gamemode.gui;
 
 import com.jme3.math.Vector2f;
-import gamemode.gui.DialogWindow;
+import gamemode.editor.map.AreaEditorSystem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ public class LoadingPopup extends DialogWindow {
     private boolean isInitialized = false;
     private Menu loadingList;
 
-    public LoadingPopup(Screen screen, String WindowName, LoadingPopupListener listener) {
+    public LoadingPopup(Screen screen, String WindowName, DialogWindowListener listener) {
         super(screen, WindowName, listener);
         addInputText("Name");
         addButton("Load from files.");
@@ -46,9 +46,8 @@ public class LoadingPopup extends DialogWindow {
         loadingList = new Menu(screen, "mapFileList", new Vector2f(), new Vector2f(getField("Load from files.").getDimensions().x, getLayoutGridSize().y), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                if (!((LoadingPopupListener) listener).loadForCurrent(getUID(), value.toString())) {
-                    popupBox("     " + value.toString() + " not found.");
-                }
+                getTextField("Name").setText((String) value);
+                listener.onDialogTrigger(getUID(), true);
             }
         };
         File[] flist = folder.listFiles();

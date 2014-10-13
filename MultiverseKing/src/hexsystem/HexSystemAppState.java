@@ -17,39 +17,31 @@ import utility.Vector2Int;
 
 /**
  * Take care of updating the geometry accordingly to the data (room grid).
+ *
  * @author roah
  */
 public class HexSystemAppState extends AbstractAppState implements ChunkChangeListener, TileChangeListener {
 
     private HashMap chunkNode = new HashMap<String, Node>();
     /**
-     * Main application.
-     */
-    protected final SimpleApplication main;
-    /**
      * Tiles data manager.
      */
     protected final MapData mapData;
     /**
+     * Main application.
+     */
+    protected SimpleApplication app;
+    /**
      * Node containing all Tile related geometry.
      */
-    protected final Node mapNode;
+    protected final Node mapNode = new Node("hexMapNode");
+
+    public HexSystemAppState(MapData mapData) {
+        this.mapData = mapData;
+    }
 
     public MapData getMapData() {
         return mapData;
-    }
-
-    /**
-     * Settup the base param for the hexMap, create a new mapNode to hold the
-     * hexMap.
-     *
-     * @param main
-     * @param mapData
-     */
-    public HexSystemAppState(SimpleApplication main, MapData mapData) {
-        this.main = main;
-        this.mapData = mapData;
-        mapNode = new Node("hexMapNode");
     }
 
     /**
@@ -61,10 +53,11 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+        this.app = (SimpleApplication) app;
         mapData.registerChunkChangeListener(this);
         mapData.registerTileChangeListener(this);
 
-        main.getRootNode().attachChild(mapNode);
+        this.app.getRootNode().attachChild(mapNode);
         /**
          * This double the Vertice count.
          */
@@ -94,7 +87,7 @@ public class HexSystemAppState extends AbstractAppState implements ChunkChangeLi
         Node chunk = new Node(pos.toString());
         chunkNode.put(pos.toString(), chunk);
         chunk.setLocalTranslation(mapData.getChunkWorldPosition(pos));
-        chunk.addControl(new ChunkControl(mapData, main.getAssetManager(), mapData.getMapElement()));
+        chunk.addControl(new ChunkControl(mapData, app.getAssetManager(), mapData.getMapElement()));
         mapNode.attachChild(chunk);
     }
 

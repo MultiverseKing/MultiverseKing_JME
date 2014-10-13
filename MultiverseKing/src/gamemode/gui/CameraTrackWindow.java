@@ -88,4 +88,8 @@ public abstract class CameraTrackWindow {
     public Element getScreenElement(){
         return screenElement;
     }
+
+    public HexCoordinate getInspectedSpatialPosition() {
+        return inspectedSpatialPosition;
+    }
 }

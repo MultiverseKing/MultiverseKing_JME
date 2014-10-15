@@ -6,6 +6,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
@@ -62,20 +63,13 @@ public class BattleSystem extends EntitySystemAppState implements HexMapRayListe
         }
         app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem());
 
-        /**
-         * Register battle input.
-         */
-//        registerInput();
         if (app.getStateManager().getState(RenderSystem.class) == null
                 || app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-            app.getStateManager().attach(new RenderSystem());
-            app.getStateManager().attach(new AreaMouseInputSystem());
-            Logger.getLogger(BattleSystem.class.getName()).warning(
-                    "This System need RenderSystem and AreaMouseInputSystem to work, they got added.");
+            throw new UnsatisfiedLinkError("This System need RenderSystem and AreaMouseInputSystem to work.");
         }
         bTrainingGUI = new BattleTrainingGUI(((MultiverseMain) app).getScreen(), app.getCamera(), this);
         renderSystem = app.getStateManager().getState(RenderSystem.class);
-        iNode = renderSystem.addSubSystemNode("InteractiveNode");
+//        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this);
         hexMapMouseSystem = app.getStateManager().getState(AreaMouseInputSystem.class);
         hexMapMouseSystem.registerRayInputListener(this);
@@ -88,6 +82,10 @@ public class BattleSystem extends EntitySystemAppState implements HexMapRayListe
         camToCenter();
 
         return entityData.getEntities(InitialTitanStatsComponent.class, RenderComponent.class);
+    }
+
+    public String getSubSystemName() {
+        return "BattleSystem";
     }
 
     /**
@@ -123,18 +121,6 @@ public class BattleSystem extends EntitySystemAppState implements HexMapRayListe
                 new TimeBreakComponent(),
                 load.getInitialStatsComponent(),
                 load.getInitialStatsComponent().getMovementComponent());
-    }
-
-    public void reloadSystem() {
-        mapData.Cleanup();
-        for (EntityId id : titanList) {
-            entityData.removeEntity(id);
-        }
-        for (EntityId id : unitList) {
-            entityData.removeEntity(id);
-        }
-        mapData.addChunk(new Vector2Int(), null);
-        camToCenter();
     }
 
     @Override
@@ -276,13 +262,36 @@ public class BattleSystem extends EntitySystemAppState implements HexMapRayListe
         }
     };
 
-    @Override
-    protected void cleanupSystem() {
-        titanList.clear();
-        unitList.clear();
+    public void reloadSystem() {
+        mapData.Clear();
+        clearList();
+        mapData.addChunk(new Vector2Int(), null);
+        camToCenter();
     }
 
-    public void remove() {
+    private void clearList(){
+        for (EntityId id : titanList) {
+            entityData.removeEntity(id);
+        }
+        titanList.clear();
+        for (EntityId id : unitList) {
+            entityData.removeEntity(id);
+        }
+        unitList.clear();
+    }
+    
+    @Override
+    protected void cleanupSystem() {
+        clearList();
+        bTrainingGUI.removeFromScreen();
+        mapData.Clear();
+        renderSystem.removeSubSystem(this);
+        app.getStateManager().detach(app.getStateManager().getState(CollisionSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(AnimationSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(MovementSystem.class));
+    }
+
+    public void removeSubSystem() {
         app.getStateManager().detach(this);
     }
 }

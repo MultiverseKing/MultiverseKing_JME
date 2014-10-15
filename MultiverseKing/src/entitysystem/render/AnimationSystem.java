@@ -148,8 +148,12 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public void remove() {
+    public void removeSubSystem() {
         app.getStateManager().detach(this);
+    }
+
+    public String getSubSystemName() {
+        return "AnimationSystem";
     }
 
 }

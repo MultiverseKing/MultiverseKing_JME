@@ -37,9 +37,12 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(HexSystemAppState.class).getMapData();
-        if(popup == null || !load(popup)){
+        if(popup != null) {
+            reloadSystem(popup);
+        } else {
             generateEmptyArea();
         }
+        app.getStateManager().getState(AreaMouseInputSystem.class).registerTileInputListener(this);
         return entityData.getEntities(AreaPropsComponent.class);
     }
 
@@ -79,9 +82,6 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     // </editor-fold>
 
     public void generateEmptyArea() {
-        if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-            app.getStateManager().attach(new AreaMouseInputSystem(this));
-        }
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(new Vector2Int(), null);
@@ -89,27 +89,29 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     public void reloadSystem() {
-        mapData.Cleanup();
+        mapData.Clear();
         generateEmptyArea();
     }
 
-    public boolean load(LoadingPopup popup) {
-        if(popup.getInput() != null){
-            if (mapData.loadArea(popup.getInput())) {
-                return true;
-            } else {
+    public void reloadSystem(LoadingPopup popup) {
+        if(popup != null && popup.getInput() != null){
+            if (!mapData.loadArea(popup.getInput())) {
                 popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
-                return false;
+            } else {
+                popup.removeFromScreen();
             }
+        } else {
+            if(popup != null){
+                popup.popupBox("    " + "There is nothing to load.");
+            }
+            reloadSystem();
         }
-        return false;
     }
 
-    public boolean save(LoadingPopup popup) {
+    public void save(LoadingPopup popup) {
         if (isEmpty() || !mapData.saveArea(popup.getInput())) {
-            return false;
+            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
         }
-        return false;
     }
 
     /**
@@ -175,10 +177,8 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     @Override
     protected void cleanupSystem() {
-        mapData.Cleanup();
-        if (app.getStateManager().getState(AreaMouseInputSystem.class) != null) {
-            app.getStateManager().detach(app.getStateManager().getState(AreaMouseInputSystem.class));
-        }
+        mapData.Clear();
+        app.getStateManager().getState(AreaMouseInputSystem.class).removeTileInputListener(this);
         if (tileWidgetMenu != null) {
             tileWidgetMenu.removeFromScreen();
         }

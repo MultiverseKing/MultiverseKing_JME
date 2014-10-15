@@ -9,8 +9,8 @@ import entitysystem.EntitySystemAppState;
  */
 public abstract class MapEditorSystem extends EntitySystemAppState {
 
-    public abstract boolean load(LoadingPopup popup);
-    public abstract boolean save(LoadingPopup popup);
-    public abstract void generateEmptyArea();
+    public abstract void reloadSystem(LoadingPopup popup);
     public abstract void reloadSystem();
+    public abstract void save(LoadingPopup popup);
+    public abstract void generateEmptyArea();
 }

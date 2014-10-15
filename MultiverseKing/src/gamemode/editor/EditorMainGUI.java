@@ -1,18 +1,20 @@
-package gamemode.gui;
+package gamemode.editor;
 
 import com.jme3.app.Application;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import gamemode.battle.BattleSystem;
 import gamemode.editor.card.CardEditorWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
-import gamemode.editor.map.AreaEditorSystem;
+import gamemode.gui.DialogWindow;
+import gamemode.gui.DialogWindowListener;
+import gamemode.gui.LayoutWindow;
+import gamemode.gui.LoadingPopup;
 
 /**
  * rootMenu of the Game Editor.
@@ -21,7 +23,8 @@ import gamemode.editor.map.AreaEditorSystem;
  */
 public final class EditorMainGUI implements DialogWindowListener {
 
-    private MultiverseMain main;
+    private final EditorSystem system;
+    private final MultiverseMain main;
     private Window mainMenuBar;
     private Menu currentMenuItem;
     private LayoutWindow editorWindow;
@@ -29,8 +32,9 @@ public final class EditorMainGUI implements DialogWindowListener {
     private String currentSelectedMenuItem;
     private DialogWindow currentDialogPopup;
 
-    public EditorMainGUI(Application app) {
+    public EditorMainGUI(Application app, EditorSystem system) {
         main = (MultiverseMain) app;
+        this.system = system;
         CreateMainMenu();
         initKeyMapping();
     }
@@ -136,12 +140,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                         showSubMenu = false;
                         break;
                     case BATTLE:
-                        if (main.getStateManager().getState(BattleSystem.class) == null) {
-                            main.getStateManager().attach(new BattleSystem());
-                        } else {
-                            main.getStateManager().getState(BattleSystem.class).reloadSystem();
-                        }
-//                        loadBattleSystem();
+                        system.initializeBattle();
                         showSubMenu = false;
                         break;
                     default:
@@ -194,11 +193,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                         break;
                     case AREA:
                         if (Byte.valueOf(value).equals((byte) 0)) { //New
-                            if (main.getStateManager().getState(AreaEditorSystem.class) == null) {
-                                main.getStateManager().attach(new AreaEditorSystem());
-                            } else {
-                                main.getStateManager().getState(AreaEditorSystem.class).reloadSystem();
-                            }
+                            system.initializeAreaEditor(null);
                         } else if (Byte.valueOf(value).equals((byte) 1)) { //Load
                             if (currentDialogPopup != null) {
                                 currentDialogPopup.removeFromScreen();
@@ -225,11 +220,7 @@ public final class EditorMainGUI implements DialogWindowListener {
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
             if (dialogUID.equals("Load Area")) {
-                if (main.getStateManager().getState(AreaEditorSystem.class) != null) {
-                    main.getStateManager().getState(AreaEditorSystem.class).load((LoadingPopup) currentDialogPopup);
-                } else {
-                    main.getStateManager().attach(new AreaEditorSystem((LoadingPopup) currentDialogPopup));
-                }
+                system.initializeAreaEditor((LoadingPopup) currentDialogPopup);
             } else if (dialogUID.equals("Load World")) {
                 /**
                  * @todo
@@ -239,19 +230,7 @@ public final class EditorMainGUI implements DialogWindowListener {
             currentDialogPopup.removeFromScreen();
         }
     }
-
-    /**
-     * @deprecated
-     */
-    private void showDialog() {
-        currentDialogPopup = new DialogWindow(main.getScreen(), "Warning !", this);
-        currentDialogPopup.addLabelField("All current system will be removed.");
-        currentDialogPopup.show();
-    }
-
-    /**
-     * @deprecated
-     */
+    
     public void cleanup() {
         main.getScreen().getApplication().getInputManager().deleteMapping("confirmDialog");
         main.getScreen().getApplication().getInputManager().deleteMapping("cancelDialog");

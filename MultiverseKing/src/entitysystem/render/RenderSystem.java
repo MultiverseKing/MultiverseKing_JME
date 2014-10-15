@@ -57,19 +57,48 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
     }
 
-    public void registerSubSystem(SubSystem system) {
-        subSystem.add(system);
-    }
-
     public String getSpatialName(EntityId id) {
         return spatials.get(id).getName();
     }
 
-    public Node addSubSystemNode(String name) {
-        Node node = new Node(name);
+    // <editor-fold defaultstate="collapsed" desc="SubSystem Method">
+    public void registerSubSystem(SubSystem system) {
+        subSystem.add(system);
+    }
+    
+    public boolean removeSubSystem(SubSystem system) {
+        if(subSystem.remove(system)){
+            removeSubSystemNode(system);
+            return true;
+        }
+        return false;
+    }
+
+    public Node addSubSystemNode(SubSystem system) {
+        for(Node n : subSystemNode){
+            if(n.getName().equals(system.getSubSystemName())){
+                return n;
+            }
+        }
+        Node node = new Node(system.getSubSystemName());
         subSystemNode.add(node);
         renderSystemNode.attachChild(node);
         return node;
+    }
+    
+    public boolean removeSubSystemNode(SubSystem system){
+        Node node = null;
+        for(Node n : subSystemNode){
+            if(n.getName().equals(system.getSubSystemName())){
+                node = n;
+            }
+        }
+        if(node != null && subSystemNode.remove(node)){
+            node.detachAllChildren();
+            renderSystemNode.detachChild(node);
+            return true;
+        }
+        return false;
     }
 
     public boolean addSpatialToSubSystem(EntityId id, Node systemNode) {
@@ -86,6 +115,8 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
     }
 
+    // </editor-fold>
+    
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
@@ -202,7 +233,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     @Override
     protected void cleanupSystem() {
         for (SubSystem s : subSystem) {
-            s.remove();
+            s.removeSubSystem();
         }
         spatials.clear();
         renderSystemNode.removeFromParent();

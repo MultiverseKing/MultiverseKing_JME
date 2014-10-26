@@ -2,10 +2,8 @@ package entitysystem.ability;
 
 import com.simsilica.es.PersistentComponent;
 import entitysystem.field.Collision;
-import java.util.ArrayList;
-import java.util.HashMap;
-import utility.ElementalAttribut;
-import utility.Vector2Int;
+import org.hexgridapi.utility.ElementalAttribut;
+import org.hexgridapi.utility.Vector2Int;
 
 /**
  *

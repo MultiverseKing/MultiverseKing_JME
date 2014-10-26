@@ -1,10 +1,12 @@
 package entitysystem.render;
 
-import entitysystem.utility.SubSystem;
+import entitysystem.SubSystem;
 import entitysystem.render.utility.SpatialInitializer;
 import com.jme3.animation.AnimControl;
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.events.MotionEvent;
+import com.jme3.collision.Collidable;
+import com.jme3.collision.CollisionResults;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
@@ -15,17 +17,19 @@ import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.utility.Curve;
-import hexsystem.HexSystemAppState;
-import hexsystem.MapData;
-import hexsystem.events.TileChangeEvent;
-import hexsystem.events.TileChangeListener;
+import hexsystem.battle.BattleSystem;
+import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import org.hexgridapi.base.MapData;
+import org.hexgridapi.events.TileChangeEvent;
+import org.hexgridapi.events.TileChangeListener;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
- * Handle the render of all entities.
- * HexGrid got his own render system.
+ * Handle the render of all entities. HexGrid got his own render system.
+ *
  * @author Eike Foede, roah
  */
 
@@ -62,12 +66,25 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     }
 
     // <editor-fold defaultstate="collapsed" desc="SubSystem Method">
+    /**
+     * Register a System to work with entity Spatial.
+     */
     public void registerSubSystem(SubSystem system) {
-        subSystem.add(system);
+        registerSubSystem(system, false);
     }
-    
+
+    /**
+     * Register a system to work with spatial having his own node settup.
+     */
+    public void registerSubSystem(SubSystem system, boolean addNode) {
+        subSystem.add(system);
+        if (addNode) {
+            addSubSystemNode(system);
+        }
+    }
+
     public boolean removeSubSystem(SubSystem system) {
-        if(subSystem.remove(system)){
+        if (subSystem.remove(system)) {
             removeSubSystemNode(system);
             return true;
         }
@@ -75,8 +92,8 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     }
 
     public Node addSubSystemNode(SubSystem system) {
-        for(Node n : subSystemNode){
-            if(n.getName().equals(system.getSubSystemName())){
+        for (Node n : subSystemNode) {
+            if (n.getName().equals(system.getSubSystemName())) {
                 return n;
             }
         }
@@ -85,15 +102,15 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         renderSystemNode.attachChild(node);
         return node;
     }
-    
-    public boolean removeSubSystemNode(SubSystem system){
+
+    public boolean removeSubSystemNode(SubSystem system) {
         Node node = null;
-        for(Node n : subSystemNode){
-            if(n.getName().equals(system.getSubSystemName())){
+        for (Node n : subSystemNode) {
+            if (n.getName().equals(system.getSubSystemName())) {
                 node = n;
             }
         }
-        if(node != null && subSystemNode.remove(node)){
+        if (node != null && subSystemNode.remove(node)) {
             node.detachAllChildren();
             renderSystemNode.detachChild(node);
             return true;
@@ -101,9 +118,9 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         return false;
     }
 
-    public boolean addSpatialToSubSystem(EntityId id, Node systemNode) {
+    public boolean addSpatialToSubSystem(EntityId id, SubSystem system) {
         if (spatials.get(id) != null) {
-            ((Node) renderSystemNode.getChild(systemNode.getName())).attachChild(spatials.get(id));
+            ((Node) renderSystemNode.getChild(system.getSubSystemName())).attachChild(spatials.get(id));
             return true;
         }
         return false;
@@ -115,14 +132,19 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
     }
 
+    public CollisionResults subSystemCollideWith(BattleSystem system, Collidable other) {
+        CollisionResults result = new CollisionResults();
+        ((Node) renderSystemNode.getChild(system.getSubSystemName())).collideWith(other, result);
+        return result;
+    }
     // </editor-fold>
-    
+
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive); //<< diseable this to remove the shadow.
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
-        mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
+        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
         mapData.registerTileChangeListener(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
@@ -180,11 +202,12 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
             Curve curve = entities.getEntity(id).get(HexPositionComponent.class).getCurve();
             final MotionPath path = new MotionPath();
             path.addWayPoint(spatials.get(id).getLocalTranslation());
-            for(int i = 1; i < curve.getWaypoints().size(); i++){
-                path.addWayPoint(mapData.convertTileToWorldPosition(curve.getWaypoints().get(i)));
+            for (int i = 1; i < curve.getWaypoints().size(); i++) {
+                HexCoordinate pos = curve.getWaypoints().get(i);
+                path.addWayPoint(pos.convertToWorldPosition(mapData.getTile(pos).getHeight()));
             }
             path.enableDebugShape(app.getAssetManager(), renderSystemNode);
-            MotionEvent motionControl = new MotionEvent(s, path, curve.getSpeed()* (curve.getWaypoints().size()));
+            MotionEvent motionControl = new MotionEvent(s, path, curve.getSpeed() * (curve.getWaypoints().size()));
             motionControl.setDirectionType(MotionEvent.Direction.Path);
             motionControl.play();
         } else if (positionComp.getCurve() != null && s.getControl(MotionEvent.class) != null) {
@@ -196,12 +219,13 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
 //            motionControl.getPath().enableDebugShape(app.getAssetManager(), renderSystemNode);
 //            motionControl.play();
         } else {
-            if(s.getControl(MotionEvent.class) != null){
+            if (s.getControl(MotionEvent.class) != null) {
                 MotionEvent motionControl = s.getControl(MotionEvent.class);
                 motionControl.getPath().disableDebugShape();
                 s.removeControl(MotionEvent.class);
             }
-            s.setLocalTranslation(mapData.convertTileToWorldPosition(positionComp.getPosition()));
+            Vector3f pos = positionComp.getPosition().convertToWorldPosition(mapData.getTile(positionComp.getPosition()).getHeight());
+            s.setLocalTranslation(pos);
             s.setLocalRotation(positionComp.getRotation().toQuaternion());
         }
     }
@@ -229,7 +253,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         }
         spatials.remove(id);
     }
-    
+
     @Override
     protected void cleanupSystem() {
         for (SubSystem s : subSystem) {
@@ -238,7 +262,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
-    
+
     public void tileChange(TileChangeEvent event) {
         Set<EntityId> key = spatials.keySet();
         for (EntityId id : key) {

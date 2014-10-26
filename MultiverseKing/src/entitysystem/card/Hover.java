@@ -5,14 +5,14 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import entitysystem.attribut.CardType;
 import entitysystem.attribut.Rarity;
+import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
-import utility.ElementalAttribut;
 
 /**
- * @todo generate too much object have to be solved/reduce.) tonegodgui update 
+ * @todo generate too much object have to be solved/reduce.) tonegodgui update
  * plan to implemented something of this order.
  * @todo The scale/position of Icon isn't correct when card is rescaled
  * @author roah
@@ -35,7 +35,7 @@ public class Hover extends Window {
         this.removeAllChildren();
         this.setIgnoreMouse(true);
     }
-    
+
     public void setProperties(CardProperties properties) {
         if (getElementsAsMap().isEmpty()) {
             initProperties(properties);
@@ -94,10 +94,10 @@ public class Hover extends Window {
             addChild(eWin);
             eWin.setIgnoreMouse(true);
         }
-        
+
         eWin.setPosition(new Vector2f(getDimensions().x * 0.72f, getDimensions().y * 0.615f));
         eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.15f);
-        switch(eAttribut){
+        switch (eAttribut) {
             case EARTH:
 //                eWin.setDimensions(getDimensions().x * 0.2f, getDimensions().y * 0.2f);
                 break;
@@ -125,7 +125,7 @@ public class Hover extends Window {
             if (name.length() < 9) {
                 nameLabel.setFontSize(17);
                 nameLabel.setPosition(new Vector2f(getDimensions().x * 0.18f, -10));
-            } else if(name.length() > 11){
+            } else if (name.length() > 11) {
                 nameLabel.setFontSize(14);
                 nameLabel.setPosition(new Vector2f(getDimensions().x * 0.14f, -10));
             } else {
@@ -143,16 +143,16 @@ public class Hover extends Window {
             icon = getElementsAsMap().get("typeIconHover");
             icon.setColorMap("Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
         } else {
-            icon = new Window(this.screen, "typeIconHover", new Vector2f(), new Vector2f(), 
+            icon = new Window(this.screen, "typeIconHover", new Vector2f(), new Vector2f(),
                     Vector4f.ZERO, "Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
             icon.removeAllChildren();
             addChild(icon);
             icon.setIgnoreMouse(true);
         }
-        
+
         icon.setPosition(new Vector2f(getDimensions().x * 0.075f, getDimensions().y * 0.8f));
         icon.setDimensions(getDimensions().x * 0.22f, getDimensions().y * 0.15f);
-        switch(type){
+        switch (type) {
             case ABILITY:
                 break;
             case EQUIPEMENT:
@@ -185,10 +185,10 @@ public class Hover extends Window {
         }
     }
 
-    public void setRarity(Rarity rarity){
+    public void setRarity(Rarity rarity) {
         getMaterial().setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/Cards/backgrounds/" + rarity.name().toLowerCase() + ".png"));
     }
-    
+
     private void updateProperties(CardProperties properties) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

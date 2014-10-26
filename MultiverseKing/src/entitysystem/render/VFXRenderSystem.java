@@ -1,7 +1,7 @@
 package entitysystem.render;
 
 import com.jme3.scene.Node;
-import hexsystem.MapData;
+import org.hexgridapi.base.MapData;
 
 /**
  * System used to show all FX on the screen, work with other system, The

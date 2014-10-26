@@ -1,6 +1,6 @@
 package entitysystem.render;
 
-import entitysystem.utility.SubSystem;
+import entitysystem.SubSystem;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
@@ -12,7 +12,7 @@ import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
-import gamemode.battle.TimeBreakComponent;
+import hexsystem.battle.TimeBreakComponent;
 
 /**
  * Handle how animation work when they got they cycle done or under defined

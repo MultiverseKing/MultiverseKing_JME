@@ -1,13 +1,14 @@
 package archives;
 
 import com.jme3.math.FastMath;
-import hexsystem.HexTile;
-import utility.HexCoordinate;
-import utility.Vector2Int;
-import utility.ElementalAttribut;
+import org.hexgridapi.base.HexTile;
+import org.hexgridapi.utility.ElementalAttribut;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Vector2Int;
 
 /**
  * test
+ *
  * @author roah
  */
 class ChunkDataOld {
@@ -98,13 +99,13 @@ class ChunkDataOld {
         byte resultID;
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1)) 
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y + 1))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y - 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y - 1))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y + 1))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) 
+                        && chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;
@@ -115,9 +116,9 @@ class ChunkDataOld {
 
         for (resultID = 0; resultID < limit; resultID++) {
             if (resultID != lastAddedID) {
-                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y)) 
+                if (!chunkKey[resultID].equals(new Vector2Int(chunkPos.x + 1, chunkPos.y))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x - 1, chunkPos.y))
-                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1)) 
+                        && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y + 1))
                         && !chunkKey[resultID].equals(new Vector2Int(chunkPos.x, chunkPos.y - 1))) {
                     chunkKey[resultID] = null;
                     chunkValue[resultID] = null;

@@ -1,7 +1,7 @@
 package entitysystem.field;
 
 import com.simsilica.es.PersistentComponent;
-import utility.ElementalAttribut;
+import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * Core Element of the entity.

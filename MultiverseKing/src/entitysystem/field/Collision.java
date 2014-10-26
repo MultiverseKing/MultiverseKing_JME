@@ -2,7 +2,7 @@ package entitysystem.field;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import utility.HexCoordinate;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *
@@ -63,6 +63,7 @@ public class Collision {
         public CollisionData(byte areaRange) {
             this.areaRadius = areaRange;
         }
+
         public CollisionData(byte areaRange, ArrayList<HexCoordinate> coord) {
             this.areaRadius = areaRange;
             this.coord = coord;
@@ -79,12 +80,12 @@ public class Collision {
         public void setAreaRadius(byte radius) {
             this.areaRadius = radius;
         }
-        
-        public void addPosition(HexCoordinate pos){
+
+        public void addPosition(HexCoordinate pos) {
             coord.add(pos);
         }
-        
-        public void removePosition(HexCoordinate pos){
+
+        public void removePosition(HexCoordinate pos) {
             coord.remove(pos);
         }
     }

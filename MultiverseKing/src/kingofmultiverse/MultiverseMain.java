@@ -1,8 +1,6 @@
 package kingofmultiverse;
 
 import test.Player;
-import gamemode.editor.EditorMainGUI;
-import hexsystem.MapData;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -15,18 +13,19 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
-import gamemode.editor.EditorSystem;
-import hexsystem.HexSystemAppState;
-import hexsystem.HexSettings;
-import hexsystem.loader.ChunkDataLoader;
-import hexsystem.loader.MapDataLoader;
+import editor.EditorSystem;
+import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import org.hexgridapi.base.HexSetting;
+import org.hexgridapi.base.MapData;
+import org.hexgridapi.loader.ChunkDataLoader;
+import org.hexgridapi.loader.MapDataLoader;
+import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
-import utility.ElementalAttribut;
 
 /**
  * test
@@ -148,11 +147,11 @@ public class MultiverseMain extends SimpleApplication {
         stateManager.attach(player);
     }
 
-    private Spatial instanciatePlayer(HexSettings hexSettings) {
+    private Spatial instanciatePlayer() {
         Spatial player = assetManager.loadModel("Models/Characters/Berserk/export.j3o");
         player.setName("Player");
 
-        player.setLocalTranslation(new Vector3f(0, HexSettings.GROUND_HEIGHT * HexSettings.FLOOR_OFFSET, 0));
+        player.setLocalTranslation(new Vector3f(0, HexSetting.GROUND_HEIGHT * HexSetting.FLOOR_OFFSET, 0));
         rootNode.attachChild(player);
         return player;
     }
@@ -170,7 +169,7 @@ public class MultiverseMain extends SimpleApplication {
 
         stateManager.attachAll(
                 new EntityDataAppState(),
-                new HexSystemAppState(mapData)
+                new MapDataAppState(mapData)
                 //                new HexMapMouseSystem(),
                 //                new RenderSystem(),
                 //                new MovementSystem(),

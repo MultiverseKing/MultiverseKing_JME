@@ -5,10 +5,10 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import utility.HexCoordinate;
 import entitysystem.attribut.CardType;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  * Handle interaction on the field.
@@ -18,11 +18,8 @@ import java.util.HashMap;
 public class CollisionSystem extends EntitySystemAppState {
 
     /**
-     * Byte == collision layer (unit, trap, object, spell etc...) 
-     * 0 == unit 
-     * 1 == trap 
-     * 2 == spell 
-     * more than two is for customLayer or for special unit like
+     * Byte == collision layer (unit, trap, object, spell etc...) 0 == unit 1 ==
+     * trap 2 == spell more than two is for customLayer or for special unit like
      * flying unit, an object can be on multiple layer at the same time.
      *
      * HashMap<HexCoordinate, EntityId> == entity position on that layer.
@@ -74,7 +71,7 @@ public class CollisionSystem extends EntitySystemAppState {
                 return false;
             case SUMMON:
                 if (collisionLayer.containsKey((byte) 0)) {
-                    return checkCollision(new Byte((byte)0), castPosition);
+                    return checkCollision(new Byte((byte) 0), castPosition);
                 }
                 return true;
             case TITAN:
@@ -84,19 +81,19 @@ public class CollisionSystem extends EntitySystemAppState {
         }
     }
 
-    private boolean checkCollision(Byte layer, HexCoordinate position){
+    private boolean checkCollision(Byte layer, HexCoordinate position) {
         for (EntityId currentId : collisionLayer.get(layer.byteValue())) {
-                ArrayList<HexCoordinate> collision = entityData.getComponent(currentId, CollisionComponent.class).getCollisionOnLayer((byte) 0);
-                for (HexCoordinate coord : collision) {
-                    HexCoordinate worldPos = coord.add(entityData.getComponent(currentId, HexPositionComponent.class).getPosition());
-                    if (worldPos.equals(position)) {
-                        return false;
-                    }
+            ArrayList<HexCoordinate> collision = entityData.getComponent(currentId, CollisionComponent.class).getCollisionOnLayer((byte) 0);
+            for (HexCoordinate coord : collision) {
+                HexCoordinate worldPos = coord.add(entityData.getComponent(currentId, HexPositionComponent.class).getPosition());
+                if (worldPos.equals(position)) {
+                    return false;
                 }
             }
+        }
         return true;
     }
-    
+
     @Override
     protected void removeEntity(Entity e) {
         for (Byte layer : collisionLayer.keySet()) {

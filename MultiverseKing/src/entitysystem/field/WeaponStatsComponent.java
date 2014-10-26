@@ -2,8 +2,8 @@ package entitysystem.field;
 
 import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
-import utility.ElementalAttribut;
-import utility.HexCoordinate;
+import org.hexgridapi.utility.ElementalAttribut;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  * @todo rework

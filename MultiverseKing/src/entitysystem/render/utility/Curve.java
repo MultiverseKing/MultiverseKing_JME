@@ -1,7 +1,7 @@
 package entitysystem.render.utility;
 
 import java.util.List;
-import utility.HexCoordinate;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *
@@ -30,8 +30,9 @@ public class Curve {
     public List<HexCoordinate> getWaypoints() {
         return waypoints;
     }
-    
+
     public enum CurveType {
+
         BEZIER,
         EASE_IN,
         EASE_OUT,

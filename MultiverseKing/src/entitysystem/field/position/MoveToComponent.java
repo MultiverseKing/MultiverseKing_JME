@@ -1,7 +1,7 @@
 package entitysystem.field.position;
 
 import com.simsilica.es.PersistentComponent;
-import utility.HexCoordinate;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *

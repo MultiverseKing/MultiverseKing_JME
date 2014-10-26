@@ -36,7 +36,7 @@ public class EntityDataAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
     }
-    
+
     public EntityData getEntityData() {
         return entityData;
     }

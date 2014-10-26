@@ -19,15 +19,16 @@ import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
-import hexsystem.AreaMouseInputSystem;
-import hexsystem.events.HexMapInputEvent;
-import hexsystem.events.HexMapInputListener;
+import hexsystem.area.AreaMouseInputSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.hexgridapi.events.MouseInputEvent;
+import org.hexgridapi.events.MouseInputListener;
+import org.hexgridapi.events.TileChangeListener;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Rotation;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
-import utility.HexCoordinate;
-import utility.Rotation;
 
 /**
  * System used to render all card on the screen.
@@ -37,7 +38,7 @@ import utility.Rotation;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends EntitySystemAppState implements HexMapInputListener {
+public class CardRenderSystem extends EntitySystemAppState implements MouseInputListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
@@ -97,13 +98,12 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
     private Vector2f minCastArea;
     private Vector2f maxCastArea;
     /**
-     * Save the card castDebug on preview so we can put it back if not
-     * casted, otherwise we remove it.
+     * Save the card castDebug on preview so we can put it back if not casted,
+     * otherwise we remove it.
      */
     private Card cardPreviewCast;
 
     // </editor-fold>
-    
     @Override
     protected EntitySet initialiseSystem() {
         this.screen = new Screen(app);
@@ -263,7 +263,6 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      */
     @Override
     protected void updateSystem(float tpf) {
-        
     }
 
     /**
@@ -303,7 +302,7 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      */
     private void castPreview(Card card) {
         cardPreviewCast = card;
-        if(activateCard(null)){
+        if (activateCard(null)) {
             if (castDebug == null) {
                 castDebug = new Window(screen, "CastDebug", new Vector2f(175, 155), new Vector2f(250, 20));
                 castDebug.setMinDimensions(new Vector2f(200, 26));
@@ -368,27 +367,26 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
      *
      * @param event result when a leftMouse event happen on hexMap.
      */
-    private boolean activateCard(HexMapInputEvent event) {
+    private boolean activateCard(MouseInputEvent event) {
         /**
-         * If a card is currently in Casting Preview we check if it can
-         * be casted, No card is currently activated so we switch over all card
-         * type to know what preview to activate. (the entity will be
-         * removed from this system automaticaly if he have to)
+         * If a card is currently in Casting Preview we check if it can be
+         * casted, No card is currently activated so we switch over all card
+         * type to know what preview to activate. (the entity will be removed
+         * from this system automaticaly if he have to)
          */
         if (cardPreviewCast != null) {
             if (event == null) {
                 /**
-                 * We activate the pulse Mode, if not activated the cast
-                 * is canceled.
+                 * We activate the pulse Mode, if not activated the cast is
+                 * canceled.
                  */
                 if (!app.getStateManager().getState(AreaMouseInputSystem.class).setCursorPulseMode(this)) {
                     return false;
                 }
-            } else if(cardPreviewCast.getProperties().getCardType().equals(CardType.TITAN)) {
+            } else if (cardPreviewCast.getProperties().getCardType().equals(CardType.TITAN)) {
                 /**
-                 * We check if the collision system is currently
-                 * running, if it's not the card will be directly
-                 * casted.
+                 * We check if the collision system is currently running, if
+                 * it's not the card will be directly casted.
                  */
                 CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
                 if (collisionSystem != null) {
@@ -415,11 +413,11 @@ public class CardRenderSystem extends EntitySystemAppState implements HexMapInpu
         }
     };
 
-    public void leftMouseActionResult(HexMapInputEvent event) {
+    public void leftMouseActionResult(MouseInputEvent event) {
         activateCard(event);
     }
 
-    public void rightMouseActionResult(HexMapInputEvent event) {
+    public void rightMouseActionResult(MouseInputEvent event) {
         //Unused
     }
 

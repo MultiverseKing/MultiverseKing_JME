@@ -8,14 +8,13 @@ import entitysystem.attribut.Animation;
 import entitysystem.render.AnimationComponent;
 import entitysystem.render.utility.Curve;
 import entitysystem.render.utility.Curve.CurveType;
-import gamemode.battle.TimeBreakComponent;
-import hexsystem.HexSystemAppState;
+import hexsystem.area.MapDataAppState;
 import hexsystem.pathfinding.Astar;
 import hexsystem.pathfinding.Pathfinder;
 import java.util.HashMap;
 import java.util.List;
-import utility.HexCoordinate;
-import utility.Rotation;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Rotation;
 
 /**
  * Todo : behavior when unit got an obstacle appearing when moving (stop it and
@@ -29,13 +28,14 @@ public class MovementSystem extends EntitySystemAppState {
     private final float GLOBAL_SPEED = 5f;
     private Pathfinder pathfinder = new Astar();
     private HashMap<EntityId, Movement> movements;
+
     /**
      *
      * @return
      */
     @Override
     protected EntitySet initialiseSystem() {
-        pathfinder.setMapData(app.getStateManager().getState(HexSystemAppState.class).getMapData());
+        pathfinder.setMapData(app.getStateManager().getState(MapDataAppState.class).getMapData());
         movements = new HashMap<EntityId, Movement>();
         return entityData.getEntities(MovementComponent.class, HexPositionComponent.class, MoveToComponent.class);
     }
@@ -49,17 +49,17 @@ public class MovementSystem extends EntitySystemAppState {
         for (Entity e : entities) {
             Movement movement = movements.get(e.getId());
             float speed = GLOBAL_SPEED / e.get(MovementComponent.class).getMoveSpeed();
-            if (movement.actualPosition == 0 && movement.distanceMoved == 0f){
+            if (movement.actualPosition == 0 && movement.distanceMoved == 0f) {
                 startMoveEntity(e, movement, speed);
-            } else if(movement.actualPosition > movement.path.size()){
+            } else if (movement.actualPosition > movement.path.size()) {
                 entityData.removeComponent(e.getId(), MoveToComponent.class);//goal is reached
-                Rotation dir = movement.path.get(movement.path.size()-2).getDirection(movement.goal);
+                Rotation dir = movement.path.get(movement.path.size() - 2).getDirection(movement.goal);
                 entityData.setComponent(e.getId(), e.get(HexPositionComponent.class).cloneWithoutCurve(movement.goal, dir));
 //                movement.distanceMoved = 0;
-                if(entityData.getComponent(e.getId(), AnimationComponent.class) != null){
+                if (entityData.getComponent(e.getId(), AnimationComponent.class) != null) {
                     entityData.setComponent(e.getId(), new AnimationComponent(Animation.IDLE));
                 }
-            } else if(movement.distanceMoved >= speed){
+            } else if (movement.distanceMoved >= speed) {
 //                moveEntity(e, movement, speed);
                 movement.actualPosition++;
                 movement.distanceMoved = 0;
@@ -67,8 +67,8 @@ public class MovementSystem extends EntitySystemAppState {
             movement.distanceMoved += tpf;
         }
     }
-    
-    private void startMoveEntity(Entity e, Movement movement, float speed){
+
+    private void startMoveEntity(Entity e, Movement movement, float speed) {
         movement.actualPosition++;
         /**
          * Update the rotation.
@@ -80,17 +80,17 @@ public class MovementSystem extends EntitySystemAppState {
         /**
          * Update the animation.
          */
-        if(entityData.getComponent(e.getId(), AnimationComponent.class) != null){
+        if (entityData.getComponent(e.getId(), AnimationComponent.class) != null) {
             entityData.setComponent(e.getId(), new AnimationComponent(Animation.WALK));
         }
         /**
-         * We set a new position for the entity, with a specifiate curve so the render will not teleport it.
+         * We set a new position for the entity, with a specifiate curve so the
+         * render will not teleport it.
          */
-
         Curve curve = new Curve(CurveType.LINEAR, speed, movement.path);
         e.set(e.get(HexPositionComponent.class).movement(curve));
     }
-    
+
     /**
      *
      * @param e
@@ -109,8 +109,6 @@ public class MovementSystem extends EntitySystemAppState {
         movement.goal = moveTo.getPosition();
         movements.put(e.getId(), movement);
     }
-    
-    
 
     /**
      *
@@ -132,14 +130,13 @@ public class MovementSystem extends EntitySystemAppState {
     protected void removeEntity(Entity e) {
         movements.remove(e.getId());
     }
-    
+
     @Override
     protected void cleanupSystem() {
     }
-    
-    
-    
+
     private class Movement {
+
         float distanceMoved = 0;//Distance already moved since last tile
         int actualPosition = 0; //index of point in list
         List<HexCoordinate> path;

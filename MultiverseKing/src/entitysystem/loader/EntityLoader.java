@@ -13,14 +13,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hexgridapi.utility.ElementalAttribut;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import sun.misc.IOUtils;
-import utility.ElementalAttribut;
-import utility.HexCoordinate;
-import utility.Vector2Int;
 
 /**
  * Master to load Entity from file.
@@ -89,7 +89,6 @@ public class EntityLoader {
         obj.put(type, typeData);
         return setData(file, obj);
     }
-    
 
     public boolean saveAbility(AbilityProperties abilityProperties, boolean override) {
         JSONObject typeData = new JSONObject();
@@ -97,7 +96,7 @@ public class EntityLoader {
         typeData.put("castRange", abilityProperties.getCastRange().toString());
         typeData.put("segmentCost", abilityProperties.getSegmentCost());
         typeData.put("collision", exportCollision(abilityProperties.getCollision()));
-        
+
         return saveCardProperties("ability", typeData, abilityProperties, override);
     }
 
@@ -161,7 +160,7 @@ public class EntityLoader {
             layer.put("layer", b);
             layer.put("areaRadius", collision.getCollisionLayer(b).getAreaRadius());
             JSONArray key = new JSONArray();
-            for(HexCoordinate coord : collision.getCollisionLayer(b).getCoord()){
+            for (HexCoordinate coord : collision.getCollisionLayer(b).getCoord()) {
                 key.add(coord.getAsOffset().toString());
             }
             layer.put("key", key);

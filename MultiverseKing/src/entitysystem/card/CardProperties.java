@@ -2,8 +2,8 @@ package entitysystem.card;
 
 import entitysystem.attribut.CardType;
 import entitysystem.attribut.Rarity;
+import org.hexgridapi.utility.ElementalAttribut;
 import org.json.simple.JSONObject;
-import utility.ElementalAttribut;
 
 /**
  * Contain the properties of the card to show up when used by the

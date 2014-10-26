@@ -3,25 +3,25 @@ package entitysystem.field.position;
 import com.simsilica.es.EntityComponent;
 import entitysystem.render.utility.Curve;
 import com.simsilica.es.PersistentComponent;
-import java.util.ArrayList;
-import utility.HexCoordinate;
-import utility.Rotation;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Rotation;
 
 /**
  *
  * @author Eike Foede
  */
 public class HexPositionComponent implements PersistentComponent {
-    
+
     private final Curve curve;
     private final HexCoordinate position;
     private final Rotation rotation;
 
-    public HexPositionComponent(HexCoordinate position, Rotation rotation, Curve curve) {
+    public HexPositionComponent(HexCoordinate position,Rotation rotation, Curve curve) {
         this.position = position;
         this.rotation = rotation;
         this.curve = curve;
     }
+
     /**
      *
      * @param position
@@ -38,7 +38,7 @@ public class HexPositionComponent implements PersistentComponent {
     public HexCoordinate getPosition() {
         return position;
     }
-
+    
     /**
      * Direction the entity is facing.
      *
@@ -50,12 +50,13 @@ public class HexPositionComponent implements PersistentComponent {
 
     /**
      * Curve to use when the entity position is updated.
-     * @return 
+     *
+     * @return
      */
     public Curve getCurve() {
         return curve;
     }
-    
+
     @Override
     public HexPositionComponent clone() {
         return new HexPositionComponent(position, rotation, curve);
@@ -80,7 +81,7 @@ public class HexPositionComponent implements PersistentComponent {
     public HexPositionComponent clone(HexCoordinate pos) {
         return new HexPositionComponent(pos, rotation, curve);
     }
-    
+
     /**
      * Create interpolation from this component.
      *
@@ -98,7 +99,7 @@ public class HexPositionComponent implements PersistentComponent {
     EntityComponent cloneWithoutCurve(HexCoordinate position) {
         return new HexPositionComponent(position, rotation);
     }
-    
+
     EntityComponent cloneWithoutCurve(HexCoordinate position, Rotation rotation) {
         return new HexPositionComponent(position, rotation);
     }

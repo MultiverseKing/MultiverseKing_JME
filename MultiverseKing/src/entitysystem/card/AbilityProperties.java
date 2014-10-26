@@ -2,9 +2,9 @@ package entitysystem.card;
 
 import entitysystem.field.Collision;
 import entitysystem.loader.EntityLoader;
+import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import utility.Vector2Int;
 
 /**
  *
@@ -23,7 +23,7 @@ public class AbilityProperties extends CardProperties {
         power = ((Number) data.get("power")).intValue();
         segmentCost = ((Number) data.get("segmentCost")).intValue();
         range = new Vector2Int(data.get("activationRange").toString());
-        
+
         EntityLoader eLoader = new EntityLoader();
         collision = eLoader.importCollision((JSONArray) data.get("hitCollision"));
     }
@@ -35,9 +35,9 @@ public class AbilityProperties extends CardProperties {
         this.range = range;
         this.collision = collision;
     }
-    
+
     public AbilityProperties(CardProperties properties, int power, int segmentCost, Vector2Int range, Collision collision) {
-        super(properties.getName(), properties.getVisual(), properties.getPlayCost(), properties.getCardType(), 
+        super(properties.getName(), properties.getVisual(), properties.getPlayCost(), properties.getCardType(),
                 properties.getRarity(), properties.getElement(), properties.getDescription());
         this.power = power;
         this.segmentCost = segmentCost;
@@ -45,10 +45,10 @@ public class AbilityProperties extends CardProperties {
         this.collision = collision;
     }
 
-    public AbilityProperties(CardProperties properties, AbilityProperties ability){
+    public AbilityProperties(CardProperties properties, AbilityProperties ability) {
         this(properties, ability.getPower(), ability.getSegmentCost(), ability.getCastRange(), ability.getCollision());
     }
-    
+
     public AbilityProperties() {
         super();
         this.power = 0;

@@ -13,6 +13,7 @@ import tonegod.gui.core.Screen;
  */
 public abstract class LayoutWindow {
 
+    private boolean isHexGrid = false;
     protected final Screen screen;
     protected final float spacement = 5;
     protected final Vector2f layoutGridSize;// = new Vector2f(230, 20);//min value X == 230
@@ -79,34 +80,33 @@ public abstract class LayoutWindow {
         this.layoutGridSize = layoutGridSize;
     }
 
-    protected final void updateAlign(Align windowElementAlignement){
+    protected final void updateAlign(Align windowElementAlignement) {
         this.windowElementAlignement = windowElementAlignement;
     }
-    protected final void updateAlign(int elementAlignMaxCount){
+
+    protected final void updateAlign(int elementAlignMaxCount) {
         this.elementAlignMaxCount = elementAlignMaxCount;
     }
-    protected final void updateAlign(Align windowElementAlignement, int elementAlignMaxCount){
+
+    protected final void updateAlign(Align windowElementAlignement, int elementAlignMaxCount) {
         this.elementAlignMaxCount = elementAlignMaxCount;
         this.windowElementAlignement = windowElementAlignement;
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Show Method">
-    protected final void show(Vector2f position) {
-        show(position, false);
-    }
 
     /**
      * Show the window on a free position on the screen.
      *
      * @param position
      */
-    protected final void show(Vector2f position, boolean isHexGrid) {
-        Vector2f size = getWindowSize(isHexGrid);
+    protected final void show(Vector2f position) {
+        Vector2f size = getWindowSize();
         size.y += 25;
         window = new Window(screen, getUID(), position, size);
-        if(isHexGrid){
+        if (isHexGrid) {
             window.setWindowTitle(name);
-        }else {
+        } else {
             window.setWindowTitle("   " + name);
         }
         window.setIgnoreMouse(true);
@@ -116,6 +116,10 @@ public abstract class LayoutWindow {
         } else {
             parent.addChild(window);
         }
+        populate();
+    }
+    
+    private void populate() {
         int row = 0;
         int column = 0;
         for (Element e : elementList.values()) {
@@ -133,13 +137,12 @@ public abstract class LayoutWindow {
                 throw new UnsupportedOperationException(windowElementAlignement + " : is not a supported type.");
             }
             if (e != null) {
-                Vector2f pos = new Vector2f(spacement + e.getPosition().x + (column * layoutGridSize.x) + 
-                        (row % 2 != 0 && isHexGrid ? layoutGridSize.x / 2 : 0) + 
-                        ((elementAlignMaxCount-1)/2 % 2 != 0 && isHexGrid ? -layoutGridSize.x / 2 : 0),
-                        e.getPosition().y + window.getDragBarHeight() + 
-                        (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y)) +
-                         row * 1.9f + (isHexGrid ? layoutGridSize.y * 0.7f / 3 : 0)
-                );
+                Vector2f pos = new Vector2f(spacement + e.getPosition().x + (column * layoutGridSize.x)
+                        + (row % 2 != 0 && isHexGrid ? layoutGridSize.x / 2 : 0)
+                        + ((elementAlignMaxCount - 1) / 2 % 2 != 0 && isHexGrid ? -layoutGridSize.x / 2 : 0),
+                        e.getPosition().y + window.getDragBarHeight()
+                        + (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y))
+                        + row * 1.9f + (isHexGrid ? layoutGridSize.y * 0.7f / 3 : 0));
                 e.setPosition(pos);
                 window.addChild(e);
             }
@@ -152,9 +155,9 @@ public abstract class LayoutWindow {
             }
         }
     }
-
+    
     protected final void show(VAlign vAlign, HAlign hAlign) {
-        show(vAlign, hAlign, false);
+        show(vAlign, hAlign);
     }
 
     /**
@@ -166,12 +169,13 @@ public abstract class LayoutWindow {
      * @param vAlign Vertical alignement to use
      */
     protected final void show(VAlign vAlign, HAlign hAlign, boolean isHexGrid) {
-        Vector2f size = getWindowSize(isHexGrid);
+        this.isHexGrid = isHexGrid;
+        Vector2f size = getWindowSize();
         Vector2f position = new Vector2f();
         if (vAlign == null && hAlign == null) {
             position.x = screen.getWidth() / 2 - size.x / 2;
             position.y = screen.getHeight() / 2 - size.y / 2;
-            show(position, isHexGrid);
+            show(position);
         } else {
             if (vAlign != null) {
                 switch (vAlign) {
@@ -197,7 +201,7 @@ public abstract class LayoutWindow {
                         throw new UnsupportedOperationException(hAlign + " Not implemented");
                 }
             }
-            show(position, isHexGrid);
+            show(position);
         }
     }
 
@@ -214,11 +218,12 @@ public abstract class LayoutWindow {
      * @param align window following the parent.
      */
     protected final void showConstrainToParent(VAlign vAlign, HAlign hAlign, boolean isHexGrid) {
-        Vector2f size = getWindowSize(isHexGrid);
+        this.isHexGrid = isHexGrid;
+        Vector2f size = getWindowSize();
         if (parent != null) {
             Vector2f position = new Vector2f();
             if (vAlign == null && hAlign == null) {
-                show(position, isHexGrid);
+                show(position);
             } else {
                 if (vAlign != null) {
                     switch (vAlign) {
@@ -252,14 +257,14 @@ public abstract class LayoutWindow {
                 } else {
                     position.x = parent.getDimensions().x / 2 - size.x / 2;
                 }
-                show(position, isHexGrid);
+                show(position);
             }
         } else {
             throw new UnsupportedOperationException("There is no parent to align the element to.");
         }
     }
 
-    private Vector2f getWindowSize(boolean isHexGrid) {
+    private Vector2f getWindowSize() {
         int column, row;
         if (windowElementAlignement == Align.Horizontal) {
             column = elementAlignMaxCount;
@@ -270,8 +275,8 @@ public abstract class LayoutWindow {
         } else {
             throw new UnsupportedOperationException(windowElementAlignement + " is not a supported allignement.");
         }
-        return new Vector2f(column * layoutGridSize.x + (spacement * 2) + (isHexGrid && elementAlignMaxCount%2==0 ? layoutGridSize.x/2 : 0),
-                (row+0.9f) * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y) + (isHexGrid ? row * 2f : 0));
+        return new Vector2f(column * layoutGridSize.x + (spacement * 2) + (isHexGrid && elementAlignMaxCount % 2 == 0 ? layoutGridSize.x / 2 : 0),
+                (row + 0.9f) * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y) + (isHexGrid ? row * 2f : 0));
     }
 
     public void setVisible() {
@@ -308,6 +313,9 @@ public abstract class LayoutWindow {
             screen.removeElement(window);
         }
         window = null;
+    }
+    public void removeAndClear() {
+        removeFromScreen();
         elementList.clear();
     }
 
@@ -327,7 +335,7 @@ public abstract class LayoutWindow {
     public Vector2f getLayoutGridSize() {
         return layoutGridSize;
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Exposed Enum">
     public enum VAlign {
 

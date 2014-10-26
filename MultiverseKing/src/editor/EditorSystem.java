@@ -85,6 +85,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
 
     private void initializeForCurrent() {
         if (currentMode.equals("area")) {
+            if (app.getStateManager().getState(RenderSystem.class) == null) {
+                app.getStateManager().attach(new RenderSystem());
+            }
             if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
                 app.getStateManager().attach(new AreaMouseInputSystem());
             }
@@ -95,11 +98,11 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
             }
         } else if (currentMode.equals("world")) {
         } else if (currentMode.equals("battle")) {
-            if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-                app.getStateManager().attach(new AreaMouseInputSystem());
-            }
             if (app.getStateManager().getState(RenderSystem.class) == null) {
                 app.getStateManager().attach(new RenderSystem());
+            }
+            if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
+                app.getStateManager().attach(new AreaMouseInputSystem());
             }
             if (app.getStateManager().getState(BattleSystem.class) == null) {
                 app.getStateManager().attach(new BattleSystem());
@@ -118,12 +121,12 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
                 clearForCurrent(true);
             }
         }
-        currentDialogPopup.removeFromScreen();
+        currentDialogPopup.removeAndClear();
     }
 
     private void showDialog() {
         if (currentDialogPopup != null) {
-            currentDialogPopup.removeFromScreen();
+            currentDialogPopup.removeAndClear();
         }
         currentDialogPopup = new DialogWindow(((MultiverseMain) app).getScreen(), "Warning !", this);
         currentDialogPopup.addLabelField("All current system will be removed.");

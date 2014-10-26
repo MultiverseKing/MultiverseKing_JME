@@ -63,8 +63,6 @@ public class MultiverseMain extends SimpleApplication {
         assetManager.registerLocator(userHome, MapDataLoader.class);
         assetManager.registerLoader(MapDataLoader.class, "map");
 
-        assetManager.loadMaterial("Materials/debugMat.j3m");
-
         //Init general input 
         super.inputManager.clearMappings();
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));

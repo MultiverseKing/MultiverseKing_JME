@@ -9,6 +9,7 @@ import entitysystem.EntitySystemAppState;
 import entitysystem.attribut.CardRenderPosition;
 import entitysystem.card.CardRenderComponent;
 import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderComponent.Type;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
@@ -58,7 +59,7 @@ public class CardEditorSystem extends EntitySystemAppState {
 
     void addEntityCard(String name) {
         EntityId cardId = entityData.createEntity();
-        entityData.setComponent(cardId, new RenderComponent(name));
+        entityData.setComponent(cardId, new RenderComponent(name, Type.Units));
         entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
         entity.add(cardId);
     }

@@ -3,6 +3,7 @@ package entitysystem.render.utility;
 import com.jme3.asset.AssetManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Spatial;
+import entitysystem.render.RenderComponent.Type;
 
 /**
  *
@@ -16,8 +17,8 @@ public class SpatialInitializer {
         this.assetManager = am;
     }
 
-    public Spatial initialize(String name) {
-        Spatial model = assetManager.loadModel("Models/Units/" + name + ".j3o");
+    public Spatial initialize(String name, Type type) {
+        Spatial model = assetManager.loadModel("Models/"+type.toString()+"/" + name + ".j3o");
         model.setShadowMode(RenderQueue.ShadowMode.Inherit);
         return model;
     }

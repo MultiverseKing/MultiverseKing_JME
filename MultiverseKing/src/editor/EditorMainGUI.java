@@ -166,7 +166,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                     if (editorWindow == null) {
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
                     } else if (editorWindow instanceof CardEditorWindow == false) {
-                        editorWindow.removeFromScreen();
+                        editorWindow.removeAndClear();
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
                     } else if (editorWindow.isVisible()) {
                         editorWindow.hide();
@@ -198,7 +198,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                             system.initializeAreaEditor(null);
                         } else if (Byte.valueOf(value).equals((byte) 1)) { //Load
                             if (currentDialogPopup != null) {
-                                currentDialogPopup.removeFromScreen();
+                                currentDialogPopup.removeAndClear();
                             }
                             currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Area", this);
                         } else {
@@ -213,7 +213,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                 if (value.equals("GenBattle")) {
                 } else if (value.equals("LoadBattle")) {
                     if (currentDialogPopup != null) {
-                        currentDialogPopup.removeFromScreen();
+                        currentDialogPopup.removeAndClear();
                     }
                     currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Battle", this);
                 }
@@ -239,7 +239,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                 system.initializeBattle();
             }
         } else {
-            currentDialogPopup.removeFromScreen();
+            currentDialogPopup.removeAndClear();
         }
     }
 

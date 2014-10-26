@@ -101,8 +101,8 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
         current = label.charAt(0);
     }
 
-    private void reload() {
-        removeFromScreen();
+    private void reloadGrid() {
+        removeAndClear();
         populate();
         for (HexGridWindow w : hexWindow.values()) {
             w.setParent(getWindow());
@@ -116,7 +116,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
             } else if (collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).getAreaRadius() != (byte) (popup.getSpinnerInput("Radius") + 1)) {
                 collision.getCollisionLayer((byte) popup.getSpinnerInput("Layer")).setAreaRadius((byte) (popup.getSpinnerInput("Radius") + 1));
             }
-            reload();
+            reloadGrid();
             onButtonTrigger(Integer.toString(popup.getSpinnerInput("Layer")));
         }
         popup.hide();

@@ -109,7 +109,7 @@ class CardEditorProperties extends EditorWindow {
 
     public void setHitCollision(Collision collision) {
         if (collisionWin != null) {
-            collisionWin.removeFromScreen();
+            collisionWin.removeAndClear();
         }
         collisionWin = new CollisionWindow(screen, getWindow(), collision);
     }

@@ -24,6 +24,7 @@ import entitysystem.render.AnimationSystem;
 import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
 import entitysystem.SubSystem;
+import entitysystem.render.RenderComponent.Type;
 import hexsystem.area.AreaMouseInputSystem;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
         HexCoordinate pos = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
         entityData.setComponents(titanList.get(0),
                 new CardRenderComponent(CardRenderPosition.FIELD, name),
-                new RenderComponent(name),
+                new RenderComponent(name, Type.Units),
                 new HexPositionComponent(pos, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 new TimeBreakComponent(),
@@ -278,9 +279,9 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     @Override
     protected void cleanupSystem() {
         clearList();
-        bTrainingGUI.removeFromScreen();
+        bTrainingGUI.removeAndClear();
         mapData.Cleanup();
-        renderSystem.removeSubSystem(this);
+        renderSystem.removeSubSystem(this, false);
         app.getStateManager().detach(app.getStateManager().getState(CollisionSystem.class));
         app.getStateManager().detach(app.getStateManager().getState(AnimationSystem.class));
         app.getStateManager().detach(app.getStateManager().getState(MovementSystem.class));

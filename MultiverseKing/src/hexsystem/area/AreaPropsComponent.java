@@ -8,11 +8,9 @@ import com.simsilica.es.PersistentComponent;
  */
 public class AreaPropsComponent implements PersistentComponent {
 
-    private boolean isTrigger = false;
-    private boolean isImmune = false;
-
-    public AreaPropsComponent() {
-    }
+    private final boolean isTrigger;
+    private final boolean isImmune;
+    private final String propsName;
 
     /**
      * 
@@ -21,9 +19,16 @@ public class AreaPropsComponent implements PersistentComponent {
      * @param isImmune Define if the entity respond to undirect effect as when a
      * firebold hit it.
      */
-    public AreaPropsComponent(boolean isTrigger, boolean isImmune) {
+    public AreaPropsComponent(boolean isTrigger, boolean isImmune, String propsName) {
         this.isTrigger = isTrigger;
         this.isImmune = isImmune;
+        this.propsName = propsName;
+    }
+
+    public AreaPropsComponent(String propsName) {
+        this.isTrigger = false;
+        this.isImmune = false;
+        this.propsName = propsName;
     }
 
     public boolean isIsTrigger() {
@@ -32,5 +37,9 @@ public class AreaPropsComponent implements PersistentComponent {
 
     public boolean isIsImmune() {
         return isImmune;
+    }
+
+    public String getPropsName() {
+        return propsName;
     }
 }

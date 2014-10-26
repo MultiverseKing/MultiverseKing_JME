@@ -1,0 +1,15 @@
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
+     MaterialParameters {
+        ColorMap : Models/Debug/texst.png
+     }
+    AdditionalRenderState {
+      Blend Off
+      Wireframe Off
+      AlphaTestFalloff 0.0
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+      DepthWrite On
+      FaceCull Back
+    }
+}

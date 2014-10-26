@@ -4,13 +4,13 @@ import gui.LoadingPopup;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import editor.EditorSystem;
-import editor.EditorSystem;
 import editor.map.MapEditorSystem;
+import entitysystem.field.position.HexPositionComponent;
+import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaGridSystem;
 import hexsystem.area.AreaMouseInputSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
-import gui.LayoutWindow;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.base.HexTile;
 import org.hexgridapi.base.MapData;
@@ -40,14 +40,16 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(MapDataAppState.class).getMapData();
-        ((MultiverseMain) app).getStateManager().attach(new AreaGridSystem(mapData));
+        app.getStateManager().attach(new AreaGridSystem(mapData));
+        app.getStateManager().attach(new AreaEventRenderDebugSystem());
+        app.getStateManager().attach(new AreaEventSystem());
         if (popup != null) {
             reloadSystem(popup);
         } else {
             generateEmptyArea();
         }
         app.getStateManager().getState(AreaMouseInputSystem.class).registerTileInputListener(this);
-        return entityData.getEntities(AreaPropsComponent.class);
+        return entityData.getEntities(AreaPropsComponent.class, HexPositionComponent.class);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Tile propertie Getters && Setters">
@@ -102,7 +104,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
             if (!mapData.loadArea(popup.getInput())) {
                 popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
             } else {
-                popup.removeFromScreen();
+                popup.removeAndClear();
             }
         } else {
             if (popup != null) {
@@ -154,11 +156,14 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     public void leftMouseActionResult(MouseInputEvent event) {
-        closeWidgetMenu();
+        closeTileMenu();
     }
 
     public void rightMouseActionResult(MouseInputEvent event) {
         openWidgetMenu(event.getEventPosition());
+        if(tileEventMenu != null && !event.getEventPosition().equals(tileEventMenu.getInspectedTilePos())){
+            closeTileEventMenu();
+        }
     }
 
     /**
@@ -173,19 +178,32 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         tileWidgetMenu.show(tilePos, mapData.getTile(tilePos).getHeight());
     }
 
-    private void closeWidgetMenu() {
+    private void closeTileMenu() {
+        closeTileWidgetMenu();
+        closeTileEventMenu();
+    }
+
+    private void closeTileEventMenu() {
+        if (tileEventMenu != null && tileEventMenu.isVisible()) {
+            tileEventMenu.hide();
+        }
+    }
+
+    private void closeTileWidgetMenu() {
         if (tileWidgetMenu != null && tileWidgetMenu.isVisible()) {
             tileWidgetMenu.hide();
         }
-    }    
+    }
 
     void openEventMenu(HexCoordinate inspectedTilePos) {
-        if(tileEventMenu == null){
-            tileEventMenu = new TileEventMenu(((MultiverseMain) app).getScreen(), app.getStateManager().getState(EditorSystem.class).getGUI(), inspectedTilePos);;
+        if (tileEventMenu == null) {
+            tileEventMenu = new TileEventMenu(app.getStateManager().getState(AreaEventSystem.class), ((MultiverseMain) app).getScreen(), app.getStateManager().getState(EditorSystem.class).getGUI(), inspectedTilePos);;
         } else if (tileEventMenu.getInspectedTilePos() != inspectedTilePos) {
             tileEventMenu.setInpectedTile(inspectedTilePos);
         }
-        tileEventMenu.show();
+        if (!tileEventMenu.isVisible()) {
+            tileEventMenu.show();
+        }
     }
 
     void openAssetMenu(HexCoordinate inspectedTilePos) {
@@ -196,6 +214,9 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     protected void cleanupSystem() {
         mapData.Cleanup();
         app.getStateManager().getState(AreaMouseInputSystem.class).removeTileInputListener(this);
+        app.getStateManager().detach(app.getStateManager().getState(AreaGridSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(AreaEventRenderDebugSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(AreaEventSystem.class));
         if (tileWidgetMenu != null) {
             tileWidgetMenu.removeFromScreen();
         }

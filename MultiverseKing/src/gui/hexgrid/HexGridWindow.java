@@ -84,7 +84,7 @@ public class HexGridWindow extends LayoutWindow implements HexButtonListener {
 
     public void reload(byte radius, ArrayList<HexCoordinate> coordList) {
         this.radius = radius;
-        removeAndClear();
+        removeFromScreen();
         updateAlign(radius * 2 + 1);
         populateWin(coordList);
     }

@@ -279,7 +279,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     @Override
     protected void cleanupSystem() {
         clearList();
-        bTrainingGUI.removeAndClear();
+        bTrainingGUI.removeFromScreen();
         mapData.Cleanup();
         renderSystem.removeSubSystem(this, false);
         app.getStateManager().detach(app.getStateManager().getState(CollisionSystem.class));

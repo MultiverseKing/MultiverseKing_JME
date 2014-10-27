@@ -7,7 +7,6 @@ import hexsystem.area.AreaEventComponent.Event;
 import static hexsystem.area.AreaEventComponent.Event.trigger;
 import hexsystem.area.AreaEventSystem;
 import java.util.ArrayList;
-import java.util.List;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
@@ -74,7 +73,7 @@ public class TileEventMenu extends EditorWindow {
     private void initializeEvents() {
         currentEvent.clear();
         AreaEventComponent comp = system.getValue(inspectedTilePos);
-        if(comp != null){
+        if (comp != null) {
             for (Event e : comp.getEvent()) {
                 currentEvent.add(e);
             }
@@ -88,7 +87,7 @@ public class TileEventMenu extends EditorWindow {
     }
 
     private void reload() {
-        removeAndClear();
+        removeFromScreen();
         populateMenu();
         showConstrainToParent(VAlign.bottom, HAlign.right);
         window.setUseCloseButton(true);

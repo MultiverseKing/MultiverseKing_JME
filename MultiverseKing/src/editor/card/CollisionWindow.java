@@ -102,7 +102,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
     }
 
     private void reloadGrid() {
-        removeAndClear();
+        removeFromScreen();
         populate();
         for (HexGridWindow w : hexWindow.values()) {
             w.setParent(getWindow());

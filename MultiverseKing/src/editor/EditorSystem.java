@@ -10,6 +10,7 @@ import entitysystem.render.RenderSystem;
 import hexsystem.battle.BattleSystem;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
+import gui.FileManagerPopup;
 import gui.LoadingPopup;
 import hexsystem.area.AreaMouseInputSystem;
 import kingofmultiverse.MultiverseMain;
@@ -25,12 +26,16 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     private SimpleApplication app;
     private EditorMainGUI gui;
     private DialogWindow currentDialogPopup;
-    private String currentMode;
+    private String currentMode = "null";
     private boolean showDialog = false;
-    private LoadingPopup loadingPopup;
+    private FileManagerPopup fileManagerPopup;
 
     public Element getGUI() {
         return gui.getMainMenu();
+    }
+
+    public String getCurrentMode() {
+        return currentMode;
     }
 
     @Override
@@ -49,10 +54,17 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
      *
      * @param popup Set to null to create new map
      */
-    void initializeAreaEditor(LoadingPopup popup) {
+    void initializeAreaEditor(FileManagerPopup popup) {
         currentMode = "area";
         clearForCurrent(false);
-        loadingPopup = popup;
+        fileManagerPopup = popup;
+    }
+    
+    void saveCurrentArea(FileManagerPopup popup){
+        if(currentMode.equals("area")){
+            app.getStateManager().getState(AreaEditorSystem.class).save(popup);
+        }
+        fileManagerPopup.removeFromScreen();
     }
 
     private void clearForCurrent(boolean force) {
@@ -92,9 +104,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
                 app.getStateManager().attach(new AreaMouseInputSystem());
             }
             if (app.getStateManager().getState(AreaEditorSystem.class) == null) {
-                app.getStateManager().attach(new AreaEditorSystem(loadingPopup));
+                app.getStateManager().attach(new AreaEditorSystem(fileManagerPopup));
             } else {
-                app.getStateManager().getState(AreaEditorSystem.class).reloadSystem(loadingPopup);
+                app.getStateManager().getState(AreaEditorSystem.class).reloadSystem(fileManagerPopup);
             }
         } else if (currentMode.equals("world")) {
         } else if (currentMode.equals("battle")) {
@@ -121,12 +133,12 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
                 clearForCurrent(true);
             }
         }
-        currentDialogPopup.removeAndClear();
+        currentDialogPopup.removeFromScreen();
     }
 
     private void showDialog() {
         if (currentDialogPopup != null) {
-            currentDialogPopup.removeAndClear();
+            currentDialogPopup.removeFromScreen();
         }
         currentDialogPopup = new DialogWindow(((MultiverseMain) app).getScreen(), "Warning !", this);
         currentDialogPopup.addLabelField("All current system will be removed.");

@@ -3,6 +3,7 @@ package editor.map;
 import gui.LoadingPopup;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
+import gui.FileManagerPopup;
 
 /**
  * @todo to not use
@@ -35,7 +36,7 @@ public class WorldEditorSystem extends MapEditorSystem {
     }
 
     @Override
-    public void reloadSystem(LoadingPopup popup) {
+    public void reloadSystem(FileManagerPopup popup) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -55,7 +56,7 @@ public class WorldEditorSystem extends MapEditorSystem {
     }
 
     @Override
-    public void save(LoadingPopup popup) {
+    public void save(FileManagerPopup popup) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

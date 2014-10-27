@@ -56,9 +56,9 @@ public class DialogWindow extends EditorWindow {
     }
 
     @Override
-    public void removeAndClear() {
+    public void removeFromScreen() {
         removeMapping();
-        super.removeAndClear();
+        super.removeFromScreen();
     }
 
     private void removeMapping() {

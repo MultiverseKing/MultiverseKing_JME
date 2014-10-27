@@ -21,6 +21,7 @@ import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.MapData;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
@@ -243,6 +244,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
                 s.removeControl(MotionEvent.class);
             }
             Vector3f pos = positionComp.getPosition().convertToWorldPosition(mapData.getTile(positionComp.getPosition()).getHeight());
+//            pos.y += 0.1f;
             s.setLocalTranslation(pos);
             s.setLocalRotation(positionComp.getRotation().toQuaternion());
         }
@@ -286,7 +288,8 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         for (EntityId id : key) {
             if (entityData.getComponent(id, HexPositionComponent.class).getPosition().equals(event.getTilePos())) {
                 Vector3f currentLoc = spatials.get(id).getLocalTranslation();
-                spatials.get(id).setLocalTranslation(currentLoc.x, event.getNewTile().getHeight(), currentLoc.z);
+                spatials.get(id).setLocalTranslation(currentLoc.x, event.getNewTile().getHeight()
+                    * HexSetting.FLOOR_OFFSET + 0.1f, currentLoc.z);
             }
         }
     }

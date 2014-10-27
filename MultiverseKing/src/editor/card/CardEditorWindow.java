@@ -171,7 +171,7 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         if (subMenu == null) {
             subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
         } else if (!subMenu.getCurrent().equals(properties.getCardType())) {
-            subMenu.removeAndClear();
+            subMenu.removeFromScreen();
             subMenu = new CardEditorProperties(screen, getWindow(), (CardType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
             subMenu.setVisible();
         }

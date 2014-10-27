@@ -6,6 +6,7 @@ import com.simsilica.es.EntitySet;
 import editor.EditorSystem;
 import editor.map.MapEditorSystem;
 import entitysystem.field.position.HexPositionComponent;
+import gui.FileManagerPopup;
 import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaGridSystem;
 import hexsystem.area.AreaMouseInputSystem;
@@ -31,10 +32,12 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     private MapData mapData;
     private AreaTileWidget tileWidgetMenu;
     private TileEventMenu tileEventMenu;
-    private LoadingPopup popup = null;
+    private FileManagerPopup popup = null;
 
-    public AreaEditorSystem(LoadingPopup popup) {
-        this.popup = popup;
+    public AreaEditorSystem(FileManagerPopup popup) {
+        if(popup != null && popup.isLoading()){
+            this.popup = popup;
+        }
     }
 
     @Override
@@ -99,12 +102,12 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         generateEmptyArea();
     }
 
-    public void reloadSystem(LoadingPopup popup) {
+    public void reloadSystem(FileManagerPopup popup) {
         if (popup != null && popup.getInput() != null) {
             if (!mapData.loadArea(popup.getInput())) {
                 popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
             } else {
-                popup.removeAndClear();
+                popup.removeFromScreen();
             }
         } else {
             if (popup != null) {
@@ -114,7 +117,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         }
     }
 
-    public void save(LoadingPopup popup) {
+    public void save(FileManagerPopup popup) {
         if (isEmpty() || !mapData.saveArea(popup.getInput())) {
             popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
         }

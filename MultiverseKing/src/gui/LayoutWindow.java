@@ -313,9 +313,6 @@ public abstract class LayoutWindow {
             screen.removeElement(window);
         }
         window = null;
-    }
-    public void removeAndClear() {
-        removeFromScreen();
         elementList.clear();
     }
 

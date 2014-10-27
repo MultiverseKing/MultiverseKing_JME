@@ -5,6 +5,7 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
+import editor.area.AreaEditorSystem;
 import editor.card.CardEditorWindow;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -13,6 +14,7 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
+import gui.FileManagerPopup;
 import gui.LayoutWindow;
 import gui.LoadingPopup;
 
@@ -102,7 +104,7 @@ public final class EditorMainGUI implements DialogWindowListener {
     private void menuTrigger(EditorItem menu, boolean forceTrigger) {
         if (currentDialogPopup == null || !currentDialogPopup.isVisible()) {
             boolean showSubMenu = true;
-            if (currentMenuValue != menu || forceTrigger) {
+            if (currentMenuValue != menu || forceTrigger || menu == EditorItem.MAP) {
                 Menu subMenu;
                 currentMenuItem.removeAllMenuItems();
                 switch (menu) {
@@ -128,6 +130,9 @@ public final class EditorMainGUI implements DialogWindowListener {
                          */
                         subMenu.addMenuItem("New", 0, null);
                         subMenu.addMenuItem("Load", 1, null);
+                        if(system.getCurrentMode().equals("area")){
+                            subMenu.addMenuItem("Save", 2, null);
+                        }
                         for (MapEditorMode mode : MapEditorMode.values()) {
                             String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
                             currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
@@ -141,7 +146,9 @@ public final class EditorMainGUI implements DialogWindowListener {
                         showSubMenu = false;
                         break;
                     case BATTLE:
-                        currentMenuItem.addMenuItem("New Battle Map", "GenBattle", null);
+                        if(system.getCurrentMode().equals("area")){
+                            currentMenuItem.addMenuItem("Start from current", "useCurrent", null);
+                        }
                         currentMenuItem.addMenuItem("Load Battle Map", "LoadBattle", null);
 //                        showSubMenu = false;
                         break;
@@ -166,7 +173,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                     if (editorWindow == null) {
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
                     } else if (editorWindow instanceof CardEditorWindow == false) {
-                        editorWindow.removeAndClear();
+                        editorWindow.removeFromScreen();
                         editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
                     } else if (editorWindow.isVisible()) {
                         editorWindow.hide();
@@ -198,9 +205,14 @@ public final class EditorMainGUI implements DialogWindowListener {
                             system.initializeAreaEditor(null);
                         } else if (Byte.valueOf(value).equals((byte) 1)) { //Load
                             if (currentDialogPopup != null) {
-                                currentDialogPopup.removeAndClear();
+                                currentDialogPopup.removeFromScreen();
                             }
-                            currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Area", this);
+                            currentDialogPopup = new FileManagerPopup(main.getScreen(), "Load Area", this, true);
+                        } else if (Byte.valueOf(value).equals((byte) 2)) { //Save
+                            if (currentDialogPopup != null) {
+                                currentDialogPopup.removeFromScreen();
+                            }
+                            currentDialogPopup = new FileManagerPopup(main.getScreen(), "Save Area", this, false);
                         } else {
                             throw new UnsupportedOperationException(value + " is not a supported type.");
                         }
@@ -210,12 +222,12 @@ public final class EditorMainGUI implements DialogWindowListener {
                 }
                 break;
             case BATTLE:
-                if (value.equals("GenBattle")) {
+                if (value.equals("useCurrent")) {
                 } else if (value.equals("LoadBattle")) {
                     if (currentDialogPopup != null) {
-                        currentDialogPopup.removeAndClear();
+                        currentDialogPopup.removeFromScreen();
                     }
-                    currentDialogPopup = new LoadingPopup(main.getScreen(), "Load Battle", this);
+                    currentDialogPopup = new FileManagerPopup(main.getScreen(), "Load Area", this, true);
                 }
                 break;
             default:
@@ -230,7 +242,9 @@ public final class EditorMainGUI implements DialogWindowListener {
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
             if (dialogUID.equals("Load Area")) {
-                system.initializeAreaEditor((LoadingPopup) currentDialogPopup);
+                system.initializeAreaEditor((FileManagerPopup) currentDialogPopup);
+            } else if (dialogUID.equals("Save Area")) {
+                system.saveCurrentArea((FileManagerPopup) currentDialogPopup);
             } else if (dialogUID.equals("Load World")) {
                 /**
                  * @todo
@@ -239,7 +253,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                 system.initializeBattle();
             }
         } else {
-            currentDialogPopup.removeAndClear();
+            currentDialogPopup.removeFromScreen();
         }
     }
 

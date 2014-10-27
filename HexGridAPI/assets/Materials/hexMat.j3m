@@ -1,0 +1,12 @@
+Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
+#extension GL_EXT_texture_array : enable
+     MaterialParameters {
+     }
+    AdditionalRenderState {
+      ColorWrite On
+      Wireframe Off
+      Blend Alpha
+      DepthWrite Off
+      FaceCull Back
+    }
+}

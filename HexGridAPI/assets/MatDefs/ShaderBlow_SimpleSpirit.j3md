@@ -30,8 +30,6 @@ MaterialDef SimpleSprite {
         Defines {
 
             MULTIPLY_COLOR : Multiply_Color
-            FOG : FogColor
-            FOG_SKY : FogSkyBox
 
         }
     } 

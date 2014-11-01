@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.hexgridapi.loader.ChunkDataLoader;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * This class holds the hex data of the map.
@@ -37,29 +36,51 @@ import org.hexgridapi.utility.ElementalAttribut;
  */
 public class MapData {
 
-    private final AssetManager assetManager;
-    private ChunkData chunkData;
-    /**
-     * @deprecated should be used in the main project
-     */
-    private ElementalAttribut mapElement;
-    private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
-    private ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
-    private ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
-    private String mapName;// = "Reset";
+    protected final AssetManager assetManager;
+    protected ChunkData chunkData;
+    protected ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
+    protected ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
+    protected ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
+    protected String mapName;// = "Reset";
+    private final String[] textureKeys;
 
-    /**
-     * Base constructor.
-     *
-     * @param eAttribut
-     * @param assetManager
-     */
-    public MapData(ElementalAttribut eAttribut, AssetManager assetManager) {
+    public MapData(AssetManager assetManager) {
         this.assetManager = assetManager;
-        mapElement = eAttribut;
-//        assetManager.registerLocator("HexGridRessource.zip", ZipLocator.class);
+        this.textureKeys = new String[]{"EMPTY_TEXTURE_KEY"};
         chunkData = new ChunkData();
     }
+    
+    public MapData(Enum[] textureKeys, AssetManager assetManager) {
+        this.assetManager = assetManager;
+        this.textureKeys = genKeys(textureKeys);
+        chunkData = new ChunkData();
+    }
+
+    public MapData(String[] textureKeys, AssetManager assetManager) {
+        this.assetManager = assetManager;
+//        assetManager.registerLocator("HexGridRessource.zip", ZipLocator.class);
+        this.textureKeys = textureKeys;
+        chunkData = new ChunkData();
+    }
+    
+    private String[] genKeys(Enum[] textureKeys){
+        String[] keys = new String[textureKeys.length+1];
+        keys[0] = "EMPTY_TEXTURE_KEY";
+        for (int i = 0; i < textureKeys.length; i++) {
+            keys[i+1] = textureKeys[i].toString();
+        }
+        return keys;
+    }
+    
+    private String[] genKeys(String[] textureKeys){
+        String[] keys = new String[textureKeys.length+1];
+        keys[0] = "EMPTY_TEXTURE_KEY";
+        for (int i = 0; i < textureKeys.length; i++) {
+            keys[i+1] = textureKeys[i];
+        }
+        return keys;
+    }
+    
 
     /**
      * Register a listener to respond to Tile Event.
@@ -106,13 +127,6 @@ public class MapData {
     }
 
     /**
-     * @return current map element.
-     */
-    public ElementalAttribut getMapElement() {
-        return mapElement;
-    }
-
-    /**
      * @return current map name.
      */
     public String getMapName() {
@@ -131,15 +145,6 @@ public class MapData {
      */
     public boolean containTilesData() {
         return !chunkData.isEmpty();
-    }
-
-    /**
-     * @deprecated should be in the game project
-     */
-    public void setMapElement(ElementalAttribut eAttribut) {
-        mapElement = eAttribut;
-        chunkData.setAllTile(mapElement);
-        chunkEvent(new ChunkChangeEvent(false));
     }
 
     /**
@@ -166,7 +171,7 @@ public class MapData {
             tiles = new HexTile[HexSetting.CHUNK_SIZE][HexSetting.CHUNK_SIZE];
             for (int y = 0; y < HexSetting.CHUNK_SIZE; y++) {
                 for (int x = 0; x < HexSetting.CHUNK_SIZE; x++) {
-                    tiles[x][y] = new HexTile(mapElement, HexSetting.GROUND_HEIGHT);
+                    tiles[x][y] = new HexTile(HexSetting.GROUND_HEIGHT);
                 }
             }
         }
@@ -228,15 +233,16 @@ public class MapData {
         }
     }
 
-    /**
-     * @deprecated game project
-     */
-    public void setTileEAttribut(HexCoordinate tilePos, ElementalAttribut eAttribut) {
-        setTile(tilePos, getTile(tilePos).cloneChangedElement(eAttribut));
-    }
-
     public void setTileHeight(HexCoordinate tilePos, byte height) {
         setTile(tilePos, getTile(tilePos).cloneChangedHeight(height));
+    }
+
+    public void setTileTextureKey(HexCoordinate tilePos, String key) {
+        setTile(tilePos, getTile(tilePos).cloneChangedTextureKey(getTextureKey(key)));
+    }
+
+    public void setMapTexture(String Key) {
+        chunkData.setAllTile(null, getTextureKey(Key));
     }
 
     /**
@@ -337,7 +343,6 @@ public class MapData {
                 BinaryExporter exporter = BinaryExporter.getInstance();
                 org.hexgridapi.loader.MapDataLoader mdLoader = new org.hexgridapi.loader.MapDataLoader();
 
-                mdLoader.setMapElement(mapElement);
                 mdLoader.setChunkPos(chunkPos);
 
                 File file = new File(userHome + "/Data/MapData/" + mapName + "/" + mapName + ".map");
@@ -413,7 +418,6 @@ public class MapData {
         org.hexgridapi.loader.MapDataLoader mdLoader = (org.hexgridapi.loader.MapDataLoader) assetManager.loadAsset("/Data/MapData/" + name + "/" + name + ".map");
         Cleanup();
         mapName = name;
-        mapElement = mdLoader.getMapElement();
         chunkPos = mdLoader.getChunkPos();
         for (byte i = 0; i < chunkPos.size(); i++) {
             loadChunk(chunkPos.get(i), mapName);
@@ -449,5 +453,18 @@ public class MapData {
         chunkPos.clear();
         chunkData.clear();
         chunkEvent(new ChunkChangeEvent(true));
+    }
+
+    public String getTextureValue(byte textureKey) {
+        return textureKeys[textureKey];
+    }
+
+    public byte getTextureKey(String value) {
+        for (byte i = 0; i < textureKeys.length; i++) {
+            if (textureKeys[i].equals(value)) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

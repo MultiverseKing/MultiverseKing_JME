@@ -14,7 +14,7 @@ import org.hexgridapi.utility.Vector2Int;
  * @todo improve method to not have the use of System.ArrayCopy
  * @author roah
  */
-public final class MeshManager {
+public final class MeshManager1 {
 
     private static final float hexRadius = HexSetting.HEX_RADIUS;
     private static float hexWidth = HexSetting.HEX_WIDTH;
@@ -36,16 +36,16 @@ public final class MeshManager {
         Vector3f[] mergedVertices = new Vector3f[triVert.length + quadVert.length];
         Vector2f[] mergedtextCoord = new Vector2f[triText.length + quadText.length];
         int[] mergedIndex = new int[triIndex.length + quadIndex.length];
-
+        
         System.arraycopy(triVert, 0, mergedVertices, 0, triVert.length);
         System.arraycopy(quadVert, 0, mergedVertices, triVert.length, quadVert.length);
-
+        
         System.arraycopy(triText, 0, mergedtextCoord, 0, triText.length);
         System.arraycopy(quadText, 0, mergedtextCoord, triText.length, quadText.length);
-
+        
         System.arraycopy(triIndex, 0, mergedIndex, 0, triIndex.length);
         System.arraycopy(quadIndex, 0, mergedIndex, triIndex.length, quadIndex.length);
-
+        
         return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
     }
 
@@ -319,13 +319,13 @@ public final class MeshManager {
             for (int i = 0; i < size.x * 4; i += 4) {
                 texCoord[i] = new Vector2f(j + 0.5f, 0f);
                 texCoord[i + 1] = new Vector2f(j, 0.25f);
-                texCoord[i + 2] = new Vector2f(j, 0.25f);//Y+
-                texCoord[i + 3] = new Vector2f(j + 0.5f, 0f);
+                texCoord[i + 2] = new Vector2f(j, 0.75f);//Y+
+                texCoord[i + 3] = new Vector2f(j + 0.5f, 1f);
                 j++;
             }
         }
         texCoord[size.x * 4] = new Vector2f(j, 0.25f);
-        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.25f);
+        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.75f);
         return texCoord;
     }
 
@@ -492,30 +492,30 @@ public final class MeshManager {
         }
         return index;
     }
-
+    
     private static Vector2f[] getSideVerticestexCoord(Vector2Int size, int height) {
         Vector2f[] texCoord = new Vector2f[(size.x * 4 + 3) * 2];
         float h = height * 0.5f;
         int j = 0;
         for (int i = 0; i < size.x; i++) {
-            texCoord[j] = new Vector2f(0, 0.75f);
-            texCoord[j + 1] = new Vector2f(0, 1f);
-            texCoord[j + 2] = new Vector2f(0, 1f);
-            texCoord[j + 3] = new Vector2f(0, 0.75f);
+            texCoord[j] = new Vector2f(0, 0.25f);
+            texCoord[j + 1] = new Vector2f(0, 0.75f);
+            texCoord[j + 2] = new Vector2f(0, 0.75f);
+            texCoord[j + 3] = new Vector2f(0, 0.25f);
 
-            texCoord[j + 4] = new Vector2f(h, 0.75f);
-            texCoord[j + 5] = new Vector2f(h, 1f);
-            texCoord[j + 6] = new Vector2f(h, 1f);
-            texCoord[j + 7] = new Vector2f(h, 0.75f);
+            texCoord[j + 4] = new Vector2f(h, 0.25f);
+            texCoord[j + 5] = new Vector2f(h, 0.75f);
+            texCoord[j + 6] = new Vector2f(h, 0.75f);
+            texCoord[j + 7] = new Vector2f(h, 0.25f);
             j += 8;
         }
-        texCoord[texCoord.length - 6] = new Vector2f(0, 1f);
-        texCoord[texCoord.length - 5] = new Vector2f(0, 0.75f);
-        texCoord[texCoord.length - 4] = new Vector2f(h, 1f);
-        texCoord[texCoord.length - 3] = new Vector2f(h, 0.75f);
+        texCoord[texCoord.length - 6] = new Vector2f(0, 0.75f);
+        texCoord[texCoord.length - 5] = new Vector2f(0, 0.25f);
+        texCoord[texCoord.length - 4] = new Vector2f(h, 0.75f);
+        texCoord[texCoord.length - 3] = new Vector2f(h, 0.25f);
 
-        texCoord[texCoord.length - 2] = new Vector2f(0, 0.75f);
-        texCoord[texCoord.length - 1] = new Vector2f(h, 0.75f);
+        texCoord[texCoord.length - 2] = new Vector2f(0, 0.25f);
+        texCoord[texCoord.length - 1] = new Vector2f(h, 0.25f);
 
         return texCoord;
     }

@@ -28,6 +28,7 @@ public class HexGridManager implements ChunkChangeListener, TileChangeListener {
     protected Node gridNode;
     protected HashMap chunksNodes = new HashMap<Vector2Int, Node>();
     protected AssetManager assetManager;
+    protected String texturePath;
 
     public HexGridManager(MapData mapData) {
         this(mapData, new Node("HexGridNode"));
@@ -70,7 +71,7 @@ public class HexGridManager implements ChunkChangeListener, TileChangeListener {
         Node chunk = new Node(pos.toString());
         chunksNodes.put(pos, chunk);
         chunk.setLocalTranslation(MapData.getChunkWorldPosition(pos));
-        chunk.addControl(new ChunkControl(meshParam, assetManager));
+        chunk.addControl(new ChunkControl(meshParam, assetManager, texturePath));
         gridNode.attachChild(chunk);
     }
 
@@ -80,7 +81,7 @@ public class HexGridManager implements ChunkChangeListener, TileChangeListener {
      * @param event contain information on the last tile event.
      */
     public final void tileChange(TileChangeEvent event) {
-        if (event.getNewTile().getElement() != event.getOldTile().getElement()
+        if (event.getNewTile().getTextureKey() != event.getOldTile().getTextureKey()
                 || event.getNewTile().getHeight() != event.getOldTile().getHeight()) {
             gridNode.getChild(event.getChunkPos().toString()).getControl(ChunkControl.class).update();
         }

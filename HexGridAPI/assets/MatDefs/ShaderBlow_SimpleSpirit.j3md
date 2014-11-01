@@ -9,10 +9,6 @@ MaterialDef SimpleSprite {
         Int numTilesV
         Int Speed
 
-        // Fog
-        Color FogColor
-        TextureCubeMap FogSkyBox
-
         // Multiply Color system
         Color Multiply_Color
 

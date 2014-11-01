@@ -6,40 +6,22 @@ package org.hexgridapi.utility;
  */
 public enum ElementalAttribut {
 
-    /**
-     *
-     */
     EARTH,
-    /**
-     *
-     */
     NATURE,
-    /**
-     *
-     */
     ICE,
-    /**
-     *
-     */
     VOLT,
-    /**
-     *
-     */
     WATER;
+    
     private static final byte SIZE = (byte) ElementalAttribut.values().length;
 
-    /**
-     *
-     * @return
-     */
     public static int getSize() {
         return SIZE;
     }
 
     /**
      * Convert a number to ElementalAttribut, if there is no convertion for the
-     * input number, the ElementalAttribut will be set to NULL, 
-     * default == ElementalAttribut.NULL;
+     * input number, the ElementalAttribut will be set to NULL, default ==
+     * ElementalAttribut.NULL;
      *
      * @param x number to convert.
      * @return converted int.

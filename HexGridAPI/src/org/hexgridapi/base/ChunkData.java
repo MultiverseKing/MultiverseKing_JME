@@ -1,24 +1,23 @@
 package org.hexgridapi.base;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * Contain all hex room data.
  * @author roah
  */
-final class ChunkData {
+public class ChunkData {
 
     /**
      * Map holding all chunk on the current memory.
      */
-    HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
+    protected HashMap<Vector2Int, HexTile[][]> chunks = new HashMap<Vector2Int, HexTile[][]>();
 
-    void add(Vector2Int chunkPos, HexTile[][] tiles) {
+    public void add(Vector2Int chunkPos, HexTile[][] tiles) {
         chunks.put(chunkPos, tiles);
     }
 
@@ -29,7 +28,7 @@ final class ChunkData {
      * @param tilePos tilePos inside the chunk.
      * @return null if the tile doesn't exist.
      */
-    HexTile getTile(Vector2Int chunk, HexCoordinate tilePos) {
+    public HexTile getTile(Vector2Int chunk, HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
         HexTile[][] tiles = chunks.get(chunk);
         if (tiles != null) {
@@ -52,7 +51,7 @@ final class ChunkData {
      * @param t tile properties.
      * @return true if the value is set correctly, false otherwise.
      */
-    boolean setTile(Vector2Int chunk, HexCoordinate tilePos, HexTile t) {
+    public boolean setTile(Vector2Int chunk, HexCoordinate tilePos, HexTile t) {
         Vector2Int tileOffset = tilePos.getAsOffset();
         HexTile[][] tiles = chunks.get(chunk);
         if (tiles != null) {
@@ -68,32 +67,38 @@ final class ChunkData {
         return false;
     }
 
-    boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
+    public boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
         Vector2Int tileOffset = tilePos.getAsOffset();
         return chunks.get(chunk)[tileOffset.x][tileOffset.y] == null ? false : true;
     }
 
-    void setAllTile(ElementalAttribut eAttribut) {
-        Set<Entry<Vector2Int, HexTile[][]>> chunkValue = chunks.entrySet();
-        for (Entry<Vector2Int, HexTile[][]> chunk : chunkValue) {
+    public HexTile[][] getChunkTiles(Vector2Int chunkPos) {
+        return chunks.get(chunkPos);
+    }
+    
+    public void setAllTile(Byte height, Byte textureKey){
+        Set<Map.Entry<Vector2Int, HexTile[][]>> chunkValue = chunks.entrySet();
+        for (Map.Entry<Vector2Int, HexTile[][]> chunk : chunkValue) {
             HexTile[][] tiles = chunk.getValue();
             for (int j = 0; j < tiles.length; j++) {
                 for (int k = 0; k < tiles[j].length; k++) {
-                    tiles[j][k] = tiles[j][k].cloneChangedElement(eAttribut);
+                    if(textureKey != null && height != null){
+                        tiles[j][k] = new HexTile(height, textureKey);
+                    } else if (height != null){
+                        tiles[j][k] = tiles[j][k].cloneChangedHeight(height);
+                    } else if (textureKey != null){
+                        tiles[j][k] = tiles[j][k].cloneChangedTextureKey(textureKey);
+                    }
                 }
             }
         }
     }
-
-    HexTile[][] getChunkTiles(Vector2Int chunkPos) {
-        return chunks.get(chunkPos);
-    }
-
-    void clear() {
+    
+    public void clear() {
         chunks.clear();
     }
     
-    boolean isEmpty(){
+    public boolean isEmpty(){
         return chunks.isEmpty();
     }
 }

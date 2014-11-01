@@ -2,12 +2,10 @@ package org.hexgridapi.base;
 
 import com.jme3.scene.Mesh;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Set;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * Used to generate the needed data used by the MeshManager.
@@ -35,7 +33,7 @@ public final class MeshParameter {
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private EnumMap<ElementalAttribut, ArrayList<Integer>> elementTypeRef = new EnumMap<ElementalAttribut, ArrayList<Integer>>(ElementalAttribut.class);
+    private HashMap<String, ArrayList<Integer>> elementTypeRef = new HashMap<String, ArrayList<Integer>>();
     /**
      * Used to define which algorithm to use with meshmanager.
      */
@@ -43,7 +41,7 @@ public final class MeshParameter {
     /**
      * Current element param returned.
      */
-    private ElementalAttribut currentElement;
+    private String currentElement;
     private int currentIndex;
 
     /**
@@ -87,12 +85,12 @@ public final class MeshParameter {
             for (int x = 0; x < chunkSize; x++) {
                 if (!isVisited[x][y]) {
                     HexTile currentTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x, y));
-                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(currentTile.getElement())) {
+                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(mapData.getTextureValue(currentTile.getTextureKey()))) {
                         ArrayList<Integer> list = new ArrayList<Integer>();
-                        elementTypeRef.put(currentTile.getElement(), list);
+                        elementTypeRef.put(mapData.getTextureValue(currentTile.getTextureKey()), list);
                     }
-                    elementTypeRef.get(currentTile.getElement()).add(posInList);
-                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (byte) currentTile.getHeight());
+                    elementTypeRef.get(mapData.getTextureValue(currentTile.getTextureKey())).add(posInList);
+                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), currentTile.getHeight());
                     setSize(chunkSize, posInList, isVisited, currentTile);
                     posInList++;
                 }
@@ -109,7 +107,7 @@ public final class MeshParameter {
     private void setSize(int chunksize, int posInList, boolean[][] isVisited, HexTile currentTile) {
         for (int x = 1; x < chunksize - position.get(posInList).x; x++) {
             HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
-            if (nextTile.getElement() == currentTile.getElement()
+            if (mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
                     && nextTile.getHeight() == currentTile.getHeight()) {
                 this.size.get(posInList).x++;
                 isVisited[x + position.get(posInList).x][position.get(posInList).y] = true;
@@ -126,7 +124,7 @@ public final class MeshParameter {
             //We check if the next Y line got the same properties
             for (int x = 0; x < size.get(posInList).x; x++) {
                 HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
-                if (nextTile.getElement() != currentTile.getElement()
+                if (!mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
                         || nextTile.getHeight() != currentTile.getHeight()) {
                     //if one tile didn't match the requirement we stop the search
                     return;
@@ -141,14 +139,14 @@ public final class MeshParameter {
         }
     }
 
-    public HashMap<ElementalAttribut, Mesh> getMesh(boolean onlyGround, Shape chunkShape) {
+    public HashMap<String, Mesh> getMesh(boolean onlyGround, Shape chunkShape) {
         clear();
         initialize(onlyGround, chunkShape);
-        HashMap<ElementalAttribut, Mesh> mesh = new HashMap<ElementalAttribut, Mesh>(elementTypeRef.size());
-        for (ElementalAttribut e : elementTypeRef.keySet()) {
-            currentElement = e;
+        HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
+        for (String value : elementTypeRef.keySet()) {
+            currentElement = value;
             currentIndex = -1;
-            mesh.put(e, meshManager.getMesh(this));
+            mesh.put(value, meshManager.getMesh(this));
         }
         return mesh;
     }
@@ -170,7 +168,7 @@ public final class MeshParameter {
     /**
      * @return a list of all element.
      */
-    public Set<ElementalAttribut> getAllElementInList() {
+    public Set<String> getAllElementInList() {
         return this.elementTypeRef.keySet();
     }
 

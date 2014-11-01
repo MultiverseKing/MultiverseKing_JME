@@ -6,7 +6,6 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
 import java.io.IOException;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * tile data used in room grid.
@@ -15,97 +14,62 @@ import org.hexgridapi.utility.ElementalAttribut;
  */
 public class HexTile implements Savable {
 
-    /**
-     * @deprecated should be used in the gameProject
-     */
-    protected byte element;
-    protected int height;
-
-    /**
-     *
-     */
+    protected byte height;
+    protected byte textureKey;
+    
     public HexTile() {
-        this.element = (byte) ElementalAttribut.EARTH.ordinal();
         this.height = 0;
+        this.textureKey = 0;
     }
 
-    /**
-     *
-     * @param eAttribut
-     */
-    public HexTile(ElementalAttribut eAttribut) {
-        this.element = (byte) eAttribut.ordinal();
-        this.height = 0;
-    }
-
-    /**
-     *
-     * @param hexElement
-     * @param height
-     */
-    public HexTile(ElementalAttribut hexElement, int height) {
-        this.element = (byte) hexElement.ordinal();
+    public HexTile(byte height) {
         this.height = height;
+        this.textureKey = 0;
     }
 
-    /**
-     *
-     * @return
-     */
-    public ElementalAttribut getElement() {
-        return ElementalAttribut.convert(element);
+    public HexTile(byte height, byte textureKey) {
+        this.height = height;
+        this.textureKey = textureKey;
     }
-
-    /**
-     *
-     * @return
-     */
-    public int getHeight() {
+    
+    public byte getHeight() {
         return height;
     }
 
-    /**
-     *
-     * @param ex
-     * @throws IOException
-     */
+    public byte getTextureKey() {
+        return textureKey;
+    }
+    
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
         capsule.write(height, "height", 0);
-        capsule.write(element, "element", 0);
-//        System.out.println(height + " "+element);
+        capsule.write(textureKey, "textureKey", 0);
     }
 
-    /**
-     *
-     * @param im
-     * @throws IOException
-     */
+    protected void extendedWrite(OutputCapsule capsule) throws IOException {
+    }
+    
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
 //        capsule.readByte("height", height);
 //        capsule.readByte("element", element);
-        height = (byte) capsule.readInt("height", 0);
-        element = (byte) capsule.readInt("element", ElementalAttribut.EARTH.ordinal());
+        height = (byte) capsule.readByte("height", (byte)0);
+        textureKey = (byte) capsule.readByte("textureKey", (byte)0);
     }
 
-    /**
-     * Returns a clone of this tile with changed Element param.
-     *
-     * @param element ElementalAttribut
-     * @return
-     */
-    public HexTile cloneChangedElement(ElementalAttribut element) {
-        return new HexTile(element, height);
+    protected void extendedread(InputCapsule capsule) throws IOException {
     }
 
     /**
      * Returns a clone of this tile with changed height param.
-     *
-     * @param height
-     * @return
      */
-    public HexTile cloneChangedHeight(int height) {
-        return new HexTile(ElementalAttribut.convert(element), height);
+    public HexTile cloneChangedHeight(byte height) {
+        return new HexTile(height, textureKey);
+    }
+    /**
+     * Returns a clone of this tile with changed texture param.
+     */
+    public HexTile cloneChangedTextureKey(byte textureKey) {
+        return new HexTile(height, textureKey);
     }
 }

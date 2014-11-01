@@ -22,8 +22,9 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
     private boolean enabled = true;
     protected MapData mapData;
 
-    public AbstractHexGridAppState(MapData mapData) {
+    public AbstractHexGridAppState(MapData mapData, String texturePath) {
         super(mapData);
+        this.texturePath = texturePath;
         this.mapData = mapData;
     }
 

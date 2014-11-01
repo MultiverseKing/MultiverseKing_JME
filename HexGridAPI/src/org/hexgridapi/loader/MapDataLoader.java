@@ -27,54 +27,21 @@ import org.hexgridapi.utility.ElementalAttribut;
 public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
 
     private String rootPath;
-    private ElementalAttribut mapElement;
     private ArrayList<Vector2Int> chunkPos = new ArrayList<Vector2Int>();
-
-    /**
-     *
-     */
+    
     public MapDataLoader() {
     }
-
-    /**
-     *
-     * @param eAttribut
-     */
-    public void setMapElement(ElementalAttribut eAttribut) {
-        this.mapElement = eAttribut;
-    }
-
-    /**
-     *
-     * @param chunkPos
-     */
+    
     public void setChunkPos(ArrayList<Vector2Int> chunkPos) {
         this.chunkPos = chunkPos;
     }
-    /**
-     *
-     * @return
-     */
-    public ElementalAttribut getMapElement() {
-        return mapElement;
-    }
-
-    /**
-     *
-     * @return
-     */
+    
     public ArrayList<Vector2Int> getChunkPos() {
         return chunkPos;
     }
-
-    /**
-     *
-     * @param ex
-     * @throws IOException
-     */
+    
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule capsule = ex.getCapsule(this);
-        capsule.write(mapElement, "mapElement", ElementalAttribut.ICE);
         capsule.writeSavableArrayList(chunkPos, "chunkPos", new ArrayList<Vector2Int>());
     }
 
@@ -85,16 +52,9 @@ public class MapDataLoader implements Savable, AssetLoader, AssetLocator {
      */
     public void read(JmeImporter im) throws IOException {
         InputCapsule capsule = im.getCapsule(this);
-        mapElement = capsule.readEnum("mapElement", ElementalAttribut.class, ElementalAttribut.ICE);
         chunkPos = capsule.readSavableArrayList("chunkPos", new ArrayList<Vector2Int>());
     }
-
-    /**
-     *
-     * @param assetInfo
-     * @return
-     * @throws IOException
-     */
+    
     public Object load(AssetInfo assetInfo) throws IOException {
         BinaryImporter importer = BinaryImporter.getInstance();
         return importer.load(assetInfo.openStream());

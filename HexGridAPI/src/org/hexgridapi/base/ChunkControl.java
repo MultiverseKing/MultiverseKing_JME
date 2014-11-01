@@ -11,7 +11,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  * Directly control the chunk geometry, all tiles geometry.
@@ -22,10 +21,12 @@ public class ChunkControl extends AbstractControl {
 
     private final AssetManager assetManager;
     private final MeshParameter meshParam;
+    private final String texturePath;
     
-    public ChunkControl(MeshParameter meshParam, AssetManager assetManager) {
+    public ChunkControl(MeshParameter meshParam, AssetManager assetManager, String texturePath) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
+        this.texturePath = texturePath;
     }
 
     @Override
@@ -61,15 +62,20 @@ public class ChunkControl extends AbstractControl {
          */
         ((Node) spatial).detachAllChildren();
         /**
-         * Generate the tile and attach them with the right texture. 1 object by
-         * element.
+         * Generate the tile and attach them with the right texture. 
+         * 1 geometry by texture.
          */
-        HashMap<ElementalAttribut, Mesh> mesh = meshParam.getMesh(false, MeshParameter.Shape.SQUARE);
+        HashMap<String, Mesh> mesh = meshParam.getMesh(false, MeshParameter.Shape.SQUARE);
 
-        for (ElementalAttribut e : mesh.keySet()) {
-            Geometry tile = new Geometry(e.toString(), mesh.get(e));
+        for (String value : mesh.keySet()) {
+            Geometry tile = new Geometry(value, mesh.get(value));
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
-            Texture text = assetManager.loadTexture("Textures/HexField/" + e.toString() + ".png");
+            Texture text;
+            if(value.equals("EMPTY_TEXTURE_KEY")) {
+                text = assetManager.loadTexture("/Textures/" + value + ".png");
+            } else {
+                text = assetManager.loadTexture(texturePath + value + ".png");
+            }
             text.setWrap(Texture.WrapMode.Repeat);
             mat.setTexture("ColorMap", text);
 //            mat.getAdditionalRenderState().setWireframe(true);

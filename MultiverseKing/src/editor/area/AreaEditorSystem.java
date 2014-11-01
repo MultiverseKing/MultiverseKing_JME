@@ -1,6 +1,5 @@
 package editor.area;
 
-import gui.LoadingPopup;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import editor.EditorSystem;
@@ -30,6 +29,7 @@ import org.hexgridapi.utility.Vector2Int;
 public final class AreaEditorSystem extends MapEditorSystem implements TileChangeListener, MouseInputListener {
 
     private MapData mapData;
+    private ElementalAttribut mapElement;
     private AreaTileWidget tileWidgetMenu;
     private TileEventMenu tileEventMenu;
     private FileManagerPopup popup = null;
@@ -61,12 +61,12 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
      * @param coord
      * @param height how many to add
      */
-    void setTileProperties(HexCoordinate coord, int height) {
+    void setTileProperties(HexCoordinate coord, byte height) {
         mapData.setTileHeight(coord, (byte) (mapData.getTile(coord).getHeight() + height));
     }
 
-    void setTileProperties(HexCoordinate coord, ElementalAttribut eAttribut) {
-        mapData.setTileEAttribut(coord, eAttribut);
+    void setTileProperties(HexCoordinate coord, String eAttribut) {
+        mapData.setTileTextureKey(coord, eAttribut);
     }
 
     void setTileProperties(HexCoordinate coord, HexTile tile) {
@@ -74,7 +74,12 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     ElementalAttribut getTileEAttribut(HexCoordinate coord) {
-        return mapData.getTile(coord).getElement();
+        ElementalAttribut eAttribut;
+        try {
+            return ElementalAttribut.valueOf(mapData.getTextureValue(mapData.getTile(coord).getTextureKey()));
+        } catch (IllegalArgumentException e){
+            return null;
+        }
     }
 
     int getTileHeight(HexCoordinate coord) {
@@ -82,11 +87,11 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     void setMapElement(ElementalAttribut eAttribut) {
-        mapData.setMapElement(eAttribut);
+        mapData.setMapTexture(eAttribut.toString());
     }
 
     ElementalAttribut getMapElement() {
-        return mapData.getMapElement();
+        return mapElement;
     }
     // </editor-fold>
 

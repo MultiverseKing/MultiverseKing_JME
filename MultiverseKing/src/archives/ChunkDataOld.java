@@ -149,7 +149,7 @@ class ChunkDataOld {
             if (chunkKey[i] != null && chunkValue[i] != null) {
                 for (int j = 0; j < chunkValue[i].length; j++) {
                     for (int k = 0; k < chunkValue[i][j].length; k++) {
-                        chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
+//                        chunkValue[i][j][k] = new HexTile(eAttribut, (byte) chunkValue[i][j][k].getHeight());
                     }
                 }
             }

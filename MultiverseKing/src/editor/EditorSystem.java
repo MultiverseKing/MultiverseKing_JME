@@ -11,7 +11,6 @@ import hexsystem.battle.BattleSystem;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.FileManagerPopup;
-import gui.LoadingPopup;
 import hexsystem.area.AreaMouseInputSystem;
 import kingofmultiverse.MultiverseMain;
 import tonegod.gui.core.Element;

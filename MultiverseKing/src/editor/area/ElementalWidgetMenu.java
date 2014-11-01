@@ -1,6 +1,5 @@
 package editor.area;
 
-import editor.area.AreaEditorSystem;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
@@ -23,7 +22,7 @@ class ElementalWidgetMenu extends CameraTrackWindow {
     private final AreaEditorSystem system;
     private final CameraTrackWindow elementParent;
     private Element eIconContainer = null;
-    private ElementalAttribut ignoredEAttribut;
+    private String ignoredEAttribut;
 
     ElementalWidgetMenu(ElementManager screen, Camera camera, AreaEditorSystem system, CameraTrackWindow parent, Vector2f position, Vector2f dimensions, String defaultImg) {
         super(screen, camera, position);
@@ -41,14 +40,14 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         }
         byte j = 0;
         int i = 0;
-        while (i < ElementalAttribut.values().length) {
+        while (i < ElementalAttribut.values().length + 1) {
             ElementalAttribut e = ElementalAttribut.convert(i);
-            if (e.equals(ignoredEAttribut)) {
+            if (e == null &&  ignoredEAttribut.equals("null") || e != null && e.toString().equals(ignoredEAttribut)) {
                 j++;
             } else {
-                String eName = e.name().toLowerCase();
-                File f = new File(System.getProperty("user.dir") + "/assets/Textures/HexField/" + eName.toUpperCase() + ".png");
-                if (!f.exists()) {
+                String eName = e == null ? "null" : e.name();
+                File f = new File(System.getProperty("user.dir") + "/assets/Textures/HexField/" + eName + ".png");
+                if (!eName.equals("null") && !f.exists()) {
                     j++;
                 } else {
                     ButtonAdapter ico = new ButtonAdapter(screen, eName + "Icon", new Vector2f(28 * (i - j) + 23, 10),
@@ -86,11 +85,11 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         screenElement.setDimensions(30 * (i - j) + 30, screenElement.getDimensions().y);
     }
 
-    private void updateElementalIcon(ElementalAttribut currentEAttribut) {
-        Element ico = eIconContainer.getChildElementById(currentEAttribut.name().toLowerCase() + "Icon");
+    private void updateElementalIcon(String currentEAttribut) {
+        Element ico = eIconContainer.getChildElementById(currentEAttribut + "Icon");
         eIconContainer.removeChild(ico);
-        ico.setColorMap("Textures/Icons/EAttributs/" + ignoredEAttribut.name().toLowerCase() + ".png");
-        ico.setUID(ignoredEAttribut.name().toLowerCase() + "Icon");
+        ico.setColorMap("Textures/Icons/EAttributs/" + ignoredEAttribut + ".png");
+        ico.setUID(ignoredEAttribut + "Icon");
         eIconContainer.addChild(ico);
         ignoredEAttribut = currentEAttribut;
     }
@@ -109,10 +108,12 @@ class ElementalWidgetMenu extends CameraTrackWindow {
             inspectedSpatialHeight = Integer.MIN_VALUE;
         }
         if (eIconContainer == null) {
-            ignoredEAttribut = currentEAttribut;
+            ignoredEAttribut = currentEAttribut == null ? "null" : currentEAttribut.toString();
             buildElementalIcon();
-        } else if (ignoredEAttribut != currentEAttribut) {
-            updateElementalIcon(currentEAttribut);
+        } else if (currentEAttribut != null && !ignoredEAttribut.equals(currentEAttribut.toString())) {
+            updateElementalIcon(currentEAttribut.toString());
+        } else if (currentEAttribut == null && !ignoredEAttribut.equals("null")){
+            updateElementalIcon("null");
         }
         show(hexPosition);
     }
@@ -125,9 +126,8 @@ class ElementalWidgetMenu extends CameraTrackWindow {
 
     private void buttonTrigger(String button) {
         String element = button.split("Icon")[0];
-        system.setTileProperties(((AreaTileWidget) elementParent).getInspectedSpatialPosition(),
-                ElementalAttribut.valueOf(element.toUpperCase()));
-        updateElementalIcon(ElementalAttribut.valueOf(element.toUpperCase()));
+        system.setTileProperties(((AreaTileWidget) elementParent).getInspectedSpatialPosition(), element);
+        updateElementalIcon(element);
         ((AreaTileWidget) elementParent).updateIcon();
         hide();
     }

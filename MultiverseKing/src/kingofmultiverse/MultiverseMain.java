@@ -163,7 +163,8 @@ public class MultiverseMain extends SimpleApplication {
      * @todo Init system only when needed.
      */
     public void initSystem() {
-        MapData mapData = new MapData(ElementalAttribut.ICE, assetManager);
+        MapData mapData = new MapData(ElementalAttribut.values(), assetManager);
+//        MapData mapData = new MapData(assetManager);
 
         stateManager.attachAll(
                 new EntityDataAppState(),

@@ -13,7 +13,7 @@ import org.hexgridapi.base.MapData;
 public class AreaGridSystem extends AbstractHexGridAppState {
     
     public AreaGridSystem(MapData mapData) {
-        super(mapData);
+        super(mapData, "Textures/HexField/");
     }
     
     @Override

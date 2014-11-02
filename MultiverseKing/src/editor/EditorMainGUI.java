@@ -16,7 +16,6 @@ import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.FileManagerPopup;
 import gui.LayoutWindow;
-import gui.LoadingPopup;
 
 /**
  * rootMenu of the Game Editor.
@@ -146,7 +145,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                         showSubMenu = false;
                         break;
                     case BATTLE:
-                        if(system.getCurrentMode().equals("area")){
+                        if(system.getCurrentMode().equals("area") && !main.getStateManager().getState(AreaEditorSystem.class).isEmpty()){
                             currentMenuItem.addMenuItem("Start from current", "useCurrent", null);
                         }
                         currentMenuItem.addMenuItem("Load Battle Map", "LoadBattle", null);

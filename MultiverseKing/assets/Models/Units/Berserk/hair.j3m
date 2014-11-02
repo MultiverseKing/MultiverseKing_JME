@@ -8,7 +8,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
         Ambient : 0.8 0.8 0.8 1.0
         Shininess : 0.0
         WardIso : false
-        DiffuseMap : Flip Textures/Characters/Berserk/HairTextureV2.png
+        DiffuseMap : Flip Models/Units/Berserk/HairTextureV2.png
         UseAlpha : false
     }
     AdditionalRenderState {
@@ -16,7 +16,7 @@ Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
       Wireframe Off
       DepthWrite On
       PolyOffset 0.0 0.0
-      AlphaTestFalloff 0.8
+      AlphaTestFalloff 0.7
       Blend Off
       PointSprite Off
       ColorWrite On

@@ -47,7 +47,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         app.getStateManager().attach(new AreaEventRenderDebugSystem());
         app.getStateManager().attach(new AreaEventSystem());
         if (popup != null) {
-            reloadSystem(popup);
+            loadFromFile(popup);
         } else {
             generateEmptyArea();
         }
@@ -107,7 +107,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         generateEmptyArea();
     }
 
-    public void reloadSystem(FileManagerPopup popup) {
+    public void loadFromFile(FileManagerPopup popup) {
         if (popup != null && popup.getInput() != null) {
             if (!mapData.loadArea(popup.getInput())) {
                 popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
@@ -132,7 +132,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
      * @return True if there is something who can be saved.
      */
     public boolean isEmpty() {
-        return mapData.containTilesData();
+        return !mapData.containTilesData();
     }
 
     @Override

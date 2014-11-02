@@ -1,8 +1,8 @@
 Material MyMaterial : ShaderBlow/MatDefs/LightBlow/LightBlow.j3md {
     MaterialParameters {
-        DiffuseMap : Textures/Units/tuxDiffuse2.png
+        DiffuseMap : Models/Units/TuxDoll/tuxDiffuse2.png
         EdgeSize : 0.1
-        ColorRamp : Textures/Units/ramp.png
+        ColorRamp : Models/Units/TuxDoll/ramp2.png
     }
     AdditionalRenderState {
       FaceCull Back

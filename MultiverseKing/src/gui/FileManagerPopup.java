@@ -15,7 +15,6 @@ import tonegod.gui.core.Screen;
  */
 public class FileManagerPopup extends DialogWindow {
 
-    private boolean isInitialized = false;
     private final boolean isLoading;
     private Menu loadingList;
 
@@ -33,9 +32,9 @@ public class FileManagerPopup extends DialogWindow {
 
     @Override
     protected void onButtonTrigger(String labelName) {
-        if (labelName.equals((isLoading ? "Load from files." : "Override existing.")) && !isInitialized) {
+        if (labelName.equals((isLoading ? "Load from files." : "Override existing.")) && loadingList == null) {
             initializeLoading();
-        } else if (labelName.equals("Override existing.") && isInitialized) {
+        } else if (labelName.equals((isLoading ? "Load from files." : "Override existing."))) {
             loadingList.showMenu(null, getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
                     getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
         } else if (labelName.equals("Confirm") && getTextInput("Name").length() < 2) {
@@ -69,7 +68,6 @@ public class FileManagerPopup extends DialogWindow {
         screen.addElement(loadingList);
         loadingList.showMenu(null, getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
                 getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
-        isInitialized = true;
     }
 
     public String getInput() {
@@ -79,4 +77,11 @@ public class FileManagerPopup extends DialogWindow {
     public boolean isLoading() {
         return isLoading;
     }
+
+    @Override
+    public void removeFromScreen() {
+        super.removeFromScreen();
+        screen.removeElement(loadingList);
+    }
+    
 }

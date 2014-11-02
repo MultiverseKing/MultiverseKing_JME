@@ -157,7 +157,7 @@ public abstract class LayoutWindow {
     }
     
     protected final void show(VAlign vAlign, HAlign hAlign) {
-        show(vAlign, hAlign);
+        show(vAlign, hAlign, false);
     }
 
     /**

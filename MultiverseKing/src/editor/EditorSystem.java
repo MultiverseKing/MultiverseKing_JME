@@ -55,8 +55,8 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
      */
     void initializeAreaEditor(FileManagerPopup popup) {
         currentMode = "area";
-        clearForCurrent(false);
         fileManagerPopup = popup;
+        clearForCurrent(false);
     }
     
     void saveCurrentArea(FileManagerPopup popup){
@@ -105,7 +105,7 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
             if (app.getStateManager().getState(AreaEditorSystem.class) == null) {
                 app.getStateManager().attach(new AreaEditorSystem(fileManagerPopup));
             } else {
-                app.getStateManager().getState(AreaEditorSystem.class).reloadSystem(fileManagerPopup);
+                app.getStateManager().getState(AreaEditorSystem.class).loadFromFile(fileManagerPopup);
             }
         } else if (currentMode.equals("world")) {
         } else if (currentMode.equals("battle")) {

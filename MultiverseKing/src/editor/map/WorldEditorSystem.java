@@ -36,7 +36,7 @@ public class WorldEditorSystem extends MapEditorSystem {
     }
 
     @Override
-    public void reloadSystem(FileManagerPopup popup) {
+    public void loadFromFile(FileManagerPopup popup) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

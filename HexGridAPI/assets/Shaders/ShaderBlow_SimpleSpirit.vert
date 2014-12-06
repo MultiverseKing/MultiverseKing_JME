@@ -22,11 +22,11 @@ int numTilesTotal = iNumTilesU * iNumTilesV;
 int selectedTile = 1;
 
 
-selectedTile += int(g_Time*m_Speed);
+selectedTile = selectedTile + int(g_Time*float(m_Speed));
 
 // the "1 - " bit is because otherwise it goes from right to left
-texCoordAni.x = -(1.0 - ((texCoordAni.x + mod((selectedTile), (iNumTilesU))) / iNumTilesU)); ///selectedTile;
-texCoordAni.y = ((-texCoordAni.y - (selectedTile / iNumTilesU)) / iNumTilesV); ///selectedTile;
+texCoordAni.x = -(1.0 - (float(texCoordAni.x + mod(float(selectedTile), float(iNumTilesU))) / float(iNumTilesU))); ///selectedTile;
+texCoordAni.y = (float(float(float(int(float(selectedTile) / float(iNumTilesU))) - (texCoordAni.y))) / float(iNumTilesV)); ///selectedTile;
 
 // if (index = 8) index = 3;
 

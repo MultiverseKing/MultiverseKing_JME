@@ -1,4 +1,4 @@
-package hexsystem.pathfinding;
+package org.hexgridapi.pathfinding;
 
 import java.util.ArrayList;
 import java.util.HashSet;

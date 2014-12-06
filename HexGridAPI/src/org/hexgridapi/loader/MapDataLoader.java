@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import org.hexgridapi.utility.Vector2Int;
-import org.hexgridapi.utility.ElementalAttribut;
 
 /**
  *

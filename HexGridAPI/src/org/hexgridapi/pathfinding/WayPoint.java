@@ -1,4 +1,4 @@
-package hexsystem.pathfinding;
+package org.hexgridapi.pathfinding;
 
 import org.hexgridapi.utility.HexCoordinate;
 

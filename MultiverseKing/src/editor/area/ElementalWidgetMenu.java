@@ -1,9 +1,12 @@
 package editor.area;
 
+import com.jme3.asset.AssetInfo;
+import com.jme3.asset.AssetKey;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
+import com.jme3.texture.Image;
 import gui.CameraTrackWindow;
 import java.io.File;
 import org.hexgridapi.utility.ElementalAttribut;
@@ -42,43 +45,38 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         int i = 0;
         while (i < ElementalAttribut.values().length + 1) {
             ElementalAttribut e = ElementalAttribut.convert(i);
-            if (e == null &&  ignoredEAttribut.equals("null") || e != null && e.toString().equals(ignoredEAttribut)) {
+            if (e == null && ignoredEAttribut.equals("null") || e != null && e.toString().equals(ignoredEAttribut)) {
                 j++;
             } else {
                 String eName = e == null ? "null" : e.name();
-                File f = new File(System.getProperty("user.dir") + "/assets/Textures/HexField/" + eName + ".png");
-                if (!eName.equals("null") && !f.exists()) {
-                    j++;
-                } else {
-                    ButtonAdapter ico = new ButtonAdapter(screen, eName + "Icon", new Vector2f(28 * (i - j) + 23, 10),
-                            new Vector2f(28, 28), Vector4f.ZERO, "Textures/Icons/EAttributs/" + eName + ".png") {
-                        @Override
-                        public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
-                            super.onButtonMouseLeftDown(evt, toggled);
-                            screen.updateZOrder(elementParent.getScreenElement());
-                        }
+                ButtonAdapter ico = new ButtonAdapter(screen, eName + "Icon", new Vector2f(28 * (i - j) + 23, 10),
+                        new Vector2f(28, 28), Vector4f.ZERO, "Textures/Icons/EAttributs/" + eName + ".png") {
+                    @Override
+                    public void onButtonMouseLeftDown(MouseButtonEvent evt, boolean toggled) {
+                        super.onButtonMouseLeftDown(evt, toggled);
+                        screen.updateZOrder(elementParent.getScreenElement());
+                    }
 
-                        @Override
-                        public void onButtonMouseRightDown(MouseButtonEvent evt, boolean toggled) {
-                            super.onButtonMouseRightDown(evt, toggled);
-                            screen.updateZOrder(elementParent.getScreenElement());
-                        }
+                    @Override
+                    public void onButtonMouseRightDown(MouseButtonEvent evt, boolean toggled) {
+                        super.onButtonMouseRightDown(evt, toggled);
+                        screen.updateZOrder(elementParent.getScreenElement());
+                    }
 
-                        @Override
-                        public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                            super.onButtonMouseLeftUp(evt, toggled);
-                            buttonTrigger(this.getUID());
-                            screen.updateZOrder(elementParent.getScreenElement());
-                        }
+                    @Override
+                    public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
+                        super.onButtonMouseLeftUp(evt, toggled);
+                        buttonTrigger(this.getUID());
+                        screen.updateZOrder(elementParent.getScreenElement());
+                    }
 
-                        @Override
-                        public void onButtonMouseRightUp(MouseButtonEvent evt, boolean toggled) {
-                            super.onButtonMouseRightUp(evt, toggled);
-                            screen.updateZOrder(elementParent.getScreenElement());
-                        }
-                    };
-                    eIconContainer.addChild(ico);
-                }
+                    @Override
+                    public void onButtonMouseRightUp(MouseButtonEvent evt, boolean toggled) {
+                        super.onButtonMouseRightUp(evt, toggled);
+                        screen.updateZOrder(elementParent.getScreenElement());
+                    }
+                };
+                eIconContainer.addChild(ico);
             }
             i++;
         }
@@ -112,7 +110,7 @@ class ElementalWidgetMenu extends CameraTrackWindow {
             buildElementalIcon();
         } else if (currentEAttribut != null && !ignoredEAttribut.equals(currentEAttribut.toString())) {
             updateElementalIcon(currentEAttribut.toString());
-        } else if (currentEAttribut == null && !ignoredEAttribut.equals("null")){
+        } else if (currentEAttribut == null && !ignoredEAttribut.equals("null")) {
             updateElementalIcon("null");
         }
         show(hexPosition);

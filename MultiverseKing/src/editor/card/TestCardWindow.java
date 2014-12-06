@@ -20,8 +20,8 @@ final class TestCardWindow extends EditorWindow {
         super(screen, parent, "Test Card");
         this.system = system;
 
-        addButtonField("Add Card", "+1", new Vector2f(0, -5));
-        addButtonField("Remove Card", "-1", new Vector2f(getLayoutGridSize().x, -8));
+        addButtonField("Add Card", HAlign.left, "+1", HAlign.right);
+        addButtonField("Remove Card", HAlign.left, "-1", HAlign.right);
         showConstrainToParent(VAlign.bottom, null);
         getWindow().setPosition(new Vector2f(getWindow().getPosition().x,
                 getWindow().getPosition().y - screen.getElementById("ReturnButtonWin").getHeight() - 15));
@@ -35,5 +35,9 @@ final class TestCardWindow extends EditorWindow {
         } else if(label.equals("-1")){
                 system.removeEntityCard();
         }
+    }
+
+    @Override
+    public void onPressCloseAndHide() {
     }
 }

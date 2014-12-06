@@ -11,8 +11,8 @@ import hexsystem.battle.BattleSystem;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.FileManagerPopup;
-import hexsystem.area.AreaMouseInputSystem;
 import kingofmultiverse.MultiverseMain;
+import org.hexgridapi.base.AreaMouseAppState;
 import tonegod.gui.core.Element;
 
 /**
@@ -66,6 +66,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         fileManagerPopup.removeFromScreen();
     }
 
+    /**
+     * Remove uneeded AppState before loading the needed one.
+     */
     private void clearForCurrent(boolean force) {
         showDialog = false;
         if (!currentMode.equals("area") && app.getStateManager().getState(AreaEditorSystem.class) != null) {
@@ -95,13 +98,10 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     }
 
     private void initializeForCurrent() {
+        if (app.getStateManager().getState(RenderSystem.class) == null) {
+            app.getStateManager().attach(new RenderSystem());
+        }
         if (currentMode.equals("area")) {
-            if (app.getStateManager().getState(RenderSystem.class) == null) {
-                app.getStateManager().attach(new RenderSystem());
-            }
-            if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-                app.getStateManager().attach(new AreaMouseInputSystem());
-            }
             if (app.getStateManager().getState(AreaEditorSystem.class) == null) {
                 app.getStateManager().attach(new AreaEditorSystem(fileManagerPopup));
             } else {
@@ -109,12 +109,6 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
             }
         } else if (currentMode.equals("world")) {
         } else if (currentMode.equals("battle")) {
-            if (app.getStateManager().getState(RenderSystem.class) == null) {
-                app.getStateManager().attach(new RenderSystem());
-            }
-            if (app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-                app.getStateManager().attach(new AreaMouseInputSystem());
-            }
             if (app.getStateManager().getState(BattleSystem.class) == null) {
                 app.getStateManager().attach(new BattleSystem());
             } else {
@@ -124,6 +118,14 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         } else {
             throw new UnsupportedOperationException(currentMode + " is not a supported Mode");
         }
+    }
+
+    void clearCurrent() {
+        app.getStateManager().detach(app.getStateManager().getState(AreaEditorSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(WorldEditorSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(BattleSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(RenderSystem.class));
+        currentMode = "null";
     }
 
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
@@ -141,7 +143,7 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         }
         currentDialogPopup = new DialogWindow(((MultiverseMain) app).getScreen(), "Warning !", this);
         currentDialogPopup.addLabelField("All current system will be removed.");
-        currentDialogPopup.show();
+        currentDialogPopup.show(true);
         showDialog = true;
     }
 
@@ -149,5 +151,6 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     public void cleanup() {
         super.cleanup();
         gui.cleanup();
+        clearCurrent();
     }
 }

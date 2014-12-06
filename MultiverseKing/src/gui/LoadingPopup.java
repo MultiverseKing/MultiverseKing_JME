@@ -22,7 +22,7 @@ public class LoadingPopup extends DialogWindow {
         super(screen, WindowName, listener);
         addInputText("Name");
         addButton("Load from files.");
-        show();
+        show(true);
     }
 
     @Override

@@ -133,6 +133,10 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
     }
 
     @Override
+    public void onPressCloseAndHide() {
+    }
+
+    @Override
     protected void onTextFieldInput(String UID, String input, boolean isTrigger) {
         if (UID.equals("Name")) {
             cardPreview.switchName(input);
@@ -358,7 +362,7 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
                         } else {
                             dialPopup = new DialogWindow(screen, "Override File", this);
                             dialPopup.showText(card.getName() + " already exist, override ?");
-                            dialPopup.show();
+                            dialPopup.show(true);
                         }
                     }
                     break;

@@ -25,10 +25,10 @@ import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
 import entitysystem.SubSystem;
 import entitysystem.render.RenderComponent.Type;
-import hexsystem.area.AreaMouseInputSystem;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
+import org.hexgridapi.base.AreaMouseAppState;
 import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.MapData;
 import org.hexgridapi.events.MouseInputEvent;
@@ -47,7 +47,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     private ArrayList<EntityId> titanList = new ArrayList<EntityId>();
     private ArrayList<EntityId> unitList = new ArrayList<EntityId>();
     private RenderSystem renderSystem;
-    private AreaMouseInputSystem hexMapMouseSystem;
+    private AreaMouseAppState hexMapMouseSystem;
     private int currentAction = -1;
     private EntityId inspectedId = null;
     private BattleTrainingGUI bTrainingGUI;
@@ -58,17 +58,17 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
         if (mapData.getAllChunkPos().isEmpty()) {
             mapData.addChunk(new Vector2Int(), null);
         }
-        app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem());
+        app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem(), new AreaMouseAppState());
 
-        if (app.getStateManager().getState(RenderSystem.class) == null
-                || app.getStateManager().getState(AreaMouseInputSystem.class) == null) {
-            throw new UnsatisfiedLinkError("This System need RenderSystem and AreaMouseInputSystem to work.");
-        }
+//        if (app.getStateManager().getState(RenderSystem.class) == null) {
+//            app.getStateManager().attach(new RenderSystem());
+////            throw new UnsatisfiedLinkError("This System need RenderSystem and AreaMouseInputSystem to work.");
+//        }
         bTrainingGUI = new BattleTrainingGUI(((MultiverseMain) app).getScreen(), app.getCamera(), this);
         renderSystem = app.getStateManager().getState(RenderSystem.class);
 //        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this, true);
-        hexMapMouseSystem = app.getStateManager().getState(AreaMouseInputSystem.class);
+        hexMapMouseSystem = app.getStateManager().getState(AreaMouseAppState.class);
         hexMapMouseSystem.registerRayInputListener(this);
 
         /**

@@ -25,7 +25,6 @@ class AreaTileWidget extends CameraTrackWindow {
     private ElementalWidgetMenu eWin = null;
     private AreaEditorSystem system;
     private Element eAttributIco;
-//    private HexCoordinate selectedTilePosition;
 
     AreaTileWidget(Screen screen, Camera camera, AreaEditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
@@ -33,7 +32,6 @@ class AreaTileWidget extends CameraTrackWindow {
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/MapWidget/rouage.png");
         this.system = system;
         super.inspectedSpatialPosition = tilePos;
-//        this.selectedTilePosition = tilePos;
 
         populateMenu();
         screenElement.scale(0.7f);

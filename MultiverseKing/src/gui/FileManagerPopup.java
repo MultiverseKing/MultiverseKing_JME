@@ -27,7 +27,7 @@ public class FileManagerPopup extends DialogWindow {
         } else {
             addButton("Override existing.");
         }
-        show();
+        show(true);
     }
 
     @Override
@@ -81,7 +81,9 @@ public class FileManagerPopup extends DialogWindow {
     @Override
     public void removeFromScreen() {
         super.removeFromScreen();
-        screen.removeElement(loadingList);
+        if(loadingList != null){
+            screen.removeElement(loadingList);
+        }
     }
     
 }

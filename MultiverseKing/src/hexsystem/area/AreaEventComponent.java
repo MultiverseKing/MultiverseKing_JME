@@ -4,7 +4,6 @@
  */
 package hexsystem.area;
 
-import com.simsilica.es.EntityComponent;
 import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import java.util.Collections;

@@ -20,9 +20,10 @@ public class DialogWindow extends EditorWindow {
         this.listener = listener;
     }
 
-    public final void show() {
-        addButtonList(getUID()+"btnField", new String[]{"Confirm", "Cancel"}, HAlign.right);
-        screen.getApplication().getInputManager().addListener(dialogPopupListener, new String[]{"confirmDialog", "cancelDialog"});
+    public final void show(boolean addCancel) {
+        addButtonList(getUID()+"btnField", (addCancel ? new String[]{"Confirm", "Cancel"} : new String[]{"Confirm"}), HAlign.right);
+        screen.getApplication().getInputManager().addListener(dialogPopupListener, 
+                (addCancel ? new String[]{"confirmDialog", "cancelDialog"} : new String[]{"confirmDialog"}));
         super.show(null, null);
     }
 
@@ -53,6 +54,11 @@ public class DialogWindow extends EditorWindow {
         } else if (labelName.equals("Cancel")) {
             listener.onDialogTrigger(name, false);
         }
+    }
+
+    @Override
+    public void onPressCloseAndHide() {
+        listener.onDialogTrigger(name, false);
     }
 
     @Override

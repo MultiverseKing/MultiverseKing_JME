@@ -1,6 +1,5 @@
 package editor.area;
 
-import com.jme3.math.Vector2f;
 import gui.EditorWindow;
 import hexsystem.area.AreaEventComponent;
 import hexsystem.area.AreaEventComponent.Event;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
+import tonegod.gui.controls.menuing.MenuItem;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
@@ -47,7 +47,7 @@ public class TileEventMenu extends EditorWindow {
         } else {
             initialize();
             showConstrainToParent(VAlign.bottom, HAlign.right);
-            window.setUseCloseButton(true);
+//            window.setUseCloseButton(true);
         }
     }
 
@@ -58,14 +58,13 @@ public class TileEventMenu extends EditorWindow {
         addNewEventMenu = new Menu(screen, true) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                addNewEventMenuTrigger((Event) value);
+                addEvent((Event) value);
             }
         };
         for (Event e : Event.values()) {
             addNewEventMenu.addMenuItem(e.toString(), e, null);
         }
         screen.addElement(addNewEventMenu);
-
         initializeEvents();
         populateMenu();
     }
@@ -80,9 +79,19 @@ public class TileEventMenu extends EditorWindow {
         }
     }
 
-    private void addNewEventMenuTrigger(Event event) {
-        system.addEvent(inspectedTilePos, event);
+    private void addEvent(Event event) {
+        if (event.equals(Event.Start) || currentEvent.size() < 2) {
+            system.updateEvent(inspectedTilePos, event, true);
+        }
         currentEvent.add(event);
+        reload();
+    }
+
+    private void removeEvent(Event event) {
+        if (event.equals(Event.Start) || currentEvent.size() < 2) {
+            system.updateEvent(inspectedTilePos, event, false);
+        }
+        currentEvent.remove(event);
         reload();
     }
 
@@ -90,7 +99,7 @@ public class TileEventMenu extends EditorWindow {
         removeFromScreen();
         populateMenu();
         showConstrainToParent(VAlign.bottom, HAlign.right);
-        window.setUseCloseButton(true);
+//        window.setUseCloseButton(true);
     }
 
     /**
@@ -101,7 +110,7 @@ public class TileEventMenu extends EditorWindow {
         for (Event e : currentEvent) {
             switch (e) {
                 case Start:
-                    addLabelField("Player Starting Position", HAlign.left, new Vector2f());
+                    addButtonField("Start Position", HAlign.left, "Delete", HAlign.full);
                     break;
                 case trigger:
                     break;
@@ -111,11 +120,45 @@ public class TileEventMenu extends EditorWindow {
         }
     }
 
+    private void updateMenu() {
+        for (Event e : Event.values()) {
+            if (currentEvent.contains(e)) {
+                addNewEventMenu.removeMenuItem(e);
+            } else if (!menuContain(e)) {
+                addNewEventMenu.addMenuItem(e.toString(), e, null);
+            }
+        }
+    }
+
+    private boolean menuContain(Event e) {
+        for (MenuItem m : addNewEventMenu.getMenuItems()) {
+            if (((Event) m.getValue()).equals(e)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected void onButtonTrigger(String event) {
         if (event.equals("Add new Event")) {
             ButtonAdapter btn = getButtonField("Add new Event", false);
+            updateMenu();
             addNewEventMenu.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - addNewEventMenu.getDimensions().y);
+        } else if (event.contains("Delete")) {
+            if (event.contains("StartPosition")) {
+                removeEvent(Event.Start);
+            }
         }
+    }
+
+    @Override
+    public void onPressCloseAndHide() {
+    }
+    
+    @Override
+    public void removeFromScreen() {
+        super.removeFromScreen();
+        system.updateEvents(inspectedTilePos, currentEvent);
     }
 }

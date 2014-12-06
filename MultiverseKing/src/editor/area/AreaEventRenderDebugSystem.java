@@ -53,7 +53,9 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
         for(Entity e : entities){
             removeEntity(e);
         }
-        app.getStateManager().getState(RenderSystem.class).removeSubSystem(this, true);
+        if(app.getStateManager().getState(RenderSystem.class) != null){
+            app.getStateManager().getState(RenderSystem.class).removeSubSystem(this, true);
+        }
     }
 
     public void removeSubSystem() {

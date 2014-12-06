@@ -103,7 +103,17 @@ public abstract class LayoutWindow {
     protected final void show(Vector2f position) {
         Vector2f size = getWindowSize();
         size.y += 25;
-        window = new Window(screen, getUID(), position, size);
+        window = new Window(screen, getUID(), position, size){
+
+            @Override
+            public void hideWindow() {
+                super.hideWindow();
+                onPressCloseAndHide();
+            }
+            
+        };
+        window.setUseCloseButton(true);
+        
         if (isHexGrid) {
             window.setWindowTitle(name);
         } else {
@@ -332,6 +342,8 @@ public abstract class LayoutWindow {
     public Vector2f getLayoutGridSize() {
         return layoutGridSize;
     }
+    
+    public abstract void onPressCloseAndHide();
 
     // <editor-fold defaultstate="collapsed" desc="Exposed Enum">
     public enum VAlign {

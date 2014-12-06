@@ -93,4 +93,8 @@ public class HexGridWindow extends LayoutWindow implements HexButtonListener {
         HexCoordinate out = new HexCoordinate(HexCoordinate.OFFSET, pos.getAsOffset().add(new Vector2Int(-radius, -radius)));
         listener.onButtonTrigger(out, selected);
     }
+
+    @Override
+    public void onPressCloseAndHide() {
+    }
 }

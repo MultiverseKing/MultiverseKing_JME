@@ -53,7 +53,7 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * Add a button Field to this menu attach to a label. (no offset)
+     * Add a button Field to this menu. HAlign.full
      */
     protected final void addButtonField(String labelName) {
         addButtonField(labelName, labelName, HAlign.full, new Vector2f(), false);
@@ -62,15 +62,10 @@ public abstract class EditorWindow extends LayoutWindow {
     /**
      * Add a button Field to this menu attach to a label.
      */
-    protected final void addButtonField(String labelName, String triggerName, Vector2f offset) {
-        addButtonField(labelName, triggerName, HAlign.left, offset, true);
-    }
-
-    /**
-     * Add a button field to this menu without label attached to it.
-     */
-    protected final void addButtonField(String triggerName, HAlign hAlign, Vector2f offset) {
-        addButtonField(triggerName, triggerName, hAlign, offset, false);
+    protected final void addButtonField(String labelName, HAlign labelHAlign, String triggerName, HAlign triggerHAlign) {
+        String uid = generateUID(labelName);
+        elementList.put(uid, generateLabel(labelName, labelHAlign, new Vector2f(), false));
+        elementList.get(uid).addChild(generateButton(uid, triggerName, triggerHAlign, new Vector2f()));
     }
 
     /**
@@ -81,17 +76,10 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * Add a button field to this menu without label attached to it.
-     */
-    protected final void addButtonField(String labelName, String triggerName, HAlign hAlign) {
-        addButtonField(triggerName, triggerName, hAlign, new Vector2f(), true);
-    }
-
-    /**
      * Add a button field to this menu.
      *
      * @param labelName field name.
-     * @param triggerName No Space && Not more than 7.
+     * @param triggerName name used for the button.
      * @param hAlign Horizontal alignement to use.
      * @param offset value to be added on top of the gridPosition.
      * @param addLabel define if a label have to be added for the button.
@@ -111,15 +99,11 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign) {
-        addButtonList(listUID, triggersNames, hAlign, 1, new Vector2f());
-    }
-
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, Vector2f offset) {
-        addButtonList(listUID, triggersNames, hAlign, 1, offset);
+        addButtonList(listUID, triggersNames, hAlign, 1, 0);
     }
 
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
-        addButtonList(listUID, triggersNames, hAlign, fieldGridSize, new Vector2f());
+        addButtonList(listUID, triggersNames, hAlign, fieldGridSize, 0);
     }
 
     /**
@@ -129,9 +113,9 @@ public abstract class EditorWindow extends LayoutWindow {
      * @param hAlign alignement of the button.
      * @param fieldGridSize gridSlot to use
      */
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, Vector2f offset) {
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, float offsetX) {
         String UID = generateUID(listUID) + "labelList";
-        Element holder = new Element(screen, UID, new Vector2f(offset.x, 4), new Vector2f(), Vector4f.ZERO, null);
+        Element holder = new Element(screen, UID, new Vector2f(offsetX, 0), new Vector2f(), Vector4f.ZERO, null);
         holder.setAsContainerOnly();
         generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize);
     }
@@ -516,7 +500,7 @@ public abstract class EditorWindow extends LayoutWindow {
         return generateButton(null, triggerName, hAlign, offset);
     }
 
-    private ButtonAdapter generateButton(String labelName, final String triggerName, HAlign hAlign, Vector2f offset) {
+    private ButtonAdapter generateButton(final String labelName, final String triggerName, HAlign hAlign, Vector2f offset) {
         ButtonAdapter button = new ButtonAdapter(screen, getUID() + generateUID(triggerName) + "Button",
                 new Vector2f(), new Vector2f((labelName != null
                 ? layoutGridSize.x - elementList.get(labelName).getDimensions().x - spacement
@@ -524,21 +508,20 @@ public abstract class EditorWindow extends LayoutWindow {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                onButtonTrigger(getText());
+                onButtonTrigger((labelName != null ? labelName : "")+getText());
             }
         };
         button.setText(triggerName);
         switch (hAlign) {
             case left:
-                button.setPosition(new Vector2f((labelName != null ? elementList.get(labelName).getDimensions().x - spacement : spacement + offset.x), 0));
+                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length+1) * 8 - spacement : spacement) + offset.x, 4));
                 return button;
             case right:
-                button.setPosition(new Vector2f(layoutGridSize.x - (spacement + offset.x + button.getDimensions().x
-                        + (labelName != null ? elementList.get(labelName).getDimensions().x : 0)), 0));
+                button.setPosition(new Vector2f(layoutGridSize.x - (spacement + offset.x + button.getDimensions().x), 4));
                 return button;
             case full:
-                button.setDimensions(new Vector2f(layoutGridSize.x - spacement, layoutGridSize.y));
-                button.setPosition(new Vector2f(0, 4));
+                button.setDimensions(new Vector2f(layoutGridSize.x - (labelName != null ? (labelName.toCharArray().length+1) * 8 : spacement), layoutGridSize.y));
+                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length+1) * 8 - spacement : 0) + offset.x, 4));
                 return button;
             default:
                 throw new UnsupportedOperationException(hAlign + " isn't supported.");

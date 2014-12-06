@@ -43,6 +43,10 @@ public class BattleTrainingGUI extends EditorWindow {
         }
     }
 
+    @Override
+    public void onPressCloseAndHide() {
+    }
+
     void update(float tpf) {
         actionMenu.update(tpf);
     }

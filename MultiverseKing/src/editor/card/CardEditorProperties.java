@@ -85,6 +85,11 @@ class CardEditorProperties extends EditorWindow {
     }
 
     @Override
+    public void onPressCloseAndHide() {
+//        getButtonField("Show collision", false).setText("Show collision");
+    }
+
+    @Override
     protected void onNumericFieldInput(Integer input) {
         super.onNumericFieldInput(input);
     }

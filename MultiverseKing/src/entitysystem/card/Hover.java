@@ -85,11 +85,11 @@ public class Hover extends Window {
         Element eWin;
         if (getElementsAsMap().containsKey("elementalIconHover")) {
             eWin = getElementsAsMap().get("elementalIconHover");
-            eWin.setColorMap("Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
+            eWin.setColorMap("Textures/Icons/EAttributs/" + eAttribut.name() + ".png");
             eWin.setIgnoreMouse(true);
         } else {
             eWin = new Window(this.screen, "elementalIconHover", new Vector2f(), new Vector2f(),
-                    Vector4f.ZERO, "Textures/Icons/EAttributs/" + eAttribut.name().toLowerCase() + ".png");
+                    Vector4f.ZERO, "Textures/Icons/EAttributs/" + eAttribut.name() + ".png");
             eWin.removeAllChildren();
             addChild(eWin);
             eWin.setIgnoreMouse(true);

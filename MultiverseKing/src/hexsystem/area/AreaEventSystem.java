@@ -1,7 +1,6 @@
 package hexsystem.area;
 
 import com.simsilica.es.Entity;
-import com.simsilica.es.EntityComponent;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
@@ -25,6 +24,10 @@ public class AreaEventSystem extends EntitySystemAppState {
     @Override
     protected EntitySet initialiseSystem() {
         return entityData.getEntities(AreaEventComponent.class, HexPositionComponent.class);
+    }
+
+    public boolean hasStartPosition() {
+        return startPosition == null ? false : true;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class AreaEventSystem extends EntitySystemAppState {
         return null;
     }
 
-    public void addEvent(HexCoordinate inspectedTilePos, AreaEventComponent.Event event) {
+    public void updateEvent(HexCoordinate inspectedTilePos, AreaEventComponent.Event event, boolean add) {
         if (event.equals(Event.Start) && startPosition != null) {
             EntityId id = eventPosition.get(startPosition);
             AreaEventComponent comp = entityData.getComponent(id, AreaEventComponent.class).cloneAndRemove(event);
@@ -77,11 +80,23 @@ public class AreaEventSystem extends EntitySystemAppState {
             startPosition = null;
         }
         EntityId id = eventPosition.get(inspectedTilePos);
-        if (id != null) {
-            entityData.setComponent(id, entityData.getComponent(id, AreaEventComponent.class).cloneAndAdd(event));
-        } else {
-            id = entityData.createEntity();
-            entityData.setComponents(id, new AreaEventComponent(event), new HexPositionComponent(inspectedTilePos, Rotation.A));
+        if(add){
+            if (id != null) {
+                entityData.setComponent(id, entityData.getComponent(id, AreaEventComponent.class).cloneAndAdd(event));
+            } else {
+                id = entityData.createEntity();
+                entityData.setComponents(id, new AreaEventComponent(event), new HexPositionComponent(inspectedTilePos, Rotation.A));
+            }
+        }
+    }
+
+    public void updateEvents(HexCoordinate inspectedTilePos, ArrayList<Event> currentEvent) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void clearAllCurrentEvent() {
+        for(EntityId id : eventPosition.values()){
+            entityData.removeComponent(id, AreaEventComponent.class);
         }
     }
 }

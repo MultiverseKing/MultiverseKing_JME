@@ -19,12 +19,11 @@ import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
-import hexsystem.area.AreaMouseInputSystem;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.hexgridapi.base.AreaMouseAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputListener;
-import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import tonegod.gui.controls.windows.Window;
@@ -313,7 +312,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
             screen.removeElement(card);
 
             //Register the input for the card system
-            app.getStateManager().getState(AreaMouseInputSystem.class).registerTileInputListener(this);
+            app.getStateManager().getState(AreaMouseAppState.class).registerTileInputListener(this);
             app.getInputManager().addListener(cardInputListener, "Cancel");
         }
     }
@@ -323,7 +322,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(AreaMouseInputSystem.class).removeTileInputListener(this);
+        app.getStateManager().getState(AreaMouseAppState.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -380,7 +379,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
                  * We activate the pulse Mode, if not activated the cast is
                  * canceled.
                  */
-                if (!app.getStateManager().getState(AreaMouseInputSystem.class).setCursorPulseMode(this)) {
+                if (!app.getStateManager().getState(AreaMouseAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
             } else if (cardPreviewCast.getProperties().getCardType().equals(CardType.TITAN)) {

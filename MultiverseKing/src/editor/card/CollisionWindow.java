@@ -36,7 +36,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
         this.collision = collision;
         populate();
     }
-
+    
     private void populate() {
         ArrayList<String> layers = new ArrayList<String>();
         for (byte b : collision.getLayers()) {
@@ -45,6 +45,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
         layers.add("Edit layer");
         addButtonList("Layers", layers.toArray(new String[layers.size()]), LayoutWindow.HAlign.left);
         showConstrainToParent(VAlign.bottom, HAlign.left);
+        window.setUseCloseButton(false);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
                 popup = new DialogWindow(screen, "Edit layer", this);
                 popup.addSpinnerField("Layer", new int[]{0, 7, 1, 2});
                 popup.addSpinnerField("Radius", new int[]{2, 11, 1, 2});
-                popup.show();
+                popup.show(true);
             } else if (!popup.isVisible()) {
                 popup.setVisible();
             }
@@ -90,6 +91,10 @@ public class CollisionWindow extends EditorWindow implements DialogWindowListene
             }
             updateCurrent(label);
         }
+    }
+
+    @Override
+    public void onPressCloseAndHide() {
     }
 
     private void updateCurrent(String label) {

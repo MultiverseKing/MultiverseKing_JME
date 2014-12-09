@@ -4,9 +4,10 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import entitysystem.attribut.Rarity;
-import entitysystem.attribut.CardType;
 import entitysystem.card.CardProperties;
 import entitysystem.card.Hover;
+import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import java.io.File;
 import java.io.FilenameFilter;
 import org.hexgridapi.utility.ElementalAttribut;
@@ -86,7 +87,7 @@ public class CardPreview {
         hover.setEAttribut(eAttribut);
     }
 
-    void switchSubType(CardType subType) {
+    void switchSubType(RenderType subType) {
         hover.setSubType(subType);
     }
 

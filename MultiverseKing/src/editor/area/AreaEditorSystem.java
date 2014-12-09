@@ -74,7 +74,6 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     ElementalAttribut getTileEAttribut(HexCoordinate coord) {
-        ElementalAttribut eAttribut;
         try {
             return ElementalAttribut.valueOf(mapData.getTextureValue(mapData.getTile(coord).getTextureKey()));
         } catch (IllegalArgumentException e){

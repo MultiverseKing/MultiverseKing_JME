@@ -4,6 +4,7 @@ import entitysystem.field.WeaponSlotsComponent;
 import entitysystem.field.EnergyComponent;
 import entitysystem.field.ATBBurstComponent;
 import entitysystem.field.InfluenceComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import org.json.simple.JSONObject;
 
 /**
@@ -15,8 +16,8 @@ public class TitanLoader extends UnitLoader {
     private final InitialTitanStatsComponent initialStatsComponent;
 
     TitanLoader(JSONObject data, EntityLoader eLoader) {
-        super((JSONObject) data.get("unitStats"), eLoader);
-        JSONObject titanData = (JSONObject) data.get("titanStats");
+        super((JSONObject) data.get(RenderType.Unit.toString() + "Stats"), eLoader);
+        JSONObject titanData = (JSONObject) data.get(RenderType.Unit.toString() + "Stats");
 
         Number influenceRange = (Number) titanData.get("influenceRange");
         Number atbBurst = (Number) titanData.get("atbBurst");

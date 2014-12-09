@@ -22,8 +22,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.MapData;
-import org.hexgridapi.loader.ChunkDataLoader;
-import org.hexgridapi.loader.MapDataLoader;
 import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.core.Screen;
 import utility.ArrowShape;
@@ -65,7 +63,7 @@ public class MultiverseMain extends SimpleApplication {
 //        assetManager.registerLocator(userHome, MapDataLoader.class);
 //        assetManager.registerLoader(MapDataLoader.class, "map");
         
-        assetManager.registerLocator(System.getProperty("user.dir") + "/assets/Data/", JSONLoader.class);
+//        assetManager.registerLocator(System.getProperty("user.dir") + "/assets/Data/", JSONLoader.class);
         assetManager.registerLoader(JSONLoader.class, "json", "card");
         
         //Init general input 

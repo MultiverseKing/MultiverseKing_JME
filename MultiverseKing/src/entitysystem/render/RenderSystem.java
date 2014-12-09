@@ -187,8 +187,8 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
 
     private Spatial initialiseSpatial(Entity e) {
         RenderComponent renderComp = e.get(RenderComponent.class);
-        Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getType());
-        s.setName(renderComp.getName() + renderComp.getType() + e.getId().toString());
+        Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getRenderType());
+        s.setName(renderComp.getName() + renderComp.getRenderType() + e.getId().toString());
         return s;
     }
 
@@ -218,7 +218,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
          * Update the spatial if it need to.
          */
         Spatial s = spatials.get(e.getId());
-        String eName = (String) (e.get(RenderComponent.class).getName() + e.get(RenderComponent.class).getType() + e.getId().toString());
+        String eName = (String) (e.get(RenderComponent.class).getName() + e.get(RenderComponent.class).getRenderType() + e.getId().toString());
         if (s == null) {
             addSpatial(e);
         } else if (!eName.equals(s.getName())) {

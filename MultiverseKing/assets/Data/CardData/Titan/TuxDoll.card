@@ -1,16 +1,15 @@
 {
-   "cardType":"TITAN",
    "rarity":"MULTIVERSE",
    "visual": "Undefined",
    "eAttribut":"ICE",
    "description":"Testing Unit used on the editor",
-   "unitsStats":{
+   "UnitsStats":{
       "healthPoint":50000,
       "atb":10,
       "speed":10,
       "moveRange":5,
       "moveSpeed":2,
-      "ability":[
+      "Ability":[
          "null"
       ],
       "collision":[
@@ -20,7 +19,7 @@
          }
       ]
    },
-    "titanStats":{
+    "TitanStats":{
         "atbBurst":5,
         "influenceRange":5,
         "energy":100,

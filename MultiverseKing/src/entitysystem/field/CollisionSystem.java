@@ -5,7 +5,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.field.position.HexPositionComponent;
-import entitysystem.attribut.CardType;
+import entitysystem.render.RenderComponent.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.hexgridapi.utility.HexCoordinate;
@@ -24,7 +24,7 @@ public class CollisionSystem extends EntitySystemAppState {
      *
      * HashMap<HexCoordinate, EntityId> == entity position on that layer.
      */
-    private HashMap<Byte, ArrayList<EntityId>> collisionLayer = new HashMap<Byte, ArrayList<EntityId>>(3);
+    private HashMap<Byte, ArrayList<EntityId>> collisionLayer = new HashMap<>(3);
 
     /**
      *
@@ -63,21 +63,27 @@ public class CollisionSystem extends EntitySystemAppState {
      * @param id entity to cast.
      * @return true if it can, false otherwise.
      */
-    public boolean isValidPosition(HexCoordinate castPosition, CardType cardType) {
-        switch (cardType) {
-            case ABILITY:
+    public boolean isValidPosition(HexCoordinate castPosition, RenderType renderType) {
+        switch (renderType) {
+            case Ability:
                 return true;
-            case EQUIPEMENT:
+            case Core:
                 return false;
-            case SUMMON:
+            case Debug:
+                return true;
+            case Environment:
+                return false;
+            case Equipement:
+                return false;
+            case Titan:
+                return false;
+            case Unit:
                 if (collisionLayer.containsKey((byte) 0)) {
                     return checkCollision(new Byte((byte) 0), castPosition);
                 }
                 return true;
-            case TITAN:
-                return false;
             default:
-                throw new UnsupportedOperationException(cardType + " isn't a valid type for the field system.");
+                throw new UnsupportedOperationException(renderType + " isn't a valid type for the field system.");
         }
     }
 

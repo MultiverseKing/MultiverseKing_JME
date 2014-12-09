@@ -1,5 +1,6 @@
 package entitysystem.loader;
 
+import com.jme3.app.SimpleApplication;
 import com.simsilica.es.PersistentComponent;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.field.ATBComponent;
@@ -7,6 +8,7 @@ import entitysystem.field.HealthComponent;
 import entitysystem.field.position.MovementComponent;
 import entitysystem.field.CollisionComponent;
 import entitysystem.field.SpeedComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -20,15 +22,17 @@ public class UnitLoader {
 
     private final CollisionComponent collisionComponent;
     private final InitialUnitStatsComponent initialUnitStatsComponent;
+    private final SimpleApplication app;
 
     UnitLoader(JSONObject data, EntityLoader eLoader) {
+        app = eLoader.getApplication();
         Number healthPoint = (Number) data.get("healthPoint");
         Number atb = (Number) data.get("atb");
         Number speed = (Number) data.get("speed");
         Number moveRange = (Number) data.get("moveRange");
         Number moveSpeed = (Number) data.get("moveSpeed");
 
-        JSONArray ability = (JSONArray) data.get("ability");
+        JSONArray ability = (JSONArray) data.get(RenderType.Ability.toString());
         String[] abilityList = new String[ability.size()];
         for (int i = 0; i < ability.size(); i++) {
             abilityList[i] = ability.get(i).toString();
@@ -113,7 +117,7 @@ public class UnitLoader {
         }
 
         public AbilityComponent[] getAbilityComponent() {
-            EntityLoader loader = new EntityLoader();
+            EntityLoader loader = new EntityLoader(app);
             AbilityComponent[] list = new AbilityComponent[abilityList.length];
             int i = 0;
             for (String s : abilityList) {

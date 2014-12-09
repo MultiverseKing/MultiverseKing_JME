@@ -3,8 +3,8 @@ package entitysystem.card;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import entitysystem.attribut.CardType;
 import entitysystem.attribut.Rarity;
+import entitysystem.render.RenderComponent.RenderType;
 import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
@@ -60,7 +60,7 @@ public class Hover extends Window {
         /**
          * Window used to show the type of the card.
          */
-        setSubType(properties.getCardType());
+        setSubType(properties.getRenderType());
 
         /**
          * Window used to show the Faction of the card.
@@ -137,14 +137,14 @@ public class Hover extends Window {
         }
     }
 
-    public void setSubType(CardType type) {
+    public void setSubType(RenderType type) {
         Element icon;
         if (getElementsAsMap().containsKey("typeIconHover")) {
             icon = getElementsAsMap().get("typeIconHover");
-            icon.setColorMap("Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
+            icon.setColorMap("Textures/Icons/CardType/" + type.toString() + ".png");
         } else {
             icon = new Window(this.screen, "typeIconHover", new Vector2f(), new Vector2f(),
-                    Vector4f.ZERO, "Textures/Icons/CardType/" + type.name().toLowerCase() + ".png");
+                    Vector4f.ZERO, "Textures/Icons/CardType/" + type.toString() + ".png");
             icon.removeAllChildren();
             addChild(icon);
             icon.setIgnoreMouse(true);
@@ -153,15 +153,21 @@ public class Hover extends Window {
         icon.setPosition(new Vector2f(getDimensions().x * 0.075f, getDimensions().y * 0.8f));
         icon.setDimensions(getDimensions().x * 0.22f, getDimensions().y * 0.15f);
         switch (type) {
-            case ABILITY:
+            case Ability:
                 break;
-            case EQUIPEMENT:
+            case Core:
                 break;
-            case SUMMON:
+            case Debug:
+                break;
+            case Environment:
+                break;
+            case Equipement:
+                break;
+            case Titan:
+                break;
+            case Unit:
                 icon.setPosition(new Vector2f(getDimensions().x * 0.079f, getDimensions().y * 0.8f));
                 icon.setDimensions(getDimensions().x * 0.21f, getDimensions().y * 0.15f);
-                break;
-            case TITAN:
                 break;
             default:
                 throw new UnsupportedOperationException(type + " is not a supported type.");

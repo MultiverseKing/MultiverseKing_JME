@@ -8,7 +8,7 @@ import entitysystem.EntitySystemAppState;
 import entitysystem.SubSystem;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.RenderComponent;
-import entitysystem.render.RenderComponent.Type;
+import entitysystem.render.RenderComponent.RenderType;
 import entitysystem.render.RenderSystem;
 import hexsystem.area.AreaEventComponent;
 import hexsystem.area.AreaEventComponent.Event;
@@ -42,9 +42,9 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
             event.put(e.get(HexPositionComponent.class).getPosition(), e.getId());
         }
         if(e.get(AreaEventComponent.class).getEvent().contains(Event.Start)){
-            entityData.setComponent(e.getId(), new RenderComponent("Start_Shape", Type.Debug, this));
+            entityData.setComponent(e.getId(), new RenderComponent("Start_Shape", RenderType.Debug, this));
         } else {
-            entityData.setComponent(e.getId(), new RenderComponent("Trigger_Shape", Type.Debug, this));
+            entityData.setComponent(e.getId(), new RenderComponent("Trigger_Shape", RenderType.Debug, this));
         }
     }
 

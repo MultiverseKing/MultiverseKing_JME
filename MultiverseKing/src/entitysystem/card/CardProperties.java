@@ -1,7 +1,8 @@
 package entitysystem.card;
 
-import entitysystem.attribut.CardType;
 import entitysystem.attribut.Rarity;
+import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import org.hexgridapi.utility.ElementalAttribut;
 import org.json.simple.JSONObject;
 
@@ -21,7 +22,7 @@ public class CardProperties {
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
-    private final CardType cardType;
+    private final RenderType renderType;
     /**
      * Used to know the amount of time the player can have/play this card.
      * Balance stats mainly.
@@ -53,10 +54,10 @@ public class CardProperties {
      * @param cardType constraint use.
      * @param rarity balance...
      */
-    public CardProperties(JSONObject obj, String name) {
+    public CardProperties(JSONObject obj, String name, RenderType renderType) {
         this.name = name;
-        cardType = CardType.valueOf(obj.get("cardType").toString());
-        if(cardType == CardType.TITAN){
+        this.renderType = renderType;
+        if(renderType == RenderType.Titan){
             playCost = 0;
         } else {
             Number tmpValue = (Number) obj.get("playCost");
@@ -71,14 +72,14 @@ public class CardProperties {
     /**
      * Constructor used for the editor mode.
      */
-    public CardProperties(String name, String visual, int playCost, CardType cardType, Rarity rarity, ElementalAttribut element, String description) {
-        if(cardType == CardType.TITAN){
+    public CardProperties(String name, String visual, int playCost, RenderType renderType, Rarity rarity, ElementalAttribut element, String description) {
+        if(renderType == RenderType.Titan){
             this.playCost = 0;
         } else {
             this.playCost = playCost;
         }
         this.name = name;
-        this.cardType = cardType;
+        this.renderType = renderType;
         this.rarity = rarity;
         this.element = element;
         this.description = description;
@@ -90,7 +91,7 @@ public class CardProperties {
      */
     public CardProperties() {
         this.playCost = 0;
-        this.cardType = null;
+        this.renderType = null;
         this.rarity = null;
         this.element = null;
         this.description = null;
@@ -114,8 +115,8 @@ public class CardProperties {
      * @see CardSubType
      * @return
      */
-    public CardType getCardType() {
-        return cardType;
+    public RenderType getRenderType() {
+        return renderType;
     }
 
     /**

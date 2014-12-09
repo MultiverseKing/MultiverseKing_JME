@@ -12,13 +12,14 @@ import static entitysystem.attribut.CardRenderPosition.DECK;
 import static entitysystem.attribut.CardRenderPosition.FIELD;
 import static entitysystem.attribut.CardRenderPosition.HAND;
 import static entitysystem.attribut.CardRenderPosition.OUTERWORLD;
-import entitysystem.attribut.CardType;
 import entitysystem.loader.EntityLoader;
 import entitysystem.field.CollisionSystem;
 import entitysystem.field.EAttributComponent;
 import entitysystem.field.position.HexPositionComponent;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.UnitLoader;
+import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.hexgridapi.base.AreaMouseAppState;
@@ -112,7 +113,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
         minCastArea = new Vector2f(screen.getWidth() * 0.05f, screen.getHeight() * 0.2f);
         maxCastArea = new Vector2f(screen.getWidth() * 0.90f, screen.getHeight() - (screen.getHeight() * 0.2f));
 
-        return entityData.getEntities(CardRenderComponent.class, CardRenderComponent.class);
+        return entityData.getEntities(RenderComponent.class, CardRenderComponent.class);
     }
 
     @Override
@@ -144,7 +145,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
         if (cardPos == CardRenderPosition.HAND) {
             String cardName = e.get(CardRenderComponent.class).getName();
             Card card;
-            CardProperties properties = new EntityLoader().loadCardProperties(cardName);
+            CardProperties properties = new EntityLoader(app).loadCardProperties(cardName, e.get(RenderComponent.class).getRenderType());
             if (properties != null) {
                 card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
                         properties);
@@ -332,16 +333,24 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
         closePreview();
     }
 
-    private void activateCard(HexCoordinate castCoord, CardType type) {
+    private void activateCard(HexCoordinate castCoord, RenderType type) {
         switch (type) {
-            case ABILITY:
+            case Ability:
                 break;
-            case EQUIPEMENT:
+            case Core:
                 break;
-            case SUMMON:
+            case Debug:
+                break;
+            case Environment:
+                break;
+            case Equipement:
+                break;
+            case Titan:
+                break;
+            case Unit:
                 CardRenderComponent cardRender = entities.getEntity(cardPreviewCast.getCardEntityUID()).get(CardRenderComponent.class);
                 String name = cardRender.getName();
-                UnitLoader unitLoader = new EntityLoader().loadUnitStats(name);
+                UnitLoader unitLoader = new EntityLoader(app).loadUnitStats(name);
                 if (unitLoader != null) {
                     entityData.setComponents(cardPreviewCast.getCardEntityUID(),
                             new HexPositionComponent(castCoord, Rotation.A),
@@ -351,8 +360,6 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
                             unitLoader.getCollisionComponent(),
                             unitLoader.getInitialStatsComponent());
                 }
-                break;
-            case TITAN:
                 break;
             default:
                 throw new UnsupportedOperationException(type.name() + " isn't a supported cardType.");
@@ -382,7 +389,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
                 if (!app.getStateManager().getState(AreaMouseAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
-            } else if (cardPreviewCast.getProperties().getCardType().equals(CardType.TITAN)) {
+            } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.Titan)) {
                 /**
                  * We check if the collision system is currently running, if
                  * it's not the card will be directly casted.
@@ -390,14 +397,14 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
                 CollisionSystem collisionSystem = app.getStateManager().getState(CollisionSystem.class);
                 if (collisionSystem != null) {
                     if (collisionSystem.isValidPosition(event.getEventPosition(),
-                            cardPreviewCast.getProperties().getCardType())) {
-                        activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardType());
+                            cardPreviewCast.getProperties().getRenderType())) {
+                        activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getRenderType());
                         closePreview();
                     } else {
                         castCanceled();
                     }
                 } else {
-                    activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getCardType());
+                    activateCard(event.getEventPosition(), cardPreviewCast.getProperties().getRenderType());
                     closePreview();
                 }
             }

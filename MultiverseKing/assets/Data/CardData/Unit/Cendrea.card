@@ -1,17 +1,16 @@
 {
-   "cardType":"SUMMON",
    "visual":"Cendrea",
    "rarity":"COMMON",
    "eAttribut":"EARTH",
    "playCost":4,
    "description":"Should be named spider moonlord king...  don't ask...",
-   "unitStats":{
+   "UnitStats":{
       "healthPoint":100,
       "atb":3,
       "speed":10,
       "moveRange":3,
       "moveSpeed":1.5,
-      "ability":[
+      "Ability":[
          "PulseVoltage"
       ],
       "collision":[

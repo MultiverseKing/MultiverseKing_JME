@@ -1,7 +1,9 @@
 package entitysystem.card;
 
+import com.jme3.app.SimpleApplication;
 import entitysystem.field.Collision;
 import entitysystem.loader.EntityLoader;
+import entitysystem.render.RenderComponent;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -17,14 +19,14 @@ public class AbilityProperties extends CardProperties {
     private final Vector2Int range;
     private final Collision collision;
 
-    public AbilityProperties(JSONObject obj, String name) {
-        super(obj, name);
+    public AbilityProperties(JSONObject obj, String name, SimpleApplication app) {
+        super(obj, name, RenderComponent.RenderType.Ability);
         JSONObject data = (JSONObject) obj.get("ability");
         power = ((Number) data.get("power")).intValue();
         segmentCost = ((Number) data.get("segmentCost")).intValue();
         range = new Vector2Int(data.get("activationRange").toString());
 
-        EntityLoader eLoader = new EntityLoader();
+        EntityLoader eLoader = new EntityLoader(app);
         collision = eLoader.importCollision((JSONArray) data.get("hitCollision"));
     }
 
@@ -37,7 +39,7 @@ public class AbilityProperties extends CardProperties {
     }
 
     public AbilityProperties(CardProperties properties, int power, int segmentCost, Vector2Int range, Collision collision) {
-        super(properties.getName(), properties.getVisual(), properties.getPlayCost(), properties.getCardType(),
+        super(properties.getName(), properties.getVisual(), properties.getPlayCost(), properties.getRenderType(),
                 properties.getRarity(), properties.getElement(), properties.getDescription());
         this.power = power;
         this.segmentCost = segmentCost;

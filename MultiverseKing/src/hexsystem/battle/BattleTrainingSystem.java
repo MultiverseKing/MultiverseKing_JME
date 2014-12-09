@@ -25,7 +25,7 @@ import entitysystem.render.AnimationSystem;
 import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
 import entitysystem.SubSystem;
-import entitysystem.render.RenderComponent.Type;
+import entitysystem.render.RenderComponent.RenderType;
 import hexsystem.area.AreaEventSystem;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
@@ -92,7 +92,11 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
             debugSystem.hideDebug(startPosition, this);
         }
         EntityId e = entityData.createEntity();
-        entityData.setComponents(e, new HexPositionComponent(startPosition), new RenderComponent("Well", Type.Core, this), new AnimationComponent(Animation.SUMMON));
+        entityData.setComponents(e, new HexPositionComponent(startPosition), new RenderComponent("Well", RenderType.Core, this), new AnimationComponent(Animation.SUMMON));
+    }
+
+    public void showGUI() {
+        bTrainingGUI.showGUI();
     }
 
     /**
@@ -116,12 +120,12 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     public void addEntityTitan(String name, HexCoordinate position) {
-        EntityLoader loader = new EntityLoader();
+        EntityLoader loader = new EntityLoader(app);
         TitanLoader load = loader.loadTitanStats(name);
 //        HexCoordinate position = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
         entityData.setComponents(entityData.createEntity(),
                 new CardRenderComponent(CardRenderPosition.FIELD, name),
-                new RenderComponent(name, Type.Titan),
+                new RenderComponent(name, RenderType.Titan),
                 new HexPositionComponent(position, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 new TimeBreakComponent(),
@@ -165,7 +169,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     private Entity checkEntities(HexCoordinate coord) {
         for (Entity e : entities) {
-            if(!e.get(RenderComponent.class).getType().equals(Type.Debug)){
+            if(!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)){
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
                 if (posComp != null && posComp.getPosition().equals(coord)) {
                     return e;
@@ -209,7 +213,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     private void openEntityActionMenu(Entity e, HexCoordinate pos) {
 //        MapData mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
-        bTrainingGUI.showActionMenu(pos, e.getId(), e.get(RenderComponent.class).getType());
+        bTrainingGUI.showActionMenu(pos, e.getId(), e.get(RenderComponent.class).getRenderType());
     }
 
     public void closeEntityPropertiesMenu() {

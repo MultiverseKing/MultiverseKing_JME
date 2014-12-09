@@ -3,7 +3,7 @@ package hexsystem.battle;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.Camera;
 import com.simsilica.es.EntityId;
-import entitysystem.render.RenderComponent.Type;
+import entitysystem.render.RenderComponent.RenderType;
 import gui.CameraTrackWindow;
 import hexsystem.battle.BattleTrainingSystem.Action;
 import java.util.logging.Level;
@@ -20,7 +20,7 @@ public class ContextualMenu extends CameraTrackWindow {
 
     private final BattleTrainingSystem system;
     private EntityId inspectedEntityId = null;
-    private Type currentType;
+    private RenderType currentType;
 
     ContextualMenu(Screen screen, Camera camera, BattleTrainingSystem guiSystem) {
         super(screen, camera);
@@ -31,13 +31,19 @@ public class ContextualMenu extends CameraTrackWindow {
                 system.setAction(inspectedEntityId, (Action)value);
             }
         };
-        screen.addElement(screenElement);
     }
     
-    void show(HexCoordinate position, EntityId id, Type type){
+    void show(HexCoordinate position, EntityId id, RenderType type){
         if(currentType != type){
-            ((Menu) screenElement).removeAllMenuItems();
+            if(screen.getElementById(screenElement.getUID()) == null){
+                screen.addElement(screenElement);
+            } else {
+                ((Menu) screenElement).removeAllMenuItems();
+            }
             switch(type){
+                case Ability:
+                    screen.removeElement((Menu) screenElement);
+                    return;
                 case Core:
                     addItem(Action.STATS);
                     break;
@@ -45,16 +51,20 @@ public class ContextualMenu extends CameraTrackWindow {
                     /**
                      * Internal use.
                      */
+                    screen.removeElement((Menu) screenElement);
+                    break;
+                case Environment:
+                    addItem(Action.STATS);
+                    break;
+                case Equipement:
+                    screen.removeElement((Menu) screenElement);
                     break;
                 case Titan:
                     addItem(Action.MOVE);
                     addItem(Action.ABILITY);
                     addItem(Action.STATS);
                     break;
-                case Environments:
-                    addItem(Action.STATS);
-                    break;
-                case Units:
+                case Unit:
                     addItem(Action.MOVE);
                     addItem(Action.ABILITY);
                     addItem(Action.STATS);

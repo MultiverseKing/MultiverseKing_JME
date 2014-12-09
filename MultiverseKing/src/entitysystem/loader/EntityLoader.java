@@ -1,15 +1,17 @@
 package entitysystem.loader;
 
+import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetKey;
 import entitysystem.card.CardProperties;
 import entitysystem.ability.AbilityComponent;
 import entitysystem.card.AbilityProperties;
 import entitysystem.field.Collision;
 import entitysystem.field.Collision.CollisionData;
+import entitysystem.render.RenderComponent;
+import entitysystem.render.RenderComponent.RenderType;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,9 +20,6 @@ import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import sun.misc.IOUtils;
 
 /**
  * Master to load Entity from file.
@@ -31,7 +30,15 @@ public class EntityLoader {
 
 //    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData";
     private final String path = "/assets/Data/CardData";
-    private final JSONParser parser = new JSONParser();
+    private final SimpleApplication app;
+
+    public EntityLoader(SimpleApplication app) {
+        this.app = app;
+    }
+
+    SimpleApplication getApplication() {
+        return app;
+    }
 
     /**
      * Load an unit from a file.
@@ -40,12 +47,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        String loadPath = path + "/Units/" + name + ".card";
-        JSONObject obj = getData(loadPath);
-        if (obj != null) {
-            return new UnitLoader((JSONObject) obj.get("unitStats"), this);
-        }
-        return null;
+        return new UnitLoader((JSONObject) getData(name, RenderType.Unit).get(RenderType.Unit.toString()+"Stats"), this);
     }
 
     /**
@@ -54,12 +56,7 @@ public class EntityLoader {
      * @return return null if not found.
      */
     public TitanLoader loadTitanStats(String name) {
-        String loadPath = path + "/Titan/" + name + ".card";
-        JSONObject obj = getData(loadPath);
-        if (obj != null) {
-            return new TitanLoader(obj, this);
-        }
-        return null;
+        return new TitanLoader(getData(name, RenderType.Titan), this);
     }
 
     /**
@@ -68,10 +65,9 @@ public class EntityLoader {
      * @param cardName to save.
      * @return false if file not correctly saved.
      */
-    public boolean saveCardProperties(String type, JSONObject typeData, CardProperties card, boolean override) {
+    public boolean saveCardProperties(RenderType type, JSONObject typeData, CardProperties card, boolean override) {
         File file;
-        String folder = "/" + card.getCardType().toString().toString().substring(0, 1)
-                + card.getCardType().toString().toString().substring(1).toLowerCase() + "/";
+        String folder = "/" + card.getRenderType().toString() + "/";
         file = new File(path + folder + card.getName() + ".card");
         if (file.exists() && !file.isDirectory() && !override) {
             return false;
@@ -80,14 +76,13 @@ public class EntityLoader {
         }
 
         JSONObject obj = new JSONObject();
-        obj.put("cardType", card.getCardType().toString());
         obj.put("visual", card.getVisual());
         obj.put("rarity", card.getRarity().toString());
         obj.put("eAttribut", card.getElement().toString());
         obj.put("playCost", card.getPlayCost());
         obj.put("description", card.getDescription());
 
-        obj.put(type, typeData);
+        obj.put(type.toString(), typeData);
         return setData(file, obj);
     }
 
@@ -98,7 +93,7 @@ public class EntityLoader {
         typeData.put("segmentCost", abilityProperties.getSegmentCost());
         typeData.put("collision", exportCollision(abilityProperties.getCollision()));
 
-        return saveCardProperties("ability", typeData, abilityProperties, override);
+        return saveCardProperties(RenderType.Ability, typeData, abilityProperties, override);
     }
 
     /**
@@ -107,51 +102,28 @@ public class EntityLoader {
      * @param cardName
      * @return null if file not found.
      */
-    public CardProperties loadCardProperties(String cardName) {
-        String loadPath = null;
-        File[] files = new File(path).listFiles();
-        continu:
-        for (File f : files) {
-            if (f.isDirectory()) {
-                File[] subFiles = f.listFiles();
-                for (File subF : subFiles) {
-                    if (subF.isFile() && subF.getName().equals(cardName + ".card")) {
-                        loadPath = subF.getPath();
-                        break continu;
-                    }
-                }
-            }
-        }
-        if (loadPath != null) {
-            JSONObject obj = getData(loadPath);
-            if (obj != null) {
-                return new CardProperties(obj, cardName);
-            }
-            return null;
-        } else {
-            return null;
-        }
+    public CardProperties loadCardProperties(String cardName, RenderType type) {
+        return new CardProperties(getData(cardName, type), cardName, type);
     }
 
     public AbilityComponent loadAbility(String name) {
         if (name.equals("None")) {
             return null;
         }
-        String loadPath = path + "/Ability/" + name + ".card";
-        JSONObject obj = getData(loadPath);
-        if (obj == null) {
-            return null;
+        JSONObject obj = getData(name, RenderType.Ability);
+        if (obj != null) {
+            ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
+            String description = obj.get("description").toString();
+
+            JSONObject abilityData = (JSONObject) obj.get(RenderType.Ability.toString());
+            Number power = (Number) abilityData.get("power");
+            Number segment = (Number) abilityData.get("segmentCost");
+            Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
+
+            return new AbilityComponent(name, new Vector2Int(abilityData.get("castRange").toString()), eAttribut,
+                    segment.byteValue(), power.intValue(), hitCollision, description);
         }
-        ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
-        String description = obj.get("description").toString();
-
-        JSONObject abilityData = (JSONObject) obj.get("ability");
-        Number power = (Number) abilityData.get("power");
-        Number segment = (Number) abilityData.get("segmentCost");
-        Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
-
-        return new AbilityComponent(name, new Vector2Int(abilityData.get("castRange").toString()), eAttribut,
-                segment.byteValue(), power.intValue(), hitCollision, description);
+        return null;
     }
 
     public JSONArray exportCollision(Collision collision) {
@@ -192,10 +164,8 @@ public class EntityLoader {
             file = new FileWriter(f);
             try {
                 file.write(obj.toJSONString());
-
             } catch (IOException e) {
                 e.printStackTrace();
-
             } finally {
                 file.flush();
                 file.close();
@@ -207,21 +177,11 @@ public class EntityLoader {
         }
     }
 
-    private JSONObject getData(String loadPath) {
-        try {
-            File file = new File(loadPath);
-            if (!file.exists() || file.isDirectory()) {
-                return null;
-            }
-            InputStream is = new FileInputStream(file);
-            String s = new String(IOUtils.readFully(is, -1, true));
-            JSONObject j = (JSONObject) parser.parse(s);
-            return j;
-        } catch (IOException ex) {
-            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(EntityLoader.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-        }
-        return null;
+    private JSONObject getData(String name, RenderType type) {
+        return (JSONObject) app.getAssetManager().loadAsset(new AssetKey<>(getFolder(type) + name + ".card"));
+    }
+
+    private String getFolder(RenderType type) {
+        return "Data/CardData/" + type.toString() + "/";
     }
 }

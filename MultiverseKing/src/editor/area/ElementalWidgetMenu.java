@@ -1,14 +1,10 @@
 package editor.area;
 
-import com.jme3.asset.AssetInfo;
-import com.jme3.asset.AssetKey;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import com.jme3.texture.Image;
 import gui.CameraTrackWindow;
-import java.io.File;
 import org.hexgridapi.utility.ElementalAttribut;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;

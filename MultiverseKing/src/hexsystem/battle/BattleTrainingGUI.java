@@ -1,12 +1,11 @@
 package hexsystem.battle;
 
-import com.jme3.asset.AssetKey;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.Camera;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import entitysystem.loader.PropertiesLoader;
-import entitysystem.render.RenderComponent.Type;
+import entitysystem.render.RenderComponent.RenderType;
 import gui.EditorWindow;
 import gui.PropertiesWindow;
 import org.hexgridapi.utility.HexCoordinate;
@@ -25,9 +24,10 @@ public class BattleTrainingGUI extends EditorWindow {
     private ContextualMenu contextualActionMenu;
     private PropertiesWindow titanStatsWindow;
     private Menu entityMenu;
+    private RenderType current;
 
     BattleTrainingGUI(Screen screen, Camera cam, BattleTrainingSystem system) {
-        super(screen, screen.getElementById("EditorMainMenu"), "BattleTrainingGUI", new Vector2f(150, 20));
+        super(screen, screen.getElementById("EditorMainMenu"), "Battle Training", new Vector2f(150, 20));
         this.cam = cam;
         this.system = system;
         contextualActionMenu = new ContextualMenu(screen, cam, system);
@@ -43,7 +43,17 @@ public class BattleTrainingGUI extends EditorWindow {
         //------
         addButtonField("Add Titan");
         addButtonField("Add Unit");
-        showConstrainToParent(VAlign.bottom, HAlign.right);
+        showGUI();
+    }
+
+    final void showGUI() {
+        if(window == null){
+            showConstrainToParent(VAlign.bottom, HAlign.right);
+        } else if (screen.getElementById(window.getUID()) == null){
+            screen.addElement(window);
+        } else if (!window.getIsVisible()){
+            window.setIsVisible(true);
+        }
     }
 
     @Override
@@ -51,19 +61,34 @@ public class BattleTrainingGUI extends EditorWindow {
         if (screen.getElementById(entityMenu.getUID()) == null) {
             screen.addElement(entityMenu);
         }
-        PropertiesLoader properties = (PropertiesLoader) screen.getApplication().getAssetManager().loadAsset(new AssetKey<>("Properties.json"));
+        PropertiesLoader properties = new PropertiesLoader(screen.getApplication().getAssetManager());
 
         switch (label) {
             case "Add Titan":
-                for (String s : properties.getTitanList()) {
-                    entityMenu.addMenuItem(s, s, null);
+                if(current == null || !current.equals(RenderType.Titan)){
+                    entityMenu.removeAllMenuItems();
+                    for (String s : properties.getTitanList()) {
+                        entityMenu.addMenuItem(s, s, null);
+                    }
                 }
-                ButtonAdapter btn = getButtonField("AddTitan", false);
-                entityMenu.showMenu(null, btn.getAbsoluteX() - btn.getDimensions().x + (spacement * 2), btn.getAbsoluteY() + btn.getDimensions().y - entityMenu.getDimensions().y);
+                showMenu(getButtonField("AddTitan", false));
+                current = RenderType.Titan;
                 break;
             case "Add Unit":
+                if(current == null || !current.equals(RenderType.Unit)){
+                    entityMenu.removeAllMenuItems();
+                    for (String s : properties.getUnitList()) {
+                        entityMenu.addMenuItem(s, s, null);
+                    }
+                }
+                showMenu(getButtonField("AddUnit", false));
+                current = RenderType.Unit;
                 break;
         }
+    }
+
+    private void showMenu(ButtonAdapter btn) {
+        entityMenu.showMenu(null, btn.getAbsoluteX() - btn.getDimensions().x + (spacement * 2), btn.getAbsoluteY() + btn.getDimensions().y - entityMenu.getDimensions().y);
     }
 
     private void addUnit(String name) {
@@ -85,7 +110,7 @@ public class BattleTrainingGUI extends EditorWindow {
         }
     }
 
-    void showActionMenu(HexCoordinate pos, EntityId id, Type type) {
+    void showActionMenu(HexCoordinate pos, EntityId id, RenderType type) {
         contextualActionMenu.show(pos, id, type);
     }
 

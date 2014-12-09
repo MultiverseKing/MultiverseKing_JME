@@ -1,16 +1,16 @@
 {
     "Card": {
-        "ability": [
+        "Ability": [
             "PulseVolt",
             "PulseVoltage"
         ],
-        "equipement": [
+        "Equipement": [
             "dadada"
         ],
-        "summon": [
+        "Unit": [
             "Cendrea"
         ],
-        "titan": [
+        "Titan": [
             "Gilga",
             "TuxDoll"
         ]

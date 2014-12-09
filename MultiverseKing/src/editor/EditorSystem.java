@@ -51,8 +51,12 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     }
 
     void initializeBattle() {
-        currentMode = "battle";
-        clearForCurrent(false);
+        if(currentMode.equals("battle")){
+            app.getStateManager().getState(BattleTrainingSystem.class).showGUI();
+        } else {
+            currentMode = "battle";
+            clearForCurrent(false);
+        }
     }
 
     /**

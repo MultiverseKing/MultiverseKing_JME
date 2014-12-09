@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package entitysystem.loader;
 
 import com.jme3.asset.AssetInfo;
@@ -25,9 +21,8 @@ import sun.misc.IOUtils;
  *
  * @author roah
  */
-public class JSONLoader implements AssetLoader, AssetLocator {
+public class JSONLoader implements AssetLoader {
 
-    private String rootPath;
     private static JSONParser parser = new JSONParser();
 
     /**
@@ -50,27 +45,10 @@ public class JSONLoader implements AssetLoader, AssetLocator {
         }
 
         if (data != null) {
-            return new PropertiesLoader(data);
+            return data;
+        } else {
+            Logger.getGlobal().log(Level.WARNING, "{0} : Data couldn't be loaded.", new Object[]{getClass().getName()});
+            return null;
         }
-        return null;
-    }
-
-    @Override
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
-    }
-
-    @Override
-    public AssetInfo locate(AssetManager manager, AssetKey key) {
-        return new AssetInfo(manager, key) {
-            @Override
-            public InputStream openStream() {
-                try {
-                    return new FileInputStream(new File(rootPath + key.getName()));
-                } catch (FileNotFoundException e) {
-                    return null;
-                }
-            }
-        };
     }
 }

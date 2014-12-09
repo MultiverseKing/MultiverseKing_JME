@@ -103,13 +103,14 @@ public final class EditorMainGUI implements DialogWindowListener {
 
     /**
      * Trigger when the user press one entry on the root menu.
+     *
      * @param menu the entry the user has pressed on.
-     * @param forceTrigger 
+     * @param forceTrigger
      */
     private void menuTrigger(EditorItem menu, boolean forceTrigger) {
         if (currentDialogPopup == null || !currentDialogPopup.isVisible()) {
             boolean showSubMenu = true;
-            if (currentMenuValue != menu /*|| forceTrigger */|| menu == EditorItem.MAP || menu == EditorItem.BATTLE) {
+            if (currentMenuValue != menu /*|| forceTrigger */ || menu == EditorItem.MAP || menu == EditorItem.BATTLE) {
                 currentMenuItem.removeAllMenuItems();
                 switch (menu) {
                     case CARD:
@@ -132,15 +133,17 @@ public final class EditorMainGUI implements DialogWindowListener {
                         subMenu.addMenuItem("New", 0, null);
                         subMenu.addMenuItem("Load", 1, null);
                         /**
-                         * If there is no mode currently on all mapSubMenu is the same,
-                         * else we create a new submenu with additionnal value and add it to the right button.
-                         * */
-                        if(!system.getCurrentMode().equals("area") && !system.getCurrentMode().equals("world")){
+                         * If there is no mode currently on all mapSubMenu is
+                         * the same, else we create a new submenu with
+                         * additionnal value and add it to the right button.
+                         *
+                         */
+                        if (!system.getCurrentMode().equals("area") && !system.getCurrentMode().equals("world")) {
                             for (MapEditorMode mode : MapEditorMode.values()) {
                                 String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
                                 currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
                             }
-                        } else if(system.getCurrentMode().equals("area") || system.getCurrentMode().equals("world")){
+                        } else if (system.getCurrentMode().equals("area") || system.getCurrentMode().equals("world")) {
                             Menu subMenuImproved = new Menu(main.getScreen(), false) {
                                 @Override
                                 public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -158,18 +161,18 @@ public final class EditorMainGUI implements DialogWindowListener {
                             subMenuImproved.addMenuItem("Save", 2, null);
                             for (MapEditorMode mode : MapEditorMode.values()) {
                                 String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
-                                if(system.getCurrentMode().equals("area")){
-                                    if(mode.equals(MapEditorMode.AREA)){
+                                if (system.getCurrentMode().equals("area")) {
+                                    if (mode.equals(MapEditorMode.AREA)) {
                                         currentMenuItem.addMenuItem("Edit " + output, mode, subMenuImproved);
-                                    } else if(mode.equals(MapEditorMode.WORLD)){
+                                    } else if (mode.equals(MapEditorMode.WORLD)) {
                                         currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
                                     } else {
                                         throw new UnsupportedOperationException(mode + " mode isn't implemented.");
                                     }
-                                } else if(system.getCurrentMode().equals("world")){
-                                    if(mode.equals(MapEditorMode.AREA)){
+                                } else if (system.getCurrentMode().equals("world")) {
+                                    if (mode.equals(MapEditorMode.AREA)) {
                                         currentMenuItem.addMenuItem("Edit " + output, mode, subMenu);
-                                    } else if(mode.equals(MapEditorMode.WORLD)){
+                                    } else if (mode.equals(MapEditorMode.WORLD)) {
                                         currentMenuItem.addMenuItem("Edit " + output, mode, subMenuImproved);
                                     } else {
                                         throw new UnsupportedOperationException(mode + " mode isn't implemented.");
@@ -183,27 +186,27 @@ public final class EditorMainGUI implements DialogWindowListener {
                          * @todo: Add the SFX-builder window to the screen.
                          * (should remove other window?)
                          */
-                        main.getAssetManager().loadAsset("TitanList");
                         showSubMenu = false;
                         break;
                     case BATTLE:
-                        /**
-                         * TODO : Add the battle area loading when no area is currently loaded or another mode is currently activated.
-                         */
-                        if (system.getCurrentMode().equals("area") && !main.getStateManager().getState(AreaEditorSystem.class).isEmpty() &&
-                                main.getStateManager().getState(AreaEventSystem.class).hasStartPosition()) {
-                            currentMenuItem.addMenuItem("Start from current", "useCurrent", null);
+                        if (system.getCurrentMode().equals("battle")) {
+                            system.initializeBattle();
+                            return;
                         } else {
-                            if (currentDialogPopup != null) {
-                                currentDialogPopup.removeFromScreen();
+                            if (system.getCurrentMode().equals("area") && !main.getStateManager().getState(AreaEditorSystem.class).isEmpty()
+                                    && main.getStateManager().getState(AreaEventSystem.class).hasStartPosition()) {
+                                currentMenuItem.addMenuItem("Start from current", "useCurrent", null);
+                            } else {
+                                if (currentDialogPopup != null) {
+                                    currentDialogPopup.removeFromScreen();
+                                }
+                                currentDialogPopup = new DialogWindow(main.getScreen(), "Warning !", this);
+                                currentDialogPopup.addLabelField("An area with Start position ");
+                                currentDialogPopup.addLabelField("must be initialized first.");
+                                currentDialogPopup.show(false);
+                                showSubMenu = false;
                             }
-                            currentDialogPopup = new DialogWindow(main.getScreen(), "Warning !", this);
-                            currentDialogPopup.addLabelField("An area with Start position ");
-                            currentDialogPopup.addLabelField("must be initialized first.");
-                            currentDialogPopup.show(false);
-                            showSubMenu = false;
                         }
-//                        currentMenuItem.addMenuItem("Load Battle Map", "LoadBattle", null);
                         break;
                     default:
                         throw new UnsupportedOperationException(menu + " is not a supported type.");
@@ -211,7 +214,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                 currentMenuValue = menu;
             }
             if (showSubMenu) {
-                if (menu != EditorItem.SFX){// && menu == EditorItem.BATTLE && system.getCurrentMode().equals("area") && !main.getStateManager().getState(AreaEditorSystem.class).isEmpty()) {
+                if (menu != EditorItem.SFX) {// && menu == EditorItem.BATTLE && system.getCurrentMode().equals("area") && !main.getStateManager().getState(AreaEditorSystem.class).isEmpty()) {
                     Element btn = mainMenuBar.getElementsAsMap().get(menu + "EditorBtn");
                     currentMenuItem.showMenu(null, btn.getAbsoluteX(), btn.getAbsoluteY() - currentMenuItem.getHeight());
                 }
@@ -222,23 +225,21 @@ public final class EditorMainGUI implements DialogWindowListener {
     private void subMenuTrigger(String value) {
         switch (currentMenuValue) {
             case CARD:
-                if (value.equals("EDIT")) {
-                    if (editorWindow == null) {
-                        editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
-                    } else if (editorWindow instanceof CardEditorWindow == false) {
-                        editorWindow.removeFromScreen();
-                        editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
-                    } else if (editorWindow.isVisible()) {
-                        editorWindow.hide();
-                    } else {
-                        editorWindow.setVisible();
-                    }
-                } else if (value.equals("TEST")) {
-                    /**
-                     * @todo: Add the card testing window to the screen. Load a
-                     * map if any are initialized. if one is initialized, ask
-                     * for : - Save / not save / load / load empty
-                     */
+                switch (value) {
+                    case "EDIT":
+                        if (editorWindow == null) {
+                            editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
+                        } else if (editorWindow instanceof CardEditorWindow == false) {
+                            editorWindow.removeFromScreen();
+                            editorWindow = new CardEditorWindow(main.getScreen(), mainMenuBar);
+                        } else if (editorWindow.isVisible()) {
+                            editorWindow.hide();
+                        } else {
+                            editorWindow.setVisible();
+                        }
+                        break;
+                    case "TEST":
+                        break;
                 }
                 break;
             case MAP:
@@ -275,13 +276,16 @@ public final class EditorMainGUI implements DialogWindowListener {
                 }
                 break;
             case BATTLE:
-                if (value.equals("useCurrent")) {
-                    system.initializeBattle();
-                } else if (value.equals("LoadBattle")) {
-                    if (currentDialogPopup != null) {
-                        currentDialogPopup.removeFromScreen();
-                    }
-                    currentDialogPopup = new FileManagerPopup(main.getScreen(), "Load Area", this, true);
+                switch (value) {
+                    case "useCurrent":
+                        system.initializeBattle();
+                        break;
+                    case "LoadBattle":
+                        if (currentDialogPopup != null) {
+                            currentDialogPopup.removeFromScreen();
+                        }
+                        currentDialogPopup = new FileManagerPopup(main.getScreen(), "Load Area", this, true);
+                        break;
                 }
                 break;
             default:
@@ -293,20 +297,24 @@ public final class EditorMainGUI implements DialogWindowListener {
         }
     }
 
+    @Override
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
-            if (dialogUID.equals("Load Area")) {
-                system.initializeAreaEditor((FileManagerPopup) currentDialogPopup);
-            } else if (dialogUID.equals("Save Area")) {
-                system.saveCurrentArea((FileManagerPopup) currentDialogPopup);
-            } else if (dialogUID.equals("Load World")) {
-                /**
-                 * @todo
-                 */
-            } else if (dialogUID.equals("Load Battle")) {
-                system.initializeBattle();
-            } else if (dialogUID.equals("Warning !")){
-                currentDialogPopup.removeFromScreen();
+            switch (dialogUID) {
+                case "Load Area":
+                    system.initializeAreaEditor((FileManagerPopup) currentDialogPopup);
+                    break;
+                case "Save Area":
+                    system.saveCurrentArea((FileManagerPopup) currentDialogPopup);
+                    break;
+                case "Load World":
+                    break;
+                case "Load Battle":
+                    system.initializeBattle();
+                    break;
+                case "Warning !":
+                    currentDialogPopup.removeFromScreen();
+                    break;
             }
         } else {
             currentDialogPopup.removeFromScreen();
@@ -317,10 +325,10 @@ public final class EditorMainGUI implements DialogWindowListener {
         main.getScreen().getApplication().getInputManager().deleteMapping("confirmDialog");
         main.getScreen().getApplication().getInputManager().deleteMapping("cancelDialog");
         main.getScreen().removeElement(main.getScreen().getElementById("EditorMainMenu"));
-        if(currentDialogPopup != null){
+        if (currentDialogPopup != null) {
             currentDialogPopup.removeFromScreen();
         }
-        if(currentMenuItem != null){
+        if (currentMenuItem != null) {
             main.getScreen().removeElement(currentMenuItem);
         }
         main.getScreen().removeElement(mainMenuBar);

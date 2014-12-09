@@ -1,11 +1,8 @@
 package editor.card;
 
-import entitysystem.attribut.CardType;
-import static entitysystem.attribut.CardType.ABILITY;
-import static entitysystem.attribut.CardType.EQUIPEMENT;
-import static entitysystem.attribut.CardType.SUMMON;
 import entitysystem.card.AbilityProperties;
 import entitysystem.field.Collision;
+import entitysystem.render.RenderComponent.RenderType;
 import gui.EditorWindow;
 import org.hexgridapi.utility.Vector2Int;
 import tonegod.gui.controls.lists.Spinner;
@@ -18,14 +15,14 @@ import tonegod.gui.core.Screen;
  */
 class CardEditorProperties extends EditorWindow {
 
-    private CardType current;
+    private RenderType current;
     private CollisionWindow collisionWin;
 
-    CardType getCurrent() {
+    RenderType getCurrent() {
         return current;
     }
 
-    CardEditorProperties(Screen screen, Element parent, CardType type) {
+    CardEditorProperties(Screen screen, Element parent, RenderType type) {
         super(screen, parent, "Properties");
         current = type;
 
@@ -36,7 +33,7 @@ class CardEditorProperties extends EditorWindow {
 
     private void populateMenu() {
         switch (current) {
-            case ABILITY:
+            case Ability:
                 /**
                  * Part used to show/set how many power have the ability. FXUsed
                  * - hitCollision
@@ -56,11 +53,17 @@ class CardEditorProperties extends EditorWindow {
                 addSpinnerList("Cast range", spinList, HAlign.left);
                 addButtonField("Show collision");
                 break;
-            case EQUIPEMENT:
+            case Core:
                 break;
-            case SUMMON:
+            case Debug:
                 break;
-            case TITAN:
+            case Environment:
+                break;
+            case Equipement:
+                break;
+            case Titan:
+                break;
+            case Unit:
                 break;
             default:
                 throw new UnsupportedOperationException(current + " is not a supported type in : " + getClass().getName());
@@ -69,7 +72,7 @@ class CardEditorProperties extends EditorWindow {
 
     @Override
     protected final void onButtonTrigger(String label) {
-        if (current.equals(CardType.ABILITY)) {
+        if (current.equals(RenderType.Ability)) {
             if (label.equals("Show collision")) {
                 if (collisionWin == null) {
                     collisionWin = new CollisionWindow(screen, getWindow(), (byte) 1);

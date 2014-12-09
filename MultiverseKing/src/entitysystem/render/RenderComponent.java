@@ -14,17 +14,17 @@ public class RenderComponent implements PersistentComponent {
     private String name;
     private boolean isVisible;
     private SubSystem system;
-    private Type type;
+    private RenderType type;
 
-    public RenderComponent(String name, Type type) {
+    public RenderComponent(String name, RenderType type) {
         this(name, type, null, true);
     }
 
-    public RenderComponent(String name, Type type, SubSystem system) {
+    public RenderComponent(String name, RenderType type, SubSystem system) {
         this(name, type, system, true);
     }
     
-    public RenderComponent(String name, Type type, SubSystem system, boolean isVisible) {
+    public RenderComponent(String name, RenderType type, SubSystem system, boolean isVisible) {
         this.name = name;
         this.type = type;
         this.system = system;
@@ -39,7 +39,7 @@ public class RenderComponent implements PersistentComponent {
         return system;
     }
 
-    public Type getType() {
+    public RenderType getRenderType() {
         return type;
     }
 
@@ -55,11 +55,13 @@ public class RenderComponent implements PersistentComponent {
         return new RenderComponent(name, type, system, false);
     }
     
-    public enum Type{
-        Units,
+    public enum RenderType{
+        Unit,
         Titan,
         Core,
-        Environments,
+        Environment,
+        Ability,
+        Equipement,
         Debug;
     }
 }

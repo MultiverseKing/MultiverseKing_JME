@@ -7,6 +7,7 @@ import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.collision.Collidable;
 import com.jme3.collision.CollisionResults;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
@@ -41,9 +42,9 @@ import org.hexgridapi.utility.HexCoordinate;
 public class RenderSystem extends EntitySystemAppState implements TileChangeListener {
 
     private final Node renderSystemNode = new Node("RenderSystemNode");
-    private HashMap<EntityId, Spatial> spatials = new HashMap<EntityId, Spatial>();
-    private ArrayList<SubSystem> subSystem = new ArrayList<SubSystem>(2);
-    private ArrayList<Node> subSystemNode = new ArrayList<Node>(2);
+    private HashMap<EntityId, Spatial> spatials = new HashMap<>();
+    private ArrayList<SubSystem> subSystems = new ArrayList<>(2);
+    private ArrayList<Node> subSystemNodes = new ArrayList<>(2);
     private SpatialInitializer spatialInitializer;
     private MapData mapData;
 
@@ -55,14 +56,29 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
      */
     public AnimControl getAnimControl(EntityId id) {
         if (spatials.containsKey(id)) {
-            return spatials.get(id).getControl(AnimControl.class);
-        } else {
-            return null;
+            Spatial s = spatials.get(id);
+            
+            AnimControl ctrl = s.getControl(AnimControl.class);
+            if(ctrl == null && s instanceof Node && !((Node)s).getChildren().isEmpty()){
+                for(Spatial child : ((Node)s).getChildren()){
+                    ctrl = child.getControl(AnimControl.class);
+                    if(ctrl != null){
+                        return ctrl;
+                    }
+                }
+            } else {
+                return ctrl;
+            }
         }
+        return null;
     }
 
     public String getSpatialName(EntityId id) {
         return spatials.get(id).getName();
+    }
+
+    public String getRenderNodeName() {
+        return renderSystemNode.getName();
     }
 
     // <editor-fold defaultstate="collapsed" desc="SubSystem Method">
@@ -77,42 +93,40 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
      * Register a system to work with spatial having his own node settup.
      */
     public Node registerSubSystem(SubSystem system, boolean addNode) {
-        subSystem.add(system);
+        subSystems.add(system);
         if (addNode) {
             return addSubSystemNode(system);
         }
         return null;
     }
 
-    public boolean removeSubSystem(SubSystem system, boolean clear) {
-        if (subSystem.remove(system)) {
+    public void removeSubSystem(SubSystem system, boolean clear) {
+        if (subSystems.remove(system)) {
             removeSubSystemNode(system, clear);
-            return true;
         }
-        return false;
     }
 
     public Node addSubSystemNode(SubSystem system) {
-        for (Node n : subSystemNode) {
+        for (Node n : subSystemNodes) {
             if (n.getName().equals(system.getSubSystemName())) {
                 return n;
             }
         }
         Node node = new Node(system.getSubSystemName());
-        subSystemNode.add(node);
+        subSystemNodes.add(node);
         renderSystemNode.attachChild(node);
         return node;
     }
 
-    public boolean removeSubSystemNode(SubSystem system, boolean clear) {
+    public void removeSubSystemNode(SubSystem system, boolean clear) {
         Node node = null;
-        for (Node n : subSystemNode) {
+        for (Node n : subSystemNodes) {
             if (n.getName().equals(system.getSubSystemName())) {
                 node = n;
                 break;
             }
         }
-        if (node != null && subSystemNode.remove(node)) {
+        if (node != null && subSystemNodes.remove(node)) {
             if (!clear) {
                 for (Spatial s : node.getChildren()) {
                     if (spatials.containsValue(s)) {
@@ -121,31 +135,27 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
                 }
             }
             renderSystemNode.detachChild(node);
-            return true;
         }
-        return false;
     }
 
-    public boolean addSpatialToSubSystem(EntityId id, SubSystem system) {
+    private void addSpatialToSubSystem(EntityId id, SubSystem system) {
         if (spatials.get(id) != null) {
-            Node node = (Node) renderSystemNode.getChild(system.getSubSystemName());
-            if (!node.hasChild(spatials.get(id))) {
-                node.attachChild(spatials.get(id));
+            Node subSystemNode = (Node) renderSystemNode.getChild(system.getSubSystemName());
+            if (!subSystemNode.hasChild(spatials.get(id))) {
+                subSystemNode.attachChild(spatials.get(id));
             }
-            return true;
         }
-        return false;
     }
 
-    public void removeSpatialFromSubSystem(EntityId id) {
+    private void addSpatialToRenderNode(EntityId id) {
         if (spatials.get(id) != null) {
             renderSystemNode.attachChild(spatials.get(id));
         }
     }
 
-    public CollisionResults subSystemCollideWith(SubSystem system, Collidable other) {
+    public CollisionResults subSystemCollideWith(SubSystem system, Ray ray) {
         CollisionResults result = new CollisionResults();
-        ((Node) renderSystemNode.getChild(system.getSubSystemName())).collideWith(other, result);
+        ((Node) renderSystemNode.getChild(system.getSubSystemName())).collideWith(ray, result);
         return result;
     }
     // </editor-fold>
@@ -167,31 +177,39 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     @Override
     public void addEntity(Entity e) {
         addSpatial(e);
-        updateSpatialTransform(e.getId());
-        if (e.get(RenderComponent.class).getSystem() != null) {
-            addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSystem());
+        if(e.get(RenderComponent.class).isVisible()){
+            updateSpatialTransform(e.getId());
+            if (e.get(RenderComponent.class).getSystem() != null) {
+                addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSystem());
+            }
         }
     }
 
-    private Spatial getSpatial(Entity e) {
+    private Spatial initialiseSpatial(Entity e) {
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getType());
-        s.setName(renderComp.getName() + e.getId().toString());
+        s.setName(renderComp.getName() + renderComp.getType() + e.getId().toString());
         return s;
     }
 
     private void addSpatial(Entity e) {
-        Spatial s = getSpatial(e);
+        Spatial s = initialiseSpatial(e);
         spatials.put(e.getId(), s);
-        renderSystemNode.attachChild(s);
+        if(e.get(RenderComponent.class).isVisible()){
+            renderSystemNode.attachChild(s);
+        }
     }
 
     private void switchSpatial(Entity e) {
-        Spatial s = getSpatial(e);
-        Node parent = spatials.get(e.getId()).getParent();
-        spatials.get(e.getId()).removeFromParent();
+        Spatial s = initialiseSpatial(e);
+        if(e.get(RenderComponent.class).isVisible()){
+            Node parent = spatials.get(e.getId()).getParent();
+            spatials.get(e.getId()).removeFromParent();
+            parent.attachChild(s);
+        } else {
+            spatials.get(e.getId()).removeFromParent();
+        }
         spatials.put(e.getId(), s);
-        parent.attachChild(s);
     }
 
     @Override
@@ -200,17 +218,21 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
          * Update the spatial if it need to.
          */
         Spatial s = spatials.get(e.getId());
-        String eName = (String) (e.get(RenderComponent.class).getName() + e.getId().toString());
+        String eName = (String) (e.get(RenderComponent.class).getName() + e.get(RenderComponent.class).getType() + e.getId().toString());
         if (s == null) {
             addSpatial(e);
         } else if (!eName.equals(s.getName())) {
             switchSpatial(e);
         }
-        updateSpatialTransform(e.getId());
-        if (e.get(RenderComponent.class).getSystem() != null) {
-            addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSystem());
-        } else {
-            removeSpatialFromSubSystem(e.getId());
+        if(e.get(RenderComponent.class).isVisible()){
+            if (e.get(RenderComponent.class).getSystem() != null) {
+                addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSystem());
+            } else {
+                addSpatialToRenderNode(e.getId());
+            }
+            updateSpatialTransform(e.getId());
+        } else if(spatials.get(e.getId()).getParent() != null){
+            spatials.get(e.getId()).removeFromParent();
         }
     }
 
@@ -265,7 +287,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
             s.getControl(MotionEvent.class).getPath().disableDebugShape();
         }
         if (renderSystemNode.detachChild(s) == -1) {
-            for (Node n : subSystemNode) {
+            for (Node n : subSystemNodes) {
                 if (n.detachChild(s) != -1) {
                     break;
                 }
@@ -276,13 +298,14 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
 
     @Override
     protected void cleanupSystem() {
-        for (SubSystem s : subSystem) {
+        for (SubSystem s : subSystems) {
             s.removeSubSystem();
         }
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
 
+    @Override
     public void tileChange(TileChangeEvent event) {
         Set<EntityId> key = spatials.keySet();
         for (EntityId id : key) {

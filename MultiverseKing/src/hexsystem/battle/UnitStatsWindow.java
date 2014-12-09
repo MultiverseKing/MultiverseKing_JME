@@ -8,16 +8,16 @@ import entitysystem.render.RenderComponent;
 import tonegod.gui.core.ElementManager;
 
 /**
- *
+ * Used to show unit stats on the screen.
  * @author roah
  */
 class UnitStatsWindow extends PropertiesWindow {
 
-    UnitStatsWindow(ElementManager screen, BattleSystem system) {
+    UnitStatsWindow(ElementManager screen, BattleTrainingSystem system) {
         this(screen, "Unit", system, 5);
     }
 
-    UnitStatsWindow(ElementManager screen, String UID, BattleSystem system, int maxField) {
+    UnitStatsWindow(ElementManager screen, String UID, BattleTrainingSystem system, int maxField) {
         super(screen, UID, system, maxField + 5);
     }
 
@@ -25,7 +25,7 @@ class UnitStatsWindow extends PropertiesWindow {
     protected void showWindow(Entity e) {
         InitialTitanStatsComponent comp = e.get(TitanLoader.InitialTitanStatsComponent.class);
         setWindowTitle(windowTitle + e.get(RenderComponent.class).getName());
-        addMinMaxField("Health Point", comp.getHealthPoint(), comp.getHealthPoint());
+        addMinMaxField("Health Point", comp.getHealPoint(), comp.getHealPoint());
         addMinMaxField("Atb Value", comp.getMaxAtb(), comp.getMaxAtb());
         addField("Speed", comp.getSpeed());
         addField("Move Range", comp.getMoveRange());

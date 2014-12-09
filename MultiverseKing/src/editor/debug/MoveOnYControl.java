@@ -8,6 +8,7 @@ import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
+import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class MoveOnYControl extends AbstractControl {
 
     private int factor = 1;
+    private float initialPosition;
     //Any local variables should be encapsulated by getters/setters so they
     //appear in the SDK properties window and can be edited.
     //Right-click a local variable to encapsulate it with getters and setters.
@@ -29,13 +31,20 @@ public class MoveOnYControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
         spatial.setLocalTranslation(spatial.getLocalTranslation().x, spatial.getLocalTranslation().y + (tpf * factor) * 0.5f, spatial.getLocalTranslation().z);
-        if (spatial.getLocalTranslation().y > 0.7f) {
+        if (spatial.getLocalTranslation().y > initialPosition+0.3f) {
             factor = -1;
-        } else if (spatial.getLocalTranslation().y < 0.2f) {
+        } else if (spatial.getLocalTranslation().y < initialPosition-0.2f) {
             factor = 1;
         }
     }
 
+    @Override
+    public void setSpatial(Spatial spatial) {
+        initialPosition = spatial.getLocalTranslation().y;
+        super.setSpatial(spatial);
+    }
+
+    
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         //Only needed for rendering-related operations,

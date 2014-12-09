@@ -9,5 +9,6 @@ Material My Material : MatDefs/shaderBlowCopy.j3md {
     AdditionalRenderState {
       Blend Alpha
       Wireframe Off
+      AlphaTestFalloff 0.3
     }
 }

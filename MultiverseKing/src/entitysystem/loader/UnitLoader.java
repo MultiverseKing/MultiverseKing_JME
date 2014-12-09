@@ -11,7 +11,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * loader to load entity units from file.
+ * loader to load entity units from file, Contain InitialUnitStatsComponent to
+ * avoids any use of it outside of the loading.
  *
  * @author roah
  */
@@ -62,7 +63,7 @@ public class UnitLoader {
         private final String[] abilityList;
 
         public InitialUnitStatsComponent(InitialUnitStatsComponent stats) {
-            this.healthPoint = stats.getHealthPoint();
+            this.healthPoint = stats.getHealPoint();
             this.maxAtb = stats.getMaxAtb();
             this.speed = stats.getSpeed();
             this.moveRange = stats.getMoveRange();
@@ -77,14 +78,6 @@ public class UnitLoader {
             this.moveRange = moveRange;
             this.moveSpeed = moveSpeed;
             this.abilityList = abilityList;
-        }
-
-        public int getHealthPoint() {
-            return healthPoint;
-        }
-
-        public HealthComponent getHealthComponent() {
-            return new HealthComponent(healthPoint);
         }
 
         public byte getMaxAtb() {
@@ -131,6 +124,14 @@ public class UnitLoader {
                 i++;
             }
             return list;
+        }
+
+        public int getHealPoint() {
+            return healthPoint;
+        }
+
+        public HealthComponent getHealthComponent() {
+            return new HealthComponent(healthPoint);
         }
     }
 }

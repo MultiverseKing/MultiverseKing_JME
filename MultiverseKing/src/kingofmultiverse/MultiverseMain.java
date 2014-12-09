@@ -14,6 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
 import editor.EditorSystem;
+import entitysystem.loader.JSONLoader;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.Map;
@@ -57,12 +58,16 @@ public class MultiverseMain extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         setPauseOnLostFocus(false);
-        String userHome = System.getProperty("user.dir") + "/assets/MapData/";
-        assetManager.registerLocator(userHome, ChunkDataLoader.class);
-        assetManager.registerLoader(ChunkDataLoader.class, "chk");
-        assetManager.registerLocator(userHome, MapDataLoader.class);
-        assetManager.registerLoader(MapDataLoader.class, "map");
-
+//        String userHome = System.getProperty("user.dir") + "/assets/Data/MapData/";
+//        assetManager.registerLocator(userHome, ChunkDataLoader.class);
+//        assetManager.registerLoader(ChunkDataLoader.class, "chk");
+//        
+//        assetManager.registerLocator(userHome, MapDataLoader.class);
+//        assetManager.registerLoader(MapDataLoader.class, "map");
+        
+        assetManager.registerLocator(System.getProperty("user.dir") + "/assets/Data/", JSONLoader.class);
+        assetManager.registerLoader(JSONLoader.class, "json", "card");
+        
         //Init general input 
         super.inputManager.clearMappings();
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));

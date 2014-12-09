@@ -3,7 +3,7 @@ package editor.area;
 import gui.EditorWindow;
 import hexsystem.area.AreaEventComponent;
 import hexsystem.area.AreaEventComponent.Event;
-import static hexsystem.area.AreaEventComponent.Event.trigger;
+import static hexsystem.area.AreaEventComponent.Event.Trigger;
 import hexsystem.area.AreaEventSystem;
 import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
@@ -112,7 +112,8 @@ public class TileEventMenu extends EditorWindow {
                 case Start:
                     addButtonField("Start Position", HAlign.left, "Delete", HAlign.full);
                     break;
-                case trigger:
+                case Trigger:
+                    addButtonField("Trigger", HAlign.left, "Delete", HAlign.full);
                     break;
                 default:
                     throw new UnsupportedOperationException(e + " is not currently supported.");
@@ -148,6 +149,8 @@ public class TileEventMenu extends EditorWindow {
         } else if (event.contains("Delete")) {
             if (event.contains("StartPosition")) {
                 removeEvent(Event.Start);
+            } else  if (event.contains("Trigger")) {
+                removeEvent(Event.Trigger);
             }
         }
     }

@@ -5,9 +5,11 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
+import editor.area.AreaEventRenderDebugSystem;
 import entitysystem.EntitySystemAppState;
 import entitysystem.attribut.Animation;
 import entitysystem.attribut.CardRenderPosition;
@@ -19,46 +21,43 @@ import entitysystem.field.position.MovementSystem;
 import entitysystem.render.AnimationComponent;
 import entitysystem.loader.EntityLoader;
 import entitysystem.loader.TitanLoader;
-import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
 import entitysystem.render.AnimationSystem;
 import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
 import entitysystem.SubSystem;
 import entitysystem.render.RenderComponent.Type;
+import hexsystem.area.AreaEventSystem;
 import hexsystem.area.MapDataAppState;
-import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.base.AreaMouseAppState;
-import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.MapData;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
-import org.hexgridapi.utility.Vector2Int;
 
 /**
- *
+ * TODO: This should extends from game Battle system.
  * @author roah
  */
-public class BattleSystem extends EntitySystemAppState implements MouseRayListener, SubSystem {
+public class BattleTrainingSystem extends EntitySystemAppState implements MouseRayListener, SubSystem {
 
     private MapData mapData;
-    private ArrayList<EntityId> titanList = new ArrayList<EntityId>();
-    private ArrayList<EntityId> unitList = new ArrayList<EntityId>();
     private RenderSystem renderSystem;
     private AreaMouseAppState hexMapMouseSystem;
-    private int currentAction = -1;
+    private Action currentAction = null;
     private EntityId inspectedId = null;
     private BattleTrainingGUI bTrainingGUI;
+    private AreaEventRenderDebugSystem debugSystem;
 
     @Override
     protected EntitySet initialiseSystem() {
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
-        if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(new Vector2Int(), null);
-        }
-        app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem(), new AreaMouseAppState());
+        debugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
+//        if (mapData.getAllChunkPos().isEmpty()) {
+//            mapData.addChunk(new Vector2Int(), null);
+//        }
+        app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem());
 
 //        if (app.getStateManager().getState(RenderSystem.class) == null) {
 //            app.getStateManager().attach(new RenderSystem());
@@ -70,27 +69,40 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
         renderSystem.registerSubSystem(this, true);
         hexMapMouseSystem = app.getStateManager().getState(AreaMouseAppState.class);
         hexMapMouseSystem.registerRayInputListener(this);
+        
+        initialisePlayerCore(app.getStateManager().getState(AreaEventSystem.class).getStartPosition());
 
         /**
          * Init the testingUnit.
          */
 //        addEntityTitan("TuxDoll");
 //        addEntityTitan("Gilga");
-        camToCenter();
+//        camToStartPosition();
 
-        return entityData.getEntities(InitialTitanStatsComponent.class, RenderComponent.class);
+        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
     }
 
+    @Override
     public String getSubSystemName() {
         return "BattleSystem";
+    }
+
+    private void initialisePlayerCore(HexCoordinate startPosition) {
+        if(debugSystem != null){
+            debugSystem.hideDebug(startPosition, this);
+        }
+        EntityId e = entityData.createEntity();
+        entityData.setComponents(e, new HexPositionComponent(startPosition), new RenderComponent("Well", Type.Core, this), new AnimationComponent(Animation.SUMMON));
     }
 
     /**
      * Move the camera to the center of the map.
      */
-    private void camToCenter() {
-        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
-                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
+    private void camToStartPosition() {
+        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+        Vector3f center = startPosition.convertToWorldPosition();
+//        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
+//                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
         ((MultiverseMain) app).getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
     }
 
@@ -101,19 +113,16 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 
     @Override
     protected void addEntity(Entity e) {
-        unitList.add(e.getId());
-        renderSystem.addSpatialToSubSystem(e.getId(), this);
     }
 
-    public void addEntityTitan(String name) {
-        titanList.add(entityData.createEntity());
+    public void addEntityTitan(String name, HexCoordinate position) {
         EntityLoader loader = new EntityLoader();
         TitanLoader load = loader.loadTitanStats(name);
-        HexCoordinate pos = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
-        entityData.setComponents(titanList.get(0),
+//        HexCoordinate position = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
+        entityData.setComponents(entityData.createEntity(),
                 new CardRenderComponent(CardRenderPosition.FIELD, name),
-                new RenderComponent(name, Type.Units),
-                new HexPositionComponent(pos, Rotation.C),
+                new RenderComponent(name, Type.Titan),
+                new HexPositionComponent(position, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 new TimeBreakComponent(),
                 load.getInitialStatsComponent(),
@@ -122,23 +131,15 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 
     @Override
     protected void updateEntity(Entity e) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     protected void removeEntity(Entity e) {
-        if (unitList.contains(e.getId())) {
-            unitList.remove(e.getId());
-        } else if (titanList.contains(e.getId())) {
-            titanList.remove(e.getId());
-        }
-        if (e.get(InitialTitanStatsComponent.class) == null) {
-            renderSystem.removeSpatialFromSubSystem(e.getId());
-        }
     }
 
+    @Override
     public void leftMouseActionResult(MouseInputEvent event) {
-        if (currentAction != -1) {
+        if (currentAction != null) {
             confirmAction(event.getEventPosition());
         }
 //        else {
@@ -152,8 +153,9 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     /**
      * Used when the spatial is not selected directly.
      */
+    @Override
     public void rightMouseActionResult(MouseInputEvent event) {
-        if (currentAction == -1) {
+        if (currentAction == null) {
             Entity e = checkEntities(event.getEventPosition());
             if (e != null && entityData.getComponent(e.getId(), MoveToComponent.class) == null) {
                 openEntityActionMenu(e, event.getEventPosition());
@@ -163,18 +165,22 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 
     private Entity checkEntities(HexCoordinate coord) {
         for (Entity e : entities) {
-            HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
-            if (posComp != null && posComp.getPosition().equals(coord)) {
-                return e;
+            if(!e.get(RenderComponent.class).getType().equals(Type.Debug)){
+                HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
+                if (posComp != null && posComp.getPosition().equals(coord)) {
+                    return e;
+                }
             }
         }
         return null;
     }
 
+    @Override
     public MouseInputEvent leftRayInputAction(Ray ray) {
         return collisionTest(ray);
     }
 
+    @Override
     public MouseInputEvent rightRayInputAction(Ray ray) {
         return collisionTest(ray);
     }
@@ -184,14 +190,18 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
             return null;
         }
         CollisionResults results = renderSystem.subSystemCollideWith(this, ray);
-        if (results.size() != 0 && results.size() > 0) {
+        if (results.size() > 0) {
             CollisionResult closest = results.getClosestCollision();
             for (Entity e : entities) {
-                if (closest.getGeometry().getParent().getName().equals(renderSystem.getSpatialName(e.getId()))) {
-                    hexMapMouseSystem.setDebugPosition(closest.getContactPoint());
-                    HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
-                    return new MouseInputEvent(pos, ray, closest);
-                }
+                Spatial s = closest.getGeometry().getParent();
+                do {
+                    if (s != null && s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
+                        hexMapMouseSystem.setDebugPosition(closest.getContactPoint());
+                        HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
+                        return new MouseInputEvent(pos, ray, closest);
+                    }
+                    s = s.getParent();
+                } while (s != null && !s.getParent().getName().equals(renderSystem.getRenderNodeName()));
             }
         }
         return null;
@@ -199,18 +209,18 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 
     private void openEntityActionMenu(Entity e, HexCoordinate pos) {
 //        MapData mapData = app.getStateManager().getState(HexSystemAppState.class).getMapData();
-        bTrainingGUI.showActionMenu(pos, e.getId());
+        bTrainingGUI.showActionMenu(pos, e.getId(), e.get(RenderComponent.class).getType());
     }
 
     public void closeEntityPropertiesMenu() {
-        if (currentAction == -1) {
+        if (currentAction == null) {
             inspectedId = null;
         }
     }
 
-    void setAction(EntityId id, Integer action) {
+    void setAction(EntityId id, Action action) {
         switch (action) {
-            case 0://Movement action
+            case MOVE:
                 if (!hexMapMouseSystem.setCursorPulseMode(this)) {
                     return;
                 }
@@ -219,11 +229,16 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
                 //Register the input for this system
                 app.getInputManager().addListener(fieldInputListener, "Cancel");
                 break;
-            case 1: //Ability
+            case ABILITY:
                 break;
-            case 2: //Stats
+            case STATS:
                 bTrainingGUI.showTitanStats(entities.getEntity(id));
                 inspectedId = id;
+                break;
+            case CUSTOM:
+                /**
+                 * TODO : For action made by external user, Data have to be loaded.
+                 */
                 break;
             default:
                 throw new UnsupportedOperationException("Action type not implemented.");
@@ -231,7 +246,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     }
 
     private void confirmAction(HexCoordinate eventPosition) {
-        if (currentAction == 0) { //movement action
+        if (currentAction.equals(Action.MOVE)) { //movement action
             entityData.setComponent(inspectedId, new MoveToComponent(eventPosition));
         }
         unregisterInput();
@@ -239,18 +254,19 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 
     private void actionCancel() {
         hexMapMouseSystem.setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
-        currentAction = -1;
+        currentAction = null;
         unregisterInput();
     }
 
     private void unregisterInput() {
         inspectedId = null;
-        currentAction = -1;
+        currentAction = null;
         hexMapMouseSystem.setCursorPulseMode(this);
         //Unregister the input for this system
         app.getInputManager().removeListener(fieldInputListener);
     }
     private ActionListener fieldInputListener = new ActionListener() {
+        @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("Cancel") && !keyPressed) {
                 actionCancel();
@@ -259,26 +275,13 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     };
 
     public void reloadSystem() {
-        mapData.Cleanup();
-        clearList();
-        mapData.addChunk(new Vector2Int(), null);
-        camToCenter();
-    }
-
-    private void clearList() {
-        for (EntityId id : titanList) {
-            entityData.removeEntity(id);
-        }
-        titanList.clear();
-        for (EntityId id : unitList) {
-            entityData.removeEntity(id);
-        }
-        unitList.clear();
+//        mapData.Cleanup();
+//        mapData.addChunk(new Vector2Int(), null);
+//        camToStartPosition();
     }
 
     @Override
     protected void cleanupSystem() {
-        clearList();
         bTrainingGUI.removeFromScreen();
         mapData.Cleanup();
         renderSystem.removeSubSystem(this, false);
@@ -287,7 +290,15 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
         app.getStateManager().detach(app.getStateManager().getState(MovementSystem.class));
     }
 
+    @Override
     public void removeSubSystem() {
         app.getStateManager().detach(this);
+    }
+    
+    public enum Action {
+        MOVE,
+        STATS,
+        ABILITY,
+        CUSTOM;
     }
 }

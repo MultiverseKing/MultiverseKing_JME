@@ -16,20 +16,18 @@ public class HexPositionComponent implements PersistentComponent {
     private final HexCoordinate position;
     private final Rotation rotation;
 
+    public HexPositionComponent(HexCoordinate position) {
+        this(position, Rotation.A, null);
+    }
+    
+    public HexPositionComponent(HexCoordinate position, Rotation rotation) {
+        this(position, rotation, null);
+    }
+    
     public HexPositionComponent(HexCoordinate position,Rotation rotation, Curve curve) {
         this.position = position;
         this.rotation = rotation;
         this.curve = curve;
-    }
-
-    /**
-     *
-     * @param position
-     */
-    public HexPositionComponent(HexCoordinate position, Rotation rotation) {
-        this.position = position;
-        this.rotation = rotation;
-        this.curve = null;
     }
 
     /**

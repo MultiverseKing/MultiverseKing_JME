@@ -7,7 +7,6 @@ import editor.map.MapEditorSystem;
 import entitysystem.field.position.HexPositionComponent;
 import gui.FileManagerPopup;
 import hexsystem.area.AreaEventSystem;
-import hexsystem.area.AreaGridSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
@@ -43,10 +42,10 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     @Override
     protected EntitySet initialiseSystem() {
         mapData = ((MultiverseMain) app).getStateManager().getState(MapDataAppState.class).getMapData();
-        app.getStateManager().attach(new AreaGridSystem(mapData));
-        app.getStateManager().attach(new AreaEventRenderDebugSystem());
-        app.getStateManager().attach(new AreaEventSystem());
-        app.getStateManager().attach(new AreaMouseAppState());
+//        app.getStateManager().attach(new AreaGridSystem(mapData));
+//        app.getStateManager().attach(new AreaEventRenderDebugSystem());
+//        app.getStateManager().attach(new AreaEventSystem());
+//        app.getStateManager().attach(new AreaMouseAppState());
         if (popup != null) {
             loadFromFile(popup);
         } else {
@@ -96,6 +95,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
     // </editor-fold>
 
+    @Override
     public void generateEmptyArea() {
         mapData.registerTileChangeListener(this);
         if (mapData.getAllChunkPos().isEmpty()) {
@@ -103,12 +103,15 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         }
     }
 
+    @Override
     public void reloadSystem() {
         mapData.Cleanup();
         app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
+        tileEventMenu.removeFromScreen();
         generateEmptyArea();
     }
 
+    @Override
     public void loadFromFile(FileManagerPopup popup) {
         if (popup != null && popup.getInput() != null) {
             if (!mapData.loadArea(popup.getInput())) {
@@ -124,6 +127,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         }
     }
 
+    @Override
     public void save(FileManagerPopup popup) {
         if (isEmpty() || !mapData.saveArea(popup.getInput())) {
             popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
@@ -159,16 +163,19 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         System.err.println("Not Supported yet.");
     }
 
+    @Override
     public void tileChange(TileChangeEvent event) {
         if (tileWidgetMenu.isVisible()) {
 //            openWidgetMenu(event.getTilePos());
         }
     }
 
+    @Override
     public void leftMouseActionResult(MouseInputEvent event) {
         closeTileMenu();
     }
 
+    @Override
     public void rightMouseActionResult(MouseInputEvent event) {
         openWidgetMenu(event.getEventPosition());
         if(tileEventMenu != null && !event.getEventPosition().equals(tileEventMenu.getInspectedTilePos())){
@@ -222,14 +229,14 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     @Override
     protected void cleanupSystem() {
-        mapData.Cleanup();
-        app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
+//        mapData.Cleanup();
+//        app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
         
-        app.getStateManager().detach(app.getStateManager().getState(AreaMouseAppState.class));
-//        app.getStateManager().getState(AreaMouseAppState.class).removeTileInputListener(this);
-        app.getStateManager().detach(app.getStateManager().getState(AreaGridSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(AreaEventRenderDebugSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(AreaEventSystem.class));
+//        app.getStateManager().detach(app.getStateManager().getState(AreaMouseAppState.class));
+        app.getStateManager().getState(AreaMouseAppState.class).removeTileInputListener(this);
+//        app.getStateManager().detach(app.getStateManager().getState(AreaGridSystem.class));
+//        app.getStateManager().detach(app.getStateManager().getState(AreaEventRenderDebugSystem.class));
+//        app.getStateManager().detach(app.getStateManager().getState(AreaEventSystem.class));
         if (tileWidgetMenu != null) {
             tileWidgetMenu.removeFromScreen();
         }

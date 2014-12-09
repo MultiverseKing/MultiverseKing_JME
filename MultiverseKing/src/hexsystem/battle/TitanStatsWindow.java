@@ -5,12 +5,12 @@ import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
 import tonegod.gui.core.ElementManager;
 
 /**
- *
+ * Used to show the titan stats on the screen.
  * @author roah
  */
 class TitanStatsWindow extends UnitStatsWindow {
 
-    TitanStatsWindow(ElementManager screen, BattleSystem system) {
+    TitanStatsWindow(ElementManager screen, BattleTrainingSystem system) {
         super(screen, "Titan", system, 4);
     }
 

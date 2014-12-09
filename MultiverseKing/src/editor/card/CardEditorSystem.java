@@ -24,7 +24,7 @@ import org.hexgridapi.utility.Vector2Int;
  */
 public class CardEditorSystem extends EntitySystemAppState {
 
-    private ArrayList<EntityId> entity = new ArrayList<EntityId>();
+    private ArrayList<EntityId> entity = new ArrayList<>();
     private MapData mapData;
 
     @Override

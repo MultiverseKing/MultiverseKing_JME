@@ -18,7 +18,12 @@ public class SpatialInitializer {
     }
 
     public Spatial initialize(String name, Type type) {
-        Spatial model = assetManager.loadModel("Models/"+type.toString()+"/" + name + ".j3o");
+        Spatial model;
+        if(type.equals(Type.Debug)){
+            model = assetManager.loadModel("Models/"+type.toString()+"/" + name + ".j3o");
+        } else {
+            model = assetManager.loadModel("Models/"+type.toString()+"/" + name + "/" + name + ".j3o");
+        }
         model.setShadowMode(RenderQueue.ShadowMode.Inherit);
         return model;
     }

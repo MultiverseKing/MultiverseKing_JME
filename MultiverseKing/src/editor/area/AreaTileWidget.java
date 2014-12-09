@@ -21,7 +21,7 @@ import tonegod.gui.core.Screen;
  */
 class AreaTileWidget extends CameraTrackWindow {
 
-    private ArrayList<AnimatedButton> animatedButton = new ArrayList<AnimatedButton>();
+    private ArrayList<AnimatedButton> animatedButton = new ArrayList<>();
     private ElementalWidgetMenu eWin = null;
     private AreaEditorSystem system;
     private Element eAttributIco;

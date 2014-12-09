@@ -3,7 +3,7 @@ package hexsystem.battle;
 import com.simsilica.es.PersistentComponent;
 
 /**
- *
+ * Used to activate the unit Timebreak ability.
  * @author roah
  */
 public class TimeBreakComponent implements PersistentComponent {

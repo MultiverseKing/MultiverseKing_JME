@@ -1,15 +1,17 @@
 Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
      MaterialParameters {
-        ColorMap : Models/Debug/texst.png
+        ColorMap : Models/Debug/testDebugCursor.png
+        AlphaDiscardThreshold : 0.3
      }
     AdditionalRenderState {
-      Blend Off
+      Blend Alpha
       Wireframe Off
-      AlphaTestFalloff 0.0
+      AlphaTestFalloff 0.3
       PointSprite Off
       ColorWrite On
       DepthTest On
       DepthWrite On
       FaceCull Back
+      PolyOffset 0.0 0.0
     }
 }

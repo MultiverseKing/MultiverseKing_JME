@@ -7,7 +7,7 @@ import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.ElementManager;
 
 /**
- *
+ * Usage ?
  * @author roah
  */
 public class TitanGUIList extends Window {
@@ -34,6 +34,7 @@ public class TitanGUIList extends Window {
         }
     }
 
+    @Override
     public void showWindow() {
     }
 

@@ -1,10 +1,10 @@
 Material My Material : Common/MatDefs/Light/Lighting.j3md {
      MaterialParameters {
-        DiffuseMap : Models/Import/Color.png
+        DiffuseMap : Models/Units/crazySheepMan/Color.png
         Specular : 1.0 1.0 1.0 1.0
         Diffuse : 1.0 1.0 1.0 1.0
-        NormalMap : Models/Import/Normal.png
-        SpecularMap : Models/Import/SpecularIntensity.png
+        NormalMap : Models/Units/crazySheepMan/Normal.png
+        SpecularMap : Models/Units/crazySheepMan/SpecularIntensity.png
         HighQuality : false
         ColorRamp : Models/Units/TuxDoll/ramp2.png
      }

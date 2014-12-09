@@ -29,7 +29,8 @@ import sun.misc.IOUtils;
  */
 public class EntityLoader {
 
-    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData";
+//    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData";
+    private final String path = "/assets/Data/CardData";
     private final JSONParser parser = new JSONParser();
 
     /**
@@ -176,7 +177,7 @@ public class EntityLoader {
             Number layer = (Number) value.get("layer");
             Number areaRange = (Number) value.get("areaRadius");
             JSONArray key = (JSONArray) value.get("key");
-            ArrayList<HexCoordinate> collisionCoord = new ArrayList<HexCoordinate>();
+            ArrayList<HexCoordinate> collisionCoord = new ArrayList<>();
             for (int j = 0; j < key.size(); j++) {
                 collisionCoord.add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) key.get(j))));
             }

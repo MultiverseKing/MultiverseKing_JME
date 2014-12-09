@@ -1,0 +1,23 @@
+{
+    "Card": {
+        "ability": [
+            "PulseVolt",
+            "PulseVoltage"
+        ],
+        "equipement": [
+            "dadada"
+        ],
+        "summon": [
+            "Cendrea"
+        ],
+        "titan": [
+            "Gilga",
+            "TuxDoll"
+        ]
+    },
+    "Map": [
+        "Reset",
+        "dada",
+        "hunter"
+    ]
+}

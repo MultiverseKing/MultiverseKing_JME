@@ -13,6 +13,8 @@ import java.util.HashMap;
 import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
 import hexsystem.battle.TimeBreakComponent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Handle how animation work when they got they cycle done or under defined
@@ -24,13 +26,13 @@ import hexsystem.battle.TimeBreakComponent;
 public class AnimationSystem extends EntitySystemAppState implements AnimEventListener, SubSystem {
 
     private RenderSystem renderSystem;
-    private HashMap<EntityId, AnimControl> animControls = new HashMap<EntityId, AnimControl>();
+    private HashMap<EntityId, AnimControl> animControls = new HashMap<>();
 
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
-        return entityData.getEntities(AnimationComponent.class, RenderComponent.class, TimeBreakComponent.class);
+        return entityData.getEntities(AnimationComponent.class, RenderComponent.class);
     }
 
     @Override
@@ -43,7 +45,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
         AnimControl control = renderSystem.getAnimControl(e.getId());
         if(control == null){
             entityData.removeComponent(e.getId(), AnimationComponent.class);
-            System.err.println(getClass().toString() + ": There is no Animation control for " + e.get(RenderComponent.class).getName());
+            Logger.getGlobal().log(Level.WARNING, "{0} : There is no Animation control for : {1}.", new Object[]{getClass().getName(), e.get(RenderComponent.class).getName()});
             return;
         } 
         control.addListener(this);
@@ -64,11 +66,11 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
         if (!animControls.get(e.getId()).getChannel(0).getAnimationName().equals(toPlay.toString())) {
             setPlay(animControls.get(e.getId()).getChannel(0), toPlay);
         }
-        if(e.get(TimeBreakComponent.class).isTimeBreak()){
-            animControls.get(e.getId()).getChannel(0).setSpeed(0);
-        } else if(!e.get(TimeBreakComponent.class).isTimeBreak() && animControls.get(e.getId()).getChannel(0).getSpeed() == 0f) {
-            animControls.get(e.getId()).getChannel(0).setSpeed(1f);
-        }
+//        if(e.get(TimeBreakComponent.class).isTimeBreak()){
+//            animControls.get(e.getId()).getChannel(0).setSpeed(0);
+//        } else if(!e.get(TimeBreakComponent.class).isTimeBreak() && animControls.get(e.getId()).getChannel(0).getSpeed() == 0f) {
+//            animControls.get(e.getId()).getChannel(0).setSpeed(1f);
+//        }
     }
 
     @Override

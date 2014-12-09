@@ -6,13 +6,18 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import editor.area.AreaEventRenderDebugSystem;
 import entitysystem.render.RenderSystem;
-import hexsystem.battle.BattleSystem;
+import hexsystem.battle.BattleTrainingSystem;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.FileManagerPopup;
+import hexsystem.area.AreaEventSystem;
+import hexsystem.area.AreaGridSystem;
+import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.base.AreaMouseAppState;
+import org.hexgridapi.base.MapData;
 import tonegod.gui.core.Element;
 
 /**
@@ -28,6 +33,7 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     private String currentMode = "null";
     private boolean showDialog = false;
     private FileManagerPopup fileManagerPopup;
+    private boolean areaIsInitialised;
 
     public Element getGUI() {
         return gui.getMainMenu();
@@ -58,9 +64,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         fileManagerPopup = popup;
         clearForCurrent(false);
     }
-    
-    void saveCurrentArea(FileManagerPopup popup){
-        if(currentMode.equals("area")){
+
+    void saveCurrentArea(FileManagerPopup popup) {
+        if (currentMode.equals("area")) {
             app.getStateManager().getState(AreaEditorSystem.class).save(popup);
         }
         fileManagerPopup.removeFromScreen();
@@ -71,6 +77,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
      */
     private void clearForCurrent(boolean force) {
         showDialog = false;
+        if (currentMode.equals("battle")) {
+            force = true;
+        }
         if (!currentMode.equals("area") && app.getStateManager().getState(AreaEditorSystem.class) != null) {
             if (force) {
                 app.getStateManager().detach(app.getStateManager().getState(AreaEditorSystem.class));
@@ -85,9 +94,9 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
                 showDialog();
             }
         }
-        if (!currentMode.equals("battle") && app.getStateManager().getState(BattleSystem.class) != null) {
+        if (!currentMode.equals("battle") && app.getStateManager().getState(BattleTrainingSystem.class) != null) {
             if (force) {
-                app.getStateManager().detach(app.getStateManager().getState(BattleSystem.class));
+                app.getStateManager().detach(app.getStateManager().getState(BattleTrainingSystem.class));
             } else {
                 showDialog();
             }
@@ -101,33 +110,42 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         if (app.getStateManager().getState(RenderSystem.class) == null) {
             app.getStateManager().attach(new RenderSystem());
         }
-        if (currentMode.equals("area")) {
-            if (app.getStateManager().getState(AreaEditorSystem.class) == null) {
-                app.getStateManager().attach(new AreaEditorSystem(fileManagerPopup));
+        if (currentMode.equals("area") || currentMode.equals("battle")) {
+            if(!areaIsInitialised){
+                initialiseAreaSystem();
+            }
+            if (currentMode.equals("area")) {
+                if (app.getStateManager().getState(AreaEditorSystem.class) == null) {
+                    app.getStateManager().attach(new AreaEditorSystem(fileManagerPopup));
+                } else {
+                    app.getStateManager().getState(AreaEditorSystem.class).loadFromFile(fileManagerPopup);
+                }
             } else {
-                app.getStateManager().getState(AreaEditorSystem.class).loadFromFile(fileManagerPopup);
+                if (app.getStateManager().getState(BattleTrainingSystem.class) == null) {
+                    app.getStateManager().attach(new BattleTrainingSystem());
+                } else {
+                    app.getStateManager().getState(BattleTrainingSystem.class).reloadSystem();
+                }
             }
         } else if (currentMode.equals("world")) {
-        } else if (currentMode.equals("battle")) {
-            if (app.getStateManager().getState(BattleSystem.class) == null) {
-                app.getStateManager().attach(new BattleSystem());
-            } else {
-                app.getStateManager().getState(BattleSystem.class).reloadSystem();
-            }
-
+            /**
+             * @todo
+             */
         } else {
             throw new UnsupportedOperationException(currentMode + " is not a supported Mode");
         }
     }
 
-    void clearCurrent() {
-        app.getStateManager().detach(app.getStateManager().getState(AreaEditorSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(WorldEditorSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(BattleSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(RenderSystem.class));
-        currentMode = "null";
+    private void initialiseAreaSystem() {
+        MapData mapData = ((MultiverseMain) app).getStateManager().getState(MapDataAppState.class).getMapData();
+        app.getStateManager().attach(new AreaGridSystem(mapData));
+        app.getStateManager().attach(new AreaEventRenderDebugSystem());
+        app.getStateManager().attach(new AreaEventSystem());
+        app.getStateManager().attach(new AreaMouseAppState());
+        areaIsInitialised = true;
     }
 
+    @Override
     public void onDialogTrigger(String dialogUID, boolean confirmOrCancel) {
         if (confirmOrCancel) {
             if (dialogUID.equals("Warning !")) {
@@ -150,7 +168,10 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
     @Override
     public void cleanup() {
         super.cleanup();
+        app.getStateManager().detach(app.getStateManager().getState(AreaEditorSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(WorldEditorSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(BattleTrainingSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(RenderSystem.class));
         gui.cleanup();
-        clearCurrent();
     }
 }

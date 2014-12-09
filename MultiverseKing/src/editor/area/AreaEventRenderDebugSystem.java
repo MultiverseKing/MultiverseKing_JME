@@ -2,6 +2,7 @@ package editor.area;
 
 import com.jme3.scene.Node;
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import entitysystem.SubSystem;
@@ -11,6 +12,10 @@ import entitysystem.render.RenderComponent.Type;
 import entitysystem.render.RenderSystem;
 import hexsystem.area.AreaEventComponent;
 import hexsystem.area.AreaEventComponent.Event;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *
@@ -19,6 +24,7 @@ import hexsystem.area.AreaEventComponent.Event;
 public class AreaEventRenderDebugSystem extends EntitySystemAppState implements SubSystem{
 
     private Node eventNode;
+    private HashMap<HexCoordinate, EntityId> event = new HashMap<>();
     
     @Override
     protected EntitySet initialiseSystem() {
@@ -32,6 +38,9 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
 
     @Override
     protected void addEntity(Entity e) {
+        if(!event.containsKey(e.get(HexPositionComponent.class).getPosition())){
+            event.put(e.get(HexPositionComponent.class).getPosition(), e.getId());
+        }
         if(e.get(AreaEventComponent.class).getEvent().contains(Event.Start)){
             entityData.setComponent(e.getId(), new RenderComponent("Start_Shape", Type.Debug, this));
         } else {
@@ -41,6 +50,15 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
 
     @Override
     protected void updateEntity(Entity e) {
+    }
+    
+
+    public void hideDebug(HexCoordinate position, SubSystem system) {
+        if(event.containsKey(position)){
+            entityData.setComponent(event.get(position), entityData.getComponent(event.get(position), RenderComponent.class).cloneAndHide());
+        } else {
+            Logger.getGlobal().log(Level.WARNING, "{0} : No event at the specifiated position : pos({1}).", new Object[]{getClass().getName(), position});
+        }
     }
 
     @Override
@@ -58,9 +76,11 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
         }
     }
 
+    @Override
     public void removeSubSystem() {
     }
 
+    @Override
     public String getSubSystemName() {
         return getClass().getName();
     }

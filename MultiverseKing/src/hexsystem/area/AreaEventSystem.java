@@ -18,7 +18,7 @@ import org.hexgridapi.utility.Rotation;
  */
 public class AreaEventSystem extends EntitySystemAppState {
 
-    private HashMap<HexCoordinate, EntityId> eventPosition = new HashMap<HexCoordinate, EntityId>();
+    private HashMap<HexCoordinate, EntityId> eventPosition = new HashMap<>();
     private HexCoordinate startPosition;
 
     @Override
@@ -28,6 +28,10 @@ public class AreaEventSystem extends EntitySystemAppState {
 
     public boolean hasStartPosition() {
         return startPosition == null ? false : true;
+    }
+
+    public HexCoordinate getStartPosition() {
+        return startPosition.duplicate();
     }
 
     @Override
@@ -45,7 +49,7 @@ public class AreaEventSystem extends EntitySystemAppState {
     }
 
     private void register(Entity e) {
-        if (e.get(AreaEventComponent.class).getEvent().contains(Event.Start) && startPosition == null) {
+        if (startPosition == null && e.get(AreaEventComponent.class).getEvent().contains(Event.Start)) {
             startPosition = e.get(HexPositionComponent.class).getPosition();
         }
         eventPosition.put(e.get(HexPositionComponent.class).getPosition(), e.getId());
@@ -77,12 +81,24 @@ public class AreaEventSystem extends EntitySystemAppState {
             } else {
                 entityData.setComponent(eventPosition.get(startPosition), comp);
             }
-            startPosition = null;
+            startPosition = inspectedTilePos;
         }
         EntityId id = eventPosition.get(inspectedTilePos);
         if(add){
             if (id != null) {
                 entityData.setComponent(id, entityData.getComponent(id, AreaEventComponent.class).cloneAndAdd(event));
+            } else {
+                id = entityData.createEntity();
+                entityData.setComponents(id, new AreaEventComponent(event), new HexPositionComponent(inspectedTilePos, Rotation.A));
+            }
+        } else {
+            if (id != null && entityData.getComponent(id, AreaEventComponent.class) != null) {
+                AreaEventComponent comp = entityData.getComponent(id, AreaEventComponent.class).cloneAndRemove(event);
+                if(comp.getEvent().isEmpty()){
+                    entityData.removeEntity(id);
+                } else {
+                    entityData.setComponent(id, comp);
+                }
             } else {
                 id = entityData.createEntity();
                 entityData.setComponents(id, new AreaEventComponent(event), new HexPositionComponent(inspectedTilePos, Rotation.A));
@@ -98,5 +114,6 @@ public class AreaEventSystem extends EntitySystemAppState {
         for(EntityId id : eventPosition.values()){
             entityData.removeComponent(id, AreaEventComponent.class);
         }
+        startPosition = null;
     }
 }

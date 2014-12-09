@@ -156,7 +156,6 @@ public final class EditorMainGUI implements DialogWindowListener {
                             subMenuImproved.addMenuItem("New", 0, null);
                             subMenuImproved.addMenuItem("Load", 1, null);
                             subMenuImproved.addMenuItem("Save", 2, null);
-                            subMenuImproved.addMenuItem("Delete", 3, null);
                             for (MapEditorMode mode : MapEditorMode.values()) {
                                 String output = mode.toString().substring(0, 1) + mode.toString().substring(1).toLowerCase();
                                 if(system.getCurrentMode().equals("area")){
@@ -184,6 +183,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                          * @todo: Add the SFX-builder window to the screen.
                          * (should remove other window?)
                          */
+                        main.getAssetManager().loadAsset("TitanList");
                         showSubMenu = false;
                         break;
                     case BATTLE:
@@ -266,14 +266,6 @@ public final class EditorMainGUI implements DialogWindowListener {
                                 currentDialogPopup.removeFromScreen();
                             }
                             currentDialogPopup = new FileManagerPopup(main.getScreen(), "Save Area", this, false);
-                        } else if (Byte.valueOf(value).equals((byte) 3)) { //Delete
-                            if (currentDialogPopup != null) {
-                                currentDialogPopup.removeFromScreen();
-                            }
-                            currentDialogPopup = new DialogWindow(main.getScreen(), "Delete Current Map", this);
-                            currentDialogPopup.addLabelField("Are you sure to want ");
-                            currentDialogPopup.addLabelField("to delete without saving.");
-                            currentDialogPopup.show(true);
                         } else {
                             throw new UnsupportedOperationException(value + " is not a supported type.");
                         }
@@ -284,6 +276,7 @@ public final class EditorMainGUI implements DialogWindowListener {
                 break;
             case BATTLE:
                 if (value.equals("useCurrent")) {
+                    system.initializeBattle();
                 } else if (value.equals("LoadBattle")) {
                     if (currentDialogPopup != null) {
                         currentDialogPopup.removeFromScreen();
@@ -313,10 +306,6 @@ public final class EditorMainGUI implements DialogWindowListener {
             } else if (dialogUID.equals("Load Battle")) {
                 system.initializeBattle();
             } else if (dialogUID.equals("Warning !")){
-                currentDialogPopup.removeFromScreen();
-            }
-            if (dialogUID.equals("Delete Current Map")) {
-                system.clearCurrent();
                 currentDialogPopup.removeFromScreen();
             }
         } else {

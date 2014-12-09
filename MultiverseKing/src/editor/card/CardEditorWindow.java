@@ -219,7 +219,8 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Menu listing all saved card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/");
+//        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/");
+        folder = new File("/assets/Data/CardData/");
         Menu categoryAll = new Menu(screen, "categoryAll", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -242,7 +243,8 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Menu listing all saved Ability card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Ability");
+//        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Ability");
+        folder = new File("/assets/Data/CardData/Ability");
         Menu categoryAbility = new Menu(screen, "categoryAbility", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -260,7 +262,8 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Menu listing all saved unit card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Summon");
+//        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Summon");
+        folder = new File("/assets/Data/CardData/Summon");
         Menu categorySummon = new Menu(screen, "categorySummon", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -278,7 +281,8 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Menu listing all saved equipment card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Equipement");
+//        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Equipement");
+        folder = new File("/assets/Data/CardData/Equipement");
         Menu categoryEquipement = new Menu(screen, "categoryEquipement", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
@@ -296,7 +300,8 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Menu listing all saved equipment card.
          */
-        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Titan");
+//        folder = new File(System.getProperty("user.dir") + "/assets/Data/CardData/Titan");
+        folder = new File("/assets/Data/CardData/Titan");
         Menu categoryTitan = new Menu(screen, "categoryTitan", new Vector2f(0, 0), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {

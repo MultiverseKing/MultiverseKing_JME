@@ -18,7 +18,7 @@ public class AreaEventComponent implements PersistentComponent {
     private final ArrayList<Event> events;
 
     public AreaEventComponent(Event event){
-        events = new ArrayList<Event>();
+        events = new ArrayList<>();
         events.add(event);
     }
     
@@ -47,6 +47,6 @@ public class AreaEventComponent implements PersistentComponent {
     public enum Event {
 
         Start,
-        trigger,
+        Trigger,
     }
 }

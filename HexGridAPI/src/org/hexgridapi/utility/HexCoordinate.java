@@ -215,4 +215,8 @@ public final class HexCoordinate {
         }
         return result;
     }
+
+    public HexCoordinate duplicate() {
+        return new HexCoordinate(q, r);
+    }
 }

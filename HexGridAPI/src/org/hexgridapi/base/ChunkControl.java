@@ -77,9 +77,11 @@ public class ChunkControl extends AbstractControl {
                 text = assetManager.loadTexture(texturePath + value + ".png");
             }
             text.setWrap(Texture.WrapMode.Repeat);
+            
+//            mat.setTexture("DiffuseMap", text);
             mat.setTexture("ColorMap", text);
 //            mat.getAdditionalRenderState().setWireframe(true);
-            mat.getAdditionalRenderState().setDepthWrite(true);
+//            mat.getAdditionalRenderState().setDepthWrite(true);
             tile.setMaterial(mat);
             ((Node) spatial).attachChild(tile);
         }

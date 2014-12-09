@@ -119,10 +119,10 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
                 try {
                     is = new FileInputStream(new File(key.getName()));
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     return null;
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     return null;
                 } finally {
                     try {
@@ -130,7 +130,7 @@ public class ChunkDataLoader implements Savable, AssetLoader, AssetLocator {
                             is.close();
                         }
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+//                        ex.printStackTrace();
                     }
                     return null;
                 }

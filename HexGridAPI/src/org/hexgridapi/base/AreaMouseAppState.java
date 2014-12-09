@@ -17,6 +17,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Sphere;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputListener;
 import org.hexgridapi.events.MouseRayListener;
@@ -30,7 +32,7 @@ import org.hexgridapi.utility.MouseRay;
  *
  * @author Eike Foede, roah
  */
-public class AreaMouseAppState extends AbstractAppState implements TileChangeListener {
+public final class AreaMouseAppState extends AbstractAppState implements TileChangeListener {
 
     private final MouseRay mouseRay = new MouseRay();    //@see utility/MouseRay.
     private final float cursorOffset = -0.15f;         //Got an offset issue with hex_void_anim.png this will solve it temporary
@@ -206,11 +208,11 @@ public class AreaMouseAppState extends AbstractAppState implements TileChangeLis
                 listenerPulseIndex = -1;
                 return true;
             } else if (inputListeners.contains(listener) && inputListeners.indexOf(listener) != listenerPulseIndex) {
-                System.err.println("Pulse already locked by : " + inputListeners.get(listenerPulseIndex).getClass().toString()
-                        + ". Lock request by : " + listener.toString());
+                Logger.getGlobal().log(Level.WARNING, "{0} : Pulse already locked by : {1} , Lock requested by : {2}", 
+                        new Object[]{getClass().getName(), inputListeners.get(listenerPulseIndex).getClass().toString(), listener.toString()});
                 return false;
             } else {
-                System.err.println("listener not registered : " + listener.toString());
+                Logger.getGlobal().log(Level.WARNING, "{0} : Listener not registered :  {1}.", new Object[]{getClass().getName(), listener.toString()});
                 return false;
             }
         }

@@ -6,7 +6,8 @@ Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
       ColorWrite On
       Wireframe Off
       Blend Alpha
-      DepthWrite Off
+      DepthWrite On
       FaceCull Back
+      PolyOffset 0.0 0.0
     }
 }

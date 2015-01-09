@@ -57,9 +57,25 @@ public class UnitLoader {
         return initialUnitStatsComponent;
     }
 
-    public class InitialUnitStatsComponent implements PersistentComponent {
+    public class InitialStatsComponent implements PersistentComponent {
 
         private final int healthPoint;
+
+        private InitialStatsComponent(int healthPoint) {
+            this.healthPoint = healthPoint;
+        }
+
+        public int getHealPoint() {
+            return healthPoint;
+        }
+
+        public HealthComponent getHealthComponent() {
+            return new HealthComponent(healthPoint);
+        }
+    }
+
+    public class InitialUnitStatsComponent extends InitialStatsComponent {
+
         private final byte maxAtb;
         private final float speed;
         private final byte moveRange;
@@ -67,7 +83,7 @@ public class UnitLoader {
         private final String[] abilityList;
 
         public InitialUnitStatsComponent(InitialUnitStatsComponent stats) {
-            this.healthPoint = stats.getHealPoint();
+            super(stats.getHealPoint());
             this.maxAtb = stats.getMaxAtb();
             this.speed = stats.getSpeed();
             this.moveRange = stats.getMoveRange();
@@ -76,7 +92,7 @@ public class UnitLoader {
         }
 
         private InitialUnitStatsComponent(int healthPoint, byte maxAtb, float speed, byte moveRange, float moveSpeed, String[] abilityList) {
-            this.healthPoint = healthPoint;
+            super(healthPoint);
             this.maxAtb = maxAtb;
             this.speed = speed;
             this.moveRange = moveRange;
@@ -128,14 +144,6 @@ public class UnitLoader {
                 i++;
             }
             return list;
-        }
-
-        public int getHealPoint() {
-            return healthPoint;
-        }
-
-        public HealthComponent getHealthComponent() {
-            return new HealthComponent(healthPoint);
         }
     }
 }

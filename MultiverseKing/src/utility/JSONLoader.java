@@ -1,13 +1,7 @@
-package entitysystem.loader;
+package utility;
 
 import com.jme3.asset.AssetInfo;
-import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetLoader;
-import com.jme3.asset.AssetLocator;
-import com.jme3.asset.AssetManager;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;

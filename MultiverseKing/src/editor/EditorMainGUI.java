@@ -50,6 +50,7 @@ public final class EditorMainGUI implements DialogWindowListener {
         mainMenuBar.setMinDimensions(new Vector2f());
         mainMenuBar.setHeight(30);
         mainMenuBar.setWindowTitle("Editor Menu |");
+//        mainMenuBar.setUseCloseButton(true);
         mainMenuBar.setIgnoreMouse(true);
         mainMenuBar.getDragBar().setPosition(mainMenuBar.getDragBar().getPosition().x, mainMenuBar.getDragBar().getPosition().y - 10);
         mainMenuBar.getDragBar().setIgnoreMouse(true);

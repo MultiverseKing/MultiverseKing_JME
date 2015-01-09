@@ -1,6 +1,6 @@
 package hexsystem.battle;
 
-import gui.PropertiesWindow;
+import gui.PropertiesWindowOld;
 import com.simsilica.es.Entity;
 import entitysystem.loader.TitanLoader;
 import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
@@ -11,7 +11,7 @@ import tonegod.gui.core.ElementManager;
  * Used to show unit stats on the screen.
  * @author roah
  */
-class UnitStatsWindow extends PropertiesWindow {
+class UnitStatsWindow extends PropertiesWindowOld {
 
     UnitStatsWindow(ElementManager screen, BattleTrainingSystem system) {
         this(screen, "Unit", system, 5);

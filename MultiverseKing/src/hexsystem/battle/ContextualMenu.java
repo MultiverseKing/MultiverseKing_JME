@@ -33,7 +33,8 @@ public class ContextualMenu extends CameraTrackWindow {
         };
     }
     
-    void show(HexCoordinate position, EntityId id, RenderType type){
+    void show(EntityId id, RenderType type, HexCoordinate position){
+        boolean show = false;
         if(currentType != type){
             if(screen.getElementById(screenElement.getUID()) == null){
                 screen.addElement(screenElement);
@@ -42,32 +43,27 @@ public class ContextualMenu extends CameraTrackWindow {
             }
             switch(type){
                 case Ability:
-                    screen.removeElement((Menu) screenElement);
                     return;
                 case Core:
-                    addItem(Action.STATS);
                     break;
                 case Debug:
                     /**
                      * Internal use.
                      */
-                    screen.removeElement((Menu) screenElement);
                     break;
                 case Environment:
-                    addItem(Action.STATS);
                     break;
                 case Equipement:
-                    screen.removeElement((Menu) screenElement);
                     break;
                 case Titan:
                     addItem(Action.MOVE);
                     addItem(Action.ABILITY);
-                    addItem(Action.STATS);
+                    show = true;
                     break;
                 case Unit:
                     addItem(Action.MOVE);
                     addItem(Action.ABILITY);
-                    addItem(Action.STATS);
+                    show = true;
                     break;
                 default:
                     Logger.getGlobal().log(Level.WARNING, "{0} : Unimplemented type : {1}", new Object[]{getClass().getName(), type.toString()});
@@ -75,7 +71,9 @@ public class ContextualMenu extends CameraTrackWindow {
             }
             currentType = type;
         }
-        super.show(position);
+        if(show){
+            show(position);
+        }
         inspectedEntityId = id;
     }
     

@@ -12,8 +12,8 @@ import org.hexgridapi.base.MapData;
  */
 public class AreaGridSystem extends AbstractHexGridAppState {
     
-    public AreaGridSystem(MapData mapData) {
-        super(mapData, "Textures/HexField/");
+    public AreaGridSystem(MapData mapData, boolean debugMode) {
+        super(mapData, "Textures/HexField/", debugMode);
     }
     
     @Override

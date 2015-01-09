@@ -20,7 +20,7 @@ public abstract class LayoutWindow {
     protected final String name;
     protected Element parent;
     protected Window window = null;
-    protected final LinkedHashMap<String, Element> elementList = new LinkedHashMap<String, Element>();
+    protected final LinkedHashMap<String, Element> elementList = new LinkedHashMap<>();
     /**
      * Max element count on the selected alignment.
      */

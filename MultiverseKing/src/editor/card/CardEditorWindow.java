@@ -7,7 +7,7 @@ import entitysystem.attribut.Rarity;
 import entitysystem.card.AbilityProperties;
 import entitysystem.card.CardProperties;
 import entitysystem.loader.EntityLoader;
-import entitysystem.loader.PropertiesLoader;
+import entitysystem.loader.GameProperties;
 import entitysystem.render.RenderComponent.RenderType;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
@@ -205,7 +205,7 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         /**
          * Some variable to get files name.
          */
-        PropertiesLoader properties = new PropertiesLoader(screen.getApplication().getAssetManager());
+        GameProperties properties = GameProperties.getInstance(screen.getApplication().getAssetManager());
 
         /**
          * Menu listing all saved card.
@@ -284,7 +284,7 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         screen.addElement(loadCategory);
     }
 
-    private void addMenuItem(PropertiesLoader properties, Menu menu) {
+    private void addMenuItem(GameProperties properties, Menu menu) {
         switch (menu.getUID()) {
             case "categoryAll":
                 addAbilityItem(properties, menu);
@@ -307,25 +307,25 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
         }
     }
 
-    private void addAbilityItem(PropertiesLoader properties, Menu menu) {
+    private void addAbilityItem(GameProperties properties, Menu menu) {
         for (String s : properties.getAbilityList()) {
             menu.addMenuItem(s, s+"."+RenderType.Ability, null);
         }
     }
 
-    private void addEquipementItem(PropertiesLoader properties, Menu menu) {
+    private void addEquipementItem(GameProperties properties, Menu menu) {
         for (String s : properties.getEquipementList()) {
             menu.addMenuItem(s, s+"."+RenderType.Equipement, null);
         }
     }
 
-    private void addUnitItem(PropertiesLoader properties, Menu menu) {
+    private void addUnitItem(GameProperties properties, Menu menu) {
         for (String s : properties.getUnitList()) {
             menu.addMenuItem(s, s+"."+RenderType.Unit, null);
         }
     }
 
-    private void addTitanItem(PropertiesLoader properties, Menu menu) {
+    private void addTitanItem(GameProperties properties, Menu menu) {
         for (String s : properties.getTitanList()) {
             menu.addMenuItem(s, s+"."+RenderType.Titan, null);
         }

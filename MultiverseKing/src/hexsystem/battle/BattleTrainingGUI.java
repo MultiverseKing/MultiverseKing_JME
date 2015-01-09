@@ -2,12 +2,13 @@ package hexsystem.battle;
 
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.Camera;
-import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
-import entitysystem.loader.PropertiesLoader;
+import com.simsilica.es.PersistentComponent;
+import entitysystem.loader.GameProperties;
 import entitysystem.render.RenderComponent.RenderType;
 import gui.EditorWindow;
-import gui.PropertiesWindow;
+import gui.EntityStatsWindow;
+import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.menuing.Menu;
@@ -19,19 +20,17 @@ import tonegod.gui.core.Screen;
  */
 public class BattleTrainingGUI extends EditorWindow {
 
-    private final BattleTrainingSystem system;
     private final Camera cam;
     private ContextualMenu contextualActionMenu;
-    private PropertiesWindow titanStatsWindow;
+    private EntityStatsWindow statsWindow;
     private Menu entityMenu;
     private RenderType current;
 
     BattleTrainingGUI(Screen screen, Camera cam, BattleTrainingSystem system) {
         super(screen, screen.getElementById("EditorMainMenu"), "Battle Training", new Vector2f(150, 20));
         this.cam = cam;
-        this.system = system;
         contextualActionMenu = new ContextualMenu(screen, cam, system);
-        titanStatsWindow = new TitanStatsWindow(screen, system);
+        statsWindow = new EntityStatsWindow(screen, this.parent);
 
         entityMenu = new Menu(screen, "entityMenuList", Vector2f.ZERO, false) {
             @Override
@@ -61,7 +60,7 @@ public class BattleTrainingGUI extends EditorWindow {
         if (screen.getElementById(entityMenu.getUID()) == null) {
             screen.addElement(entityMenu);
         }
-        PropertiesLoader properties = new PropertiesLoader(screen.getApplication().getAssetManager());
+        GameProperties properties = GameProperties.getInstance(screen.getApplication().getAssetManager());
 
         switch (label) {
             case "Add Titan":
@@ -111,10 +110,10 @@ public class BattleTrainingGUI extends EditorWindow {
     }
 
     void showActionMenu(HexCoordinate pos, EntityId id, RenderType type) {
-        contextualActionMenu.show(pos, id, type);
+        contextualActionMenu.show(id, type, pos);
     }
 
-    void showTitanStats(Entity entity) {
-        titanStatsWindow.show(entity);
+    void statsWindow(EntityId id, RenderType renderType, ArrayList<PersistentComponent> comps) {
+        statsWindow.show(id, renderType, comps);
     }
 }

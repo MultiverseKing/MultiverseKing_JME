@@ -12,20 +12,18 @@ import tonegod.gui.core.ElementManager;
  *
  * @author roah
  */
-public abstract class PropertiesWindow extends Window {
+public abstract class PropertiesWindowOld extends Window {
 
-    protected final BattleTrainingSystem system;
     protected String windowTitle = "Properties : ";
     private int fieldCount = 0;
 
-    public PropertiesWindow(ElementManager screen, String UID, BattleTrainingSystem system, int maxField) {
+    public PropertiesWindowOld(ElementManager screen, String UID, BattleTrainingSystem system, int maxField) {
         super(screen, UID + "PropertiesWindow", new Vector2f(screen.getWidth() - 260, 10), new Vector2f(250, 30 * maxField));
         setIgnoreMouse(true);
         setUseCollapseButton(true);
         setUseCloseButton(true);
         getDragBar().setIgnoreMouse(true);
         setWindowTitle(windowTitle);
-        this.system = system;
     }
 
     /**
@@ -66,12 +64,6 @@ public abstract class PropertiesWindow extends Window {
             showWindow(inspectedEntity);
             screen.addElement(this);
         }
-    }
-
-    @Override
-    public void hideWindow() {
-        super.hideWindow();
-        system.closeEntityPropertiesMenu();
     }
 
     protected abstract void showWindow(Entity e);

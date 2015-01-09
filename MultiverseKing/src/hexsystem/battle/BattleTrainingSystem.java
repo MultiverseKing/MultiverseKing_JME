@@ -3,12 +3,15 @@ package hexsystem.battle;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
+import com.simsilica.es.PersistentComponent;
 import editor.area.AreaEventRenderDebugSystem;
 import entitysystem.EntitySystemAppState;
 import entitysystem.attribut.Animation;
@@ -25,9 +28,14 @@ import entitysystem.render.AnimationSystem;
 import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderSystem;
 import entitysystem.SubSystem;
+import entitysystem.field.HealthComponent;
+import entitysystem.field.InfluenceComponent;
+import entitysystem.loader.PlayerProperties;
 import entitysystem.render.RenderComponent.RenderType;
 import hexsystem.area.AreaEventSystem;
+import hexsystem.area.AreaGridSystem;
 import hexsystem.area.MapDataAppState;
+import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.base.AreaMouseAppState;
 import org.hexgridapi.base.MapData;
@@ -38,6 +46,7 @@ import org.hexgridapi.utility.Rotation;
 
 /**
  * TODO: This should extends from game Battle system.
+ *
  * @author roah
  */
 public class BattleTrainingSystem extends EntitySystemAppState implements MouseRayListener, SubSystem {
@@ -49,6 +58,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     private EntityId inspectedId = null;
     private BattleTrainingGUI bTrainingGUI;
     private AreaEventRenderDebugSystem debugSystem;
+    private EntityId playerCore;
 
     @Override
     protected EntitySet initialiseSystem() {
@@ -69,8 +79,8 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         renderSystem.registerSubSystem(this, true);
         hexMapMouseSystem = app.getStateManager().getState(AreaMouseAppState.class);
         hexMapMouseSystem.registerRayInputListener(this);
-        
-        initialisePlayerCore(app.getStateManager().getState(AreaEventSystem.class).getStartPosition());
+
+        initialisePlayerCore();
 
         /**
          * Init the testingUnit.
@@ -78,7 +88,6 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 //        addEntityTitan("TuxDoll");
 //        addEntityTitan("Gilga");
 //        camToStartPosition();
-
         return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
     }
 
@@ -87,12 +96,27 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         return "BattleSystem";
     }
 
-    private void initialisePlayerCore(HexCoordinate startPosition) {
-        if(debugSystem != null){
-            debugSystem.hideDebug(startPosition, this);
+    private void initialisePlayerCore() {
+        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+        if (debugSystem != null) {
+            debugSystem.showDebug(false, startPosition, this);
         }
-        EntityId e = entityData.createEntity();
-        entityData.setComponents(e, new HexPositionComponent(startPosition), new RenderComponent("Well", RenderType.Core, this), new AnimationComponent(Animation.SUMMON));
+
+        PlayerProperties properties = PlayerProperties.getInstance(app.getAssetManager());
+        playerCore = entityData.createEntity();
+        entityData.setComponents(playerCore, new HexPositionComponent(startPosition),
+                new RenderComponent("Well", RenderType.Core, this),
+                new AnimationComponent(Animation.SUMMON),
+                new HealthComponent(properties.getLevel() * 10),
+                new InfluenceComponent((byte) (1 + FastMath.floor((float) properties.getLevel() / 25f))));
+    }
+    
+    private void removePlayerCore(){
+        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+        if(debugSystem != null){
+            debugSystem.showDebug(true, startPosition, this);
+        }
+        entityData.removeEntity(playerCore);
     }
 
     public void showGUI() {
@@ -145,13 +169,12 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     public void leftMouseActionResult(MouseInputEvent event) {
         if (currentAction != null) {
             confirmAction(event.getEventPosition());
+        } else {
+            Entity e = checkEntities(event.getEventPosition());
+            if (e != null) {
+                openEntityPropertiesMenu(e);
+            }
         }
-//        else {
-//            Entity e = checkEntities(event.getEventPosition());  
-//            if(e != null){
-//                openEntityPropertiesMenu(e);
-//            }
-//        }
     }
 
     /**
@@ -169,7 +192,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     private Entity checkEntities(HexCoordinate coord) {
         for (Entity e : entities) {
-            if(!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)){
+            if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)) {
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
                 if (posComp != null && posComp.getPosition().equals(coord)) {
                     return e;
@@ -216,9 +239,34 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         bTrainingGUI.showActionMenu(pos, e.getId(), e.get(RenderComponent.class).getRenderType());
     }
 
-    public void closeEntityPropertiesMenu() {
-        if (currentAction == null) {
-            inspectedId = null;
+    private void openEntityPropertiesMenu(Entity e) {
+        if (inspectedId == null || !inspectedId.equals(e.getId())) {
+            ArrayList<PersistentComponent> comps = new ArrayList<>();
+            RenderType renderType = e.get(RenderComponent.class).getRenderType();
+            switch (renderType) {
+                case Ability:
+                    break;
+                case Core:
+                    comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
+                    comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
+                    app.getStateManager().getState(AreaGridSystem.class).showAreaRange(
+                            e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
+                    break;
+                case Debug:
+                    break;
+                case Environment:
+                    break;
+                case Equipement:
+                    break;
+                case Titan:
+                    break;
+                case Unit:
+                    break;
+                default:
+                    throw new UnsupportedOperationException(e.get(RenderComponent.class).getRenderType() + " is not currently supported.");
+            }
+            bTrainingGUI.statsWindow(e.getId(), renderType, comps);
+            inspectedId = e.getId();
         }
     }
 
@@ -235,13 +283,10 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
                 break;
             case ABILITY:
                 break;
-            case STATS:
-                bTrainingGUI.showTitanStats(entities.getEntity(id));
-                inspectedId = id;
-                break;
             case CUSTOM:
                 /**
-                 * TODO : For action made by external user, Data have to be loaded.
+                 * TODO : For action made by external user, Data have to be
+                 * loaded from files.
                  */
                 break;
             default:
@@ -287,6 +332,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     @Override
     protected void cleanupSystem() {
         bTrainingGUI.removeFromScreen();
+        removePlayerCore();
         mapData.Cleanup();
         renderSystem.removeSubSystem(this, false);
         app.getStateManager().detach(app.getStateManager().getState(CollisionSystem.class));
@@ -298,10 +344,10 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     public void removeSubSystem() {
         app.getStateManager().detach(this);
     }
-    
+
     public enum Action {
+
         MOVE,
-        STATS,
         ABILITY,
         CUSTOM;
     }

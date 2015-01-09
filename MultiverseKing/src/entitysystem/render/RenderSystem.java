@@ -154,9 +154,12 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     }
 
     public CollisionResults subSystemCollideWith(SubSystem system, Ray ray) {
-        CollisionResults result = new CollisionResults();
-        ((Node) renderSystemNode.getChild(system.getSubSystemName())).collideWith(ray, result);
-        return result;
+        if(subSystems.contains(system)){
+            CollisionResults result = new CollisionResults();
+            ((Node) renderSystemNode.getChild(system.getSubSystemName())).collideWith(ray, result);
+            return result;
+        }
+        return null;
     }
     // </editor-fold>
 

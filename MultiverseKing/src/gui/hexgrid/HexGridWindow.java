@@ -34,7 +34,7 @@ public class HexGridWindow extends LayoutWindow implements HexButtonListener {
         HexCoordinate center = new HexCoordinate(HexCoordinate.OFFSET,
                 new Vector2Int(radius, radius));
         for (int i = 0; i < FastMath.pow(radius * 2 + 1, 2); i++) {
-            if (isInRange(center, pos, radius)) {
+            if (center.hasInRange(pos, radius)) {
                 elementList.put(pos.x + "|" + pos.y + "_" + radius,
                         new HexButton(screen, pos.x + "|" + pos.y + "button" + "_" + radius,
                         new HexCoordinate(HexCoordinate.OFFSET, pos),
@@ -47,19 +47,8 @@ public class HexGridWindow extends LayoutWindow implements HexButtonListener {
                 pos = new Vector2Int(0, pos.y + 1);
             }
         }
-        showConstrainToParent(VAlign.bottom, HAlign.left, true);
-    }
 
-    private boolean isInRange(HexCoordinate center, Vector2Int pos, int range) {
-        if (center.equals(new HexCoordinate(HexCoordinate.OFFSET, pos))) {
-            return true;
-        }
-        for (HexCoordinate c : center.getCoordinateInRange(range)) {
-            if (c.equals(new HexCoordinate(HexCoordinate.OFFSET, pos))) {
-                return true;
-            }
-        }
-        return false;
+        showConstrainToParent(VAlign.bottom, HAlign.left, true);
     }
 
     private boolean isSelected(HexCoordinate pos, ArrayList<HexCoordinate> coordList) {

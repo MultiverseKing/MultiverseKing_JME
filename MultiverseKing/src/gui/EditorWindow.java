@@ -27,20 +27,51 @@ import tonegod.gui.core.Screen;
 public abstract class EditorWindow extends LayoutWindow {
 
     // <editor-fold defaultstate="collapsed" desc="Constructor">
+    /**
+     * 
+     * @param screen used to show the window.
+     * @param parent if any.
+     * @param name window name.
+     */
     public EditorWindow(Screen screen, Element parent, String name) {
         super(screen, parent, name);
     }
 
+    /**
+     * 
+     * @param screen used to show the window.
+     * @param parent if any.
+     * @param name window name.
+     * @param align Element alignement type to use for element position.
+     * @param alignElement max element count on the selected alignement.
+     */
     public EditorWindow(Screen screen, Element parent, String name, Align align, int alignElement) {
         super(screen, parent, name, align, alignElement);
     }
 
+    /**
+     * 
+     * @param screen used to show the window.
+     * @param parent if any.
+     * @param name window name.
+     * @param align Element alignement type to use for element position.
+     * @param gridSize size of an element on X and Y.
+     */
     public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize) {
         super(screen, parent, name, gridSize);
     }
 
-    public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize, Align windowElementAlignement, int elementAlignMaxCount) {
-        super(screen, parent, name, gridSize, windowElementAlignement, elementAlignMaxCount);
+    /**
+     * 
+     * @param screen used to show the window.
+     * @param parent if any.
+     * @param name window name.
+     * @param gridSize size of an element on X and Y.
+     * @param align Element alignement type to use for element position.
+     * @param elementAlignMaxCount max element count on the selected alignement.
+     */
+    public EditorWindow(Screen screen, Element parent, String name, Vector2f gridSize, Align align, int elementAlignMaxCount) {
+        super(screen, parent, name, gridSize, align, elementAlignMaxCount);
     }
     // </editor-fold>
 
@@ -140,16 +171,20 @@ public abstract class EditorWindow extends LayoutWindow {
         int i = 0;
         float posX = 0f;
         float fillValue = spacement;
-        ArrayList<Element> eList = new ArrayList<Element>();
+        ArrayList<Element> eList = new ArrayList<>();
         for (Object o : elements) {
-            if (type.equals("labelList")) {
-                eList.add(generateButton(o.toString(), HAlign.left, new Vector2f()));
-            } else if (type.equals("numList")) {
-                eList.add(generateNumericField(UID + i, i, hAlign));
-            } else if (type.equals("spinList")) {
-                eList.add(generateSpinner(UID + i, null, (int[]) o));
-            } else {
-                throw new UnsupportedOperationException(type + " is not a supported type.");
+            switch (type) {
+                case "labelList":
+                    eList.add(generateButton(o.toString(), HAlign.left, new Vector2f()));
+                    break;
+                case "numList":
+                    eList.add(generateNumericField(UID + i, i, hAlign));
+                    break;
+                case "spinList":
+                    eList.add(generateSpinner(UID + i, null, (int[]) o));
+                    break;
+                default:
+                    throw new UnsupportedOperationException(type + " is not a supported type.");
             }
             eList.get(eList.size() - 1).setPosition(posX, eList.get(eList.size() - 1).getPosition().y);
             posX += eList.get(eList.size() - 1).getWidth();
@@ -349,14 +384,35 @@ public abstract class EditorWindow extends LayoutWindow {
      * Add a selectionList Element based on a enum to this menu.
      *
      * @param labelName field name.
-     * @param baseValue first value to show.
-     * @param value all possible value.
      * @param hAlign horizontal alignemenet to use.
      * @param offset value to be added on top of the gridPosition.
      */
     protected final void addLabelField(String labelName, HAlign hAlign, Vector2f offset) {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset, true));
+    }
+    
+    /**
+     * Add a selectionList Element based on a enum to this menu.
+     *
+     * @param labelName field name.
+     * @param value x as current value && y as max value.
+     * @param hAlign horizontal alignemenet to use.
+     */
+    protected final void addLabelPropertieField(String labelName, Vector2Int value, HAlign hAlign) {
+        String uid = generateUID(labelName);
+        elementList.put(uid, generateLabel(labelName + " : "+ value.x+" / "+ value.y, hAlign, Vector2f.ZERO, true));
+    }
+    /**
+     * Add a selectionList Element based on a enum to this menu.
+     *
+     * @param labelName field name.
+     * @param value value to show.
+     * @param hAlign horizontal alignemenet to use.
+     */
+    protected final void addLabelPropertieField(String labelName, int value, HAlign hAlign) {
+        String uid = generateUID(labelName);
+        elementList.put(uid, generateLabel(labelName + " : " + value, hAlign, Vector2f.ZERO, true));
     }
     // </editor-fold>
 

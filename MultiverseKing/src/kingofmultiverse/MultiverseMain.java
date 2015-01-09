@@ -1,5 +1,6 @@
 package kingofmultiverse;
 
+import utility.JSONLoader;
 import test.Player;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -14,7 +15,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import entitysystem.EntityDataAppState;
 import editor.EditorSystem;
-import entitysystem.loader.JSONLoader;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.MapData;
 import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.core.Screen;
-import utility.ArrowShape;
+import org.hexgridapi.utility.ArrowDebugShape;
 
 /**
  * test
@@ -159,7 +159,7 @@ public class MultiverseMain extends SimpleApplication {
     // </editor-fold>
 
     private void initDebug() {
-        ArrowShape arrowShape = new ArrowShape(assetManager, rootNode, new Vector3f(0f, 0f, 0f));
+        ArrowDebugShape arrowShape = new ArrowDebugShape(assetManager, rootNode, new Vector3f(0f, 0f, 0f));
     }
 
     /**

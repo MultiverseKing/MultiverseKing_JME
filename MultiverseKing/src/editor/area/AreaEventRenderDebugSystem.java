@@ -53,9 +53,14 @@ public class AreaEventRenderDebugSystem extends EntitySystemAppState implements 
     }
     
 
-    public void hideDebug(HexCoordinate position, SubSystem system) {
-        if(event.containsKey(position)){
+    public void showDebug(boolean show, HexCoordinate position, SubSystem system) {
+        if(entityData.getComponent(event.get(position), RenderComponent.class) == null){
+            return;
+        }
+        if(show && event.containsKey(position)){
             entityData.setComponent(event.get(position), entityData.getComponent(event.get(position), RenderComponent.class).cloneAndHide());
+        } else if (!show && event.containsKey(position)){
+            entityData.setComponent(event.get(position), entityData.getComponent(event.get(position), RenderComponent.class).cloneAndShow());
         } else {
             Logger.getGlobal().log(Level.WARNING, "{0} : No event at the specifiated position : pos({1}).", new Object[]{getClass().getName(), position});
         }

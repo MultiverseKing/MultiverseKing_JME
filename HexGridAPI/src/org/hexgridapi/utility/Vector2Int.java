@@ -122,11 +122,26 @@ public class Vector2Int implements Savable {
 
     /**
      * return a new Vector2Int as 
+     * new Vector2Int(this.x + value, this.y + value).
+     * @param value value to add
+     */
+    public Vector2Int add(int value) {
+        return new Vector2Int(x + value, y + value);
+    }
+    /**
+     * return a new Vector2Int as 
      * new Vector2Int(this.x + value.x, this.y + value.y).
      * @param value vector to add
-     * @return
      */
     public Vector2Int add(Vector2Int value) {
         return new Vector2Int(x + value.x, y + value.y);
+    }
+    /**
+     * return a new Vector2Int as 
+     * new Vector2Int(this.x + x, this.y + y).
+     * @param value vector to add
+     */
+    public Vector2Int add(int x, int y) {
+        return new Vector2Int(this.x + x, this.y + y);
     }
 }

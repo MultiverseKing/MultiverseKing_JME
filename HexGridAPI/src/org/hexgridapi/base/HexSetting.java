@@ -23,7 +23,7 @@ public class HexSetting {
     /**
      * Number of hex contain in a chunk.
      */
-    public final static int CHUNK_SIZE = 16; //must be power of two
+    public final static int CHUNK_SIZE = 8; //must be power of two
     /**
      * WU distance between two hex of different height.
      */

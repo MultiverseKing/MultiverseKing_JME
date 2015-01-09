@@ -200,6 +200,24 @@ public final class HexCoordinate {
     public HexCoordinate add(HexCoordinate value) {
         return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
     }
+    /**
+     * Combine two position using Vector2Int. (Offset)
+     */
+    public HexCoordinate add(Vector2Int value) {
+        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value));
+    }
+    /**
+     * Add the value to the position. (Offset)
+     */
+    public HexCoordinate add(int value) {
+        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value));
+    }
+    /**
+     * Add the value to the position. (Offset)
+     */
+    public HexCoordinate add(int x, int y) {
+        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(x, y));
+    }
     
     /**
      * Return all coordinate between this position and the max range.
@@ -214,6 +232,29 @@ public final class HexCoordinate {
             }
         }
         return result;
+    }
+    
+    public boolean hasInRange(Vector2Int offsetPos, int range){
+        return hasInRange(new HexCoordinate(HexCoordinate.OFFSET, offsetPos), range);
+    }
+    
+    public boolean hasInRange(HexCoordinate pos, int range){
+        if (this.equals(pos)) {
+            return true;
+        }
+        Vector3Int cub = this.getAsCubic();
+        for (int x = -range; x <= range; x++) {
+            for (int y = Math.max(-range, -x - range); y <= Math.min(range, range -x); y++) {
+//                int z = -x - y;
+//                if(new HexCoordinate(HexCoordinate.CUBIC, new Vector3Int(cub.x + x, cub.y + y, cub.z + z)).equals(pos)){
+//                    return true;
+//                }
+                if(q+x == pos.q && r+y == pos.r){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public HexCoordinate duplicate() {

@@ -1,6 +1,7 @@
 Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
 #extension GL_EXT_texture_array : enable
      MaterialParameters {
+        Color : 1.0 1.0 1.0 1.0
      }
     AdditionalRenderState {
       ColorWrite On

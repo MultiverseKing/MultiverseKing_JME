@@ -42,6 +42,12 @@ public class MapData {
     protected ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     protected ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
     protected String mapName;// = "Reset";
+    /**
+     * key index :
+     * -1 (inclusive) and below used for areaTexture;
+     * 0 used for EMPTY_TEXTURE_KEY (when specifiating no texture);
+     * 1 (inclusive) and above user for added texture (ordered the way the get added).
+     */
     private final String[] textureKeys;
 
     public MapData(AssetManager assetManager) {
@@ -52,31 +58,22 @@ public class MapData {
     
     public MapData(Enum[] textureKeys, AssetManager assetManager) {
         this.assetManager = assetManager;
-        this.textureKeys = genKeys(textureKeys);
+        this.textureKeys = genTextureKeys(textureKeys);
         chunkData = new ChunkData();
     }
 
     public MapData(String[] textureKeys, AssetManager assetManager) {
         this.assetManager = assetManager;
 //        assetManager.registerLocator("HexGridRessource.zip", ZipLocator.class);
-        this.textureKeys = textureKeys;
+        this.textureKeys = genTextureKeys(textureKeys);
         chunkData = new ChunkData();
     }
     
-    private String[] genKeys(Enum[] textureKeys){
-        String[] keys = new String[textureKeys.length+1];
+    private String[] genTextureKeys(Object[] userKey){
+        String[] keys = new String[userKey.length+1];
         keys[0] = "EMPTY_TEXTURE_KEY";
-        for (int i = 0; i < textureKeys.length; i++) {
-            keys[i+1] = textureKeys[i].toString();
-        }
-        return keys;
-    }
-    
-    private String[] genKeys(String[] textureKeys){
-        String[] keys = new String[textureKeys.length+1];
-        keys[0] = "EMPTY_TEXTURE_KEY";
-        for (int i = 0; i < textureKeys.length; i++) {
-            keys[i+1] = textureKeys[i];
+        for (int i = 0; i < userKey.length; i++) {
+            keys[i+1] = userKey[i].toString();
         }
         return keys;
     }
@@ -178,8 +175,7 @@ public class MapData {
 
         chunkData.add(chunkPos, tiles);
         this.chunkPos.add(chunkPos);
-        ChunkChangeEvent cce = new ChunkChangeEvent(chunkPos);
-        chunkEvent(cce);
+        chunkEvent(new ChunkChangeEvent(chunkPos));
     }
 
     /**
@@ -198,11 +194,11 @@ public class MapData {
                     HexTile tile = chunkData.getTile(chunkPosition, tilePos);
                     if (tile != null) {
                         return tile;
-                    } else if (false) { //
-                        //todo : Check for the file if the chunk exist, if not return null
-                        //Load the file and check for the tile.
-                        //If still null, the tile doesn't exist so return null
-                        System.err.println("Chunk data to load haven't been found or tile does not exist. Requested Tile : " + tilePos);
+//                    } else if (false) { 
+//                        //todo : Check for the file if the chunk exist, if not return null
+//                        //Load the file and check for the tile.
+//                        //If still null, the tile doesn't exist so return null
+//                        System.err.println("Chunk data to load haven't been found or tile does not exist. Requested Tile : " + tilePos);
                     } else {
                         return null;
                     }
@@ -456,10 +452,21 @@ public class MapData {
     }
 
     public String getTextureValue(byte textureKey) {
-        return textureKeys[textureKey];
+        if (textureKey == (byte)-1) {
+            return "AREA_TEXTURE";
+        } else  if (textureKey < (byte)-1) {
+            return "NO_TILES";
+        }else {
+            return textureKeys[textureKey];
+        }
     }
 
     public byte getTextureKey(String value) {
+        if(value.equals("AREA_TEXTURE")){
+            return -1;
+        } else if(value.equals("NO_TILES")){
+            return -2;
+        }
         for (byte i = 0; i < textureKeys.length; i++) {
             if (textureKeys[i].equals(value)) {
                 return i;

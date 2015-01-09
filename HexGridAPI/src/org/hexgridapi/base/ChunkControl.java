@@ -65,8 +65,9 @@ public class ChunkControl extends AbstractControl {
          * Generate the tile and attach them with the right texture. 
          * 1 geometry by texture.
          */
-        HashMap<String, Mesh> mesh = meshParam.getMesh(false, MeshParameter.Shape.SQUARE);
+        HashMap<String, Mesh> mesh = meshParam.getMesh(false);
 
+        int i = 0;
         for (String value : mesh.keySet()) {
             Geometry tile = new Geometry(value, mesh.get(value));
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
@@ -80,6 +81,7 @@ public class ChunkControl extends AbstractControl {
             
             mat.setTexture("ColorMap", text);
 //            mat.getAdditionalRenderState().setWireframe(true);
+//            tile.getMesh().setMode(Mesh.Mode.Points);
             tile.setMaterial(mat);
             ((Node) spatial).attachChild(tile);
         }

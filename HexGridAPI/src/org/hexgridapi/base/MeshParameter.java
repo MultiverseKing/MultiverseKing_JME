@@ -1,5 +1,6 @@
 package org.hexgridapi.base;
 
+import com.jme3.math.FastMath;
 import com.jme3.scene.Mesh;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,12 +15,6 @@ import org.hexgridapi.utility.Vector2Int;
  */
 public final class MeshParameter {
 
-    public enum Shape {
-
-        SQUARE,
-        CIRCLE;
-    }
-    private static final MeshManager meshManager = new MeshManager();
     /**
      * Reference used to generate the parameter.
      */
@@ -33,7 +28,7 @@ public final class MeshParameter {
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private HashMap<String, ArrayList<Integer>> elementTypeRef = new HashMap<String, ArrayList<Integer>>();
+    private HashMap<String, ArrayList<Integer>> elementTypeRef = new HashMap<String, ArrayList<Integer>>(2, 1.0f);
     /**
      * Used to define which algorithm to use with meshmanager.
      */
@@ -56,76 +51,86 @@ public final class MeshParameter {
         this.mapData = mapData;
     }
 
-    private void initialize(boolean onlyGround, Shape chunkShape){
-        switch (chunkShape) {
-            case CIRCLE:
-                /**
-                 * @todo:
-                 */
-                break;
-            case SQUARE:
-                initializeSquare(onlyGround);
-                break;
-        }
-        
-    }
-    
-    private void initializeSquare(boolean onlyGround) {
+    private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround) {
+        clear();
         this.onlyGround = onlyGround;
-        int chunkSize = HexSetting.CHUNK_SIZE;
-        boolean[][] isVisited = new boolean[chunkSize][chunkSize];
-        for (int y = 0; y < chunkSize; y++) {
-            for (int x = 0; x < chunkSize; x++) {
-                isVisited[x][y] = false;
-            }
-        }
-
+        boolean[][] isVisited = getVisitedList(radius);
+        /**
+         * x && y == coord local
+         */
         int posInList = 0;
-        for (int y = 0; y < chunkSize; y++) {
-            for (int x = 0; x < chunkSize; x++) {
+        for (int y = 0; y < isVisited.length; y++) {
+            for (int x = 0; x < isVisited.length; x++) {
                 if (!isVisited[x][y]) {
-                    HexTile currentTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x, y));
-                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(mapData.getTextureValue(currentTile.getTextureKey()))) {
-                        ArrayList<Integer> list = new ArrayList<Integer>();
-                        elementTypeRef.put(mapData.getTextureValue(currentTile.getTextureKey()), list);
+                    HexTile currentTile;
+                    String textValue;
+                    boolean currentIsInRange;
+                    HexCoordinate currentTileMapCoord; //global coord -> used in map data and range check
+                    if (centerPosition != null && radius > 0) {
+                        currentTileMapCoord = centerPosition.add(x + ((centerPosition.getAsOffset().y&1) == 0 && (radius&1) != 0? - radius : -radius), y - radius);
+                        currentTile = mapData.getTile(currentTileMapCoord);
+                        currentIsInRange = getIsInRange(radius, null, x, y);
+                    } else {
+                        currentTileMapCoord = new HexCoordinate(HexCoordinate.OFFSET, x, y);
+                        currentTile = mapData.getTile(currentTileMapCoord);
+                        currentIsInRange = false;
                     }
-                    elementTypeRef.get(mapData.getTextureValue(currentTile.getTextureKey())).add(posInList);
-                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), currentTile.getHeight());
-                    setSize(chunkSize, posInList, isVisited, currentTile);
+                    if (currentTile == null || centerPosition != null && !currentIsInRange) {
+                        textValue = mapData.getTextureValue((byte) -2); //Value used to not generate mesh on that position.
+                    } else if (centerPosition != null) {
+                        textValue = mapData.getTextureValue((byte) -1);  //Value used to use the areaRange texture.
+                    } else {
+                        textValue = mapData.getTextureValue(currentTile.getTextureKey());
+                    }
+                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(textValue)) {
+                        ArrayList<Integer> list = new ArrayList<Integer>();
+                        elementTypeRef.put(textValue, list);
+                    }
+                    elementTypeRef.get(textValue).add(posInList);
+                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), (currentTile == null ? null : currentTile.getHeight()));
+                    setSizeX(centerPosition, radius, posInList, isVisited, currentTile, currentIsInRange);
                     posInList++;
                 }
             }
         }
     }
 
-    private void add(Vector2Int position, Vector2Int size, byte height) {
-        this.position.add(position);
-        this.size.add(size);
-        this.height.add(height);
-    }
-
-    private void setSize(int chunksize, int posInList, boolean[][] isVisited, HexTile currentTile) {
-        for (int x = 1; x < chunksize - position.get(posInList).x; x++) {
-            HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
-            if (mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
-                    && nextTile.getHeight() == currentTile.getHeight()) {
+    private void setSizeX(HexCoordinate centerPos, int radius, int posInList, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange) {
+        for (int x = 1; x < isVisited.length - position.get(posInList).x; x++) {
+            boolean alreadyVisited = isVisited[position.get(posInList).x + x][position.get(posInList).y];
+            HexCoordinate nextTileMapCoord = getNextTileCoord(centerPos, radius, posInList, x, 0);
+            HexTile nextTile = mapData.getTile(nextTileMapCoord);
+            if (!alreadyVisited && currentTile == null && nextTile == null
+                    || !alreadyVisited && centerPos == null && currentTile != null && nextTile != null
+                    && currentTile.getTextureKey() == nextTile.getTextureKey() && currentTile.getHeight() == nextTile.getHeight()
+                    || !alreadyVisited && centerPos != null && currentTile != null && nextTile != null
+                    && getIsInRange(radius, posInList, x, 0) == currentIsInRange
+                    && currentTile.getHeight() == nextTile.getHeight()) {
                 this.size.get(posInList).x++;
                 isVisited[x + position.get(posInList).x][position.get(posInList).y] = true;
             } else {
-                setSizeY(posInList, isVisited, currentTile);
+                setSizeY(centerPos, radius, posInList, isVisited, currentTile, currentIsInRange);
                 return;
             }
         }
-        setSizeY(posInList, isVisited, currentTile);
+        setSizeY(centerPos, radius, posInList, isVisited, currentTile, currentIsInRange);
     }
 
-    private void setSizeY(int posInList, boolean[][] isVisited, HexTile currentTile) {
-        for (int y = 1; y < size.get(posInList).y; y++) {
+    private void setSizeY(HexCoordinate centerPos, int radius, int posInList, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange) {
+        for (int y = 1; y < isVisited.length - position.get(posInList).y; y++) {
             //We check if the next Y line got the same properties
             for (int x = 0; x < size.get(posInList).x; x++) {
-                HexTile nextTile = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, position.get(posInList).y));
-                if (!mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
-                        || nextTile.getHeight() != currentTile.getHeight()) {
+                boolean alreadyVisited = isVisited[position.get(posInList).x + x][y + position.get(posInList).y];
+                HexCoordinate nextTileMapCoord = getNextTileCoord(centerPos, radius, posInList, x, y);
+                HexTile nextTile = mapData.getTile(nextTileMapCoord);
+                if (alreadyVisited || currentTile == null && nextTile != null || currentTile != null && nextTile == null
+                        || centerPos == null && currentTile != null && nextTile != null
+                        && !mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
+                        || centerPos == null && currentTile != null && nextTile != null && nextTile.getHeight() != currentTile.getHeight()
+                        || centerPos != null && currentTile != null && nextTile != null
+                        && getIsInRange(radius, posInList, x, y) != currentIsInRange
+                        || centerPos != null && currentTile != null && nextTile != null
+                        && nextTile.getHeight() != currentTile.getHeight()) {
                     //if one tile didn't match the requirement we stop the search
                     return;
                 }
@@ -139,25 +144,61 @@ public final class MeshParameter {
         }
     }
 
-    public HashMap<String, Mesh> getMesh(boolean onlyGround, Shape chunkShape) {
-        clear();
-        initialize(onlyGround, chunkShape);
+    private boolean getIsInRange(int radius, Integer posInList, int x, int y){
+        return new HexCoordinate(HexCoordinate.OFFSET, radius, radius).hasInRange(
+                new HexCoordinate(HexCoordinate.OFFSET, (posInList != null ? position.get(posInList).x : 0) + x, (posInList != null ? position.get(posInList).y : 0) + y), radius);
+    }
+    
+    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, int posInList, int x, int y) {
+        if (centerPos != null) {
+            return centerPos.add(new Vector2Int(x + position.get(posInList).x
+                    + ((centerPos.getAsOffset().y&1) != 0 && (radius&1) == 0 ? - radius : -radius), 
+                    y - radius + position.get(posInList).y));
+//            currentTileMapCoord = centerPosition.add(x -radius, y - radius);
+//            nextTileMapCoord = nextTileMapCoord.add(centerPos.getAsOffset().x + -radius, centerPos.getAsOffset().y - radius);
+        } else {
+            return new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, y + position.get(posInList).y);
+        }
+    }
+
+    private boolean[][] getVisitedList(int radius) {
+        int chunkSize = (radius < 1 ? HexSetting.CHUNK_SIZE : (radius * 2) + 1);
+        boolean[][] isVisited = new boolean[chunkSize][chunkSize];
+        for (int y = 0; y < chunkSize; y++) {
+            for (int x = 0; x < chunkSize; x++) {
+                isVisited[x][y] = false;
+            }
+        }
+        return isVisited;
+    }
+
+    private void add(Vector2Int position, Vector2Int size, Byte height) {
+        this.position.add(position);
+        this.size.add(size);
+        this.height.add((height == null ? 0 : height));
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Getters">
+    public HashMap<String, Mesh> getMesh(boolean onlyGround) {
+        initialize(null, 0, onlyGround);
+        return getMesh();
+    }
+
+    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround) {
+        initialize(centerPosition, radius, onlyGround);
+        return getMesh();
+    }
+
+    private HashMap<String, Mesh> getMesh() {
         HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
         for (String value : elementTypeRef.keySet()) {
             currentElement = value;
             currentIndex = -1;
-            mesh.put(value, meshManager.getMesh(this));
+            mesh.put(value, MeshManager.getInstance().getMesh(this));
         }
         return mesh;
     }
-    
-    private void clear(){
-        elementTypeRef.clear();
-        height.clear();
-        position.clear();
-        size.clear();
-    }
-    
+
     /**
      * @return index list of all mesh of the current element.
      */
@@ -205,6 +246,7 @@ public final class MeshParameter {
     /**
      * wish side of the mesh should be rendered on other term.
      *
+     * @todo : update
      * @return
      */
     public Boolean[][] getCulling() {
@@ -268,5 +310,13 @@ public final class MeshParameter {
         } else {
             return false;
         }
+    }
+    // </editor-fold>
+
+    private void clear() {
+        elementTypeRef.clear();
+        height.clear();
+        position.clear();
+        size.clear();
     }
 }

@@ -11,16 +11,27 @@ import org.hexgridapi.utility.Vector2Int;
 /**
  * Maths used to generate the room grid.
  *
- * @todo improve method to not have the use of System.ArrayCopy
+ * @todo improve method to not have to use System.ArrayCopy
  * @author roah
  */
 public final class MeshManager {
 
+    private MeshManager() {
+    }
+
+    private static class Holder {
+
+        private static final MeshManager instance = new MeshManager();
+    }
+
+    public static MeshManager getInstance() {
+        return Holder.instance;
+    }
     private static final float hexRadius = HexSetting.HEX_RADIUS;
     private static float hexWidth = HexSetting.HEX_WIDTH;
     private static float floorHeight = HexSetting.FLOOR_OFFSET;
 
-    public static Mesh getSingleMesh() {
+    public Mesh getSingleMesh() {
         Vector2Int offset = new Vector2Int();
         Vector2Int size = new Vector2Int(1, 1);
 
@@ -29,7 +40,7 @@ public final class MeshManager {
         int[] triIndex = getTriIndex(size, 0);
 
         Vector3f[] quadVert = getQuadVerticesPosition(offset, size, 0);
-        Vector2f[] quadText = getQuadTexCoord(size);
+        Vector2f[] quadText = getQuadTexCoord(offset, size);
         int[] quadIndex = getQuadIndex(size, 0);
 
 
@@ -70,7 +81,7 @@ public final class MeshManager {
             int[] groundTriIndice = getTriIndex(meshParam.getSizeParam(), mergedVerticeCount);
 
             Vector3f[] groundQuadVert = getQuadVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
-            Vector2f[] groundQuadTex = getQuadTexCoord(meshParam.getSizeParam());
+            Vector2f[] groundQuadTex = getQuadTexCoord(meshParam.getPositionParam(), meshParam.getSizeParam());
             int[] groundQuadIndice = getQuadIndex(meshParam.getSizeParam(), mergedVerticeCount + groundTriVert.length);
 
             Vector3f[] groundVert = new Vector3f[groundTriVert.length + groundQuadVert.length];
@@ -135,108 +146,112 @@ public final class MeshManager {
         return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
     }
 
-    private static Vector3f[] getTriVerticesPosition(Vector2Int offset, Vector2Int size, int height) {
+    private static Vector3f[] getTriVerticesPosition(Vector2Int position, Vector2Int size, int height) {
         Vector3f[] vertices = new Vector3f[size.x * 4 + 2];
         int j = 0;
         float currentHexPos;
+        float startTriOffsetA = 0;
+        float startTriOffsetB = -hexWidth / 2;
+        float endTriOffsetA = 0;
+        float endTriOffsetB = -hexWidth / 2;
+        if((position.y & 1) == 0){
+//            System.err.println("even start");
+            startTriOffsetA = -hexWidth / 2;
+            startTriOffsetB = 0;
+        } else {
+//            System.err.println("odd start");
+            startTriOffsetA = 0;
+            startTriOffsetB = hexWidth / 2;
+        }
+        if(((position.y +size.y - 1)& 1) == 0){
+//            System.err.println("even end");
+        } else {
+//            System.err.println("odd end");
+            endTriOffsetB = 0;
+            endTriOffsetA = +hexWidth / 2;
+        }
         for (int i = 0; i < size.x * 4; i += 4) {
-            currentHexPos = j * hexWidth + (offset.x * hexWidth);
-            if ((size.y + offset.y & 1) == 0) {
-                vertices[i] = new Vector3f(currentHexPos + hexWidth / 2, height * floorHeight,
-                        -hexRadius + (offset.y * (hexRadius * 1.5f)));
-                vertices[i + 1] = new Vector3f(currentHexPos, height * floorHeight,
-                        -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            } else {
-                vertices[i] = new Vector3f(currentHexPos, height * floorHeight, -hexRadius + (offset.y * (hexRadius * 1.5f)));
-                vertices[i + 1] = new Vector3f(currentHexPos - hexWidth / 2, height * floorHeight, -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            }
-            if ((size.y + offset.y & 1) == 0) {
-                currentHexPos = (j * hexWidth) + (hexWidth / 2) + (offset.x * hexWidth);
-                vertices[i + 2] = new Vector3f(currentHexPos - hexWidth / 2, height * floorHeight,
-                        ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[i + 3] = new Vector3f(currentHexPos, height * floorHeight,
-                        (hexRadius * size.y) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-            } else {
-                vertices[i + 2] = new Vector3f(currentHexPos - (hexWidth / 2), height * floorHeight,
-                        ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[i + 3] = new Vector3f(currentHexPos, height * floorHeight,
-                        (hexRadius * size.y) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-            }
+            currentHexPos = j * hexWidth + (position.x * hexWidth);
+            vertices[i] = new Vector3f(currentHexPos + startTriOffsetB, height * floorHeight, -hexRadius + (position.y * hexRadius * 1.5f));
+            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetA, height * floorHeight, -(hexRadius / 2) + (position.y * hexRadius * 1.5f));
+            vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetB, height * floorHeight,
+                    ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (position.y * hexRadius * 1.5f));
+            vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetA, height * floorHeight,
+                    (hexRadius * size.y) + ((size.y - 1) * (hexRadius / 2)) + (position.y * hexRadius * 1.5f));
             j++;
         }
 
-        currentHexPos = (j * hexWidth) + (offset.x * hexWidth);
-        if ((size.y + offset.y & 1) == 0) {
-            vertices[size.x * 4] = new Vector3f(currentHexPos, height * floorHeight,
-                    -hexRadius / 2 + (offset.y * (hexRadius * 1.5f)));
+        currentHexPos = j * hexWidth + position.x * hexWidth;
+        vertices[size.x * 4] = new Vector3f(currentHexPos, height * floorHeight,
+                -hexRadius / 2 + (position.y * hexRadius * 1.5f));
+        vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, height * floorHeight,
+                ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (position.y * (hexRadius * 1.5f)));
+        if (((size.y - 1 + position.y) & 1) == 0) {
+//            vertices[size.x * 4].x -= hexWidth / 2;
+            vertices[size.x * 4 + 1].x -= hexWidth / 2;
         } else {
-            vertices[size.x * 4] = new Vector3f(currentHexPos - hexWidth / 2, height * floorHeight,
-                    -hexRadius / 2 + (offset.y * (hexRadius * 1.5f)));
-        }
-        if ((size.y + offset.y & 1) == 0) {
-            vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, height * floorHeight,
-                    ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-        } else {
-            vertices[size.x * 4 + 1] = new Vector3f(currentHexPos - hexWidth / 2, height * floorHeight,
-                    ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (offset.y * (hexRadius * 1.5f)));
-        }
+//            vertices[size.x * 4].x -= hexWidth / 2;
+//            vertices[size.x * 4 +1].x -= hexWidth / 2;
 
+        }
+        if ((position.y & 1) == 0) {
+            vertices[size.x * 4].x -= hexWidth / 2;
+//            vertices[size.x * 4 + 1].x -= hexWidth / 2;
+        } else {
+//            vertices[size.x * 4].x -= hexWidth / 2;
+//            vertices[size.x * 4 +1].x -= hexWidth / 2;
+
+        }
         return vertices;
     }
 
-    private static Vector3f[] getQuadVerticesPosition(Vector2Int offset, Vector2Int size, int height) {
+    private static Vector3f[] getQuadVerticesPosition(Vector2Int position, Vector2Int size, int height) {
+        //2 Quad by Row so 6 vertice by row, first row contain only 1 quad so 4 vertice.
         Vector3f[] vertices = new Vector3f[(4 * size.y) + ((size.y - 1) * 2)];
         int index = 0;
 
         //generate the first quad
-        if (((offset.y) & 1) == 0) { //even
-            vertices[index] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth),
-                    height * floorHeight, -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 1] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
-                    height * floorHeight, -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 2] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth),
-                    height * floorHeight, (hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 3] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
-                    height * floorHeight, (hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-        } else {
-            vertices[index] = new Vector3f((offset.x * hexWidth), height * floorHeight,
-                    -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 1] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
-                    height * floorHeight, -(hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 2] = new Vector3f((offset.x * hexWidth), height * floorHeight,
-                    (hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
-            vertices[index + 3] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
-                    height * floorHeight, (hexRadius / 2) + (offset.y * (hexRadius * 1.5f)));
+        vertices[index] = new Vector3f((position.x * hexWidth), height * floorHeight,
+                -(hexRadius / 2) + (position.y * hexRadius * 1.5f));
+        vertices[index + 1] = new Vector3f((size.x * hexWidth) + (position.x * hexWidth),
+                height * floorHeight, -(hexRadius / 2) + (position.y * hexRadius * 1.5f));
+        vertices[index + 2] = new Vector3f((position.x * hexWidth), height * floorHeight,
+                (hexRadius / 2) + (position.y * hexRadius * 1.5f));
+        vertices[index + 3] = new Vector3f((size.x * hexWidth) + (position.x * hexWidth),
+                height * floorHeight, (hexRadius / 2) + (position.y * hexRadius * 1.5f));
+        if (((position.y) & 1) == 0) { //even
+            vertices[index].x -= hexWidth / 2;
+            vertices[index + 1].x -= hexWidth / 2;
+            vertices[index + 2].x -= hexWidth / 2;
+            vertices[index + 3].x -= hexWidth / 2;
         }
         index += 4;
         for (int i = 1; i < size.y; i++) {
-            float Ypos = (hexRadius * i) + ((hexRadius / 2) * i) + (offset.y * (hexRadius * 1.5f));
-            if (((i + offset.y) & 1) == 0) { //even
-                vertices[index] = new Vector3f((offset.x * hexWidth), height * floorHeight,
-                        (hexRadius / 2) + hexRadius * (i - 1) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 1] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
-                        height * floorHeight, (hexRadius / 2) + (hexRadius * (i - 1)) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 2] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth),
-                        height * floorHeight, -(hexRadius / 2) + Ypos);
-                vertices[index + 3] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
-                        height * floorHeight, -(hexRadius / 2) + Ypos);
-                vertices[index + 4] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth),
-                        height * floorHeight, (hexRadius / 2) + Ypos);
-                vertices[index + 5] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
-                        height * floorHeight, (hexRadius / 2) + Ypos);
+            float Ypos = (hexRadius * 1.5f * i) + (position.y * hexRadius * 1.5f);
+            vertices[index] = new Vector3f((position.x * hexWidth) - (hexWidth / 2), height * floorHeight,
+                    Ypos - hexRadius);
+            vertices[index + 1] = new Vector3f((size.x * hexWidth) + (position.x * hexWidth) - (hexWidth / 2),
+                    height * floorHeight, Ypos - hexRadius);
+            vertices[index + 2] = new Vector3f((position.x * hexWidth),
+                    height * floorHeight, -(hexRadius / 2) + Ypos);
+            vertices[index + 3] = new Vector3f((size.x * hexWidth) + (position.x * hexWidth),
+                    height * floorHeight, -(hexRadius / 2) + Ypos);
+            vertices[index + 4] = new Vector3f((position.x * hexWidth),
+                    height * floorHeight, (hexRadius / 2) + Ypos);
+            vertices[index + 5] = new Vector3f((size.x * hexWidth) + (position.x * hexWidth),
+                    height * floorHeight, (hexRadius / 2) + Ypos);
+            if (((i + position.y) & 1) == 0) { //even
+//                System.err.println("even Quad");
+                vertices[index].x += (hexWidth / 2);
+                vertices[index + 1].x += (hexWidth / 2);
+                vertices[index + 2].x -= (hexWidth / 2);
+                vertices[index + 3].x -= (hexWidth / 2);
+                vertices[index + 4].x -= (hexWidth / 2);
+                vertices[index + 5].x -= (hexWidth / 2);
             } else {
-                vertices[index] = new Vector3f(-(hexWidth / 2) + (offset.x * hexWidth), height * floorHeight,
-                        (hexRadius / 2) + (hexRadius * (i - 1)) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 1] = new Vector3f((size.x * hexWidth) - (hexWidth / 2) + (offset.x * hexWidth),
-                        height * floorHeight, (hexRadius / 2) + (hexRadius * (i - 1)) + ((hexRadius / 2) * (i - 1)) + (offset.y * (hexRadius * 1.5f)));
-                vertices[index + 2] = new Vector3f((offset.x * hexWidth), height * floorHeight,
-                        -(hexRadius / 2) + Ypos);
-                vertices[index + 3] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
-                        height * floorHeight, -(hexRadius / 2) + Ypos);
-                vertices[index + 4] = new Vector3f((offset.x * hexWidth), height * floorHeight,
-                        (hexRadius / 2) + Ypos);
-                vertices[index + 5] = new Vector3f((size.x * hexWidth) + (offset.x * hexWidth),
-                        height * floorHeight, (hexRadius / 2) + Ypos);
+//                vertices[index].x -= (hexWidth / 2);
+//                vertices[index + 1].x -= (hexWidth / 2);
+//                System.err.println("odd Quad");
             }
             index += 6;
         }
@@ -255,7 +270,7 @@ public final class MeshManager {
         index[5] = 1 + offset;
 
         int i = 6;
-        for (int j = offset; j < (size.y) * 6 - 6; j += 6) {
+        for (int j = offset; j < size.y * 6 - 6 + offset; j += 6) {
 
             index[i] = j + 4;
             index[i + 1] = j + 6;
@@ -275,11 +290,10 @@ public final class MeshManager {
 
             i += 12;
         }
-//        System.err.println((size.y)*4);
         return index;
     }
 
-    private static Vector2f[] getQuadTexCoord(Vector2Int size) {
+    private static Vector2f[] getQuadTexCoord(Vector2Int position, Vector2Int size) {
         Vector2f[] texCoord = new Vector2f[(4 * size.y) + ((size.y - 1) * 2)];
 
         texCoord[0] = new Vector2f(0f, 0.25f);
@@ -288,7 +302,7 @@ public final class MeshManager {
         texCoord[3] = new Vector2f(size.x, 0.75f);
 
         int index = 4;
-        for (int i = 1; i < size.y; i++) {
+        for (int i = 1 + position.y; i < size.y + position.y; i++) {
 
             if ((i & 1) == 0) {
                 texCoord[index] = new Vector2f(0.5f, 0.002f);

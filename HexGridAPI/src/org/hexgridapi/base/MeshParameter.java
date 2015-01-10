@@ -67,7 +67,7 @@ public final class MeshParameter {
                     boolean currentIsInRange;
                     HexCoordinate currentTileMapCoord; //global coord -> used in map data and range check
                     if (centerPosition != null && radius > 0) {
-                        currentTileMapCoord = centerPosition.add(x + ((centerPosition.getAsOffset().y&1) == 0 && (radius&1) != 0? - radius : -radius), y - radius);
+                        currentTileMapCoord = getNextTileCoord(centerPosition, radius, null, x, y);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = getIsInRange(radius, null, x, y);
                     } else {
@@ -98,8 +98,7 @@ public final class MeshParameter {
     private void setSizeX(HexCoordinate centerPos, int radius, int posInList, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange) {
         for (int x = 1; x < isVisited.length - position.get(posInList).x; x++) {
             boolean alreadyVisited = isVisited[position.get(posInList).x + x][position.get(posInList).y];
-            HexCoordinate nextTileMapCoord = getNextTileCoord(centerPos, radius, posInList, x, 0);
-            HexTile nextTile = mapData.getTile(nextTileMapCoord);
+            HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, 0));
             if (!alreadyVisited && currentTile == null && nextTile == null
                     || !alreadyVisited && centerPos == null && currentTile != null && nextTile != null
                     && currentTile.getTextureKey() == nextTile.getTextureKey() && currentTile.getHeight() == nextTile.getHeight()
@@ -120,9 +119,8 @@ public final class MeshParameter {
         for (int y = 1; y < isVisited.length - position.get(posInList).y; y++) {
             //We check if the next Y line got the same properties
             for (int x = 0; x < size.get(posInList).x; x++) {
-                boolean alreadyVisited = isVisited[position.get(posInList).x + x][y + position.get(posInList).y];
-                HexCoordinate nextTileMapCoord = getNextTileCoord(centerPos, radius, posInList, x, y);
-                HexTile nextTile = mapData.getTile(nextTileMapCoord);
+                boolean alreadyVisited = isVisited[position.get(posInList).x + x][position.get(posInList).y + y];
+                HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, y));
                 if (alreadyVisited || currentTile == null && nextTile != null || currentTile != null && nextTile == null
                         || centerPos == null && currentTile != null && nextTile != null
                         && !mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
@@ -144,18 +142,35 @@ public final class MeshParameter {
         }
     }
 
-    private boolean getIsInRange(int radius, Integer posInList, int x, int y){
+    private boolean getIsInRange(int radius, Integer posInList, int x, int y) {
         return new HexCoordinate(HexCoordinate.OFFSET, radius, radius).hasInRange(
                 new HexCoordinate(HexCoordinate.OFFSET, (posInList != null ? position.get(posInList).x : 0) + x, (posInList != null ? position.get(posInList).y : 0) + y), radius);
     }
-    
-    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, int posInList, int x, int y) {
+
+    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Integer posInList, int x, int y) {
         if (centerPos != null) {
-            return centerPos.add(new Vector2Int(x + position.get(posInList).x
-                    + ((centerPos.getAsOffset().y&1) != 0 && (radius&1) == 0 ? - radius : -radius), 
-                    y - radius + position.get(posInList).y));
-//            currentTileMapCoord = centerPosition.add(x -radius, y - radius);
-//            nextTileMapCoord = nextTileMapCoord.add(centerPos.getAsOffset().x + -radius, centerPos.getAsOffset().y - radius);
+            Vector2Int coord = new Vector2Int(x + (posInList != null ? position.get(posInList).x : 0)- radius, y + (posInList != null ? position.get(posInList).y : 0) - radius);
+            if((radius&1) == 0){
+                if((centerPos.getAsOffset().y&1) == 0){
+                    return centerPos.add(coord);
+                } else {
+                    if((coord.y&1) == 0){
+                        return centerPos.add(coord);
+                    } else {
+                        return centerPos.add(coord.x+1, coord.y);
+                    }
+                }
+            } else {
+                if((centerPos.getAsOffset().y&1) == 0){
+                    if((coord.y&1) == 0){
+                        return centerPos.add(coord);
+                    } else {
+                        return centerPos.add(coord.x-1, coord.y);
+                    }
+                } else {
+                    return centerPos.add(coord);
+                }
+            }
         } else {
             return new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x, y + position.get(posInList).y);
         }

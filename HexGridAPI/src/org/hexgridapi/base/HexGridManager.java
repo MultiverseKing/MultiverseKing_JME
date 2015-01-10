@@ -116,7 +116,7 @@ public class HexGridManager implements ChunkChangeListener, TileChangeListener {
         if (!gridNode.hasChild(areaRangeNode)) {
             gridNode.attachChild(areaRangeNode);
         }
-        Vector3f pos = centerPosition.add(-radius+ ((centerPosition.getAsOffset().y&1) == 0 && (radius&1) != 0 ? -1 : 0), -radius).convertToWorldPosition();
+        Vector3f pos = centerPosition.add(-radius + ((centerPosition.getAsOffset().y&1) == 0 && (radius&1) != 0 ? -1 : 0), -radius).convertToWorldPosition();
         areaRangeNode.setLocalTranslation(pos.x, pos.y + 0.1f, pos.z);
     }
 }

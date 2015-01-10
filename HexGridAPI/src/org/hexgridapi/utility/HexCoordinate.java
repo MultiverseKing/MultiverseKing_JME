@@ -46,7 +46,7 @@ public final class HexCoordinate {
     }
 
     /**
-     * Only for internal use.
+     * Only for internal use. (Axial)
      */
     private HexCoordinate(int q, int r) {
         this.q = q;
@@ -91,7 +91,7 @@ public final class HexCoordinate {
     
     @Override
     public String toString() {
-        return q + "|" + r;
+        return getAsOffset().x + "|" + getAsOffset().y;
     }
     
     public HexCoordinate[] getNeighbours() {
@@ -242,13 +242,8 @@ public final class HexCoordinate {
         if (this.equals(pos)) {
             return true;
         }
-        Vector3Int cub = this.getAsCubic();
         for (int x = -range; x <= range; x++) {
             for (int y = Math.max(-range, -x - range); y <= Math.min(range, range -x); y++) {
-//                int z = -x - y;
-//                if(new HexCoordinate(HexCoordinate.CUBIC, new Vector3Int(cub.x + x, cub.y + y, cub.z + z)).equals(pos)){
-//                    return true;
-//                }
                 if(q+x == pos.q && r+y == pos.r){
                     return true;
                 }

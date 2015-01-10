@@ -22,7 +22,7 @@ public class TileEventMenu extends EditorWindow {
     private final AreaEventSystem system;
     private HexCoordinate inspectedTilePos;
     private Menu addNewEventMenu;
-    private ArrayList<Event> currentEvent = new ArrayList<Event>();
+    private ArrayList<Event> currentEvent = new ArrayList<>();
 
     public HexCoordinate getInspectedTilePos() {
         return inspectedTilePos;
@@ -38,7 +38,7 @@ public class TileEventMenu extends EditorWindow {
         this.inspectedTilePos = inspectedTilePos;
         initializeEvents();
         reload();
-        window.getDragBar().setText("   " + inspectedTilePos + " Tile Event Menu");
+        window.getDragBar().setText("   " + inspectedTilePos.getAsOffset() + " Tile Event Menu");
     }
 
     public void show() {
@@ -149,7 +149,7 @@ public class TileEventMenu extends EditorWindow {
         } else if (event.contains("Delete")) {
             if (event.contains("StartPosition")) {
                 removeEvent(Event.Start);
-            } else  if (event.contains("Trigger")) {
+            } else if (event.contains("Trigger")) {
                 removeEvent(Event.Trigger);
             }
         }
@@ -158,7 +158,7 @@ public class TileEventMenu extends EditorWindow {
     @Override
     public void onPressCloseAndHide() {
     }
-    
+
     @Override
     public void removeFromScreen() {
         super.removeFromScreen();

@@ -1,11 +1,13 @@
 package org.hexgridapi.base;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
+import org.hexgridapi.base.MeshParameter.CullingData;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
@@ -100,7 +102,8 @@ public final class MeshManager {
             mergedIndexCount += groundIndice.length;
 
             if (!meshParam.onlyGround() && meshParam.getHeightParam() != 0) {
-                Vector3f[] sideVert = getSideVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
+//                Vector3f[] sideVert = getSideVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
+                Vector3f[] sideVert = getSideVerticesPositionUpdate(groundVert, meshParam.getHeightParam());
                 Vector3f[] vertCombi = new Vector3f[sideVert.length + groundVert.length];
                 System.arraycopy(groundVert, 0, vertCombi, 0, groundVert.length);
                 System.arraycopy(sideVert, 0, vertCombi, groundVert.length, sideVert.length);
@@ -112,7 +115,8 @@ public final class MeshManager {
                 System.arraycopy(sideTex, 0, texCombi, groundTex.length, sideTex.length);
                 texCoord.add(texCombi);
 
-                int[] sideIndice = getSideIndex(meshParam.getSizeParam().x, mergedVerticeCount, meshParam.getCulling());
+                int[] sideIndice = getSideIndexUpdate((meshParam.getPositionParam().y & 1) == 0, meshParam.getSizeParam(), mergedVerticeCount - groundVert.length, groundVert.length, meshParam.getCullingData());
+//                int[] sideIndice = getSideIndex(meshParam.getSizeParam().x, mergedVerticeCount, meshParam.getCulling());
                 int[] indiceCombi = new int[sideIndice.length + groundIndice.length];
                 System.arraycopy(groundIndice, 0, indiceCombi, 0, groundIndice.length);
                 System.arraycopy(sideIndice, 0, indiceCombi, groundIndice.length, sideIndice.length);
@@ -150,34 +154,31 @@ public final class MeshManager {
         Vector3f[] vertices = new Vector3f[size.x * 4 + 2];
         int j = 0;
         float currentHexPos;
-        float startTriOffsetA = 0;
-        float startTriOffsetB = -hexWidth / 2;
+        float startTriOffsetA;
+        float startTriOffsetB;
         float endTriOffsetA = 0;
         float endTriOffsetB = -hexWidth / 2;
-        if((position.y & 1) == 0){
-//            System.err.println("even start");
+
+        if ((position.y & 1) == 0) {
             startTriOffsetA = -hexWidth / 2;
             startTriOffsetB = 0;
         } else {
-//            System.err.println("odd start");
             startTriOffsetA = 0;
             startTriOffsetB = hexWidth / 2;
         }
-        if(((position.y +size.y - 1)& 1) == 0){
-//            System.err.println("even end");
-        } else {
-//            System.err.println("odd end");
+        if (((position.y + size.y - 1) & 1) != 0) {
             endTriOffsetB = 0;
             endTriOffsetA = +hexWidth / 2;
         }
+
         for (int i = 0; i < size.x * 4; i += 4) {
             currentHexPos = j * hexWidth + (position.x * hexWidth);
-            vertices[i] = new Vector3f(currentHexPos + startTriOffsetB, height * floorHeight, -hexRadius + (position.y * hexRadius * 1.5f));
-            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetA, height * floorHeight, -(hexRadius / 2) + (position.y * hexRadius * 1.5f));
-            vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetB, height * floorHeight,
-                    ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (position.y * hexRadius * 1.5f));
-            vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetA, height * floorHeight,
+            vertices[i] = new Vector3f(currentHexPos + startTriOffsetA, height * floorHeight, -(hexRadius / 2) + (position.y * hexRadius * 1.5f));
+            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetB, height * floorHeight, -hexRadius + (position.y * hexRadius * 1.5f));
+            vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetA, height * floorHeight,
                     (hexRadius * size.y) + ((size.y - 1) * (hexRadius / 2)) + (position.y * hexRadius * 1.5f));
+            vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetB, height * floorHeight,
+                    ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (position.y * hexRadius * 1.5f));
             j++;
         }
 
@@ -186,21 +187,12 @@ public final class MeshManager {
                 -hexRadius / 2 + (position.y * hexRadius * 1.5f));
         vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, height * floorHeight,
                 ((hexRadius * size.y) - hexRadius / 2) + ((size.y - 1) * (hexRadius / 2)) + (position.y * (hexRadius * 1.5f)));
-        if (((size.y - 1 + position.y) & 1) == 0) {
-//            vertices[size.x * 4].x -= hexWidth / 2;
-            vertices[size.x * 4 + 1].x -= hexWidth / 2;
-        } else {
-//            vertices[size.x * 4].x -= hexWidth / 2;
-//            vertices[size.x * 4 +1].x -= hexWidth / 2;
 
+        if (((size.y - 1 + position.y) & 1) == 0) {
+            vertices[size.x * 4 + 1].x -= hexWidth / 2;
         }
         if ((position.y & 1) == 0) {
             vertices[size.x * 4].x -= hexWidth / 2;
-//            vertices[size.x * 4 + 1].x -= hexWidth / 2;
-        } else {
-//            vertices[size.x * 4].x -= hexWidth / 2;
-//            vertices[size.x * 4 +1].x -= hexWidth / 2;
-
         }
         return vertices;
     }
@@ -331,53 +323,58 @@ public final class MeshManager {
         for (int k = 0; k < 2; k++) {
             j = 0;
             for (int i = 0; i < size.x * 4; i += 4) {
-                texCoord[i] = new Vector2f(j + 0.5f, 0f);
-                texCoord[i + 1] = new Vector2f(j, 0.25f);
-                texCoord[i + 2] = new Vector2f(j, 0.25f);//Y+
-                texCoord[i + 3] = new Vector2f(j + 0.5f, 0f);
+                texCoord[i] = new Vector2f(j, 0.25f);
+                texCoord[i + 1] = new Vector2f(j + 0.5f, 0f);
+                texCoord[i + 2] = new Vector2f(j + 0.5f, 0.015f);
+                texCoord[i + 3] = new Vector2f(j, 0.265f);//Y+
                 j++;
             }
         }
         texCoord[size.x * 4] = new Vector2f(j, 0.25f);
-        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.25f);
+        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.265f);
         return texCoord;
     }
 
     private static int[] getTriIndex(Vector2Int size, int offset) {
-        int[] index = new int[(size.x * 2) * 3];
-
-        int j = offset;
+        int[] index = new int[size.x * 6];
         int i = 0;
-        while (i < (size.x * 2) * 3 - 6) {
-            index[i] = j;
-            index[i + 1] = j + 1;
-            index[i + 2] = j + 5;
+        for (int x = 0; x < size.x - 1; x++) {
+            i = x * 6;
+            index[i] = offset + x * 4;
+            index[i + 1] = offset + (x + 1) * 4;
+            index[i + 2] = offset + x * 4 + 1;
 
-            index[i + 3] = j + 2;
-            index[i + 4] = j + 3;
-            index[i + 5] = j + 6;
-            j += 4;
-            i += 6;
+            index[i + 3] = offset + x * 4 + 2;
+            index[i + 4] = offset + (x + 1) * 4 + 3;
+            index[i + 5] = offset + x * 4 + 1 + 2;
         }
+        i = (size.x - 1) * 6;
+        index[i] = offset + (size.x - 1) * 4;
+        index[i + 1] = offset + size.x * 4;
+        index[i + 2] = offset + (size.x - 1) * 4 + 1;
 
-        index[i] = j;
-        index[i + 1] = j + 1;
-        index[i + 2] = size.x * 4 + offset;
+        index[i + 3] = offset + (size.x - 1) * 4 + 2;
+        index[i + 4] = offset + size.x * 4 + 1;
+        index[i + 5] = offset + (size.x - 1) * 4 + 1 + 2;
 
-        index[i + 3] = j + 2;
-        index[i + 4] = j + 3;
-        index[i + 5] = size.x * 4 + 1 + offset;
-
-//      [XY] == World position
+//      [XY] == Tile position
 //      ++++++++++++++++++++++++++++++++++++++ = Y-
-//      +++++[03]++++[07]++++[11]++++[15]+++++
-//      +[02]++++[06]++++[10]++++[14]++++[16]+
+//      +++++[01]++++[05]++++[09]++++[13]+++++
+//      +[00]++++[04]++++[08]++++[12]++++[16]+
 //      +++++[XY]++++[XY]++++[XY]++++[XY]+++++
-//      +[01]++++[05]++++[09]++++[13]++++[17]+
-//      +++++[00]++++[04]++++[08]++++[12]+++++
+//      +[02]++++[06]++++[10]++++[14]++++[17]+
+//      +++++[03]++++[07]++++[11]++++[15]+++++
 //      ++++++++++++++++++++++++++++++++++++++ = Y+
 
         return index;
+    }
+
+    private Vector3f[] getSideVerticesPositionUpdate(Vector3f[] groundVert, byte height) {
+        Vector3f[] sideVert = new Vector3f[groundVert.length];
+        for (int i = 0; i < groundVert.length; i++) {
+            sideVert[i] = new Vector3f(groundVert[i].x, groundVert[i].y - height * floorHeight, groundVert[i].z);
+        }
+        return sideVert;
     }
 
     private static Vector3f[] getSideVerticesPosition(Vector2Int position, Vector2Int size, int height) {
@@ -414,6 +411,136 @@ public final class MeshManager {
         vertices[vertices.length - 1] = new Vector3f(posX, (((position.y) & 1) == 0 ? 0 : 0.001f), -hexRadius / 2 + posY);
 
         return vertices;
+    }
+
+    private static int[] getSideIndexUpdate(boolean isOddStart, Vector2Int size, int arrayOffset, int groundOffset, CullingData culling) {
+        if (arrayOffset < 0) {
+            arrayOffset = 0;
+        }
+        int Ytri = ((size.y - 1 + size.y) * 2) * 2;
+        int Xtri = (size.x * 4) * 2;
+        int[] index = new int[(Xtri + Ytri) * 3];
+        int i = 0;
+        /**
+         * generate top/bot face.
+         */
+        for (int x = 0; x < size.x; x++) {
+            int vert = x * 4 + arrayOffset;
+            if (!culling.getCulling(MeshParameter.Position.TOP, x, MeshParameter.Position.TOP_LEFT)) {
+                index[i] = vert;
+                index[i + 1] = vert + 1;
+                index[i + 2] = vert + groundOffset;
+
+                index[i + 3] = vert + groundOffset;
+                index[i + 4] = vert + 1;
+                index[i + 5] = vert + 1 + groundOffset;
+            }
+            if (!culling.getCulling(MeshParameter.Position.TOP, x, MeshParameter.Position.TOP_RIGHT)) {
+                index[i + 6] = (x + 1) * 4 + arrayOffset;
+                index[i + 7] = (x + 1) * 4 + arrayOffset + groundOffset;
+                index[i + 8] = vert + 1;
+
+                index[i + 9] = vert + 1;
+                index[i + 10] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + groundOffset : size.x * 4 + arrayOffset + groundOffset;
+                index[i + 11] = vert + 1 + groundOffset;
+            }
+            if (!culling.getCulling(MeshParameter.Position.BOTTOM, x, MeshParameter.Position.BOT_LEFT)) {
+                index[i + 12] = vert + 2;
+                index[i + 13] = vert + 1 + 2;
+                index[i + 14] = vert + groundOffset + 2;
+
+                index[i + 15] = vert + groundOffset + 2;
+                index[i + 16] = vert + 1 + 2;
+                index[i + 17] = vert + 1 + groundOffset + 2;
+            }
+            if (!culling.getCulling(MeshParameter.Position.BOTTOM, x, MeshParameter.Position.BOT_RIGHT)) {
+                index[i + 18] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + groundOffset + 2 + 1 : size.x * 4 + arrayOffset + 1 + groundOffset;
+                index[i + 19] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + 2 + 1 : size.x * 4 + arrayOffset + 1;
+                index[i + 20] = vert + 2;
+
+                index[i + 21] = vert + 2;
+                index[i + 22] = vert + 2 + groundOffset;
+                index[i + 23] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + groundOffset + 2 + 1 : size.x * 4 + arrayOffset + groundOffset + 1;
+            }
+            i += 24;
+        }
+        /**
+         * generate left/right face.
+         */
+        int offsetB = size.x * 4 + 2 + arrayOffset;
+        if (!culling.getCulling(MeshParameter.Position.LEFT, 0, MeshParameter.Position.LEFT)) {
+            index[i] = offsetB;
+            index[i + 1] = offsetB + groundOffset;
+            index[i + 2] = offsetB + 2;
+
+            index[i + 3] = offsetB + 2;
+            index[i + 4] = offsetB + groundOffset;
+            index[i + 5] = offsetB + groundOffset + 2;
+        }
+
+        if (!culling.getCulling(MeshParameter.Position.RIGHT, 0, MeshParameter.Position.RIGHT)) {
+            index[i + 6] = offsetB + 1;
+            index[i + 7] = offsetB + 3;
+            index[i + 8] = offsetB + groundOffset + 1;
+
+            index[i + 9] = offsetB + 3;
+            index[i + 10] = offsetB + groundOffset + 3;
+            index[i + 11] = offsetB + groundOffset + 1;
+        }
+        offsetB += 4;
+        i += 12;
+        for (int y = 1; y < size.y; y++) {
+            int vert = (y - 1) * 6;
+            if (!culling.getCulling(MeshParameter.Position.LEFT, y, MeshParameter.Position.LEFT)) {
+                index[i] = offsetB + vert + 4;
+                index[i + 1] = offsetB + vert + 2;
+                index[i + 2] = offsetB + groundOffset + vert + 2;
+//
+                index[i + 3] = offsetB + vert + 4;
+                index[i + 4] = offsetB + groundOffset + vert + 2;
+                index[i + 5] = offsetB + groundOffset + vert + 4;
+            }
+
+            if (!culling.getCulling(MeshParameter.Position.LEFT, y, MeshParameter.Position.TOP_LEFT)
+                    || !culling.getCulling(MeshParameter.Position.LEFT, y - 1, MeshParameter.Position.BOT_LEFT)) {
+                index[i + 6] = offsetB + vert;
+                index[i + 7] = offsetB + groundOffset + vert;
+                index[i + 8] = offsetB + vert + 2;
+
+                index[i + 9] = offsetB + vert + 2;
+                index[i + 10] = offsetB + groundOffset + vert;
+                index[i + 11] = offsetB + groundOffset + vert + 2;
+            }
+
+            if (!culling.getCulling(MeshParameter.Position.RIGHT, y, MeshParameter.Position.RIGHT)) {
+                index[i + 12] = offsetB + vert + 3;
+                index[i + 13] = offsetB + vert + 5;
+                index[i + 14] = offsetB + groundOffset + vert + 3;
+//
+                index[i + 15] = offsetB + vert + 5;
+                index[i + 16] = offsetB + groundOffset + vert + 5;
+                index[i + 17] = offsetB + groundOffset + vert + 3;
+            }
+
+            if (!culling.getCulling(MeshParameter.Position.RIGHT, y, MeshParameter.Position.TOP_RIGHT)
+                    || !culling.getCulling(MeshParameter.Position.RIGHT, y - 1, MeshParameter.Position.BOT_RIGHT)) {
+                index[i + 18] = offsetB + vert + 1;
+                index[i + 19] = offsetB + vert + 3;
+                index[i + 20] = offsetB + groundOffset + vert + 1;
+
+                index[i + 21] = offsetB + vert + 3;
+                index[i + 22] = offsetB + groundOffset + vert + 3;
+                index[i + 23] = offsetB + groundOffset + vert + 1;
+            }
+            i += 24;
+        }
+
+//         ++[00]++++++++++[01]++++ 
+//         ++++[02]++++++++++[02]++ 
+//         ++++++++++++++++++++++++
+//         ++++[04]++++++++++[05]++
+
+        return index;
     }
 
     private static int[] getSideIndex(int sizeX, int offset, Boolean[][] isNeightborsCull) {

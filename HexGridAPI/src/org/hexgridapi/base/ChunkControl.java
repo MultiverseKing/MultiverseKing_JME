@@ -11,6 +11,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
+import org.hexgridapi.utility.Vector2Int;
 
 /**
  * Directly control the chunk geometry, all tiles geometry.

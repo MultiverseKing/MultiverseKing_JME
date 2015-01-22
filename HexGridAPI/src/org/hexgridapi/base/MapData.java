@@ -244,7 +244,24 @@ public class MapData {
     /**
      * Get all tile around the defined position, return null for tile who
      * doesn't exist.
-     *
+     * <li>
+     * HexTile[0] == right;
+     * </li>
+     * <li>
+     * HexTile[1] == top right;
+     * </li>
+     * <li>
+     * HexTile[2] == top left;
+     * </li>
+     * <li>
+     * HexTile[3] == left;
+     * </li>
+     * <li>
+     * HexTile[4] == bot left;
+     * </li>
+     * <li>
+     * HexTile[5] == bot right;
+     * </li>
      * @param position of the center tile.
      * @return All tile arround the needed tile.
      */

@@ -106,7 +106,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     public void reloadSystem() {
         mapData.Cleanup();
         app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
-        tileEventMenu.removeFromScreen();
+        closeTileEventMenu();
         generateEmptyArea();
     }
 

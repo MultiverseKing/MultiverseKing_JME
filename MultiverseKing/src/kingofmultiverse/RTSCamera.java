@@ -514,8 +514,6 @@ public final class RTSCamera extends AbstractAppState {
 //            negDistance = new KeyTrigger(KeyInput.KEY_W);
         }
 
-
-
         if (up == UpVector.Y_UP) {
             inputManager.addMapping("-SIDE", negSide);
             inputManager.addMapping("+SIDE", new KeyTrigger(KeyInput.KEY_D));

@@ -142,7 +142,7 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
 
     private void initialiseAreaSystem() {
         MapData mapData = ((MultiverseMain) app).getStateManager().getState(MapDataAppState.class).getMapData();
-        app.getStateManager().attach(new AreaGridSystem(mapData, false));
+        app.getStateManager().attach(new AreaGridSystem(mapData, true));
         app.getStateManager().attach(new AreaEventRenderDebugSystem());
         app.getStateManager().attach(new AreaEventSystem());
         app.getStateManager().attach(new AreaMouseAppState());

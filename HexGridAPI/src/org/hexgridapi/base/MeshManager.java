@@ -1,6 +1,5 @@
 package org.hexgridapi.base;
 
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
@@ -103,19 +102,20 @@ public final class MeshManager {
 
             if (!meshParam.onlyGround() && meshParam.getHeightParam() != 0) {
 //                Vector3f[] sideVert = getSideVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
-                Vector3f[] sideVert = getSideVerticesPositionUpdate(groundVert, meshParam.getHeightParam());
+                Vector3f[] sideVert = getSideVerticesPosition(groundVert, meshParam.getHeightParam());
                 Vector3f[] vertCombi = new Vector3f[sideVert.length + groundVert.length];
                 System.arraycopy(groundVert, 0, vertCombi, 0, groundVert.length);
                 System.arraycopy(sideVert, 0, vertCombi, groundVert.length, sideVert.length);
                 vertices.add(vertCombi);
 
-                Vector2f[] sideTex = getSideVerticestexCoord(meshParam.getSizeParam(), meshParam.getHeightParam());
+                Vector2f[] sideTex = getSideVerticesTextCoord(meshParam.getSizeParam(), meshParam.getHeightParam());
+//                Vector2f[] sideTex = getSideVerticestexCoord(meshParam.getSizeParam(), meshParam.getHeightParam());
                 Vector2f[] texCombi = new Vector2f[sideTex.length + groundTex.length];
                 System.arraycopy(groundTex, 0, texCombi, 0, groundTex.length);
                 System.arraycopy(sideTex, 0, texCombi, groundTex.length, sideTex.length);
                 texCoord.add(texCombi);
 
-                int[] sideIndice = getSideIndexUpdate((meshParam.getPositionParam().y & 1) == 0, meshParam.getSizeParam(), mergedVerticeCount - groundVert.length, groundVert.length, meshParam.getCullingData());
+                int[] sideIndice = getSideIndex(meshParam.getSizeParam(), mergedVerticeCount, groundVert.length, meshParam.getCullingData());
 //                int[] sideIndice = getSideIndex(meshParam.getSizeParam().x, mergedVerticeCount, meshParam.getCulling());
                 int[] indiceCombi = new int[sideIndice.length + groundIndice.length];
                 System.arraycopy(groundIndice, 0, indiceCombi, 0, groundIndice.length);
@@ -197,6 +197,55 @@ public final class MeshManager {
         return vertices;
     }
 
+    private static Vector2f[] getTriTexCoord(Vector2Int size) {
+        Vector2f[] texCoord = new Vector2f[size.x * 4 + 2];
+        int j = 0;
+        for (int i = 0; i < size.x * 4; i += 4) {
+            texCoord[i] = new Vector2f(j, 0.25f);
+            texCoord[i + 1] = new Vector2f(j + 0.5f, 0f);
+            texCoord[i + 2] = new Vector2f(j + 0.5f, 0.015f);
+            texCoord[i + 3] = new Vector2f(j, 0.265f);//Y+
+            j++;
+        }
+        texCoord[size.x * 4] = new Vector2f(j, 0.25f);
+        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.265f);
+        return texCoord;
+    }
+
+    private static int[] getTriIndex(Vector2Int size, int offset) {
+        int[] index = new int[size.x * 6];
+        int i = 0;
+        for (int x = 0; x < size.x - 1; x++) {
+            i = x * 6;
+            index[i] = offset + x * 4;
+            index[i + 1] = offset + (x + 1) * 4;
+            index[i + 2] = offset + x * 4 + 1;
+
+            index[i + 3] = offset + x * 4 + 2;
+            index[i + 4] = offset + (x + 1) * 4 + 3;
+            index[i + 5] = offset + x * 4 + 1 + 2;
+        }
+        i = (size.x - 1) * 6;
+        index[i] = offset + (size.x - 1) * 4;
+        index[i + 1] = offset + size.x * 4;
+        index[i + 2] = offset + (size.x - 1) * 4 + 1;
+
+        index[i + 3] = offset + (size.x - 1) * 4 + 2;
+        index[i + 4] = offset + size.x * 4 + 1;
+        index[i + 5] = offset + (size.x - 1) * 4 + 1 + 2;
+
+//      [XY] == Tile position
+//      ++++++++++++++++++++++++++++++++++++++ = Y-
+//      +++++[01]++++[05]++++[09]++++[13]+++++
+//      +[00]++++[04]++++[08]++++[12]++++[16]+
+//      +++++[XY]++++[XY]++++[XY]++++[XY]+++++
+//      +[02]++++[06]++++[10]++++[14]++++[17]+
+//      +++++[03]++++[07]++++[11]++++[15]+++++
+//      ++++++++++++++++++++++++++++++++++++++ = Y+
+
+        return index;
+    }
+
     private static Vector3f[] getQuadVerticesPosition(Vector2Int position, Vector2Int size, int height) {
         //2 Quad by Row so 6 vertice by row, first row contain only 1 quad so 4 vertice.
         Vector3f[] vertices = new Vector3f[(4 * size.y) + ((size.y - 1) * 2)];
@@ -250,6 +299,38 @@ public final class MeshManager {
         return vertices;
     }
 
+    private static Vector2f[] getQuadTexCoord(Vector2Int position, Vector2Int size) {
+        Vector2f[] texCoord = new Vector2f[(4 * size.y) + ((size.y - 1) * 2)];
+
+        texCoord[0] = new Vector2f(0f, 0.25f);
+        texCoord[1] = new Vector2f(size.x, 0.25f);
+        texCoord[2] = new Vector2f(0f, 0.75f);
+        texCoord[3] = new Vector2f(size.x, 0.75f);
+
+        int index = 4;
+        for (int i = 1 + position.y; i < size.y + position.y; i++) {
+
+            if ((i & 1) == 0) {
+                texCoord[index] = new Vector2f(0.5f, 0.002f);
+                texCoord[index + 1] = new Vector2f(size.x + 0.5f, 0.002f);
+                texCoord[index + 2] = new Vector2f(0f, 0.25f);
+                texCoord[index + 3] = new Vector2f(size.x, 0.25f);
+                texCoord[index + 4] = new Vector2f(0f, 0.75f);
+                texCoord[index + 5] = new Vector2f(size.x, 0.75f);
+            } else {
+                texCoord[index] = new Vector2f(-0.5f, 0.002f);
+                texCoord[index + 1] = new Vector2f(-(size.x + 0.5f), 0.002f);
+                texCoord[index + 2] = new Vector2f(-1f, 0.25f);
+                texCoord[index + 3] = new Vector2f(-(size.x + 1f), 0.25f);
+                texCoord[index + 4] = new Vector2f(-1f, 0.75f);
+                texCoord[index + 5] = new Vector2f(-(size.x + 1f), 0.75f);
+            }
+            index += 6;
+        }
+
+        return texCoord;
+    }
+
     private static int[] getQuadIndex(Vector2Int size, int offset) {
         int[] index = new int[(size.y * 2 * 3) + ((size.y - 1) * 2 * 3)];
 
@@ -285,135 +366,78 @@ public final class MeshManager {
         return index;
     }
 
-    private static Vector2f[] getQuadTexCoord(Vector2Int position, Vector2Int size) {
-        Vector2f[] texCoord = new Vector2f[(4 * size.y) + ((size.y - 1) * 2)];
-
-        texCoord[0] = new Vector2f(0f, 0.25f);
-        texCoord[1] = new Vector2f(size.x, 0.25f);
-        texCoord[2] = new Vector2f(0f, 0.75f);
-        texCoord[3] = new Vector2f(size.x, 0.75f);
-
-        int index = 4;
-        for (int i = 1 + position.y; i < size.y + position.y; i++) {
-
-            if ((i & 1) == 0) {
-                texCoord[index] = new Vector2f(0.5f, 0.002f);
-                texCoord[index + 1] = new Vector2f(size.x + 0.5f, 0.002f);
-                texCoord[index + 2] = new Vector2f(0f, 0.25f);
-                texCoord[index + 3] = new Vector2f(size.x, 0.25f);
-                texCoord[index + 4] = new Vector2f(0f, 0.75f);
-                texCoord[index + 5] = new Vector2f(size.x, 0.75f);
-            } else {
-                texCoord[index] = new Vector2f(-0.5f, 0.002f);
-                texCoord[index + 1] = new Vector2f(-(size.x + 0.5f), 0.002f);
-                texCoord[index + 2] = new Vector2f(-1f, 0.25f);
-                texCoord[index + 3] = new Vector2f(-(size.x + 1f), 0.25f);
-                texCoord[index + 4] = new Vector2f(-1f, 0.75f);
-                texCoord[index + 5] = new Vector2f(-(size.x + 1f), 0.75f);
-            }
-            index += 6;
-        }
-
-        return texCoord;
-    }
-
-    private static Vector2f[] getTriTexCoord(Vector2Int size) {
-        Vector2f[] texCoord = new Vector2f[size.x * 4 + 2];
-        int j = 0;
-        for (int k = 0; k < 2; k++) {
-            j = 0;
-            for (int i = 0; i < size.x * 4; i += 4) {
-                texCoord[i] = new Vector2f(j, 0.25f);
-                texCoord[i + 1] = new Vector2f(j + 0.5f, 0f);
-                texCoord[i + 2] = new Vector2f(j + 0.5f, 0.015f);
-                texCoord[i + 3] = new Vector2f(j, 0.265f);//Y+
-                j++;
-            }
-        }
-        texCoord[size.x * 4] = new Vector2f(j, 0.25f);
-        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.265f);
-        return texCoord;
-    }
-
-    private static int[] getTriIndex(Vector2Int size, int offset) {
-        int[] index = new int[size.x * 6];
-        int i = 0;
-        for (int x = 0; x < size.x - 1; x++) {
-            i = x * 6;
-            index[i] = offset + x * 4;
-            index[i + 1] = offset + (x + 1) * 4;
-            index[i + 2] = offset + x * 4 + 1;
-
-            index[i + 3] = offset + x * 4 + 2;
-            index[i + 4] = offset + (x + 1) * 4 + 3;
-            index[i + 5] = offset + x * 4 + 1 + 2;
-        }
-        i = (size.x - 1) * 6;
-        index[i] = offset + (size.x - 1) * 4;
-        index[i + 1] = offset + size.x * 4;
-        index[i + 2] = offset + (size.x - 1) * 4 + 1;
-
-        index[i + 3] = offset + (size.x - 1) * 4 + 2;
-        index[i + 4] = offset + size.x * 4 + 1;
-        index[i + 5] = offset + (size.x - 1) * 4 + 1 + 2;
-
-//      [XY] == Tile position
-//      ++++++++++++++++++++++++++++++++++++++ = Y-
-//      +++++[01]++++[05]++++[09]++++[13]+++++
-//      +[00]++++[04]++++[08]++++[12]++++[16]+
-//      +++++[XY]++++[XY]++++[XY]++++[XY]+++++
-//      +[02]++++[06]++++[10]++++[14]++++[17]+
-//      +++++[03]++++[07]++++[11]++++[15]+++++
-//      ++++++++++++++++++++++++++++++++++++++ = Y+
-
-        return index;
-    }
-
-    private Vector3f[] getSideVerticesPositionUpdate(Vector3f[] groundVert, byte height) {
-        Vector3f[] sideVert = new Vector3f[groundVert.length];
+    private Vector3f[] getSideVerticesPosition(Vector3f[] groundVert, byte height) {
+        Vector3f[] sideVert = new Vector3f[groundVert.length * 2];
+        System.arraycopy(groundVert, 0, sideVert, 0, groundVert.length);
         for (int i = 0; i < groundVert.length; i++) {
-            sideVert[i] = new Vector3f(groundVert[i].x, groundVert[i].y - height * floorHeight, groundVert[i].z);
+            sideVert[i + groundVert.length] = new Vector3f(groundVert[i].x, groundVert[i].y - height * floorHeight, groundVert[i].z);
         }
         return sideVert;
     }
 
-    private static Vector3f[] getSideVerticesPosition(Vector2Int position, Vector2Int size, int height) {
-        Vector3f[] vertices = new Vector3f[(size.x * 4 + 3) * 2];
-        float posX;
-        float posY = ((position.y) * hexRadius * 1.5f);
-        float posZ;
-        for (int i = 0; i < size.x; i++) {
-            int r = i * 8;
-            if (((position.y) & 1) == 0) { //even
-                posX = (position.x * hexWidth) + (i * hexWidth);
-                posZ = 0;
-            } else {
-                posX = (position.x * hexWidth) + (i * hexWidth) + (hexWidth / 2);
-                posZ = 0.001f;
+    private Vector2f[] getSideVerticesTextCoord(Vector2Int size, byte height) {
+        Vector2f[] texCoord = new Vector2f[((size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2)) * 2];
+        int offset = (size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2);
+        /**
+         * Side-tri coord.
+         */
+        for (int k = 0; k < 2; k++) {
+            for (int i = 0; i < size.x * 4; i += 4) {
+                if ((i & 1) == 0) {
+                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                } else {
+                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                }
             }
-            vertices[r] = new Vector3f(posX, height * floorHeight + posZ, hexRadius + posY);
-            vertices[r + 1] = new Vector3f(posX - (hexWidth / 2), height * floorHeight + posZ, (hexRadius / 2) + posY);
-            vertices[r + 2] = new Vector3f(posX, height * floorHeight + posZ, -hexRadius + posY);
-            vertices[r + 3] = new Vector3f(posX - (hexWidth / 2), height * floorHeight + posZ, -(hexRadius / 2) + posY);
-
-            vertices[r + 4] = new Vector3f(posX, posZ, hexRadius + posY);
-            vertices[r + 5] = new Vector3f(posX - (hexWidth / 2), posZ, (hexRadius / 2) + posY);
-            vertices[r + 6] = new Vector3f(posX, posZ, -hexRadius + posY);
-            vertices[r + 7] = new Vector3f(posX - (hexWidth / 2), posZ, -(hexRadius / 2) + posY);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
         }
-        posX = position.x * hexWidth + size.x * hexWidth + ((((position.y) & 1) == 0 ? -hexWidth / 2 : 0));
-        vertices[vertices.length - 6] = new Vector3f(posX, height * floorHeight + (((position.y) & 1) == 0 ? 0 : 0.001f), hexRadius / 2 + posY);
-        vertices[vertices.length - 5] = new Vector3f(posX, height * floorHeight + (((position.y) & 1) == 0 ? 0 : 0.001f), -hexRadius / 2 + posY);
-        vertices[vertices.length - 4] = new Vector3f(posX, (((position.y) & 1) == 0 ? 0 : 0.001f), hexRadius / 2 + posY);
-        vertices[vertices.length - 3] = new Vector3f(posX, (((position.y) & 1) == 0 ? 0 : 0.001f), -hexRadius / 2 + posY);
+        /**
+         * Side-quad coord.
+         */
+        texCoord[(size.x * 4 + 2)] = new Vector2f(0f, 1f);
+        texCoord[(size.x * 4 + 2) + 1] = new Vector2f(0f, 1f);
+        texCoord[(size.x * 4 + 2) + 2] = new Vector2f(0f, 0.75f);
+        texCoord[(size.x * 4 + 2) + 3] = new Vector2f(0f, 0.75f);
 
-        vertices[vertices.length - 2] = new Vector3f(posX, height * floorHeight + (((position.y) & 1) == 0 ? 0 : 0.001f), -hexRadius / 2 + posY);
-        vertices[vertices.length - 1] = new Vector3f(posX, (((position.y) & 1) == 0 ? 0 : 0.001f), -hexRadius / 2 + posY);
+        texCoord[(size.x * 4 + 2) + offset] = new Vector2f(height * 0.5f, 1f);
+        texCoord[(size.x * 4 + 2) + offset + 1] = new Vector2f(height * 0.5f, 1f);
+        texCoord[(size.x * 4 + 2) + offset + 2] = new Vector2f(height * 0.5f, 0.75f);
+        texCoord[(size.x * 4 + 2) + offset + 3] = new Vector2f(height * 0.5f, 0.75f);
 
-        return vertices;
+        for (int k = 0; k < 2; k++) {
+            int index = (size.x * 4 + 2) + 4;
+            for (int i = 0; i < size.y - 1; i++) {
+
+                if ((i & 1) == 0) {
+                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                } else {
+                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                }
+                index += 6;
+            }
+        }
+        return texCoord;
+
     }
 
-    private static int[] getSideIndexUpdate(boolean isOddStart, Vector2Int size, int arrayOffset, int groundOffset, CullingData culling) {
+    private static int[] getSideIndex(Vector2Int size, int arrayOffset, int groundOffset, CullingData culling) {
         if (arrayOffset < 0) {
             arrayOffset = 0;
         }
@@ -541,124 +565,6 @@ public final class MeshManager {
 //         ++++[04]++++++++++[05]++
 
         return index;
-    }
-
-    private static int[] getSideIndex(int sizeX, int offset, Boolean[][] isNeightborsCull) {
-        int[] index = new int[((sizeX * 4) + 2) * 2 * 3]; //2 tri * 3 point
-
-        if (isNeightborsCull[0][3]) {
-            index[0] = offset + 1;
-            index[1] = offset + 7;
-            index[2] = offset + 5;
-
-            index[3] = offset + 1;
-            index[4] = offset + 3;
-            index[5] = offset + 7;
-        }
-
-        int j = offset;
-        for (int i = 0; i < sizeX; i++) {
-            int r = (i * 24) + 6;
-            if (isNeightborsCull[i][4]) {
-                index[r] = j;
-                index[r + 1] = j + 1;
-                index[r + 2] = j + 4;
-
-                index[r + 3] = j + 1;
-                index[r + 4] = j + 5;
-                index[r + 5] = j + 4;
-            }
-
-            if (isNeightborsCull[i][2]) {
-                index[r + 6] = j + 2;
-                index[r + 7] = j + 6;
-                index[r + 8] = j + 3;
-
-                index[r + 9] = j + 3;
-                index[r + 10] = j + 6;
-                index[r + 11] = j + 7;
-            }
-
-            if (i < sizeX - 1) {
-                if (isNeightborsCull[i][5]) {
-                    index[r + 12] = j + 0;
-                    index[r + 13] = j + 4;
-                    index[r + 14] = j + 9;
-
-                    index[r + 15] = j + 9;
-                    index[r + 16] = j + 4;
-                    index[r + 17] = j + 13;
-                }
-                if (isNeightborsCull[i][1]) {
-                    index[r + 18] = j + 11;
-                    index[r + 19] = j + 6;
-                    index[r + 20] = j + 2;
-
-                    index[r + 21] = j + 11;
-                    index[r + 22] = j + 15;
-                    index[r + 23] = j + 6;
-                }
-            } else {
-                if (isNeightborsCull[i][5]) {
-                    index[r + 12] = j + 0;
-                    index[r + 13] = j + 4;
-                    index[r + 14] = j + 8;
-
-                    index[r + 15] = j + 4;
-                    index[r + 16] = j + 10;
-                    index[r + 17] = j + 8;
-                }
-
-                if (isNeightborsCull[i][1]) {
-                    index[r + 18] = j + 6;
-                    index[r + 19] = j + 2;
-                    index[r + 20] = offset + ((sizeX * 4 + 3) * 2) - 3;
-
-                    index[r + 21] = j + 2;
-                    index[r + 22] = offset + ((sizeX * 4 + 3) * 2) - 5;
-                    index[r + 23] = offset + ((sizeX * 4 + 3) * 2) - 3;
-                }
-            }
-            j += 8;
-        }
-
-        if (isNeightborsCull[sizeX - 1][0]) {
-            index[index.length - 6] = offset + ((sizeX * 4 + 3) * 2) - 6;
-            index[index.length - 5] = offset + ((sizeX * 4 + 3) * 2) - 4;
-            index[index.length - 4] = offset + ((sizeX * 4 + 3) * 2) - 2;
-
-            index[index.length - 3] = offset + ((sizeX * 4 + 3) * 2) - 4;
-            index[index.length - 2] = offset + ((sizeX * 4 + 3) * 2) - 1;
-            index[index.length - 1] = offset + ((sizeX * 4 + 3) * 2) - 2;
-        }
-        return index;
-    }
-
-    private static Vector2f[] getSideVerticestexCoord(Vector2Int size, int height) {
-        Vector2f[] texCoord = new Vector2f[(size.x * 4 + 3) * 2];
-        float h = height * 0.5f;
-        int j = 0;
-        for (int i = 0; i < size.x; i++) {
-            texCoord[j] = new Vector2f(0, 0.75f);
-            texCoord[j + 1] = new Vector2f(0, 1f);
-            texCoord[j + 2] = new Vector2f(0, 1f);
-            texCoord[j + 3] = new Vector2f(0, 0.75f);
-
-            texCoord[j + 4] = new Vector2f(h, 0.75f);
-            texCoord[j + 5] = new Vector2f(h, 1f);
-            texCoord[j + 6] = new Vector2f(h, 1f);
-            texCoord[j + 7] = new Vector2f(h, 0.75f);
-            j += 8;
-        }
-        texCoord[texCoord.length - 6] = new Vector2f(0, 1f);
-        texCoord[texCoord.length - 5] = new Vector2f(0, 0.75f);
-        texCoord[texCoord.length - 4] = new Vector2f(h, 1f);
-        texCoord[texCoord.length - 3] = new Vector2f(h, 0.75f);
-
-        texCoord[texCoord.length - 2] = new Vector2f(0, 0.75f);
-        texCoord[texCoord.length - 1] = new Vector2f(h, 0.75f);
-
-        return texCoord;
     }
 
     private static Mesh setCollisionBound(Mesh meshToUpdate) {

@@ -315,7 +315,7 @@ public class MapData {
         Vector2Int tileOffset = tilePos.getAsOffset();
         int x = (int) (FastMath.abs(tileOffset.x) / HexSetting.CHUNK_SIZE);
         int y = (int) (FastMath.abs(tileOffset.y)) / HexSetting.CHUNK_SIZE;
-        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? x * -1 : x), ((tileOffset.y < 0) ? y * -1 : y));
+        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? (x+1) * -1 : x), ((tileOffset.y < 0) ? (y+1) * -1 : y));
         if (chunkPos.contains(result)) {
             return result;
         } else {

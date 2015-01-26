@@ -296,7 +296,6 @@ public final class MeshParameter {
 //        }
 //        return neightborsCull;
 //    }
-
     /**
      * How many mesh param this element have.
      *
@@ -379,11 +378,10 @@ public final class MeshParameter {
 //        }
 //        return neightborsCull;
 //    }
-
-    public CullingData getCullingData(){
+    public CullingData getCullingData() {
         return new CullingData();
     }
-    
+
     /**
      * Internal use.
      */
@@ -397,44 +395,44 @@ public final class MeshParameter {
             int currentChunk = elementTypeRef.get(currentElement).get(currentIndex);
             boolean isOddStart = (position.get(currentChunk).y & 1) == 0;
 
+            HexCoordinate coord = new HexCoordinate(HexCoordinate.OFFSET,
+                    position.get(currentChunk).x, position.get(currentChunk).y);
             for (int i = 0; i < 4; i++) {
                 int currentSize = (i == 0 || i == 1 ? size.get(currentChunk).x : size.get(currentChunk).y);
                 culling[i] = new boolean[currentSize][3];
                 for (int j = 0; j < currentSize; j++) {
-                    HexCoordinate coord = new HexCoordinate(HexCoordinate.OFFSET,
-                            position.get(currentChunk).x, position.get(currentChunk).y);
                     if (i == 0) { // top chunk
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(j, 0));
-                        culling[i][j][0] = neightbors[2] != null && neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                        culling[i][j][1] = neightbors[1] != null && neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
+                        culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
+                        culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
                         culling[i][j][2] = true;
                     } else if (i == 1) { //bot chunk
-                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(currentChunk).y - 1));
-                        culling[i][j][0] = neightbors[4] != null && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
-                        culling[i][j][1] = neightbors[5] != null && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(currentChunk).y-1));
+                        culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
+                        culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
                         culling[i][j][2] = true;
                     } else if (i == 2) { // left chunk
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(0, j));
-                        culling[i][j][0] = neightbors[3] != null && neightbors[3].getHeight() < height.get(currentChunk) ? false : true; // left
+                        culling[i][j][0] = neightbors[3] == null || neightbors[3].getHeight() < height.get(currentChunk) ? false : true; // left
                         if (isOddStart && (j & 1) == 0) {
-                            culling[i][j][1] = j != 0 && neightbors[2] != null && neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] != null && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
+                            culling[i][j][1] = j != 0 && neightbors[2] == null || j != 0 && neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
                         } else if (!isOddStart && (j & 1) != 0) {
-                            culling[i][j][1] = neightbors[2] != null && neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] != null && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
+                            culling[i][j][1] = neightbors[2] == null || neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
                         } else {
                             culling[i][j][1] = true; // top left ignored
                             culling[i][j][2] = true; // bot left ignored
                         }
                     } else { // right chunk 
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(size.get(currentChunk).x - 1, j));
-                        culling[i][j][0] = neightbors[0] != null && neightbors[0].getHeight() < height.get(currentChunk) ? false : true; // right
+                        culling[i][j][0] = neightbors[0] == null || neightbors[0].getHeight() < height.get(currentChunk) ? false : true; // right
                         if (!isOddStart && (j & 1) == 0) {
-                            culling[i][j][1] = j != 0 && neightbors[1] != null && neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] != null && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                            culling[i][j][1] = j != 0 && neightbors[1] == null || j != 0 && neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
                         } else if (isOddStart && (j & 1) != 0) {
-                            culling[i][j][1] = neightbors[1] != null && neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] != null && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                            culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
                         } else {
                             culling[i][j][1] = true; // top right ignored
                             culling[i][j][2] = true; // bot right ignored
@@ -445,34 +443,35 @@ public final class MeshParameter {
             }
 
         }
-        
+
         /**
          * return the culling on the desired location.
+         *
          * @param pos of the inspected side.
          * @param tilePosition position of the til inside the chunk.
          * @param facePos needed face of the selected tile.
          * @return true if the face have to be culled.
          */
-        public boolean getCulling(Position pos, int tilePosition, Position facePos){
+        public boolean getCulling(Position pos, int tilePosition, Position facePos) {
             int index;
-            if(pos.equals(Position.TOP)){
-                if(facePos.equals(Position.TOP_LEFT)){
+            if (pos.equals(Position.TOP)) {
+                if (facePos.equals(Position.TOP_LEFT)) {
                     index = 0;
                 } else if (facePos.equals(Position.TOP_RIGHT)) {
                     index = 1;
                 } else {
                     throw new UnsupportedOperationException(facePos + " is not allowed in the current context.");
                 }
-            } else if(pos.equals(Position.BOTTOM)){
-                if(facePos.equals(Position.BOT_LEFT)){
+            } else if (pos.equals(Position.BOTTOM)) {
+                if (facePos.equals(Position.BOT_LEFT)) {
                     index = 0;
                 } else if (facePos.equals(Position.BOT_RIGHT)) {
                     index = 1;
                 } else {
                     throw new UnsupportedOperationException(facePos + " is not allowed in the current context.");
                 }
-            } else if(pos.equals(Position.LEFT)){
-                if(facePos.equals(Position.LEFT)){
+            } else if (pos.equals(Position.LEFT)) {
+                if (facePos.equals(Position.LEFT)) {
                     index = 0;
                 } else if (facePos.equals(Position.TOP_LEFT)) {
                     index = 1;
@@ -481,8 +480,8 @@ public final class MeshParameter {
                 } else {
                     throw new UnsupportedOperationException(facePos + " is not allowed in the current context.");
                 }
-            } else if(pos.equals(Position.RIGHT)){
-                if(facePos.equals(Position.RIGHT)){
+            } else if (pos.equals(Position.RIGHT)) {
+                if (facePos.equals(Position.RIGHT)) {
                     index = 0;
                 } else if (facePos.equals(Position.TOP_RIGHT)) {
                     index = 1;
@@ -497,9 +496,9 @@ public final class MeshParameter {
             return culling[pos.ordinal()][tilePosition][index];
         }
     }
-    
-    
-    public enum Position{
+
+    public enum Position {
+
         TOP,
         BOTTOM,
         LEFT,

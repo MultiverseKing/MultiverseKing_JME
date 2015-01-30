@@ -43,10 +43,9 @@ public class MapData {
     protected ArrayList<ChunkChangeListener> chunkListeners = new ArrayList<ChunkChangeListener>();
     protected String mapName;// = "Reset";
     /**
-     * key index :
-     * -1 (inclusive) and below used for areaTexture;
-     * 0 used for EMPTY_TEXTURE_KEY (when specifiating no texture);
-     * 1 (inclusive) and above user for added texture (ordered the way the get added).
+     * key index : -1 (inclusive) and below used for areaTexture; 0 used for
+     * EMPTY_TEXTURE_KEY (when specifiating no texture); 1 (inclusive) and above
+     * user for added texture (ordered the way the get added).
      */
     private final String[] textureKeys;
 
@@ -55,7 +54,7 @@ public class MapData {
         this.textureKeys = new String[]{"EMPTY_TEXTURE_KEY"};
         chunkData = new ChunkData();
     }
-    
+
     public MapData(Enum[] textureKeys, AssetManager assetManager) {
         this.assetManager = assetManager;
         this.textureKeys = genTextureKeys(textureKeys);
@@ -68,16 +67,15 @@ public class MapData {
         this.textureKeys = genTextureKeys(textureKeys);
         chunkData = new ChunkData();
     }
-    
-    private String[] genTextureKeys(Object[] userKey){
-        String[] keys = new String[userKey.length+1];
+
+    private String[] genTextureKeys(Object[] userKey) {
+        String[] keys = new String[userKey.length + 1];
         keys[0] = "EMPTY_TEXTURE_KEY";
         for (int i = 0; i < userKey.length; i++) {
-            keys[i+1] = userKey[i].toString();
+            keys[i + 1] = userKey[i].toString();
         }
         return keys;
     }
-    
 
     /**
      * Register a listener to respond to Tile Event.
@@ -262,6 +260,7 @@ public class MapData {
      * <li>
      * HexTile[5] == bot right;
      * </li>
+     *
      * @param position of the center tile.
      * @return All tile arround the needed tile.
      */
@@ -315,7 +314,7 @@ public class MapData {
         Vector2Int tileOffset = tilePos.getAsOffset();
         int x = (int) (FastMath.abs(tileOffset.x) / HexSetting.CHUNK_SIZE);
         int y = (int) (FastMath.abs(tileOffset.y)) / HexSetting.CHUNK_SIZE;
-        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? (x+1) * -1 : x), ((tileOffset.y < 0) ? (y+1) * -1 : y));
+        Vector2Int result = new Vector2Int(((tileOffset.x < 0) ? (x + 1) * -1 : x), ((tileOffset.y < 0) ? (y + 1) * -1 : y));
         if (chunkPos.contains(result)) {
             return result;
         } else {
@@ -469,19 +468,19 @@ public class MapData {
     }
 
     public String getTextureValue(byte textureKey) {
-        if (textureKey == (byte)-1) {
+        if (textureKey == (byte) -1) {
             return "AREA_TEXTURE";
-        } else  if (textureKey < (byte)-1) {
+        } else if (textureKey < (byte) -1) {
             return "NO_TILES";
-        }else {
+        } else {
             return textureKeys[textureKey];
         }
     }
 
     public byte getTextureKey(String value) {
-        if(value.equals("AREA_TEXTURE")){
+        if (value.equals("AREA_TEXTURE")) {
             return -1;
-        } else if(value.equals("NO_TILES")){
+        } else if (value.equals("NO_TILES")) {
             return -2;
         }
         for (byte i = 0; i < textureKeys.length; i++) {

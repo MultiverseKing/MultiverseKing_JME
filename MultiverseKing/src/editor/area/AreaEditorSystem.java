@@ -1,16 +1,19 @@
 package editor.area;
 
+import com.jme3.math.FastMath;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import editor.EditorSystem;
 import editor.map.MapEditorSystem;
 import entitysystem.field.position.HexPositionComponent;
 import gui.FileManagerPopup;
+import gui.LayoutWindow;
 import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.base.AreaMouseAppState;
+import org.hexgridapi.base.HexSetting;
 import org.hexgridapi.base.HexTile;
 import org.hexgridapi.base.MapData;
 import org.hexgridapi.events.MouseInputEvent;
@@ -32,6 +35,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     private AreaTileWidget tileWidgetMenu;
     private TileEventMenu tileEventMenu;
     private FileManagerPopup popup = null;
+    private AreaEditorGUI gui;
 
     public AreaEditorSystem(FileManagerPopup popup) {
         if(popup != null && popup.isLoading()){
@@ -52,6 +56,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
             generateEmptyArea();
         }
         app.getStateManager().getState(AreaMouseAppState.class).registerTileInputListener(this);
+        gui = new AreaEditorGUI(((MultiverseMain)app).getScreen(), ((MultiverseMain)app).getScreen().getElementById("EditorMainMenu"), this);
         return entityData.getEntities(AreaPropsComponent.class, HexPositionComponent.class);
     }
 
@@ -242,5 +247,34 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         if (tileEventMenu != null) {
             tileEventMenu.removeFromScreen();
         }
+    }
+
+    /**
+     * Virtual max size of the map, chunk param only.
+     * @return 
+     */
+    Vector2Int getChunkMapSize() {
+        Vector2Int maxResult = new Vector2Int();
+        Vector2Int minResult = new Vector2Int();
+        for(Vector2Int pos : mapData.getAllChunkPos()){
+            if(pos.x > maxResult.x){
+                maxResult.x = pos.x;
+            } else if(pos.x < minResult.x){
+                minResult.x = pos.x;
+            }
+            if(pos.y > maxResult.y){
+                maxResult.y = pos.y;
+            } else if(pos.y < minResult.y){
+                minResult.y = pos.y;
+            }
+        }
+        return new Vector2Int(FastMath.abs(minResult.x) + FastMath.abs(maxResult.x)+1,
+                FastMath.abs(minResult.y) + FastMath.abs(maxResult.y)+1);
+    }
+    
+    Vector2Int getTileMapSize(){
+        Vector2Int chunkMapSize = getChunkMapSize();
+        return new Vector2Int(chunkMapSize.x * HexSetting.CHUNK_SIZE,
+                chunkMapSize.y * HexSetting.CHUNK_SIZE);
     }
 }

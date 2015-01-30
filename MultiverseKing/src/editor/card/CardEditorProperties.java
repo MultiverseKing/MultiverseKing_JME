@@ -50,7 +50,7 @@ class CardEditorProperties extends EditorWindow {
                 int[] spinA = new int[]{0, 20, 1, 0};
                 int[] spinB = new int[]{0, 20, 1, 1};
                 int[][] spinList = new int[][]{spinA, spinB};
-                addSpinnerList("Cast range", spinList, HAlign.left);
+                addSpinnerList("Cast range (min - max)", spinList, HAlign.left);
                 addButtonField("Show collision");
                 break;
             case Core:
@@ -111,8 +111,8 @@ class CardEditorProperties extends EditorWindow {
     }
 
     public void setCastRange(Vector2Int range) {
-        ((Spinner) getSpinnerListField("Cast range", 0)).setSelectedIndex(range.x);
-        ((Spinner) getSpinnerListField("Cast range", 1)).setSelectedIndex(range.y);
+        ((Spinner) getSpinnerListField("Cast range (min - max)", 0)).setSelectedIndex(range.x);
+        ((Spinner) getSpinnerListField("Cast range (min - max)", 1)).setSelectedIndex(range.y);
     }
 
     public void setHitCollision(Collision collision) {
@@ -123,8 +123,8 @@ class CardEditorProperties extends EditorWindow {
     }
 
     public AbilityProperties getProperties() {
-        Vector2Int range = new Vector2Int(((Spinner) getSpinnerListField("Cast range", 0)).getSelectedIndex(),
-                ((Spinner) getSpinnerListField("Cast range", 1)).getSelectedIndex());
+        Vector2Int range = new Vector2Int(((Spinner) getSpinnerListField("Cast range (min - max)", 0)).getSelectedIndex(),
+                ((Spinner) getSpinnerListField("Cast range (min - max)", 1)).getSelectedIndex());
         return new AbilityProperties(Integer.valueOf(getNumericField("Power").getText()),
                 getSpinnerField("Segment Cost").getSelectedIndex(), range, collisionWin.getCollision());
     }

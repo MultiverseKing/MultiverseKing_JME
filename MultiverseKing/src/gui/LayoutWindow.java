@@ -102,7 +102,7 @@ public abstract class LayoutWindow {
      */
     protected final void show(Vector2f position) {
         Vector2f size = getWindowSize();
-        size.y += 25;
+        size.y += 28;
         window = new Window(screen, getUID(), position, size){
 
             @Override
@@ -110,7 +110,6 @@ public abstract class LayoutWindow {
                 super.hideWindow();
                 onPressCloseAndHide();
             }
-            
         };
         window.setUseCloseButton(true);
         
@@ -127,6 +126,12 @@ public abstract class LayoutWindow {
             parent.addChild(window);
         }
         populate();
+        /**
+         * this resolve a weird issue with button not showing properly
+         * @todo : resolve.
+         */
+        window.hide();
+        window.show();
     }
     
     private void populate() {
@@ -150,11 +155,12 @@ public abstract class LayoutWindow {
                 Vector2f pos = new Vector2f(spacement + e.getPosition().x + (column * layoutGridSize.x)
                         + (row % 2 != 0 && isHexGrid ? layoutGridSize.x / 2 : 0)
                         + ((elementAlignMaxCount - 1) / 2 % 2 != 0 && isHexGrid ? -layoutGridSize.x / 2 : 0),
-                        e.getPosition().y + window.getDragBarHeight()
-                        + (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y))
+//                        e.getPosition().y + window.getDragBarHeight()
+                        (row * (isHexGrid ? layoutGridSize.y * 2 / 3 : layoutGridSize.y))
                         + row * 1.9f + (isHexGrid ? layoutGridSize.y * 0.7f / 3 : 0));
                 e.setPosition(pos);
-                window.addChild(e);
+//                window.addChild(e);
+                window.addWindowContent(e);
             }
             if (windowElementAlignement == Align.Horizontal) {
                 column++;

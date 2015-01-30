@@ -28,7 +28,7 @@ public abstract class EditorWindow extends LayoutWindow {
 
     // <editor-fold defaultstate="collapsed" desc="Constructor">
     /**
-     * 
+     *
      * @param screen used to show the window.
      * @param parent if any.
      * @param name window name.
@@ -38,7 +38,7 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * 
+     *
      * @param screen used to show the window.
      * @param parent if any.
      * @param name window name.
@@ -50,7 +50,7 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * 
+     *
      * @param screen used to show the window.
      * @param parent if any.
      * @param name window name.
@@ -62,7 +62,7 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * 
+     *
      * @param screen used to show the window.
      * @param parent if any.
      * @param name window name.
@@ -129,44 +129,71 @@ public abstract class EditorWindow extends LayoutWindow {
         }
     }
 
+    /**
+     * Add a list off button (button group).
+     *
+     * @param listUID storage UID.
+     * @param triggersNames button label.
+     * @param hAlign alignement to use
+     */
     protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign) {
-        addButtonList(listUID, triggersNames, hAlign, 1, 0);
-    }
-
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
-        addButtonList(listUID, triggersNames, hAlign, fieldGridSize, 0);
+        addButtonList(listUID, triggersNames, hAlign, 1, 0, false);
     }
 
     /**
-     * Add a button List.
+     * Add a list off button (button group).
      *
+     * @param listUID storage UID.
+     * @param triggersNames button label.
+     * @param hAlign alignement to use
+     * @param fieldGridSize gridSlot to use
+     */
+
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize) {
+        addButtonList(listUID, triggersNames, hAlign, fieldGridSize, 0, false);
+    }
+
+    /**
+     * Add a button List (button group).
+     *
+     * @param listUID uid used to store the group / label used if label group enable
      * @param triggersNames list of button to add.
      * @param hAlign alignement of the button.
      * @param fieldGridSize gridSlot to use
+     * @param offsetX additional offset on X if needed
+     * @param enableLabel use the uid as label name !?
      */
-    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, float offsetX) {
+    protected final void addButtonList(String listUID, String[] triggersNames, HAlign hAlign, int fieldGridSize, float offsetX, boolean enableLabel) {
         String UID = generateUID(listUID) + "labelList";
-        Element holder = new Element(screen, UID, new Vector2f(offsetX, 0), new Vector2f(), Vector4f.ZERO, null);
-        holder.setAsContainerOnly();
-        generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize);
+        Element holder;
+        if(enableLabel){
+            holder = generateLabel(listUID, hAlign, Vector2f.ZERO, false);
+        } else {
+            holder = new Element(screen, UID, new Vector2f(offsetX, 0), new Vector2f(), Vector4f.ZERO, null);
+            holder.setAsContainerOnly();
+        }
+        generateList(UID, holder, triggersNames, hAlign, "labelList", fieldGridSize, enableLabel);
     }
 
     /**
-     * Add a Text Field element to this menu, limited to number as input.
+     * Add a numeric list Field, limited to number as input.
      */
     protected final void addNumericListField(String labelName, Integer[] baseValue, HAlign hAlign) {
         String uid = generateUID(labelName) + "numList";
         Label holder = generateLabel(labelName, hAlign, new Vector2f(), false);
-        generateList(uid, holder, baseValue, hAlign, "numList", 1);
+        generateList(uid, holder, baseValue, hAlign, "numList", 1, false);
     }
 
+    /**
+     * Add spinner list field.
+     */
     protected final void addSpinnerList(String labelName, int[][] value, HAlign hAlign) {
         String uid = generateUID(labelName) + "spinList";
         Label holder = generateLabel(labelName, hAlign, new Vector2f(), false);
-        generateList(uid, holder, value, hAlign, "spinList", 1);
+        generateList(uid, holder, value, hAlign, "spinList", 1, false);
     }
 
-    private void generateList(String UID, Element holder, Object[] elements, HAlign hAlign, String type, int fieldGridSize) {
+    private void generateList(String UID, Element holder, Object[] elements, HAlign hAlign, String type, int fieldGridSize, boolean enableLabel) {
 
         int i = 0;
         float posX = 0f;
@@ -204,6 +231,7 @@ public abstract class EditorWindow extends LayoutWindow {
                 e.setDimensions(e.getDimensions().x + fillValue - (e.getDimensions().y * 2), e.getDimensions().y);
                 e.setPosition(e.getPosition().x + fillValue * i + e.getDimensions().y, e.getPosition().y - layoutGridSize.y);
                 e.getChildElementById(e.getUID() + ":btnInc").setPosition(e.getDimensions().x, 0);
+                ((Spinner) e).setSelectedIndex(((Spinner) e).getSelectedIndex());
                 i++;
             }
             fieldGridSize++;
@@ -251,16 +279,22 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     /**
-     * Add a spinner Element to this menu. value[0] = min, value[1] = max,
-     * value[2] = step, value[3] = current.
+     * Add a spinner Element to this menu.
+     * <li> value[0] = min </li>
+     * <li> value[1] = max </li>
+     * <li> value[2] = step </li>
+     * <li> value[3] = current </li>
      */
     protected final void addSpinnerField(String labelName, int[] value, HAlign hAlign) {
         addSpinnerField(labelName, value, hAlign, new Vector2f());
     }
 
     /**
-     * Add a spinner Element to this menu. value[0] = min, value[1] = max,
-     * value[2] = step, value[3] = current.
+     * Add a spinner Element to this menu.
+     * <li> value[0] = min </li>
+     * <li> value[1] = max </li>
+     * <li> value[2] = step </li>
+     * <li> value[3] = current </li>
      *
      * @param labelName field name.
      * @param value first value to show.
@@ -391,7 +425,7 @@ public abstract class EditorWindow extends LayoutWindow {
         String uid = generateUID(labelName);
         elementList.put(uid, generateLabel(labelName, hAlign, offset, true));
     }
-    
+
     /**
      * Add a selectionList Element based on a enum to this menu.
      *
@@ -401,8 +435,9 @@ public abstract class EditorWindow extends LayoutWindow {
      */
     protected final void addLabelPropertieField(String labelName, Vector2Int value, HAlign hAlign) {
         String uid = generateUID(labelName);
-        elementList.put(uid, generateLabel(labelName + " : "+ value.x+" / "+ value.y, hAlign, Vector2f.ZERO, true));
+        elementList.put(uid, generateLabel(labelName + " : " + value.x + " / " + value.y, hAlign, Vector2f.ZERO, true));
     }
+
     /**
      * Add a selectionList Element based on a enum to this menu.
      *
@@ -564,20 +599,20 @@ public abstract class EditorWindow extends LayoutWindow {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                onButtonTrigger((labelName != null ? labelName : "")+getText());
+                onButtonTrigger((labelName != null ? labelName : "") + getText());
             }
         };
         button.setText(triggerName);
         switch (hAlign) {
             case left:
-                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length+1) * 8 - spacement : spacement) + offset.x, 4));
+                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length + 1) * 8 - spacement : spacement) + offset.x, 4));
                 return button;
             case right:
                 button.setPosition(new Vector2f(layoutGridSize.x - (spacement + offset.x + button.getDimensions().x), 4));
                 return button;
             case full:
-                button.setDimensions(new Vector2f(layoutGridSize.x - (labelName != null ? (labelName.toCharArray().length+1) * 8 : spacement), layoutGridSize.y));
-                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length+1) * 8 - spacement : 0) + offset.x, 4));
+                button.setDimensions(new Vector2f(layoutGridSize.x - (labelName != null ? (labelName.toCharArray().length + 1) * 8 : spacement), layoutGridSize.y));
+                button.setPosition(new Vector2f((labelName != null ? (labelName.toCharArray().length + 1) * 8 - spacement : 0) + offset.x, 4));
                 return button;
             default:
                 throw new UnsupportedOperationException(hAlign + " isn't supported.");

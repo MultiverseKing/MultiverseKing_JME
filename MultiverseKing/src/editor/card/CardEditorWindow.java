@@ -101,31 +101,37 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
 
     @Override
     protected void onButtonTrigger(String triggerName) {
-        if (triggerName.equals("Load")) {
-            if (((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
-                clearLoadingMenu();
-            }
-            openLoadingMenu();
-            Element btn = getLabelListField("additionalField", "Load");
-            Menu loadMenu = (Menu) screen.getElementById("loadCategory");
-            loadMenu.showMenu(null, btn.getAbsoluteX(),
-                    btn.getAbsoluteY() - loadMenu.getHeight());
-        } else if (triggerName.equals("Save")) {
-            saveCardProperties(false);
-        } else if (triggerName.equals("Hide Preview")) {
-            cardPreview.getPreview().hide();
-            getLabelListField("additionalField", "Hide Preview").setText("Show Preview");
-        } else if (triggerName.equals("Show Preview")) {
-            cardPreview.getPreview().show();
-            getLabelListField("additionalField", "Hide Preview").setText("Hide Preview");
-        } else if (triggerName.equals("SubType Properties")) {
-            if (subMenu == null) {
-                subMenu = new CardEditorProperties(screen, getWindow(), (RenderType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
-            } else if (subMenu.isVisible()) {
-                subMenu.hide();
-            } else {
-                subMenu.setVisible();
-            }
+        switch (triggerName) {
+            case "Load":
+                if (((Screen) screen).getElementsAsMap().containsKey("loadCategory")) {
+                    clearLoadingMenu();
+                }
+                openLoadingMenu();
+                Element btn = getLabelListField("additionalField", "Load");
+                Menu loadMenu = (Menu) screen.getElementById("loadCategory");
+                loadMenu.showMenu(null, btn.getAbsoluteX(),
+                        btn.getAbsoluteY() - loadMenu.getHeight());
+                break;
+            case "Save":
+                saveCardProperties(false);
+                break;
+            case "Hide Preview":
+                cardPreview.getPreview().hide();
+                getLabelListField("additionalField", "Hide Preview").setText("Show Preview");
+                break;
+            case "Show Preview":
+                cardPreview.getPreview().show();
+                getLabelListField("additionalField", "Hide Preview").setText("Hide Preview");
+                break;
+            case "SubType Properties":
+                if (subMenu == null) {
+                    subMenu = new CardEditorProperties(screen, getWindow(), (RenderType) getSelectBoxField("Card Type").getSelectedListItem().getValue());
+                } else if (subMenu.isVisible()) {
+                    subMenu.hide();
+                } else {
+                    subMenu.setVisible();
+                }
+                break;
         }
     }
 
@@ -309,25 +315,25 @@ public final class CardEditorWindow extends EditorWindow implements DialogWindow
 
     private void addAbilityItem(GameProperties properties, Menu menu) {
         for (String s : properties.getAbilityList()) {
-            menu.addMenuItem(s, s+"."+RenderType.Ability, null);
+            menu.addMenuItem(s, s + "." + RenderType.Ability, null);
         }
     }
 
     private void addEquipementItem(GameProperties properties, Menu menu) {
         for (String s : properties.getEquipementList()) {
-            menu.addMenuItem(s, s+"."+RenderType.Equipement, null);
+            menu.addMenuItem(s, s + "." + RenderType.Equipement, null);
         }
     }
 
     private void addUnitItem(GameProperties properties, Menu menu) {
         for (String s : properties.getUnitList()) {
-            menu.addMenuItem(s, s+"."+RenderType.Unit, null);
+            menu.addMenuItem(s, s + "." + RenderType.Unit, null);
         }
     }
 
     private void addTitanItem(GameProperties properties, Menu menu) {
         for (String s : properties.getTitanList()) {
-            menu.addMenuItem(s, s+"."+RenderType.Titan, null);
+            menu.addMenuItem(s, s + "." + RenderType.Titan, null);
         }
     }
 

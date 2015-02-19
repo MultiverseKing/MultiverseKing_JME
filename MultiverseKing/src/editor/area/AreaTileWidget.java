@@ -8,11 +8,11 @@ import com.jme3.renderer.Camera;
 import gui.AnimatedButton;
 import gui.CameraTrackWindow;
 import java.util.ArrayList;
-import org.hexgridapi.utility.ElementalAttribut;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
+import utility.ElementalAttribut;
 
 /**
  * Widget menu allowing modification on one tiles.
@@ -102,7 +102,7 @@ class AreaTileWidget extends CameraTrackWindow {
                 new Vector2f(45, 45), Vector4f.ZERO, "Textures/Icons/MapWidget/arrow.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(inspectedSpatialPosition, (byte)1);
+                system.setTileProperties(inspectedSpatialPosition, (byte) 1);
             }
         };
         holder.addChild(upBtn);
@@ -111,7 +111,7 @@ class AreaTileWidget extends CameraTrackWindow {
                 new Vector2f(45, 45), Vector4f.ZERO, "Textures/Icons/MapWidget/arrow.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(inspectedSpatialPosition, (byte)-1);
+                system.setTileProperties(inspectedSpatialPosition, (byte) -1);
             }
         };
         downBtn.setLocalRotation(downBtn.getLocalRotation().fromAngles(0, 0, 180 * FastMath.DEG_TO_RAD));
@@ -121,8 +121,8 @@ class AreaTileWidget extends CameraTrackWindow {
 
     private void loadEAttributIcon(Element parent) {
         ElementalAttribut eAttribut = system.getTileEAttribut(inspectedSpatialPosition);
-        String icoPath = "Textures/Icons/EAttributs/" + (eAttribut == null ? "null" : eAttribut.name()) + ".png";
-        
+        String icoPath = "Textures/Icons/EAttributs/" + (eAttribut == null ? "EMPTY_TEXTURE_KEY" : eAttribut.name()) + ".png";
+
         eAttributIco = new Element(screen, "tileWidgetEAttributIco", new Vector2f(15, 15),
                 new Vector2f(50, 50), Vector4f.ZERO, icoPath);
         eAttributIco.setIgnoreMouse(true);
@@ -183,7 +183,7 @@ class AreaTileWidget extends CameraTrackWindow {
 
     void updateIcon() {
         ElementalAttribut eAttribut = system.getTileEAttribut(inspectedSpatialPosition);
-        eAttributIco.setColorMap("Textures/Icons/EAttributs/" + (eAttribut == null ? "null" : eAttribut.name()) + ".png");
+        eAttributIco.setColorMap("Textures/Icons/EAttributs/" + (eAttribut == null ? "EMPTY_TEXTURE_KEY" : eAttribut.name()) + ".png");
     }
 
     @Override

@@ -7,22 +7,21 @@ import editor.EditorSystem;
 import editor.map.MapEditorSystem;
 import entitysystem.field.position.HexPositionComponent;
 import gui.FileManagerPopup;
-import gui.LayoutWindow;
 import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.base.AreaMouseAppState;
-import org.hexgridapi.base.HexSetting;
-import org.hexgridapi.base.HexTile;
-import org.hexgridapi.base.MapData;
+import org.hexgridapi.core.appstate.MouseControlAppState;
+import org.hexgridapi.core.HexSetting;
+import org.hexgridapi.core.HexTile;
+import org.hexgridapi.core.MapData;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputListener;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
-import org.hexgridapi.utility.ElementalAttribut;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
+import utility.ElementalAttribut;
 
 /**
  *
@@ -55,7 +54,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         } else {
             generateEmptyArea();
         }
-        app.getStateManager().getState(AreaMouseAppState.class).registerTileInputListener(this);
+        app.getStateManager().getState(MouseControlAppState.class).registerTileInputListener(this);
         gui = new AreaEditorGUI(((MultiverseMain)app).getScreen(), ((MultiverseMain)app).getScreen().getElementById("EditorMainMenu"), this);
         return entityData.getEntities(AreaPropsComponent.class, HexPositionComponent.class);
     }
@@ -91,7 +90,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     void setMapElement(ElementalAttribut eAttribut) {
-        mapData.setMapTexture(eAttribut.toString());
+        mapData.setDefaultTexture(eAttribut.toString());
     }
 
     ElementalAttribut getMapElement() {
@@ -101,10 +100,10 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 
     @Override
     public void generateEmptyArea() {
-        mapData.registerTileChangeListener(this);
-        if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(new Vector2Int(), null);
-        }
+//        mapData.registerTileChangeListener(this);
+//        if (mapData.getAllChunkPos().isEmpty()) {
+//            mapData.addChunk(new Vector2Int(), null);
+//        }
     }
 
     @Override
@@ -237,7 +236,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 //        app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
         
 //        app.getStateManager().detach(app.getStateManager().getState(AreaMouseAppState.class));
-        app.getStateManager().getState(AreaMouseAppState.class).removeTileInputListener(this);
+        app.getStateManager().getState(MouseControlAppState.class).removeTileInputListener(this);
 //        app.getStateManager().detach(app.getStateManager().getState(AreaGridSystem.class));
 //        app.getStateManager().detach(app.getStateManager().getState(AreaEventRenderDebugSystem.class));
 //        app.getStateManager().detach(app.getStateManager().getState(AreaEventSystem.class));
@@ -254,22 +253,23 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
      * @return 
      */
     Vector2Int getChunkMapSize() {
-        Vector2Int maxResult = new Vector2Int();
-        Vector2Int minResult = new Vector2Int();
-        for(Vector2Int pos : mapData.getAllChunkPos()){
-            if(pos.x > maxResult.x){
-                maxResult.x = pos.x;
-            } else if(pos.x < minResult.x){
-                minResult.x = pos.x;
-            }
-            if(pos.y > maxResult.y){
-                maxResult.y = pos.y;
-            } else if(pos.y < minResult.y){
-                minResult.y = pos.y;
-            }
-        }
-        return new Vector2Int(FastMath.abs(minResult.x) + FastMath.abs(maxResult.x)+1,
-                FastMath.abs(minResult.y) + FastMath.abs(maxResult.y)+1);
+//        Vector2Int maxResult = new Vector2Int();
+//        Vector2Int minResult = new Vector2Int();
+//        for(Vector2Int pos : mapData.getAllChunkPos()){
+//            if(pos.x > maxResult.x){
+//                maxResult.x = pos.x;
+//            } else if(pos.x < minResult.x){
+//                minResult.x = pos.x;
+//            }
+//            if(pos.y > maxResult.y){
+//                maxResult.y = pos.y;
+//            } else if(pos.y < minResult.y){
+//                minResult.y = pos.y;
+//            }
+//        }
+//        return new Vector2Int(FastMath.abs(minResult.x) + FastMath.abs(maxResult.x)+1,
+//                FastMath.abs(minResult.y) + FastMath.abs(maxResult.y)+1);
+        return new Vector2Int();
     }
     
     Vector2Int getTileMapSize(){

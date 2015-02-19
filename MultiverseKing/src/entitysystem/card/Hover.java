@@ -5,11 +5,11 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import entitysystem.attribut.Rarity;
 import entitysystem.render.RenderComponent.RenderType;
-import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
+import utility.ElementalAttribut;
 
 /**
  * @todo generate too much object have to be solved/reduce.) tonegodgui update

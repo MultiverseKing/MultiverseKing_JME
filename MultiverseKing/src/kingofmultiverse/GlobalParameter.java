@@ -17,10 +17,10 @@ import org.hexgridapi.utility.ArrowDebugShape;
  *
  * @author roah
  */
-public class GameParameter {
+public class GlobalParameter {
     private RTSCamera rtsCam;
 
-    public GameParameter(SimpleApplication app, boolean debug) {
+    public GlobalParameter(SimpleApplication app, boolean debug) {
         app.setPauseOnLostFocus(false);
         lightSettup(app);
         cameraSettup(app);
@@ -49,9 +49,9 @@ public class GameParameter {
 
         /* Drop shadows */
 //        final int SHADOWMAP_SIZE = 1024;
-//        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, SHADOWMAP_SIZE, 3);
+//        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(app.getAssetManager(), SHADOWMAP_SIZE, 3);
 //        dlsr.setLight(sun);
-//        viewPort.addProcessor(dlsr);
+//        app.getViewPort().addProcessor(dlsr);
 
         /**
          * A white ambient light source.

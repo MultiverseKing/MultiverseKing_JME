@@ -12,12 +12,12 @@ import entitysystem.render.RenderComponent.RenderType;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.EditorWindow;
-import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
+import utility.ElementalAttribut;
 
 /**
  *

@@ -5,7 +5,6 @@ import entitysystem.render.utility.SpatialInitializer;
 import com.jme3.animation.AnimControl;
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.events.MotionEvent;
-import com.jme3.collision.Collidable;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
@@ -22,8 +21,8 @@ import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import org.hexgridapi.base.HexSetting;
-import org.hexgridapi.base.MapData;
+import org.hexgridapi.core.HexSetting;
+import org.hexgridapi.core.MapData;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.utility.HexCoordinate;
@@ -166,7 +165,7 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
-        renderSystemNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive); //<< diseable this to remove the shadow.
+        renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow.
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
         mapData.registerTileChangeListener(this);
@@ -192,6 +191,11 @@ public class RenderSystem extends EntitySystemAppState implements TileChangeList
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getRenderType());
         s.setName(renderComp.getName() + renderComp.getRenderType() + e.getId().toString());
+        if(renderComp.getRenderType().equals(RenderComponent.RenderType.Debug)){
+            s.setShadowMode(RenderQueue.ShadowMode.Cast);
+        } else {
+            s.setShadowMode(RenderQueue.ShadowMode.Inherit);
+        }
         return s;
     }
 

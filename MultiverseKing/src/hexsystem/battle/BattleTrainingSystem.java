@@ -37,8 +37,8 @@ import hexsystem.area.AreaGridSystem;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.base.AreaMouseAppState;
-import org.hexgridapi.base.MapData;
+import org.hexgridapi.core.appstate.MouseControlAppState;
+import org.hexgridapi.core.MapData;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.HexCoordinate;
@@ -53,7 +53,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     private MapData mapData;
     private RenderSystem renderSystem;
-    private AreaMouseAppState hexMapMouseSystem;
+    private MouseControlAppState mouseSystem;
     private Action currentAction = null;
     private EntityId inspectedId = null;
     private BattleTrainingGUI bTrainingGUI;
@@ -77,8 +77,8 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         renderSystem = app.getStateManager().getState(RenderSystem.class);
 //        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this, true);
-        hexMapMouseSystem = app.getStateManager().getState(AreaMouseAppState.class);
-        hexMapMouseSystem.registerRayInputListener(this);
+        mouseSystem = app.getStateManager().getState(MouseControlAppState.class);
+        mouseSystem.registerRayInputListener(this);
 
         initialisePlayerCore();
 
@@ -223,7 +223,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
                 Spatial s = closest.getGeometry().getParent();
                 do {
                     if (s != null && s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
-                        hexMapMouseSystem.setDebugPosition(closest.getContactPoint());
+//                        mouseSystem.setDebugPosition(closest.getContactPoint());
                         HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
                         return new MouseInputEvent(pos, ray, closest);
                     }
@@ -273,7 +273,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     void setAction(EntityId id, Action action) {
         switch (action) {
             case MOVE:
-                if (!hexMapMouseSystem.setCursorPulseMode(this)) {
+                if (!mouseSystem.setCursorPulseMode(this)) {
                     return;
                 }
                 inspectedId = id;
@@ -302,7 +302,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     private void actionCancel() {
-        hexMapMouseSystem.setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
+        mouseSystem.setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
         currentAction = null;
         unregisterInput();
     }
@@ -310,7 +310,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     private void unregisterInput() {
         inspectedId = null;
         currentAction = null;
-        hexMapMouseSystem.setCursorPulseMode(this);
+        mouseSystem.setCursorPulseMode(this);
         //Unregister the input for this system
         app.getInputManager().removeListener(fieldInputListener);
     }

@@ -13,8 +13,8 @@ import entitysystem.render.RenderComponent.RenderType;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.base.HexSetting;
-import org.hexgridapi.base.MapData;
+import org.hexgridapi.core.HexSetting;
+import org.hexgridapi.core.MapData;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 
@@ -35,9 +35,9 @@ public class CardEditorSystem extends EntitySystemAppState {
     }
 
     void genTestMap() {
-        if (mapData.getAllChunkPos().isEmpty()) {
-            mapData.addChunk(new Vector2Int(), null);
-        }
+//        if (mapData.getAllChunkPos().isEmpty()) {
+//            mapData.addChunk(new Vector2Int(), null);
+//        }
 
         /**
          * Move the camera to the center of the map.

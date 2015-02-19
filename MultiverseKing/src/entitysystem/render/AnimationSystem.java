@@ -10,15 +10,15 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import entitysystem.EntitySystemAppState;
 import java.util.HashMap;
-import kingofmultiverse.MultiverseMain;
 import entitysystem.attribut.Animation;
-import hexsystem.battle.TimeBreakComponent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utility.Utility;
 
 /**
  * Handle how animation work when they got they cycle done or under defined
- * pattern. 
+ * pattern.
+ *
  * @todo make this a sub-system of the renderSystem
  *
  * @author roah
@@ -43,11 +43,11 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void addEntity(Entity e) {
         AnimControl control = renderSystem.getAnimControl(e.getId());
-        if(control == null){
+        if (control == null) {
             entityData.removeComponent(e.getId(), AnimationComponent.class);
             Logger.getGlobal().log(Level.WARNING, "{0} : There is no Animation control for : {1}.", new Object[]{getClass().getName(), e.get(RenderComponent.class).getName()});
             return;
-        } 
+        }
         control.addListener(this);
         AnimChannel channel = control.createChannel();
         setPlay(channel, e.get(AnimationComponent.class).getAnimation());
@@ -57,7 +57,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
 
     @Override
     protected void updateEntity(Entity e) {
-        if(renderSystem.getAnimControl(e.getId()) != animControls.get(e.getId())){
+        if (renderSystem.getAnimControl(e.getId()) != animControls.get(e.getId())) {
             removeEntity(e);
             addEntity(e);
             return;
@@ -76,7 +76,7 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
     @Override
     protected void removeEntity(Entity e) {
         AnimControl animControl = animControls.get(e.getId());
-        if(animControl == null){
+        if (animControl == null) {
             return;
         }
         animControl.clearChannels();
@@ -101,8 +101,8 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
      * @param anim animation to play.
      */
     private void setPlay(AnimChannel channel, Animation anim) {
-        if(channel.getControl().getAnimationNames().contains(anim.name())){
-            switch(anim){
+        if (channel.getControl().getAnimationNames().contains(anim.name())) {
+            switch (anim) {
                 case IDLE:
                     channel.setAnim(anim.toString(), 0.50f);
                     channel.setLoopMode(LoopMode.Loop);
@@ -117,13 +117,13 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
                     channel.setLoopMode(LoopMode.Loop);
                     break;
                 default:
-                    System.err.println(anim.name()+" Is not a supported animation type.");
+                    System.err.println(anim.name() + " Is not a supported animation type.");
             }
-        } else if(anim.equals(Animation.SUMMON)){
+        } else if (anim.equals(Animation.SUMMON)) {
             setPlay(channel, Animation.IDLE);
         }
     }
-    
+
     /**
      * Called When an animation on a channel ended his life cycle.
      *
@@ -131,9 +131,10 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
      * @param channel channel used by the animation.
      * @param animName name of the ended animation.
      */
+    @Override
     public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
         if (animName.equals(Animation.SUMMON.toString())) {
-            EntityId id = MultiverseMain.getKeyByValue(animControls, control);
+            EntityId id = Utility.getKeyByValue(animControls, control);
             entityData.setComponent(id, new AnimationComponent(Animation.IDLE));
         }
     }
@@ -146,16 +147,18 @@ public class AnimationSystem extends EntitySystemAppState implements AnimEventLi
      * @param animName name of the ended animation.
      * @deprecated not used on the current context.
      */
+    @Override
     public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public void removeSubSystem() {
         app.getStateManager().detach(this);
     }
 
+    @Override
     public String getSubSystemName() {
         return "AnimationSystem";
     }
-
 }

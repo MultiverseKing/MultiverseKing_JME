@@ -2,8 +2,8 @@ package hexsystem.area;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import org.hexgridapi.base.AbstractMapDataAppState;
-import org.hexgridapi.base.MapData;
+import org.hexgridapi.core.appstate.AbstractMapDataAppState;
+import org.hexgridapi.core.MapData;
 
 /**
  *

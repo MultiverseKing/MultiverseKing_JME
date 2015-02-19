@@ -50,7 +50,6 @@ public final class EditorMainGUI implements DialogWindowListener {
         mainMenuBar.setMinDimensions(new Vector2f());
         mainMenuBar.setHeight(30);
         mainMenuBar.setWindowTitle("Editor Menu |");
-//        mainMenuBar.setUseCloseButton(true);
         mainMenuBar.setIgnoreMouse(true);
         mainMenuBar.getDragBar().setPosition(mainMenuBar.getDragBar().getPosition().x, mainMenuBar.getDragBar().getPosition().y - 10);
         mainMenuBar.getDragBar().setIgnoreMouse(true);
@@ -62,7 +61,7 @@ public final class EditorMainGUI implements DialogWindowListener {
             ButtonAdapter editorMenuBtn = new ButtonAdapter(main.getScreen(), eValue + "EditorBtn", new Vector2f((100 * i) + 10, 5), new Vector2f(100, 20)) {
                 @Override
                 public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                    menuTrigger(eValue, false);
+                    menuTrigger(eValue);
                 }
             };
             String output = eValue.toString().substring(0, 1) + eValue.toString().substring(1).toLowerCase();
@@ -106,9 +105,8 @@ public final class EditorMainGUI implements DialogWindowListener {
      * Trigger when the user press one entry on the root menu.
      *
      * @param menu the entry the user has pressed on.
-     * @param forceTrigger
      */
-    private void menuTrigger(EditorItem menu, boolean forceTrigger) {
+    private void menuTrigger(EditorItem menu) {
         if (currentDialogPopup == null || !currentDialogPopup.isVisible()) {
             boolean showSubMenu = true;
             if (currentMenuValue != menu /*|| forceTrigger */ || menu == EditorItem.MAP || menu == EditorItem.BATTLE) {

@@ -5,11 +5,11 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
 import gui.CameraTrackWindow;
-import org.hexgridapi.utility.ElementalAttribut;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
+import utility.ElementalAttribut;
 
 /**
  * Menu showing all invalable element to change the hex to.
@@ -41,10 +41,10 @@ class ElementalWidgetMenu extends CameraTrackWindow {
         int i = 0;
         while (i < ElementalAttribut.values().length + 1) {
             ElementalAttribut e = ElementalAttribut.convert(i);
-            if (e == null && ignoredEAttribut.equals("null") || e != null && e.toString().equals(ignoredEAttribut)) {
+            if (e == null && ignoredEAttribut.equals("EMPTY_TEXTURE_KEY") || e != null && e.toString().equals(ignoredEAttribut)) {
                 j++;
             } else {
-                String eName = e == null ? "null" : e.name();
+                String eName = e == null ? "EMPTY_TEXTURE_KEY" : e.name();
                 ButtonAdapter ico = new ButtonAdapter(screen, eName + "Icon", new Vector2f(28 * (i - j) + 23, 10),
                         new Vector2f(28, 28), Vector4f.ZERO, "Textures/Icons/EAttributs/" + eName + ".png") {
                     @Override
@@ -102,12 +102,12 @@ class ElementalWidgetMenu extends CameraTrackWindow {
             inspectedSpatialHeight = Integer.MIN_VALUE;
         }
         if (eIconContainer == null) {
-            ignoredEAttribut = currentEAttribut == null ? "null" : currentEAttribut.toString();
+            ignoredEAttribut = currentEAttribut == null ? "EMPTY_TEXTURE_KEY" : currentEAttribut.toString();
             buildElementalIcon();
         } else if (currentEAttribut != null && !ignoredEAttribut.equals(currentEAttribut.toString())) {
             updateElementalIcon(currentEAttribut.toString());
-        } else if (currentEAttribut == null && !ignoredEAttribut.equals("null")) {
-            updateElementalIcon("null");
+        } else if (currentEAttribut == null && !ignoredEAttribut.equals("EMPTY_TEXTURE_KEY")) {
+            updateElementalIcon("EMPTY_TEXTURE_KEY");
         }
         show(hexPosition);
     }

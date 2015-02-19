@@ -1,14 +1,13 @@
 package editor.area;
 
-import editor.area.AreaEditorSystem;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
-import org.hexgridapi.utility.ElementalAttribut;
 import tonegod.gui.controls.buttons.Button;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.ElementManager;
+import utility.ElementalAttribut;
 
 /**
  * Context menu used to let you chose the element for map to change to.

@@ -22,7 +22,7 @@ import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderComponent.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.base.AreaMouseAppState;
+import org.hexgridapi.core.appstate.MouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputListener;
 import org.hexgridapi.utility.HexCoordinate;
@@ -313,7 +313,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
             screen.removeElement(card);
 
             //Register the input for the card system
-            app.getStateManager().getState(AreaMouseAppState.class).registerTileInputListener(this);
+            app.getStateManager().getState(MouseControlAppState.class).registerTileInputListener(this);
             app.getInputManager().addListener(cardInputListener, "Cancel");
         }
     }
@@ -323,7 +323,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(AreaMouseAppState.class).removeTileInputListener(this);
+        app.getStateManager().getState(MouseControlAppState.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -386,7 +386,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseInput
                  * We activate the pulse Mode, if not activated the cast is
                  * canceled.
                  */
-                if (!app.getStateManager().getState(AreaMouseAppState.class).setCursorPulseMode(this)) {
+                if (!app.getStateManager().getState(MouseControlAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
             } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.Titan)) {

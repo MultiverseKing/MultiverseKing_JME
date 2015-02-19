@@ -1,7 +1,9 @@
 Material My Material : Common/MatDefs/Misc/ColoredTextured.j3md {
      MaterialParameters {
-        Color : 0.8 0.0 0.0 1.0
      }
     AdditionalRenderState {
+      FaceCull Back
+      Blend Off
+      PolyOffset 0.0 0.0
     }
 }

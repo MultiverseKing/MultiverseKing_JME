@@ -1,10 +1,10 @@
 package archives;
 
 import com.jme3.math.FastMath;
-import org.hexgridapi.base.HexTile;
-import org.hexgridapi.utility.ElementalAttribut;
+import org.hexgridapi.core.HexTile;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
+import utility.ElementalAttribut;
 
 /**
  * test

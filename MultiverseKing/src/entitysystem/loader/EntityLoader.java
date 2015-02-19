@@ -7,7 +7,6 @@ import entitysystem.ability.AbilityComponent;
 import entitysystem.card.AbilityProperties;
 import entitysystem.field.Collision;
 import entitysystem.field.Collision.CollisionData;
-import entitysystem.render.RenderComponent;
 import entitysystem.render.RenderComponent.RenderType;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,11 +14,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.utility.ElementalAttribut;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import utility.ElementalAttribut;
 
 /**
  * Master to load Entity from file.

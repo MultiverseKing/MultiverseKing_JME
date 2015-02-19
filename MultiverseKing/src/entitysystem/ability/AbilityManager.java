@@ -2,7 +2,7 @@ package entitysystem.ability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import kingofmultiverse.MultiverseMain;
+import utility.Utility;
 
 /**
  *
@@ -17,7 +17,7 @@ public class AbilityManager {
      * Byte[0] == segment needed for activation Byte[1] == current segment
      * loaded
      */
-    private HashMap<String, Byte[]> abilitySegment = new HashMap<String, Byte[]>(4, 0.8f);
+    private HashMap<String, Byte[]> abilitySegment = new HashMap<>(4, 0.8f);
 
     AbilityManager(String abilityName, byte segmentNeeded, float unitSpeed) {
         this.abilitySegment.put(abilityName, new Byte[]{segmentNeeded, 0});
@@ -28,12 +28,12 @@ public class AbilityManager {
         System.out.println("tpf = " + tpf);
         currentLoadTime += tpf * unitSpeed;
         System.out.println("currentLoadTime = " + currentLoadTime);
-        ArrayList<String> toActivate = new ArrayList<String>(4);
+        ArrayList<String> toActivate = new ArrayList<>(4);
         if (currentLoadTime >= segmentSize) {
             for (Byte[] segment : abilitySegment.values()) {
                 segment[1]++;
                 if (segment[1] >= segment[0]) {
-                    toActivate.add(MultiverseMain.getKeyByValue(abilitySegment, segment));
+                    toActivate.add(Utility.getKeyByValue(abilitySegment, segment));
                     segment[1] = 0;
                 }
             }

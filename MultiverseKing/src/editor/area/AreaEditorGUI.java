@@ -1,7 +1,6 @@
 package editor.area;
 
 import gui.EditorWindow;
-import org.hexgridapi.utility.Vector2Int;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 

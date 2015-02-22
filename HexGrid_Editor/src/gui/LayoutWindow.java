@@ -303,7 +303,6 @@ public abstract class LayoutWindow {
     public void setVisible() {
         if (window != null) {
             window.show();
-            window.setIsVisible(true);
         } else {
             System.err.println(getUID() + "Can't be set to visible, window does not exist.");
         }
@@ -312,7 +311,6 @@ public abstract class LayoutWindow {
     public void hide() {
         if (window != null) {
             window.hide();
-            window.setIsVisible(false);
         } else {
             System.err.println(getUID() + "Can't be hided, window does not exist.");
         }

@@ -6,6 +6,7 @@ import gui.EditorWindow;
 import org.hexgridapi.core.HexGridManager;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.utility.HexCoordinate;
+import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
@@ -19,11 +20,13 @@ public class EditorTileProperties extends EditorWindow {
 
     private final EditorMainSystem system;
     private HexCoordinate tilePosition;// = new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int());
+    private Boolean currentIsGhost = null; // if inspected tile exist in MapData
+    private EditorWindow textureSelectionMenu;
 
     public EditorTileProperties(Screen screen, Element parent, EditorMainSystem system) {
         super(screen, parent, "Tile Properties");
         this.system = system;
-        addLabelField("data" ,"No data", HAlign.left);
+        addLabelField("data", "No data", HAlign.left);
         show();
     }
 
@@ -40,30 +43,46 @@ public class EditorTileProperties extends EditorWindow {
         }
     }
 
-    public void updatePosition(HexCoordinate position, boolean isGhost) {
+    public void updatePosition(HexCoordinate position, boolean isGroup, boolean isGhost) {
         this.tilePosition = position;
-        update(isGhost);
-    }
-
-    public void updateTexture(String label) {
-        system.setTileProperties(tilePosition, label);
+        if (currentIsGhost == null || currentIsGhost != isGhost) {
+            this.currentIsGhost = isGhost;
+            initialise(isGroup);
+        } else {
+            update(isGroup);
+        }
         update(false);
     }
 
-    public void update(boolean isGhost) {
+    private void updateTexture(String label) {
+        ButtonAdapter btn = getButtonField(null, "Texture", system.getTileTextureKey(tilePosition), ButtonType.IMG);
+        btn.setColorMap("Textures/Icons/Buttons/"+label+".png");
+        Element btnParent = btn.getElementParent();
+        btnParent.removeChild(btn);
+        btn.setUID(label + btn.getUID().substring(system.getTileTextureKey(tilePosition).length()));
+        btnParent.addChild(btn);
+        system.setTileProperties(tilePosition, label);
+    }
+
+    public void update(boolean isGroup) {
+    }
+
+    private void initialise(boolean isGroup) {
         if (parent != null) {
             window.getElementParent().removeChild(window);
         } else {
             parent.removeChild(window);
         }
         elementList.clear();
-        addLabelPropertieField("Coordinate", tilePosition.getAsOffset(), HAlign.left);
-        addLabelPropertieField("Chunk", HexGridManager.getChunkGridPosition(tilePosition), HAlign.left);
-        if (!isGhost) {
+        if (!isGroup) {
+            addLabelPropertieField("Coordinate", tilePosition.getAsOffset(), HAlign.left);
+            addLabelPropertieField("Chunk", HexGridManager.getChunkGridPosition(tilePosition), HAlign.left);
+        }
+        if (!currentIsGhost || isGroup) {
             addButtonField(null, "Texture", HAlign.left, system.getTileTextureKey(tilePosition), HAlign.left, ButtonType.IMG);
             addHeighField();
             addButtonField(null, "Destroy", HAlign.full, ButtonType.TEXT);
-        } else {
+        } else if (currentIsGhost || isGroup) {
             addButtonField(null, "Generate", HAlign.full, ButtonType.TEXT);
         }
         show();
@@ -79,22 +98,22 @@ public class EditorTileProperties extends EditorWindow {
     protected void onButtonTrigger(String label) {
         if (label.equals("Generate")) {
             system.setTileProperties(tilePosition, new HexTile((byte) 0, (byte) 0));
-            updatePosition(tilePosition, false);
+            updatePosition(tilePosition, false, false);
         } else if (label.equals("Destroy")) {
             system.removeTile(tilePosition);
-            updatePosition(tilePosition, true);
+            updatePosition(tilePosition, false, true);
         }
-        String[] val = label.split("\\.");
-        switch (val[0]) {
-            case "Texture":
-                selectionMenu(val[1]);
-                break;
-        }
+        selectionMenu(label);
     }
 
     private void selectionMenu(final String ignoredKey) {
-        EditorWindow win = new EditorWindow(screen, getButtonField(null, "Texture", ignoredKey, ButtonType.IMG),
-                "Textures", new Vector2f(spacement + (system.getTextureKeys().size()-1) * 16, 18)) {
+        if (textureSelectionMenu != null) {
+            textureSelectionMenu.removeFromScreen();
+        }
+        System.err.println("get value : " + ignoredKey);
+        System.err.println(getButtonField(null, "Texture", ignoredKey, ButtonType.IMG).getUID());
+        textureSelectionMenu = new EditorWindow(screen, getButtonField(null, "Texture", ignoredKey, ButtonType.IMG),
+                "Textures", new Vector2f(spacement + (system.getTextureKeys().size() - 1) * 16, 18)) {
             @Override
             public void setVisible() {
                 String[] list = new String[system.getTextureKeys().size() - 1];
@@ -120,6 +139,7 @@ public class EditorTileProperties extends EditorWindow {
             @Override
             protected void onButtonTrigger(String label) {
                 updateTexture(label);
+                window.hide();
             }
 
             @Override
@@ -138,7 +158,7 @@ public class EditorTileProperties extends EditorWindow {
             protected void onSpinnerChange(String sTrigger, int currentIndex) {
             }
         };
-        win.setVisible();
+        textureSelectionMenu.setVisible();
     }
 
     @Override

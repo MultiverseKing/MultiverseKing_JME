@@ -454,7 +454,7 @@ public abstract class EditorWindow extends LayoutWindow {
         return spinner;
     }
 
-    protected final ButtonAdapter generateButton(final String labelName, final String triggerName, HAlign hAlign, final ButtonType bType) {
+    protected final ButtonAdapter generateButton(String labelName, String triggerName, HAlign hAlign, ButtonType bType) {
 
         Vector2f bSize = bType.equals(ButtonType.TEXT)
                 ? new Vector2f(((triggerName.toCharArray().length + 2) * 8), layoutGridSize.y)
@@ -471,7 +471,8 @@ public abstract class EditorWindow extends LayoutWindow {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
                 super.onButtonMouseLeftUp(evt, toggled);
-                onButtonTrigger((labelName != null ? labelName + "." : "") + triggerName);
+//                onButtonTrigger((labelName != null ? labelName + "." : "") + triggerName);
+                onButtonTrigger(this.getUID().split("\\.")[0]);
             }
         };
         if (bType.equals(ButtonType.TEXT)) {

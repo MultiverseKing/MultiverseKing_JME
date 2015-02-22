@@ -81,7 +81,7 @@ public final class EditorMainSystem extends AbstractHexGridAppState implements M
          * Activate the input to interact with the grid.
          */
         screen.getApplication().getInputManager().addMapping("help", new KeyTrigger(KeyInput.KEY_F1));
-        app.getInputManager().addMapping("selectionGrp", new KeyTrigger(KeyInput.KEY_LSHIFT));
+        app.getInputManager().addMapping("selectionGrp", new KeyTrigger(KeyInput.KEY_LSHIFT), new KeyTrigger(KeyInput.KEY_RSHIFT));
         app.getInputManager().addListener(keyListener, new String[]{"help", "selectionGrp"});
         app.getInputManager().addListener(mouseListener, new String[]{"Cancel", "Confirm"});
     }
@@ -233,7 +233,8 @@ public final class EditorMainSystem extends AbstractHexGridAppState implements M
     @Override
     public void leftMouseActionResult(MouseInputEvent event) {
         HexTile tile = mapData.getTile(event.getEventPosition());
-        editorMainGUI.getTileWindow().updatePosition(event.getEventPosition(), tile != null ? false : true);
+        editorMainGUI.getTileWindow().updatePosition(event.getEventPosition(), tile != null ? false : true,
+                !tileSelectionControl.getList().isEmpty());
         if (selectionGroup) {
             tileSelectionControl.addTile(event.getEventPosition(), tile != null ? tile.getHeight() : 0);
             editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getTileCount());

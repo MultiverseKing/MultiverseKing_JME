@@ -56,7 +56,7 @@ public class FileManagerPopup extends DialogWindow {
             }
         };
         File[] flist = folder.listFiles();
-        byte i = 0;
+        int i = 0;
         for (int j = 0; j < flist.length; j++) {
             if (flist[j].getName().equalsIgnoreCase("Reset") || flist[j].getName().equalsIgnoreCase("Temp")) {
                 i++;

@@ -4,10 +4,8 @@ import com.jme3.math.Vector2f;
 import core.EditorMainSystem;
 import gui.EditorWindow;
 import org.hexgridapi.core.HexGridManager;
-import org.hexgridapi.core.HexTile;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
-import tonegod.gui.controls.text.Label;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
@@ -19,8 +17,9 @@ import tonegod.gui.core.Screen;
 public class EditorTileProperties extends EditorWindow {
 
     private final EditorMainSystem system;
-    private HexCoordinate tilePosition;// = new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int());
+//    private HexCoordinate tilePosition;// = new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int());
     private Boolean currentIsGhost = null; // if inspected tile exist in MapData
+    private boolean currentIsGroup = false; // if inspected tile exist in MapData
     private EditorWindow textureSelectionMenu;
 
     public EditorTileProperties(Screen screen, Element parent, EditorMainSystem system) {
@@ -28,6 +27,7 @@ public class EditorTileProperties extends EditorWindow {
         this.system = system;
         addLabelField("data", "No data", HAlign.left);
         show();
+        window.setIsCollapse();
     }
 
     private void show() {
@@ -38,14 +38,11 @@ public class EditorTileProperties extends EditorWindow {
         }
         window.setUseCloseButton(false);
         window.setUseCollapseButton(true);
-        if (tilePosition == null) {
-            window.setIsCollapse();
-        }
     }
-
-    public void updatePosition(HexCoordinate position, boolean isGroup, boolean isGhost) {
-        this.tilePosition = position;
-        if (currentIsGhost == null || currentIsGhost != isGhost) {
+    
+    public void updatePosition(boolean isGhost, boolean isGroup) {
+//        this.tilePosition = position;
+        if (currentIsGhost == null || currentIsGhost != isGhost || isGroup != currentIsGroup) {
             this.currentIsGhost = isGhost;
             initialise(isGroup);
         } else {
@@ -55,13 +52,13 @@ public class EditorTileProperties extends EditorWindow {
     }
 
     private void updateTexture(String label) {
-        ButtonAdapter btn = getButtonField(null, "Texture", system.getTileTextureKey(tilePosition), ButtonType.IMG);
+        ButtonAdapter btn = getButtonField(null, "Texture", system.getTileTextureKey(), ButtonType.IMG);
         btn.setColorMap("Textures/Icons/Buttons/"+label+".png");
         Element btnParent = btn.getElementParent();
         btnParent.removeChild(btn);
-        btn.setUID(label + btn.getUID().substring(system.getTileTextureKey(tilePosition).length()));
+        btn.setUID(label + btn.getUID().substring(system.getTileTextureKey().length()));
         btnParent.addChild(btn);
-        system.setTileProperties(tilePosition, label);
+        system.setTilePropertiesTexTure(label);
     }
 
     public void update(boolean isGroup) {
@@ -78,45 +75,61 @@ public class EditorTileProperties extends EditorWindow {
             addLabelPropertieField("Coordinate", tilePosition.getAsOffset(), HAlign.left);
             addLabelPropertieField("Chunk", HexGridManager.getChunkGridPosition(tilePosition), HAlign.left);
         }
-        if (!currentIsGhost || isGroup) {
+        if(isGroup) {
+            addButtonField(null, "Texture", HAlign.left, system.getTileTextureKey(tilePosition), HAlign.left, ButtonType.IMG);
+            addButtonList(null, "Height", HAlign.left, new String[]{"dec", "inc"}, HAlign.left, ButtonType.TEXT, 1);
+        } else if (!currentIsGhost) {
             addButtonField(null, "Texture", HAlign.left, system.getTileTextureKey(tilePosition), HAlign.left, ButtonType.IMG);
             addHeighField();
             addButtonField(null, "Destroy", HAlign.full, ButtonType.TEXT);
-        } else if (currentIsGhost || isGroup) {
+        } else if (currentIsGhost) {
             addButtonField(null, "Generate", HAlign.full, ButtonType.TEXT);
         }
+        currentIsGroup = isGroup;
         show();
     }
 
+    /**
+     * @todo
+     */
     private void addHeighField() {
-        Label label = generateLabel("Height", HAlign.left, false);
-        elementList.put("Height", label);
-        label.addChild(generateSpinner("Height", "Height", new int[]{-100, 100, 1, system.getTileHeight(tilePosition)}));
+        addSpinnerField("Height", "Height", new int[]{-100, 100, 1, system.getTileHeight(tilePosition)}, HAlign.left);
+//        Label label = generateLabel("Height", HAlign.left, false);
+//        elementList.put("Height", label);
+//        label.addChild(generateSpinner("Height", "Height", new int[]{-100, 100, 1, system.getTileHeight(tilePosition)}));
     }
 
     @Override
     protected void onButtonTrigger(String label) {
+        boolean updateSelection = false;
         if (label.equals("Generate")) {
-            system.setTileProperties(tilePosition, new HexTile((byte) 0, (byte) 0));
-            updatePosition(tilePosition, false, false);
+            system.setTileProperties(tilePosition);
+            updatePosition(tilePosition, false, currentIsGroup);
         } else if (label.equals("Destroy")) {
             system.removeTile(tilePosition);
-            updatePosition(tilePosition, false, true);
+            updatePosition(tilePosition, true, currentIsGroup);
+        } else if (label.equals("inc")) {
+            system.setTilePropertiesUp(tilePosition);
+        } else if (label.equals("dec")) {
+            system.setTilePropertiesDown(tilePosition);
+        } else {
+            updateSelection = true;
         }
-        selectionMenu(label);
+        if(updateSelection) {
+            selectionMenu(label);
+        }
     }
 
     private void selectionMenu(final String ignoredKey) {
         if (textureSelectionMenu != null) {
             textureSelectionMenu.removeFromScreen();
         }
-        System.err.println("get value : " + ignoredKey);
-        System.err.println(getButtonField(null, "Texture", ignoredKey, ButtonType.IMG).getUID());
+        System.err.println(ignoredKey);
         textureSelectionMenu = new EditorWindow(screen, getButtonField(null, "Texture", ignoredKey, ButtonType.IMG),
                 "Textures", new Vector2f(spacement + (system.getTextureKeys().size() - 1) * 16, 18)) {
             @Override
             public void setVisible() {
-                String[] list = new String[system.getTextureKeys().size() - 1];
+                String[] list = new String[system.getTextureKeys().size()-1];
                 int i = 0;
                 for (String s : system.getTextureKeys()) {
                     if (!s.equals(ignoredKey)) {
@@ -179,6 +192,6 @@ public class EditorTileProperties extends EditorWindow {
 
     @Override
     protected void onSpinnerChange(String sTrigger, int currentIndex) {
-        system.setTileProperties(tilePosition, (byte) currentIndex);
+        system.setTileProperties(tilePosition, currentIndex);
     }
 }

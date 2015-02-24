@@ -34,7 +34,6 @@ public class TestMain extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        
         //Init general input 
         super.inputManager.clearMappings();
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
@@ -65,8 +64,6 @@ public class TestMain extends SimpleApplication {
      * @todo Init system only when needed.
      */
     public void initSystem() {
-        MapData md = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager);
-        stateManager.attach(new MapDataAppState(md));
-        stateManager.attach(new EditorMainSystem(md));
+        stateManager.attach(new EditorMainSystem(new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager)));
     }
 }

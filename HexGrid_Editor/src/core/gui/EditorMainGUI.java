@@ -121,15 +121,4 @@ public class EditorMainGUI extends EditorWindow {
 //        }
         currentSelectedBtn = selected;
     }
-    
-    private void updateSystem(String selected){
-        switch(selected){
-            case "disable":
-                system.setSelectionGroup(false);
-                break;
-            case "cursorSelect":
-                system.setSelectionGroup(true);
-                break;
-        }
-    }
 }

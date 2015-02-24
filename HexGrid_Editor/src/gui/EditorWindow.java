@@ -459,11 +459,6 @@ public abstract class EditorWindow extends LayoutWindow {
         Vector2f bSize = bType.equals(ButtonType.TEXT)
                 ? new Vector2f(((triggerName.toCharArray().length + 2) * 8), layoutGridSize.y)
                 : new Vector2f(layoutGridSize.y, layoutGridSize.y);
-//        Vector2f bSize = bType.equals(ButtonType.TEXT)
-//                ? new Vector2f(labelName != null
-//                ? layoutGridSize.x - elementList.get(labelName).getDimensions().x - spacement
-//                : ((triggerName.toCharArray().length + 2) * 8) + spacement, layoutGridSize.y)
-//                : new Vector2f(layoutGridSize.y, layoutGridSize.y);
 
         ButtonAdapter button = new ButtonAdapter(screen, generateUID(triggerName) + "." + getUID() + ".Button" + bType.toString(),
                 new Vector2f(), bSize, bType.equals(ButtonType.IMG) ? Vector4f.ZERO : screen.getStyle("Window").getVector4f("resizeBorders"),

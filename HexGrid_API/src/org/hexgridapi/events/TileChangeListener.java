@@ -6,5 +6,5 @@ package org.hexgridapi.events;
  */
 public interface TileChangeListener {
 
-    public void tileChange(TileChangeEvent... events);
+    void tileChange(TileChangeEvent... events);
 }

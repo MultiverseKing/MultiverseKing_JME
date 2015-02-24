@@ -19,7 +19,8 @@ import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.control.GridRayCastControl;
 import org.hexgridapi.events.MouseInputEvent;
-import org.hexgridapi.events.MouseInputListener;
+import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
+import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
@@ -30,13 +31,13 @@ import org.hexgridapi.utility.HexCoordinate;
  *
  * @author Eike Foede, roah
  */
-public class MouseControlAppState extends AbstractAppState implements TileChangeListener {
+public class MouseControlAppState extends AbstractAppState {
 
 //    private final MouseRay mouseRay = new MouseRay();    //@see utility.MouseRay.
     private final float cursorOffset = -0.15f;           //Got an offset issue with hex_void_anim.png this will solve it temporary
     private GridRayCastControl rayCastControl;
     private SimpleApplication app;
-    private ArrayList<MouseInputListener> inputListeners = new ArrayList<MouseInputListener>();
+    private ArrayList<TileInputListener> inputListeners = new ArrayList<TileInputListener>();
     private ArrayList<MouseRayListener> rayListeners = new ArrayList<MouseRayListener>(3);
     private Spatial cursor;
     private int listenerPulseIndex = -1;
@@ -44,6 +45,23 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
     private boolean isLock = false;
+    /**
+     * Inner Class.
+     */
+    private final TileChangeListener tileChangeListener = new TileChangeListener() {
+        public void tileChange(TileChangeEvent... events) {
+            if (cursor == null) {
+                initCursor();
+            }
+            for (int i = 0; i < events.length; i++) {
+                if (new HexCoordinate(cursor.getLocalTranslation()).equals(events[i].getTilePos())) {
+                    cursor.setLocalTranslation(cursor.getLocalTranslation().x,
+                            (events[i].getNewTile() != null ? events[i].getNewTile().getHeight() : 0)
+                            * HexSetting.FLOOR_OFFSET + 0.1f, cursor.getLocalTranslation().z);
+                }
+            }
+        }
+    };
 
     public MouseControlAppState() {
     }
@@ -51,8 +69,8 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         this.app = (SimpleApplication) app;
-        mapData = stateManager.getState(AbstractMapDataAppState.class).getMapData();
-        mapData.registerTileChangeListener(this);
+        mapData = stateManager.getState(AbstractHexGridAppState.class).getMapData();
+        mapData.registerTileChangeListener(tileChangeListener);
         /**
          * Activate the input to interact with the grid.
          */
@@ -68,7 +86,7 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
      *
      * @param listener to register.
      */
-    public void registerTileInputListener(MouseInputListener listener) {
+    public void registerTileInputListener(TileInputListener listener) {
         inputListeners.add(listener);
     }
 
@@ -77,7 +95,7 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
      *
      * @param listener to register.
      */
-    public void removeTileInputListener(MouseInputListener listener) {
+    public void removeTileInputListener(TileInputListener listener) {
         inputListeners.remove(listener);
     }
 
@@ -113,19 +131,19 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("Confirm") && !isPressed) {
                 if (listenerPulseIndex == -1) {
-                    castRay("L");
+                    castRay(MouseInputEventType.LMB);
                 } else {
                     inputListeners.get(listenerPulseIndex).leftMouseActionResult(
-                            new MouseInputEvent(new HexCoordinate(cursor.getLocalTranslation()),
-                            rayCastControl.get3DRay(GridRayCastControl.castFrom.MOUSE), null));
+                            new MouseInputEvent(MouseInputEventType.LMB, new HexCoordinate(cursor.getLocalTranslation()),
+                            rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
                 }
             } else if (name.equals("Cancel") && !isPressed) {
                 if (listenerPulseIndex == -1) {
-                    castRay("R");
+                    castRay(MouseInputEventType.RMB);
                 } else {
                     inputListeners.get(listenerPulseIndex).rightMouseActionResult(
-                            new MouseInputEvent(new HexCoordinate(cursor.getLocalTranslation()),
-                            rayCastControl.get3DRay(GridRayCastControl.castFrom.MOUSE), null));
+                            new MouseInputEvent(MouseInputEventType.RMB, new HexCoordinate(cursor.getLocalTranslation()),
+                            rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
                 }
             }
         }
@@ -155,7 +173,7 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
         if (listenerPulseIndex != -1) {
             Vector2f newMousePos = app.getInputManager().getCursorPosition().normalize();
             if (!newMousePos.equals(lastScreenMousePos)) {
-                castRay("0");
+                castRay(MouseInputEventType.PULSE);
                 lastScreenMousePos = newMousePos;
             }
         }
@@ -170,7 +188,7 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
      * @param listener calling for it.
      * @return false if an error happen or if already on pulseMode.
      */
-    public boolean setCursorPulseMode(MouseInputListener listener) {
+    public boolean setCursorPulseMode(TileInputListener listener) {
         if (listenerPulseIndex == -1) {
             //We keep track of the listener locking the input.
             if (!inputListeners.contains(listener)) {
@@ -203,23 +221,26 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
         }
     }
 
-    private void castRay(String mouseInput) {
-        Ray ray = rayCastControl.get3DRay(GridRayCastControl.castFrom.MOUSE);
-        MouseInputEvent event = callRayActionListeners(mouseInput, ray);
+    private void castRay(MouseInputEventType mouseInput) {
+        Ray ray = rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE);
+        MouseInputEvent event = null;
+        if(!mouseInput.equals(MouseInputEventType.PULSE)){
+            event = callRayActionListeners(mouseInput, ray);
+        }
         if (event == null) {
             event = rayCastControl.castRay(ray);
-            if (event != null){// && !event.getEventPosition().equals(lastHexPos)) {
-                setNewRayEvent(mouseInput, event);
+            if (event != null) {// && !event.getEventPosition().equals(lastHexPos)) {
+                setNewRayEvent(new MouseInputEvent(mouseInput, rayCastControl.castRay(ray)));
             }
-        } else{// if (!event.getEventPosition().equals(lastHexPos)) {
-            setNewRayEvent(mouseInput, event);
+        } else {// if (!event.getEventPosition().equals(lastHexPos)) {
+            setNewRayEvent(event);
             rayCastControl.setDebugPosition(event.getCollisionResult().getContactPoint());
         }
     }
 
-    private void setNewRayEvent(String mouseInput, MouseInputEvent event) {
+    private void setNewRayEvent(MouseInputEvent event) {
         moveCursor(event.getEventPosition());
-        callMouseActionListeners(mouseInput, event);
+        callMouseActionListeners(event);
         lastHexPos = event.getEventPosition();
     }
 
@@ -227,33 +248,22 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
      * @param mouseInput L or R listener to call
      * @param event event to pass
      */
-    private void callMouseActionListeners(String mouseInput, MouseInputEvent event) {
-        for (MouseInputListener l : inputListeners) {
-            if (mouseInput.contains("L")) {
-                l.leftMouseActionResult(event);
-            } else if (mouseInput.contains("R")) {
-                l.rightMouseActionResult(event);
-            }
+    private void callMouseActionListeners(MouseInputEvent event) {
+        for (TileInputListener l : inputListeners) {
+            l.leftMouseActionResult(event);
         }
     }
 
     /**
      * @todo When multiple ray listeners run on same time, the closest got the
      * event.
-     * @param mouseInput
+     * @param mouseInputType
      * @param ray
      */
-    private MouseInputEvent callRayActionListeners(String mouseInput, Ray ray) {
-        if (mouseInput.contains("0")) {
-            return null;
-        }
+    private MouseInputEvent callRayActionListeners(MouseInputEventType mouseInputType, Ray ray) {
         MouseInputEvent event = null;
         for (MouseRayListener l : rayListeners) {
-            if (mouseInput.contains("L")) {
-                event = l.leftRayInputAction(ray);
-            } else if (mouseInput.contains("R")) {
-                event = l.rightRayInputAction(ray);
-            }
+            event = l.MouseRayInputAction(mouseInputType, ray);
             if (event != null) {
                 return event;
             }
@@ -293,19 +303,6 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
         }
     }
 
-    public void tileChange(TileChangeEvent... events) {
-        if (cursor == null) {
-            initCursor();
-        }
-        for(int i = 0; i < events.length; i++){
-            if (new HexCoordinate(cursor.getLocalTranslation()).equals(events[i].getTilePos())) {
-                cursor.setLocalTranslation(cursor.getLocalTranslation().x,
-                        (events[i].getNewTile() != null ? events[i].getNewTile().getHeight() : 0)
-                        * HexSetting.FLOOR_OFFSET + 0.1f, cursor.getLocalTranslation().z);
-            }
-        }
-    }
-
     public void lockCursor() {
         this.isLock = true;
     }
@@ -324,7 +321,7 @@ public class MouseControlAppState extends AbstractAppState implements TileChange
         rayCastControl.clear();
         listenerPulseIndex = -1;
         app.getInputManager().removeListener(tileActionListener);
-        mapData.removeTileChangeListener(this);
+        mapData.removeTileChangeListener(tileChangeListener);
     }
 
     public HexCoordinate getLastHexCollision() {

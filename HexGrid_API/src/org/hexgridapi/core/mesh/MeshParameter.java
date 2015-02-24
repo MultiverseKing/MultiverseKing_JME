@@ -9,6 +9,7 @@ import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
@@ -27,7 +28,7 @@ public final class MeshParameter {
      */
     private ArrayList<Vector2Int> position = new ArrayList<Vector2Int>();
     private ArrayList<Vector2Int> size = new ArrayList<Vector2Int>();
-    private ArrayList<Byte> height = new ArrayList<Byte>();
+    private ArrayList<Integer> height = new ArrayList<Integer>();
     /**
      * Contain all list of parameter for a specifate element.
      */
@@ -41,7 +42,7 @@ public final class MeshParameter {
      */
     private String currentElement;
     private int currentIndex;
-    private byte groundHeight = 0;
+    private int groundHeight = 0;
 
     /**
      * Generate all parameter needed to create a grid from defined value.
@@ -78,14 +79,14 @@ public final class MeshParameter {
 //                        currentTile = null;
 //                        currentIsInRange = false;
                     } else {
-                        currentTileMapCoord = new HexCoordinate(HexCoordinate.OFFSET, x + chunkOffset.x, y + chunkOffset.y);
+                        currentTileMapCoord = new HexCoordinate(Coordinate.OFFSET, x + chunkOffset.x, y + chunkOffset.y);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = false;
                     }
                     if (currentTile == null || centerPosition != null && !currentIsInRange) {
-                        textValue = mapData.getTextureValue((byte) -2); //Value used to not generate mesh on that position.
+                        textValue = mapData.getTextureValue(-2); //Value used to not generate mesh on that position.
                     } else if (centerPosition != null) {
-                        textValue = mapData.getTextureValue((byte) -1);  //Value used to use the selection texture.
+                        textValue = mapData.getTextureValue(-1);  //Value used to use the selection texture.
                     } else {
                         textValue = mapData.getTextureValue(currentTile.getTextureKey());
                     }
@@ -95,7 +96,7 @@ public final class MeshParameter {
                     }
                     elementTypeRef.get(textValue).add(posInList);
 
-                    Byte tileHeight = currentTile == null ? null : currentTile.getHeight();
+                    Integer tileHeight = currentTile == null ? null : currentTile.getHeight();
                     if (tileHeight != null && tileHeight < groundHeight) {
                         groundHeight = tileHeight;
                     }
@@ -104,7 +105,7 @@ public final class MeshParameter {
 //                    } else {
 //                        tileHeight = HexSetting.GROUND_HEIGHT;
 //                    }
-//                    Byte tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
+//                    Integer tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
 
                     this.add(new Vector2Int(x, y), new Vector2Int(1, 1), tileHeight);
                     setSizeX(centerPosition, radius, posInList, isVisited, currentTile, currentIsInRange, chunkOffset);
@@ -172,8 +173,8 @@ public final class MeshParameter {
     }
 
     private boolean getIsInRange(int radius, Integer posInList, int x, int y) {
-        return new HexCoordinate(HexCoordinate.OFFSET, radius, radius).hasInRange(
-                new HexCoordinate(HexCoordinate.OFFSET, (posInList != null ? position.get(posInList).x : 0) + x, (posInList != null ? position.get(posInList).y : 0) + y), radius);
+        return new HexCoordinate(Coordinate.OFFSET, radius, radius).hasInRange(
+                new HexCoordinate(Coordinate.OFFSET, (posInList != null ? position.get(posInList).x : 0) + x, (posInList != null ? position.get(posInList).y : 0) + y), radius);
     }
 
     private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Integer posInList, int x, int y, Vector2Int chunkOffset) {
@@ -201,7 +202,7 @@ public final class MeshParameter {
                 }
             }
         } else {
-            return new HexCoordinate(HexCoordinate.OFFSET, x + position.get(posInList).x + chunkOffset.x, y + position.get(posInList).y + chunkOffset.y);
+            return new HexCoordinate(Coordinate.OFFSET, x + position.get(posInList).x + chunkOffset.x, y + position.get(posInList).y + chunkOffset.y);
         }
     }
 
@@ -216,7 +217,7 @@ public final class MeshParameter {
         return isVisited;
     }
 
-    private void add(Vector2Int position, Vector2Int size, Byte height) {
+    private void add(Vector2Int position, Vector2Int size, Integer height) {
         this.position.add(position);
         this.size.add(size);
         this.height.add(height == null ? 0 : height);
@@ -295,7 +296,7 @@ public final class MeshParameter {
     /**
      * @return height of the current element mesh visited.
      */
-    public byte getHeightParam() {
+    public int getHeightParam() {
         return height.get(elementTypeRef.get(currentElement).get(currentIndex));
     }
 
@@ -308,7 +309,7 @@ public final class MeshParameter {
         return onlyGround;
     }
 
-    public byte getGroundHeight() {
+    public int getGroundHeight() {
         return groundHeight;
     }
 
@@ -353,7 +354,7 @@ public final class MeshParameter {
             int currentChunk = elementTypeRef.get(currentElement).get(currentIndex);
             boolean isOddStart = (position.get(currentChunk).y & 1) == 0;
 
-            HexCoordinate coord = new HexCoordinate(HexCoordinate.OFFSET,
+            HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
                     position.get(currentChunk).x, position.get(currentChunk).y);
             for (int i = 0; i < 4; i++) {
                 int currentSize = (i == 0 || i == 1 ? size.get(currentChunk).x : size.get(currentChunk).y);

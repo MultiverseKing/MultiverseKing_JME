@@ -6,16 +6,13 @@ import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 
 /**
- *
+ * Data is stored as AXIAL cordinate.
  * @author Roah with the help of : ArtemisArt => http://artemis.art.free.fr/ &&
  * http://www.redblobgames.com --Changed version by Eike Foede-- This Class is
  * only used as a converter system so we can simplifie algorithm.
  */
 public final class HexCoordinate {
 
-    public static final int OFFSET = 0;
-    public static final int AXIAL = 1;
-    public static final int CUBIC = 2;
     /**
      * Axial position in Grid. q == x
      */
@@ -53,15 +50,15 @@ public final class HexCoordinate {
         this.r = r;
     }
     
-    public HexCoordinate(int type, Vector2Int pos) {
-        if (type == OFFSET) {
+    public HexCoordinate(Coordinate type, Vector2Int pos) {
+        if (type.equals(Coordinate.OFFSET)) {
             pos = offsetToAxial(pos);
         }
         q = pos.x;
         r = pos.y;
     }
     
-    public HexCoordinate(int type, int x, int y) {
+    public HexCoordinate(Coordinate type, int x, int y) {
         this(type, new Vector2Int(x, y));
     }
     
@@ -80,8 +77,8 @@ public final class HexCoordinate {
         q = (int) (FastMath.floor((FastMath.floor(2 * x + 1) + t2) / 3) - r);
     }
     
-    public HexCoordinate(int type, Vector3Int pos) {
-        if (type != CUBIC) {
+    public HexCoordinate(Coordinate type, Vector3Int pos) {
+        if (!type.equals(Coordinate.CUBIC)) {
             throw new UnsupportedOperationException("Only TYPE_CUBIC expects a Vector3Int!");
         }
         Vector2Int posAxial = cubicToAxial(pos);
@@ -126,7 +123,7 @@ public final class HexCoordinate {
      */
     public Vector3f convertToWorldPositionYAsFloor() {
         Vector3f result = convertToWorldPosition();
-        result.y = result.y + (HexSetting.GROUND_HEIGHT*HexSetting.FLOOR_OFFSET);
+        result.y += HexSetting.GROUND_HEIGHT*HexSetting.FLOOR_OFFSET;
         return result;
     }
     /**
@@ -136,7 +133,7 @@ public final class HexCoordinate {
      */
     public Vector3f convertToWorldPosition(int height) {
         Vector3f result = convertToWorldPosition();
-        result.y = result.y + (height*HexSetting.FLOOR_OFFSET);
+        result.y += height*HexSetting.FLOOR_OFFSET;
         return result;
     }
     
@@ -198,25 +195,25 @@ public final class HexCoordinate {
      * Combine two position.
      */
     public HexCoordinate add(HexCoordinate value) {
-        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
+        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
     }
     /**
      * Combine two position using Vector2Int. (Offset)
      */
     public HexCoordinate add(Vector2Int value) {
-        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value));
+        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value));
     }
     /**
      * Add the value to the position. (Offset)
      */
     public HexCoordinate add(int value) {
-        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(value));
+        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value));
     }
     /**
      * Add the value to the position. (Offset)
      */
     public HexCoordinate add(int x, int y) {
-        return new HexCoordinate(HexCoordinate.OFFSET, getAsOffset().add(x, y));
+        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(x, y));
     }
     
     /**
@@ -228,14 +225,14 @@ public final class HexCoordinate {
         ArrayList<HexCoordinate> result = new ArrayList<HexCoordinate>();
         for (int x = -range; x <= range; x++) {
             for (int y = Math.max(-range, -x - range); y <= Math.min(range, range -x); y++) {
-                result.add(new HexCoordinate(HexCoordinate.AXIAL, new Vector2Int(x+q, y+r)));
+                result.add(new HexCoordinate(Coordinate.AXIAL, new Vector2Int(x+q, y+r)));
             }
         }
         return result;
     }
     
     public boolean hasInRange(Vector2Int offsetPos, int range){
-        return hasInRange(new HexCoordinate(HexCoordinate.OFFSET, offsetPos), range);
+        return hasInRange(new HexCoordinate(Coordinate.OFFSET, offsetPos), range);
     }
     
     public boolean hasInRange(HexCoordinate pos, int range){
@@ -254,5 +251,11 @@ public final class HexCoordinate {
 
     public HexCoordinate duplicate() {
         return new HexCoordinate(q, r);
+    }
+    
+    public enum Coordinate {
+        OFFSET,
+        AXIAL,
+        CUBIC;
     }
 }

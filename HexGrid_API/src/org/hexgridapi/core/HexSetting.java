@@ -33,10 +33,10 @@ public final class HexSetting {
      * to handle negative value, mainly help with the meshManager and how
      * geometry is handle, generated.
      */
-    public final static byte GROUND_HEIGHT = 5;
+    public final static int GROUND_HEIGHT = 5;
     /**
      * Used to know how many chunk to keep in memory before start deleting.
      * Unused for the time being.
      */
-    public final static byte CHUNK_DATA_LIMIT = 4;
+    public final static int CHUNK_DATA_LIMIT = 4;
 }

@@ -9,12 +9,15 @@ import org.hexgridapi.utility.HexCoordinate;
  * @author roah
  */
 public class MouseInputEvent {
-
+    
     protected final HexCoordinate eventPosition;
     protected final Ray lastUsedRay;
     protected final CollisionResult collisionResult;
 
-    public MouseInputEvent(HexCoordinate eventPosition, Ray usedRay, CollisionResult collisionResult) {
+    public MouseInputEvent(MouseInputEventType eventType, MouseInputEvent event) {
+        this(eventType, event.getEventPosition(), event.getLastUsedRay(), event.getCollisionResult());
+    }
+    public MouseInputEvent(MouseInputEventType eventType, HexCoordinate eventPosition, Ray usedRay, CollisionResult collisionResult) {
         this.eventPosition = eventPosition;
         this.lastUsedRay = usedRay;
         this.collisionResult = collisionResult;
@@ -30,5 +33,12 @@ public class MouseInputEvent {
 
     public CollisionResult getCollisionResult() {
         return collisionResult;
+    }
+    
+    public enum MouseInputEventType{
+        PULSE,
+        RMB,
+        LMB,
+        MMB;
     }
 }

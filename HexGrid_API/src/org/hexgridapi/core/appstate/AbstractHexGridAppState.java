@@ -24,7 +24,7 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
      * If enabled the update will run.
      */
     private boolean enabled = true;
-    protected MapData mapData;
+//    protected MapData mapData;
 
     /**
      *
@@ -34,7 +34,7 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
      */
     public AbstractHexGridAppState(MapData mapData, boolean debugMode) {
         super(mapData, debugMode);
-        this.mapData = mapData;
+//        this.mapData = mapData;
     }
 
     /**
@@ -45,12 +45,12 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
      */
     public AbstractHexGridAppState(MapData mapData, Node gridNode, boolean debugMode) {
         super(mapData, gridNode, debugMode);
-        this.mapData = mapData;
+//        this.mapData = mapData;
     }
 
     public final void initialize(AppStateManager stateManager, Application app) {
 //        mapData.registerChunkChangeListener(this);
-        mapData.registerTileChangeListener(this);
+//        mapData.registerTileChangeListener(this);
         ((SimpleApplication) app).getRootNode().attachChild(gridNode);
         initializeSystem(stateManager, app);
         initialized = true;
@@ -90,13 +90,15 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
     public void postRender() {
     }
 
+    @Override
     public final void cleanup() {
 //        mapData.removeChunkChangeListener(this);
-        mapData.removeTileChangeListener(this);
+//        mapData.removeTileChangeListener(tileChangeListener);
         gridNode.removeFromParent();
         cleanupSystem();
         initialized = false;
         enabled = false;
+        super.cleanup();
     }
 
     public abstract void cleanupSystem();

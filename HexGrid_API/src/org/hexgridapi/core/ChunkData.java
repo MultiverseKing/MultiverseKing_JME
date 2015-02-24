@@ -9,6 +9,7 @@ import org.hexgridapi.utility.Vector2Int;
 /**
  * Contain all hex room data.
  * @author roah
+ * @deprecated 
  */
 public class ChunkData {
 

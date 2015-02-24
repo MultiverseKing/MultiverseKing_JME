@@ -78,7 +78,7 @@ public class GridRayCastControl {
 
     public MouseInputEvent castRay(Ray ray) {
         CollisionResults results = new CollisionResults();
-        ray = ray != null ? ray : get3DRay(castFrom.SCREEN_CENTER);
+        ray = ray != null ? ray : get3DRay(CastFrom.SCREEN_CENTER);
 
         app.getRootNode().getChild("HexGridNode").collideWith(ray, results);
         if (results.size() != 0) {
@@ -86,7 +86,7 @@ public class GridRayCastControl {
                 CollisionResult closest = results.getClosestCollision();
                 setDebugPosition(closest.getContactPoint());
                 HexCoordinate newPos = convertMouseCollision(results);
-                return new MouseInputEvent(newPos, ray, closest);
+                return new MouseInputEvent(null, newPos, ray, closest);
             }
             return null;
         } else {
@@ -105,7 +105,7 @@ public class GridRayCastControl {
      * @param app
      * @return
      */
-    public Ray get3DRay(castFrom from) {
+    public Ray get3DRay(CastFrom from) {
         Vector2f click2d;
         switch(from){
             case MOUSE:
@@ -141,7 +141,7 @@ public class GridRayCastControl {
 //                return tilePos;
 //            }
 //            /*}else if (mapData.getTile(tilePos).getHeight() 
-//             * == (byte)FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
+//             * == FastMath.floor(pos.y/mapData.getHexSettings().getFloorHeight())){
 //             return tilePos;
 //             }*/
 //        } while (i.hasNext());
@@ -164,7 +164,7 @@ public class GridRayCastControl {
         return rayDebug;
     }
     
-    public enum castFrom{
+    public enum CastFrom{
         MOUSE,
         SCREEN_CENTER;
     }

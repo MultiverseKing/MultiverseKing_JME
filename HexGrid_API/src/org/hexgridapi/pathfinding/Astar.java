@@ -50,30 +50,28 @@ public class Astar implements Pathfinder {
             for (WayPoint point : tmp) {
                 HexCoordinate[] neighbours = point.thisPoint.getNeighbours();
                 for (HexCoordinate next : neighbours) {
-                    if (!visitedFields.contains(next)) {
-                        if (isPassable(point.thisPoint, next)) {
-                            if (to.equals(next)) {
-                                //WAY IS FOUND
-                                ArrayList<HexCoordinate> way = new ArrayList<HexCoordinate>();
-                                way.add(next);
-                                while (point != null) {
-                                    way.add(0, point.thisPoint);
-                                    point = point.lastPoint;
-                                }
+                    if (!visitedFields.contains(next) && isPassable(point.thisPoint, next)) {
+                        if (to.equals(next)) {
+                            //WAY IS FOUND
+                            ArrayList<HexCoordinate> way = new ArrayList<HexCoordinate>();
+                            way.add(next);
+                            while (point != null) {
+                                way.add(0, point.thisPoint);
+                                point = point.lastPoint;
+                            }
 //                                System.out.println((System.nanoTime() - time)/100000);
-                                return way;
-                            }
-                            WayPoint newPoint = new WayPoint(next, point);
-                            int diff = next.distanceTo(to) - point.thisPoint.distanceTo(to);
-                            if (diff < 0) {
-                                actualPoints[0].add(newPoint);
-                            } else if (diff == 0) {
-                                actualPoints[1].add(newPoint);
-                            } else {
-                                actualPoints[2].add(newPoint);
-                            }
-                            visitedFields.add(next);
+                            return way;
                         }
+                        WayPoint newPoint = new WayPoint(next, point);
+                        int diff = next.distanceTo(to) - point.thisPoint.distanceTo(to);
+                        if (diff < 0) {
+                            actualPoints[0].add(newPoint);
+                        } else if (diff == 0) {
+                            actualPoints[1].add(newPoint);
+                        } else {
+                            actualPoints[2].add(newPoint);
+                        }
+                        visitedFields.add(next);
                     }
                 }
             }

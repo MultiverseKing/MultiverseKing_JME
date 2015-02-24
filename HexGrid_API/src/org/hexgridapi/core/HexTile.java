@@ -14,29 +14,29 @@ import java.io.IOException;
  */
 public class HexTile implements Savable {
 
-    protected byte height;
-    protected byte textureKey;
+    protected int height;
+    protected int textureKey;
     
     public HexTile() {
-        this.height = (byte)0;
-        this.textureKey = (byte)0;
+        this.height = 0;
+        this.textureKey = 0;
     }
 
-    public HexTile(byte height) {
+    public HexTile(int height) {
         this.height = height;
-        this.textureKey = (byte)0;
+        this.textureKey = 0;
     }
 
-    public HexTile(byte height, byte textureKey) {
+    public HexTile(int height, int textureKey) {
         this.height = height;
         this.textureKey = textureKey;
     }
     
-    public byte getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public byte getTextureKey() {
+    public int getTextureKey() {
         return textureKey;
     }
     
@@ -53,8 +53,8 @@ public class HexTile implements Savable {
         InputCapsule capsule = im.getCapsule(this);
 //        capsule.readByte("height", height);
 //        capsule.readByte("element", element);
-        height = (byte) capsule.readByte("height", (byte)0);
-        textureKey = (byte) capsule.readByte("textureKey", (byte)0);
+        height = capsule.readInt("height", (byte)0);
+        textureKey = capsule.readInt("textureKey", (byte)0);
     }
 
     protected void extendedread(InputCapsule capsule) throws IOException {
@@ -63,13 +63,13 @@ public class HexTile implements Savable {
     /**
      * Returns a clone of this tile with changed height param.
      */
-    public HexTile cloneChangedHeight(byte height) {
+    public HexTile cloneChangedHeight(int height) {
         return new HexTile(height, textureKey);
     }
     /**
      * Returns a clone of this tile with changed texture param.
      */
-    public HexTile cloneChangedTextureKey(byte textureKey) {
+    public HexTile cloneChangedTextureKey(int textureKey) {
         return new HexTile(height, textureKey);
     }
 }

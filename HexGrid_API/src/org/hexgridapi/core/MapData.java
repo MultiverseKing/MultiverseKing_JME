@@ -31,7 +31,7 @@ public final class MapData {
     private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private String mapName;// = "Reset";
-    private byte defaultkeyTexture = 0;
+    private int defaultkeyTexture = 0;
     /**
      * Key index :
      * -2 = and below used for non existant tile or ghost tile
@@ -109,55 +109,75 @@ public final class MapData {
     }
 
     /**
-     * Get a tile properties.
+     * Get tile(s) properties. (one tile)
      *
-     * @todo see below.
      * @param tilePos Offset position of the tile.
-     * @return null if the tile doesn't exist.
+     * @return
      */
-    public HexTile getTile(HexCoordinate tilePos) {
-        return tileData.get(tilePos.getAsOffset());
+    public HexTile getTile(HexCoordinate tile){
+        return tileData.get(tile.getAsOffset());
+    }
+    /**
+     * Get tile(s) properties. (multiple tile)
+     *
+     * @param tilePos Offset position of the tile.
+     * @return
+     */
+    public HexTile[] getTile(HexCoordinate[] tilePos) {
+        HexTile[] result = new HexTile[tilePos.length];
+        for(int i = 0; i < tilePos.length; i++) {
+            result[i] = tileData.get(tilePos[i].getAsOffset());
+        }
+        return result;
     }
 
     /**
-     * Change the designed tile properties.
+     * Change the designed tile(s) properties.
+     * if tile array size is == 1 the given properties will be apply on all position,
+     * else the two array size must match.
      *
      * @param tilePos position of the tile to change.
      * @param tile tile to change.
      */
-    public void setTile(HexTile tile, HexCoordinate... tilePos) {
+    public void setTile(HexCoordinate[] tilePos, HexTile[] tile) {
         TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
+        boolean arrayUpdate = false;
+        if(tile.length > 1 && tile.length == tilePos.length){
+            arrayUpdate = true;
+        } else if (tile.length > 1 && tile.length != tilePos.length) {
+            throw new UnsupportedOperationException("Inserted param does not match the requiment tile.length != tilePos.length");
+        }
         for (int i = 0; i < tilePos.length; i++) {
-            tceList[i] = updateTileData(tilePos[i], tile);
+            tceList[i] = updateTileData(tilePos[i], arrayUpdate ? tile[i] : tile[0]);
         }
         updateTileListeners(tceList);
     }
 
-    public void setTileHeight(byte height, HexCoordinate... tilePos) {
-        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
-        for(int i = 0; i < tilePos.length; i++){
-            HexTile tile = tileData.get(tilePos[i].getAsOffset());
-            if (tile != null) {
-                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedHeight(height));
-            } else {
-                tceList[i] = updateTileData(tilePos[i], new HexTile(height, defaultkeyTexture));
-            }
-        }
-        updateTileListeners(tceList);
-    }
-
-    public void setTileTextureKey(String key, HexCoordinate... tilePos) {
-        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
-        for(int i = 0; i < tilePos.length; i++){
-            HexTile tile = tileData.get(tilePos[i].getAsOffset());
-            if (tile != null) {
-                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedTextureKey(getTextureKey(key)));
-            } else {
-                tceList[i] = updateTileData(tilePos[i], new HexTile((byte) 0, getTextureKey(key)));
-            }
-        }
-        updateTileListeners(tceList);
-    }
+//    public void setTilesHeight(byte[] height, HexCoordinate[] tilePos) {
+//        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
+//        for(int i = 0; i < tilePos.length; i++){
+//            HexTile tile = tileData.get(tilePos[i].getAsOffset());
+//            if (tile != null) {
+//                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedHeight(height));
+//            } else {
+//                tceList[i] = updateTileData(tilePos[i], new HexTile(height, defaultkeyTexture));
+//            }
+//        }
+//        updateTileListeners(tceList);
+//    }
+//
+//    public void setTilesTextureKey(String[] key, HexCoordinate... tilePos) {
+//        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
+//        for(int i = 0; i < tilePos.length; i++){
+//            HexTile tile = tileData.get(tilePos[i].getAsOffset());
+//            if (tile != null) {
+//                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedTextureKey(getTextureKey(key)));
+//            } else {
+//                tceList[i] = updateTileData(tilePos[i], new HexTile((byte) 0, getTextureKey(key)));
+//            }
+//        }
+//        updateTileListeners(tceList);
+//    }
 
     private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
         HexTile oldTile;
@@ -170,16 +190,10 @@ public final class MapData {
     }
 
     public void setDefaultTexture(String Key) {
-        setDefaultTexture(Key, false);
-    }
-
-    public void setDefaultTexture(String Key, boolean update) {
         for (Vector2Int coord : tileData.keySet()) {
             tileData.put(coord, tileData.get(coord).cloneChangedTextureKey(getTextureKey(Key)));
         }
-        if (update) {
-            updateTileListeners(new TileChangeEvent(null, new HexTile(Byte.MIN_VALUE, getTextureKey(Key)), new HexTile(Byte.MIN_VALUE, Byte.MIN_VALUE)));
-        }
+        updateTileListeners(new TileChangeEvent(null, new HexTile(Integer.MIN_VALUE, getTextureKey(Key)), new HexTile(Integer.MIN_VALUE, Integer.MIN_VALUE)));
     }
 
     /**
@@ -366,10 +380,10 @@ public final class MapData {
      * @param textureKey
      * @return null if no corresponding key
      */
-    public String getTextureValue(byte textureKey) {
-        if (textureKey == (byte) -1) {
+    public String getTextureValue(int textureKey) {
+        if (textureKey == -1) {
             return "SELECTION_TEXTURE";
-        } else if (textureKey < (byte) -1) {
+        } else if (textureKey < -1) {
             return "NO_TILE";
         } else {
             try {
@@ -380,13 +394,13 @@ public final class MapData {
         }
     }
 
-    public byte getTextureKey(String value) throws NoSuchFieldError {
+    public int getTextureKey(String value) throws NoSuchFieldError {
         if (value.equals("SELECTION_TEXTURE")) {
             return -1;
         } else if (value.equals("NO_TILE")) {
             return -2;
         }
-        byte result = (byte) textureKeys.indexOf(value);
+        int result = textureKeys.indexOf(value);
         if (result == -1) {
             throw new NoSuchFieldError(value + " is not in the registered key List.");
         } else {

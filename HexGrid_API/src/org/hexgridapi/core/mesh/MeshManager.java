@@ -34,7 +34,7 @@ public final class MeshManager {
 //    private static float HexSetting.HEX_WIDTH = HexSetting.HEX_WIDTH;
 //    private static float HexSetting.FLOOR_OFFSET = HexSetting.FLOOR_OFFSET;
 
-    public Mesh getSingleMesh(Byte height) {
+    public Mesh getSingleMesh(int height) {
         Vector2Int offset = new Vector2Int();
         Vector2Int size = new Vector2Int(1, 1);
 
@@ -363,7 +363,7 @@ public final class MeshManager {
         return index;
     }
 
-    private Vector3f[] getSideVerticesPosition(Vector3f[] groundVert, byte groundHeight) {
+    private Vector3f[] getSideVerticesPosition(Vector3f[] groundVert, int groundHeight) {
         Vector3f[] sideVert = new Vector3f[groundVert.length * 2];
         System.arraycopy(groundVert, 0, sideVert, 0, groundVert.length);
         for (int i = 0; i < groundVert.length; i++) {
@@ -372,10 +372,10 @@ public final class MeshManager {
         return sideVert;
     }
 
-    private Vector2f[] getSideVerticesTextCoord(Vector2Int size, byte height, byte groundHeight) {
+    private Vector2f[] getSideVerticesTextCoord(Vector2Int size, int height, int groundHeight) {
         Vector2f[] texCoord = new Vector2f[((size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2)) * 2];
         int offset = (size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2);
-        height = (byte) (FastMath.abs(groundHeight) + height);
+        height = (int) (FastMath.abs(groundHeight) + height);
         /**
          * Side-tri coord.
          */

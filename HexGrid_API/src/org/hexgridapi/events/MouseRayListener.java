@@ -5,8 +5,10 @@ import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 
 /**
  * This is called before MouseInputListener.
+ *
  * @author roah
  */
 public interface MouseRayListener extends TileInputListener {
+
     MouseInputEvent MouseRayInputAction(MouseInputEventType mouseInputType, Ray ray);
 }

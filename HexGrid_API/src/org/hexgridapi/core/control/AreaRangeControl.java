@@ -120,7 +120,7 @@ public class AreaRangeControl extends AbstractControl {
                 tile.setMaterial(tmp);
                 ((Node) spatial).attachChild(tile);
             }
-            if(tile != null){
+            if (tile != null) {
 //                tile.setQueueBucket(RenderQueue.Bucket.Inherit);
 //                tile.setShadowMode(RenderQueue.ShadowMode.Off);
             }

@@ -17,17 +17,17 @@ import org.hexgridapi.utility.Vector2Int;
  * @todo improve method to not have to use System.ArrayCopy
  * @author roah
  */
-public final class MeshManager {
+public final class MeshGenerator {
 
-    private MeshManager() {
+    private MeshGenerator() {
     }
 
     private static class Holder {
 
-        private static final MeshManager instance = new MeshManager();
+        private static final MeshGenerator instance = new MeshGenerator();
     }
 
-    public static MeshManager getInstance() {
+    public static MeshGenerator getInstance() {
         return Holder.instance;
     }
 //    private static final float HexSetting.HEX_RADIUS = HexSetting.HEX_RADIUS;

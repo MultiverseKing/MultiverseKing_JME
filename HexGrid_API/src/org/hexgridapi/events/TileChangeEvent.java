@@ -12,7 +12,7 @@ public class TileChangeEvent {
     protected HexCoordinate tilePos;
     protected HexTile oldTile;
     protected HexTile newTile;
-    
+
     public TileChangeEvent(HexCoordinate tilePos, HexTile oldTile, HexTile newTile) {
         this.tilePos = tilePos;
         this.oldTile = oldTile;
@@ -25,11 +25,11 @@ public class TileChangeEvent {
     public HexCoordinate getTilePos() {
         return tilePos;
     }
-    
+
     public HexTile getOldTile() {
         return oldTile;
     }
-    
+
     public HexTile getNewTile() {
         return newTile;
     }

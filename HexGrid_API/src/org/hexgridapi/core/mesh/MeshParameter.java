@@ -4,7 +4,7 @@ import com.jme3.scene.Mesh;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import org.hexgridapi.core.HexGridManager;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
@@ -233,13 +233,13 @@ public final class MeshParameter {
      * @return list of all generated mesh. (1 mesh by texture)
      */
     public HashMap<String, Mesh> getMesh(boolean onlyGround, boolean debugMode, Vector2Int chunkPosition) {
-        initialize(null, 0, onlyGround, HexGridManager.getTileFromChunk(new Vector2Int(), chunkPosition));
+        initialize(null, 0, onlyGround, HexGrid.getTileFromChunk(new Vector2Int(), chunkPosition));
         return getMesh(debugMode);
     }
 
     /**
      * Generate a mesh from a specifiate radius.
-     * 
+     *
      * @param centerPosition
      * @param radius must be greater than 0 (exclusive)
      * @param onlyGround generate side face ?
@@ -249,7 +249,7 @@ public final class MeshParameter {
         if (radius <= 0) {
             radius = 1;
         }
-        initialize(centerPosition, radius, onlyGround, HexGridManager.getTileFromChunk(new Vector2Int(), chunkPosition));
+        initialize(centerPosition, radius, onlyGround, HexGrid.getTileFromChunk(new Vector2Int(), chunkPosition));
         return getMesh(debugMode);
     }
 
@@ -259,7 +259,7 @@ public final class MeshParameter {
             if (value.equals("NO_TILE") && debugMode || !value.equals("NO_TILE")) {
                 currentElement = value;
                 currentIndex = -1;
-                mesh.put(value, MeshManager.getInstance().getMesh(this));
+                mesh.put(value, MeshGenerator.getInstance().getMesh(this));
             }
         }
         return mesh;

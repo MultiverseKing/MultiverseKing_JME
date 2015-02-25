@@ -1,47 +1,44 @@
 package org.hexgridapi.core.appstate;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
+import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.control.GridRayCastControl;
+import org.hexgridapi.core.control.TileSelectionControl;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
-import org.hexgridapi.utility.HexCoordinate;
 
 /**
  * take care of all input hapening on the room grid.
  *
  * @author Eike Foede, roah
  */
-public class MouseControlAppState extends AbstractAppState {
+public class MouseControlSystem extends AbstractAppState {
 
 //    private final MouseRay mouseRay = new MouseRay();    //@see utility.MouseRay.
-    private final float cursorOffset = -0.15f;           //Got an offset issue with hex_void_anim.png this will solve it temporary
+    private final Node rootNode;
+//    private final float cursorOffset = -0.15f;           //Got an offset issue with hex_void_anim.png this will solve it temporary
     private GridRayCastControl rayCastControl;
-    private SimpleApplication app;
+    private Application app;
     private ArrayList<TileInputListener> inputListeners = new ArrayList<TileInputListener>();
     private ArrayList<MouseRayListener> rayListeners = new ArrayList<MouseRayListener>(3);
-    private Spatial cursor;
+    private TileSelectionControl tileSelectionControl = new TileSelectionControl(this);
+//    private Spatial cursor;
     private int listenerPulseIndex = -1;
-    private HexCoordinate lastHexPos;
     private Vector2f lastScreenMousePos = new Vector2f(0, 0);
     private MapData mapData;
     private boolean isLock = false;
@@ -49,27 +46,28 @@ public class MouseControlAppState extends AbstractAppState {
      * Inner Class.
      */
     private final TileChangeListener tileChangeListener = new TileChangeListener() {
-        public void tileChange(TileChangeEvent... events) {
-            if (cursor == null) {
-                initCursor();
-            }
-            for (int i = 0; i < events.length; i++) {
-                if (new HexCoordinate(cursor.getLocalTranslation()).equals(events[i].getTilePos())) {
-                    cursor.setLocalTranslation(cursor.getLocalTranslation().x,
-                            (events[i].getNewTile() != null ? events[i].getNewTile().getHeight() : 0)
-                            * HexSetting.FLOOR_OFFSET + 0.1f, cursor.getLocalTranslation().z);
-                }
-            }
+        public void onTileChange(TileChangeEvent... events) {
+//            if (cursor == null) {
+//                initCursor();
+//            }
+//            for (int i = 0; i < events.length; i++) {
+//                if (new HexCoordinate(cursor.getLocalTranslation()).equals(events[i].getTilePos())) {
+//                    cursor.setLocalTranslation(cursor.getLocalTranslation().x,
+//                            (events[i].getNewTile() != null ? events[i].getNewTile().getHeight() : 0)
+//                            * HexSetting.FLOOR_OFFSET + 0.1f, cursor.getLocalTranslation().z);
+//                }
+//            }
         }
     };
 
-    public MouseControlAppState() {
+    public MouseControlSystem(Node rootNode) {
+        this.rootNode = rootNode;
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-        this.app = (SimpleApplication) app;
-        mapData = stateManager.getState(AbstractHexGridAppState.class).getMapData();
+        this.app = app;
+        mapData = stateManager.getState(MapDataAppState.class).getMapData();
         mapData.registerTileChangeListener(tileChangeListener);
         /**
          * Activate the input to interact with the grid.
@@ -78,7 +76,8 @@ public class MouseControlAppState extends AbstractAppState {
         /**
          * Activate the RaycastDebug.
          */
-        rayCastControl = new GridRayCastControl(this.app, ColorRGBA.Red);
+        rayCastControl = new GridRayCastControl(app, rootNode, ColorRGBA.Red);
+        tileSelectionControl.initialise(app);
     }
 
     /**
@@ -124,7 +123,7 @@ public class MouseControlAppState extends AbstractAppState {
      */
     public void removeInput() {
         app.getInputManager().removeListener(tileActionListener);
-        clearCursor();
+//        clearCursor();
         clearDebug();
     }
     private final ActionListener tileActionListener = new ActionListener() {
@@ -133,16 +132,16 @@ public class MouseControlAppState extends AbstractAppState {
                 if (listenerPulseIndex == -1) {
                     castRay(MouseInputEventType.LMB);
                 } else {
-                    inputListeners.get(listenerPulseIndex).leftMouseActionResult(
-                            new MouseInputEvent(MouseInputEventType.LMB, new HexCoordinate(cursor.getLocalTranslation()),
+                    inputListeners.get(listenerPulseIndex).onMouseAction(
+                            new MouseInputEvent(MouseInputEventType.LMB, tileSelectionControl.getSelectedPos(),//new HexCoordinate(cursor.getLocalTranslation()),
                             rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
                 }
             } else if (name.equals("Cancel") && !isPressed) {
                 if (listenerPulseIndex == -1) {
                     castRay(MouseInputEventType.RMB);
                 } else {
-                    inputListeners.get(listenerPulseIndex).rightMouseActionResult(
-                            new MouseInputEvent(MouseInputEventType.RMB, new HexCoordinate(cursor.getLocalTranslation()),
+                    inputListeners.get(listenerPulseIndex).onMouseAction(
+                            new MouseInputEvent(MouseInputEventType.RMB, tileSelectionControl.getSelectedPos(),//new HexCoordinate(cursor.getLocalTranslation()),
                             rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
                 }
             }
@@ -153,20 +152,20 @@ public class MouseControlAppState extends AbstractAppState {
         rayCastControl.clear();
     }
 
-    private void initCursor() {
-        if (cursor == null) {
-            cursor = app.getAssetManager().loadModel("Models/animPlane.j3o");
-            Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
-            animShader.setInt("Speed", 16);
-            cursor.setMaterial(animShader);
-        }
-        if (!app.getRootNode().hasChild(cursor)) {
-            app.getRootNode().attachChild(cursor);
-        }
-        //Remove offset and set it to zero if hex_void_anim.png is not used
-//        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
-//        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
-    }
+//    private void initCursor() {
+//        if (cursor == null) {
+//            cursor = app.getAssetManager().loadModel("Models/animPlane.j3o");
+//            Material animShader = app.getAssetManager().loadMaterial("Materials/animatedTexture.j3m");
+//            animShader.setInt("Speed", 16);
+//            cursor.setMaterial(animShader);
+//        }
+//        if (!rootNode.hasChild(cursor)) {
+//            rootNode.attachChild(cursor);
+//        }
+//        //Remove offset and set it to zero if hex_void_anim.png is not used
+////        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
+////        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
+//    }
 
     @Override
     public void update(float tpf) {
@@ -224,7 +223,7 @@ public class MouseControlAppState extends AbstractAppState {
     private void castRay(MouseInputEventType mouseInput) {
         Ray ray = rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE);
         MouseInputEvent event = null;
-        if(!mouseInput.equals(MouseInputEventType.PULSE)){
+        if (!mouseInput.equals(MouseInputEventType.PULSE)) {
             event = callRayActionListeners(mouseInput, ray);
         }
         if (event == null) {
@@ -239,18 +238,17 @@ public class MouseControlAppState extends AbstractAppState {
     }
 
     private void setNewRayEvent(MouseInputEvent event) {
-        moveCursor(event.getEventPosition());
-        callMouseActionListeners(event);
-        lastHexPos = event.getEventPosition();
+//        moveCursor(event.getEventPosition());
+        callMouseInputActionListeners(event);
     }
 
     /**
      * @param mouseInput L or R listener to call
      * @param event event to pass
      */
-    private void callMouseActionListeners(MouseInputEvent event) {
+    private void callMouseInputActionListeners(MouseInputEvent event) {
         for (TileInputListener l : inputListeners) {
-            l.leftMouseActionResult(event);
+            l.onMouseAction(event);
         }
     }
 
@@ -271,60 +269,94 @@ public class MouseControlAppState extends AbstractAppState {
         return event;
     }
 
-    public void setCursor(HexCoordinate tilePos) {
-        moveCursor(tilePos);
+//    public void setCursor(HexCoordinate tilePos) {
+//        moveCursor(tilePos);
+//    }
+    
+    public TileSelectionControl getSelectionControl(){
+        return tileSelectionControl;
     }
-
-    private void moveCursor(HexCoordinate tilePos) {
-//        if(enable <= 0){
-        if (!isLock) {
-            initCursor();
-            Vector3f pos = tilePos.convertToWorldPosition();
-            HexTile tile = mapData.getTile(tilePos);
-            //        cursor.setLocalTranslation(pos.x, (tile != null ? tile.getHeight() * HexSetting.FLOOR_OFFSET : HexSetting.GROUND_HEIGHT * HexSetting.FLOOR_OFFSET)
-            //                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
-            cursor.setLocalTranslation(pos.x, (tile != null ? tile.getHeight() * HexSetting.FLOOR_OFFSET : 0)
-                    + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
-        }
-        /**
-         * The cursor real position is not updated on pulseMode.
-         */
-//        if (listenerPulseIndex == -1) {
-//            lastHexPos = tilePos;
-//        }
-//        } else {
-//            enable--;
-//        }
+    /**
+     * @return the currently selected tile.
+     */
+    public HexTile getSelectedTile() {
+        return mapData.getTile(tileSelectionControl.getSelectedPos());
+//        return mapData.getTile(tileSelectionControl.getTileList().toArray(new HexCoordinate[tileSelectionControl.getTileList().size()]));
     }
-
-    public void clearCursor() {
-        if (cursor != null && app.getRootNode().hasChild(cursor)) {
-            cursor.removeFromParent();
+    
+    public int getTileHeight() {
+        HexTile tile = getSelectedTile();
+        if (tile != null) {
+            return tile.getHeight();
+        } else {
+            return 0;
         }
     }
 
-    public void lockCursor() {
-        this.isLock = true;
+    public int getTileTextureValue() {
+        HexTile tile = getSelectedTile();
+        if (tile != null) {
+            return tile.getTextureKey();
+        } else {
+            return 0;
+        }
     }
 
-    public void unlockCursor() {
-        this.isLock = false;
-        moveCursor(lastHexPos);
+    public String getTileTextureKey() {
+        HexTile tile = getSelectedTile();
+        if (tile != null) {
+            return mapData.getTextureValue(tile.getTextureKey());
+        } else {
+            return mapData.getTextureValue(0);
+        }
     }
+
+//    private void moveCursor(HexCoordinate tilePos) {
+////        if(enable <= 0){
+//        if (!isLock) {
+//            initCursor();
+//            Vector3f pos = tilePos.convertToWorldPosition();
+//            HexTile tile = mapData.getTile(tilePos);
+//            //        cursor.setLocalTranslation(pos.x, (tile != null ? tile.getHeight() * HexSetting.FLOOR_OFFSET : HexSetting.GROUND_HEIGHT * HexSetting.FLOOR_OFFSET)
+//            //                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+//            cursor.setLocalTranslation(pos.x, (tile != null ? tile.getHeight() * HexSetting.FLOOR_OFFSET : 0)
+//                    + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+//        }
+//        /**
+//         * The cursor real position is not updated on pulseMode.
+//         */
+////        if (listenerPulseIndex == -1) {
+////            lastHexPos = tilePos;
+////        }
+////        } else {
+////            enable--;
+////        }
+//    }
+
+//    public void clearCursor() {
+//        if (cursor != null && rootNode.hasChild(cursor)) {
+//            cursor.removeFromParent();
+//        }
+//    }
+//
+//    public void lockCursor() {
+//        this.isLock = true;
+//    }
+//
+//    public void unlockCursor() {
+//        this.isLock = false;
+//        moveCursor(lastHexPos);
+//    }
 
     @Override
     public void cleanup() {
         super.cleanup();
-        if (cursor != null) {
-            cursor.removeFromParent();
-        }
+//        if (cursor != null) {
+//            cursor.removeFromParent();
+//        }
         rayCastControl.clear();
         listenerPulseIndex = -1;
         app.getInputManager().removeListener(tileActionListener);
         mapData.removeTileChangeListener(tileChangeListener);
-    }
-
-    public HexCoordinate getLastHexCollision() {
-        return lastHexPos;
     }
 }

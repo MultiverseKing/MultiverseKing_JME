@@ -8,8 +8,9 @@ import org.hexgridapi.utility.Vector2Int;
 
 /**
  * Contain all hex room data.
+ *
  * @author roah
- * @deprecated 
+ * @deprecated
  */
 public class ChunkData {
 
@@ -20,7 +21,7 @@ public class ChunkData {
     protected HashMap<Vector2Int, HashMap> chunks = new HashMap<Vector2Int, HashMap>();
 
     public HexTile add(Vector2Int chunkPos, HexCoordinate coord, HexTile tile) {
-        if(chunks.containsKey(chunkPos)){
+        if (chunks.containsKey(chunkPos)) {
             return (HexTile) chunks.get(chunkPos).put(coord.getAsOffset(), tile);
         } else {
             chunks.put(chunkPos, new HashMap());
@@ -75,10 +76,9 @@ public class ChunkData {
 ////        }
 ////        return false;
 //    }
-
     public boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
-        if(chunks.containsKey(chunk)){
-            if(chunks.get(chunk).containsKey(tilePos.getAsOffset())){
+        if (chunks.containsKey(chunk)) {
+            if (chunks.get(chunk).containsKey(tilePos.getAsOffset())) {
                 return true;
             }
         }
@@ -90,7 +90,7 @@ public class ChunkData {
     public Collection getChunkTiles(Vector2Int chunkPos) {
         return Collections.unmodifiableCollection(chunks.get(chunkPos).values());
     }
-    
+
 //    public void setAllTile(Byte height, Byte textureKey){
 //        Set<Map.Entry<Vector2Int, HexTile[][]>> chunkValue = chunks.entrySet();
 //        for (Map.Entry<Vector2Int, HexTile[][]> chunk : chunkValue) {
@@ -108,12 +108,11 @@ public class ChunkData {
 //            }
 //        }
 //    }
-    
     public void clear() {
         chunks.clear();
     }
-    
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return chunks.isEmpty();
     }
 }

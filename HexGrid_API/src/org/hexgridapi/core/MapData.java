@@ -31,7 +31,6 @@ public final class MapData {
     private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private String mapName;// = "Reset";
-    private int defaultkeyTexture = 0;
     /**
      * Key index :
      * -2 = and below used for non existant tile or ghost tile
@@ -112,20 +111,21 @@ public final class MapData {
      * Get tile(s) properties. (one tile)
      *
      * @param tilePos Offset position of the tile.
-     * @return
+     * @return can be null
      */
-    public HexTile getTile(HexCoordinate tile){
+    public HexTile getTile(HexCoordinate tile) {
         return tileData.get(tile.getAsOffset());
     }
+
     /**
      * Get tile(s) properties. (multiple tile)
      *
      * @param tilePos Offset position of the tile.
-     * @return
+     * @return can contain null
      */
     public HexTile[] getTile(HexCoordinate[] tilePos) {
         HexTile[] result = new HexTile[tilePos.length];
-        for(int i = 0; i < tilePos.length; i++) {
+        for (int i = 0; i < tilePos.length; i++) {
             result[i] = tileData.get(tilePos[i].getAsOffset());
         }
         return result;
@@ -133,7 +133,8 @@ public final class MapData {
 
     /**
      * Change the designed tile(s) properties.
-     * if tile array size is == 1 the given properties will be apply on all position,
+     * if tile array size is == 1 the given properties will be apply on all
+     * position,
      * else the two array size must match.
      *
      * @param tilePos position of the tile to change.
@@ -142,7 +143,7 @@ public final class MapData {
     public void setTile(HexCoordinate[] tilePos, HexTile[] tile) {
         TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
         boolean arrayUpdate = false;
-        if(tile.length > 1 && tile.length == tilePos.length){
+        if (tile.length > 1 && tile.length == tilePos.length) {
             arrayUpdate = true;
         } else if (tile.length > 1 && tile.length != tilePos.length) {
             throw new UnsupportedOperationException("Inserted param does not match the requiment tile.length != tilePos.length");
@@ -178,7 +179,6 @@ public final class MapData {
 //        }
 //        updateTileListeners(tceList);
 //    }
-
     private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
         HexTile oldTile;
         if (tile != null) {
@@ -189,6 +189,11 @@ public final class MapData {
         return new TileChangeEvent(tilePos, oldTile, tile);
     }
 
+    /**
+     * The texture used when adding a tile with no texture.
+     *
+     * @param Key texture to use as default
+     */
     public void setDefaultTexture(String Key) {
         for (Vector2Int coord : tileData.keySet()) {
             tileData.put(coord, tileData.get(coord).cloneChangedTextureKey(getTextureKey(Key)));
@@ -225,145 +230,10 @@ public final class MapData {
      */
     private void updateTileListeners(TileChangeEvent... tce) {
         for (TileChangeListener l : tileListeners) {
-            l.tileChange(tce);
+            l.onTileChange(tce);
         }
     }
-
-    /**
-     * Call/Update all registered Chunk listener with the last chunk event.
-     *
-     * @param cce Last chunk event.
-     */
-//    private void updateChunk(ChunkChangeEvent cce) {
-//        for (ChunkChangeListener l : chunkListeners) {
-//            l.chunkUpdate(cce);
-//        }
-//    }
-    /**
-     * Save the current map in a folder of the same name of the map.
-     *
-     *
-     * @param mapName "RESET" && "TEMP" cannot be used for a map name since they
-     * are already be used internaly.
-     */
-    public boolean saveArea(String mapName) {
-        if (mapName == null || mapName.toUpperCase(Locale.ENGLISH).equalsIgnoreCase("TEMP")) {
-            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, "Invalid Path name");
-            return false;
-        }
-        this.mapName = mapName;
-        try {
-            if (saveChunk(null)) {
-                String userHome = System.getProperty("user.dir") + "/assets";
-                BinaryExporter exporter = BinaryExporter.getInstance();
-                org.hexgridapi.loader.MapDataLoader mdLoader = new org.hexgridapi.loader.MapDataLoader();
-
-//                mdLoader.setChunkPos(chunkPos);
-
-                File file = new File(userHome + "/Data/MapData/" + mapName + "/" + mapName + ".map");
-                exporter.save(mdLoader, file);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(MapData.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
-
-    /**
-     * Save the selected chunk, two main use as :
-     * - When saving the map
-     * - When removing data from the memory.
-     *
-     * @param position the chunk to save.
-     * @throws IOException
-     */
-    private boolean saveChunk(Vector2Int position) throws IOException {
-        String userHome = System.getProperty("user.dir") + "/assets";
-
-        BinaryExporter exporter = BinaryExporter.getInstance();
-        ChunkDataLoader cdLoader = new ChunkDataLoader();
-
-        if (position == null) {
-//            for (Vector2Int pos : chunkPos) {
-//                Path file = Paths.get(userHome + "/Data/MapData/" + mapName + "/" + pos.toString() + ".chk");
-//                HexTile[][] tiles = getChunkTiles(pos);
-//                if (tiles == null) {
-//                    Path f = Paths.get(userHome + "/Data/MapData/Temp/" + pos.toString() + ".chk");
-//                    if (f.toFile().exists() && !f.toFile().isDirectory()) {
-//                        CopyOption[] options = new CopyOption[]{
-//                            StandardCopyOption.REPLACE_EXISTING,
-//                            StandardCopyOption.COPY_ATTRIBUTES
-//                        };
-//                        Files.copy(f, file, options);
-//                    } else {
-//                        Logger.getLogger(MapData.class.getName()).log(Level.WARNING,
-//                                "userHome + \"/Data/MapData/\" + mapName + \"/\" + pos.toString() \n"
-//                                + "                                + \".chk\" + \" can't be saved, data missing.\"");
-//                        return false;
-//                    }
-//                } else {
-//                    cdLoader.setChunk(tiles);
-//                    exporter.save(cdLoader, file.toFile());
-//                }
-//            }
-            return true;
-        } else {
-            File file = new File(userHome + "/Data/MapData/Temp/" + position.toString() + ".chk");
-//            cdLoader.setChunk(getChunkTiles(position));
-            exporter.save(cdLoader, file);
-            return true;
-        }
-    }
-
-    /**
-     * Load a map and all the corresponding chunk and return true if done
-     * properly, return false otherwise.
-     *
-     * @param name of the map to load.
-     * @return false if not located
-     */
-    public boolean loadArea(String name) {
-        File file = new File(System.getProperty("user.dir") + "/assets/Data/MapData/" + name + "/" + name + ".map");
-        if (file.isDirectory() || !file.exists()) {
-            Logger.getLogger(MapData.class.getName()).log(Level.WARNING, null, new IOException(name + " can't be found."));
-            return false;
-        }
-        org.hexgridapi.loader.MapDataLoader mdLoader = (org.hexgridapi.loader.MapDataLoader) assetManager.loadAsset("/Data/MapData/" + name + "/" + name + ".map");
-        Cleanup();
-        mapName = name;
-//        chunkPos = mdLoader.getChunkPos();
-//        for (byte i = 0; i < chunkPos.size(); i++) {
-//            loadChunk(chunkPos.get(i), mapName);
-//            updateTile(new ChunkChangeEvent(chunkPos.get(i)));
-//        }
-        return true;
-    }
-
-    /**
-     * load the chunk from a specifiate folder, internal use.
-     *
-     * @todo: All Tile data should only be loaded to create the map and not be
-     * added into chunkData. (not keeping track of tile data in the memory)
-     */
-    private void loadChunk(Vector2Int position, String folder) {
-        String chunkPath;
-        if (folder == null) {
-            chunkPath = "/Data/MapData/Temp/" + position.toString() + ".chk";
-        } else {
-            chunkPath = "/Data/MapData/" + folder + "/" + position.toString() + ".chk";
-        }
-        File file = new File(System.getProperty("user.dir") + "/assets" + chunkPath);
-        if (file.exists() && !file.isDirectory()) {
-            ChunkDataLoader cdLoaded = (ChunkDataLoader) assetManager.loadAsset(new AssetKey(chunkPath));
-//            chunkData.add(position, cdLoaded.getTiles());
-        } else {
-            System.err.println(chunkPath + " can't be load, missing data.");
-        }
-    }
-
+    
     /**
      * Cleanup the current map.
      */
@@ -376,9 +246,10 @@ public final class MapData {
     }
 
     /**
+     * Convert a textureKey to is mapped value (name).
      *
      * @param textureKey
-     * @return null if no corresponding key
+     * @return EMPTY_TEXTURE_KEY if not found
      */
     public String getTextureValue(int textureKey) {
         if (textureKey == -1) {
@@ -394,11 +265,18 @@ public final class MapData {
         }
     }
 
+    /**
+     * Convert a texture value (name) to it's mapped textureKey.
+     *
+     * @param value texture name
+     * @return "NO_TILE" if == null
+     * @throws NoSuchFieldError if no mapping
+     */
     public int getTextureKey(String value) throws NoSuchFieldError {
-        if (value.equals("SELECTION_TEXTURE")) {
-            return -1;
-        } else if (value.equals("NO_TILE")) {
+        if(value == null || value.equals("NO_TILE")){
             return -2;
+        } else if (value.equals("SELECTION_TEXTURE")) {
+            return -1;
         }
         int result = textureKeys.indexOf(value);
         if (result == -1) {
@@ -408,6 +286,10 @@ public final class MapData {
         }
     }
 
+    /**
+     *
+     * @return all registered texture value, cannot be edited
+     */
     public List<String> getTextureKeys() {
         return Collections.unmodifiableList(textureKeys);
     }

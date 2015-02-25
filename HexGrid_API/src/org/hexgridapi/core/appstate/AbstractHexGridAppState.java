@@ -1,12 +1,11 @@
 package org.hexgridapi.core.appstate;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
-import org.hexgridapi.core.HexGridManager;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.MapData;
 
 /**
@@ -14,7 +13,7 @@ import org.hexgridapi.core.MapData;
  *
  * @author roah
  */
-public abstract class AbstractHexGridAppState extends HexGridManager implements AppState {
+public abstract class AbstractHexGridAppState extends HexGrid implements AppState {
 
     /**
      * Is initilized at the first initilisation.
@@ -24,7 +23,6 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
      * If enabled the update will run.
      */
     private boolean enabled = true;
-//    protected MapData mapData;
 
     /**
      *
@@ -32,26 +30,14 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
      * @param enableGhostTile is inexisting tile should be generated as ghost ?
      * @param debugMode generate the grid on wireframe
      */
-    public AbstractHexGridAppState(MapData mapData, boolean debugMode) {
-        super(mapData, debugMode);
-//        this.mapData = mapData;
-    }
-
-    /**
-     *
-     * @param mapData tile dataHandler of the grid.
-     * @param gridNode node used to hold the grid mesh
-     * @param debugMode generate the grid on wireframe
-     */
-    public AbstractHexGridAppState(MapData mapData, Node gridNode, boolean debugMode) {
-        super(mapData, gridNode, debugMode);
-//        this.mapData = mapData;
+    public AbstractHexGridAppState(MapData mapData, Node rootNode, boolean debugMode) {
+        super(mapData, rootNode, debugMode);
     }
 
     public final void initialize(AppStateManager stateManager, Application app) {
 //        mapData.registerChunkChangeListener(this);
 //        mapData.registerTileChangeListener(this);
-        ((SimpleApplication) app).getRootNode().attachChild(gridNode);
+//        ((Node)app.getViewPort().getScenes().get(0)).attachChild(gridNode);
         initializeSystem(stateManager, app);
         initialized = true;
     }
@@ -92,9 +78,7 @@ public abstract class AbstractHexGridAppState extends HexGridManager implements 
 
     @Override
     public final void cleanup() {
-//        mapData.removeChunkChangeListener(this);
-//        mapData.removeTileChangeListener(tileChangeListener);
-        gridNode.removeFromParent();
+//        gridNode.removeFromParent();
         cleanupSystem();
         initialized = false;
         enabled = false;

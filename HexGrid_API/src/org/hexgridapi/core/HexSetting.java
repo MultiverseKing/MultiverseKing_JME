@@ -12,6 +12,7 @@ import com.jme3.math.FastMath;
  * @author roah
  */
 public final class HexSetting {
+
     /**
      * Radius to use when generating hex.
      */

@@ -3,12 +3,12 @@ package org.hexgridapi.events;
 /**
  *
  * @author roah
- * @deprecated 
+ * @deprecated
  */
 public interface ChunkChangeListener {
 
     /**
-     * @deprecated 
+     * @deprecated
      */
     void chunkUpdate(ChunkChangeEvent event);
 }

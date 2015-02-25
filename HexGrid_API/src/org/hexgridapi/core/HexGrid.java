@@ -22,7 +22,7 @@ import org.hexgridapi.utility.Vector2Int;
  * @todo update for chunkChange listener
  * @author roah
  */
-public class HexGridManager {
+public class HexGrid {
 
     /**
      * Parameter used to generate the grid mesh.
@@ -31,18 +31,17 @@ public class HexGridManager {
     /**
      * Node containing all Tiles.
      */
-    protected Node gridNode;
-    protected Node tileSelectionNode;//= new Node("tileSelectionNode");
+    protected MapData mapData;
+    protected final Node gridNode = new Node("HexGridNode");
     protected boolean debugMode;
     protected HashMap chunksNodes = new HashMap<Vector2Int, Node>();
     protected Node areaRangeNode;
     protected AssetManager assetManager;
-    protected MapData mapData;
     /**
-     * Inner Class.
+     * Listeners.
      */
     private final TileChangeListener tileChangeListener = new TileChangeListener() {
-        public final void tileChange(TileChangeEvent... events) {
+        public final void onTileChange(TileChangeEvent... events) {
             if (events.length > 1) {
                 HashSet<Vector2Int> updatedChunk = new HashSet<Vector2Int>();
                 for (int i = 0; i < events.length; i++) {
@@ -63,25 +62,17 @@ public class HexGridManager {
         }
     };
 
-    public HexGridManager(MapData mapData) {
-        this(mapData, new Node("HexGridNode"), false);
+    public HexGrid(MapData mapData, Node rootNode) {
+        this(mapData, rootNode, false);
     }
 
-    public HexGridManager(MapData mapData, boolean debugMode) {
-        this(mapData, new Node("HexGridNode"), debugMode);
-    }
-
-    public HexGridManager(MapData mapData, Node gridNode, boolean debugMode) {
+    public HexGrid(MapData mapData, Node rootNode, boolean debugMode) {
         this.assetManager = mapData.getAssetManager();
-        this.gridNode = gridNode;
         this.meshParam = new MeshParameter(mapData);
         this.debugMode = debugMode;
         this.mapData = mapData;
+        rootNode.attachChild(gridNode);
         mapData.registerTileChangeListener(tileChangeListener);
-    }
-
-    public MapData getMapData() {
-        return mapData;
     }
 
     public final Node getGridNode() {

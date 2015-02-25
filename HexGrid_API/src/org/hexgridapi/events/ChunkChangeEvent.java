@@ -4,7 +4,7 @@ import org.hexgridapi.utility.Vector2Int;
 
 /**
  * Trigger when an event occur in mapData who affect the chunk.
- * 
+ *
  * @author roah
  */
 public class ChunkChangeEvent {
@@ -22,7 +22,8 @@ public class ChunkChangeEvent {
 
     /**
      * if chunkPos == null it mean this event affect the whole map.
-     * @return 
+     *
+     * @return
      */
     public Vector2Int getChunkPos() {
         return chunkPos;

@@ -1,6 +1,6 @@
 package org.hexgridapi.core.control;
 
-import com.jme3.app.SimpleApplication;
+import com.jme3.app.Application;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.material.Material;
@@ -24,21 +24,23 @@ import org.hexgridapi.utility.HexCoordinate;
  */
 public class GridRayCastControl {
 
-    private SimpleApplication app;
     private Node rayDebug;
+    private Node rootNode;
+    private Application app;
     private ColorRGBA debugColor;
 
-    public GridRayCastControl(SimpleApplication app, ColorRGBA debugColor) {
-        this(app, debugColor, false);
+    public GridRayCastControl(Application app, Node rootNode, ColorRGBA debugColor) {
+        this(app, rootNode, debugColor, false);
     }
-    public GridRayCastControl(SimpleApplication app, ColorRGBA debugColor, boolean debugArrow) {
-        this.app = app;
+
+    public GridRayCastControl(Application app, Node rootNode, ColorRGBA debugColor, boolean debugArrow) {
         this.debugColor = debugColor;
+        this.rootNode = rootNode;
+        this.app = app;
         initialiseDebug(debugArrow);
     }
 
     private void initialiseDebug(boolean debugArrow) {
-
         Sphere sphere = new Sphere(30, 30, 0.2f);
         rayDebug = new Node("DebugRay");
         Geometry geo = new Geometry("SphereDebugRayCast", sphere);
@@ -46,7 +48,7 @@ public class GridRayCastControl {
         mark_mat.setColor("Color", debugColor);
         geo.setMaterial(mark_mat);
         rayDebug.attachChild(geo);
-        if(debugArrow){
+        if (debugArrow) {
             attachCoordinateAxes();
         }
     }
@@ -75,12 +77,12 @@ public class GridRayCastControl {
         rayDebug.attachChild(g);
         return g;
     }
-
+    
     public MouseInputEvent castRay(Ray ray) {
         CollisionResults results = new CollisionResults();
         ray = ray != null ? ray : get3DRay(CastFrom.SCREEN_CENTER);
 
-        app.getRootNode().getChild("HexGridNode").collideWith(ray, results);
+        rootNode.getChild("HexGridNode").collideWith(ray, results);
         if (results.size() != 0) {
             if (results.size() > 0) {
                 CollisionResult closest = results.getClosestCollision();
@@ -92,7 +94,7 @@ public class GridRayCastControl {
         } else {
             //Error catching.
             System.out.println("null raycast");
-            app.getRootNode().detachChild(rayDebug);
+            rootNode.detachChild(rayDebug);
             return null;
         }
     }
@@ -107,12 +109,12 @@ public class GridRayCastControl {
      */
     public Ray get3DRay(CastFrom from) {
         Vector2f click2d;
-        switch(from){
+        switch (from) {
             case MOUSE:
                 click2d = app.getInputManager().getCursorPosition();
                 break;
             case SCREEN_CENTER:
-                click2d = new Vector2f(app.getCamera().getWidth()/2, app.getCamera().getHeight() /2);
+                click2d = new Vector2f(app.getCamera().getWidth() / 2, app.getCamera().getHeight() / 2);
                 break;
             default:
                 throw new UnsupportedOperationException(from + "isn't a valid type.");
@@ -151,20 +153,21 @@ public class GridRayCastControl {
 
     public void setDebugPosition(Vector3f pos) {
         if (rayDebug != null) {
-            if (app.getRootNode().hasChild(rayDebug)) {
+            if (rootNode.hasChild(rayDebug)) {
                 rayDebug.setLocalTranslation(pos);
             } else {
-                app.getRootNode().attachChild(rayDebug);
+                rootNode.attachChild(rayDebug);
                 rayDebug.setLocalTranslation(pos);
             }
         }
     }
-    
-    public Spatial getDebug(){
+
+    public Spatial getDebug() {
         return rayDebug;
     }
-    
-    public enum CastFrom{
+
+    public enum CastFrom {
+
         MOUSE,
         SCREEN_CENTER;
     }

@@ -3,6 +3,7 @@ package org.hexgridapi.core.appstate;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetManager;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Node;
 import org.hexgridapi.core.HexGrid;
@@ -30,8 +31,8 @@ public abstract class AbstractHexGridAppState extends HexGrid implements AppStat
      * @param enableGhostTile is inexisting tile should be generated as ghost ?
      * @param debugMode generate the grid on wireframe
      */
-    public AbstractHexGridAppState(MapData mapData, Node rootNode, boolean debugMode) {
-        super(mapData, rootNode, debugMode);
+    public AbstractHexGridAppState(MapData mapData, AssetManager assetManager, Node rootNode, boolean debugMode) {
+        super(mapData, assetManager, rootNode, debugMode);
     }
 
     public final void initialize(AppStateManager stateManager, Application app) {

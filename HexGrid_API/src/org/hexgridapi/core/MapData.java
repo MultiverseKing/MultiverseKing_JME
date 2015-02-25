@@ -1,20 +1,13 @@
 package org.hexgridapi.core;
 
-import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
-import com.jme3.export.binary.BinaryExporter;
-import java.io.File;
-import java.io.IOException;
 import org.hexgridapi.events.TileChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.hexgridapi.events.TileChangeEvent;
-import org.hexgridapi.loader.ChunkDataLoader;
+import org.hexgridapi.loader.HexGridMapLoader;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 
@@ -30,6 +23,7 @@ public final class MapData {
     private final AssetManager assetManager;
     private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
+    private final HexGridMapLoader hexGridMapLoader;
     private String mapName;// = "Reset";
     /**
      * Key index :
@@ -41,17 +35,20 @@ public final class MapData {
     private ArrayList<String> textureKeys = new ArrayList<String>();
 
     public MapData(AssetManager assetManager) {
-        this.assetManager = assetManager;
-        genTextureKeys(null);
+        this(null, assetManager);
     }
 
-    public MapData(Enum[] textureKeys, AssetManager assetManager) {
+//    public MapData(Enum[] textureKeys, AssetManager assetManager) {
+//        this(textureKeys, assetManager);
+//    }
+//
+//    public MapData(String[] textureKeys, AssetManager assetManager) {
+//        this(textureKeys, assetManager);
+//    }
+    
+    public MapData(Object[] textureKeys, AssetManager assetManager){
         this.assetManager = assetManager;
-        genTextureKeys(textureKeys);
-    }
-
-    public MapData(String[] textureKeys, AssetManager assetManager) {
-        this.assetManager = assetManager;
+        hexGridMapLoader = new HexGridMapLoader(assetManager);
         genTextureKeys(textureKeys);
     }
 
@@ -80,10 +77,6 @@ public final class MapData {
      */
     public void removeTileChangeListener(TileChangeListener listener) {
         tileListeners.remove(listener);
-    }
-
-    public AssetManager getAssetManager() {
-        return assetManager;
     }
 
     /**
@@ -179,6 +172,17 @@ public final class MapData {
 //        }
 //        updateTileListeners(tceList);
 //    }
+    
+
+    public boolean saveArea(String mapName) {
+        this.mapName = mapName;
+        return hexGridMapLoader.saveArea(mapName);
+    }
+
+    public boolean loadArea(String mapName) {
+        return hexGridMapLoader.loadArea(mapName);
+    }
+    
     private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
         HexTile oldTile;
         if (tile != null) {

@@ -62,12 +62,12 @@ public class HexGrid {
         }
     };
 
-    public HexGrid(MapData mapData, Node rootNode) {
-        this(mapData, rootNode, false);
+    public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode) {
+        this(mapData, assetManager, rootNode, false);
     }
 
-    public HexGrid(MapData mapData, Node rootNode, boolean debugMode) {
-        this.assetManager = mapData.getAssetManager();
+    public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode, boolean debugMode) {
+        this.assetManager = assetManager;
         this.meshParam = new MeshParameter(mapData);
         this.debugMode = debugMode;
         this.mapData = mapData;

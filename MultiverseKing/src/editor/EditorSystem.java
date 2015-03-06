@@ -16,7 +16,7 @@ import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaGridSystem;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.core.appstate.MouseControlAppState;
+import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.MapData;
 import tonegod.gui.core.Element;
 
@@ -145,7 +145,7 @@ public class EditorSystem extends AbstractAppState implements DialogWindowListen
         app.getStateManager().attach(new AreaGridSystem(mapData, true));
         app.getStateManager().attach(new AreaEventRenderDebugSystem());
         app.getStateManager().attach(new AreaEventSystem());
-        app.getStateManager().attach(new MouseControlAppState());
+        app.getStateManager().attach(new MouseControlSystem());
         areaIsInitialised = true;
     }
 

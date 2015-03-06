@@ -37,9 +37,10 @@ import hexsystem.area.AreaGridSystem;
 import hexsystem.area.MapDataAppState;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.core.appstate.MouseControlAppState;
+import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.events.MouseInputEvent;
+import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
@@ -53,7 +54,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     private MapData mapData;
     private RenderSystem renderSystem;
-    private MouseControlAppState mouseSystem;
+    private MouseControlSystem mouseSystem;
     private Action currentAction = null;
     private EntityId inspectedId = null;
     private BattleTrainingGUI bTrainingGUI;
@@ -77,7 +78,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         renderSystem = app.getStateManager().getState(RenderSystem.class);
 //        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this, true);
-        mouseSystem = app.getStateManager().getState(MouseControlAppState.class);
+        mouseSystem = app.getStateManager().getState(MouseControlSystem.class);
         mouseSystem.registerRayInputListener(this);
 
         initialisePlayerCore();
@@ -166,11 +167,11 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     @Override
-    public void leftMouseActionResult(MouseInputEvent event) {
+    public void onMouseAction(MouseInputEvent event) {
         if (currentAction != null) {
-            confirmAction(event.getEventPosition());
+            confirmAction(event.getPosition());
         } else {
-            Entity e = checkEntities(event.getEventPosition());
+            Entity e = checkEntities(event.getPosition());
             if (e != null) {
                 openEntityPropertiesMenu(e);
             }
@@ -183,9 +184,9 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     @Override
     public void rightMouseActionResult(MouseInputEvent event) {
         if (currentAction == null) {
-            Entity e = checkEntities(event.getEventPosition());
+            Entity e = checkEntities(event.getPosition());
             if (e != null && entityData.getComponent(e.getId(), MoveToComponent.class) == null) {
-                openEntityActionMenu(e, event.getEventPosition());
+                openEntityActionMenu(e, event.getPosition());
             }
         }
     }
@@ -203,32 +204,25 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     @Override
-    public MouseInputEvent leftRayInputAction(Ray ray) {
-        return collisionTest(ray);
-    }
-
-    @Override
-    public MouseInputEvent rightRayInputAction(Ray ray) {
-        return collisionTest(ray);
-    }
-
-    private MouseInputEvent collisionTest(Ray ray) {
+    public MouseInputEvent MouseRayInputAction(MouseInputEventType mouseInputType, Ray ray) {
         if (entities.isEmpty()) {
             return null;
         }
-        CollisionResults results = renderSystem.subSystemCollideWith(this, ray);
-        if (results.size() > 0) {
-            CollisionResult closest = results.getClosestCollision();
-            for (Entity e : entities) {
-                Spatial s = closest.getGeometry().getParent();
-                do {
-                    if (s != null && s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
-//                        mouseSystem.setDebugPosition(closest.getContactPoint());
-                        HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
-                        return new MouseInputEvent(pos, ray, closest);
-                    }
-                    s = s.getParent();
-                } while (s != null && !s.getParent().getName().equals(renderSystem.getRenderNodeName()));
+        if(mouseInputType.equals(MouseInputEventType.RMB)) {
+            CollisionResults results = renderSystem.subSystemCollideWith(this, ray);
+            if (results.size() > 0) {
+                CollisionResult closest = results.getClosestCollision();
+                for (Entity e : entities) {
+                    Spatial s = closest.getGeometry().getParent();
+                    do {
+                        if (s != null && s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
+    //                        mouseSystem.setDebugPosition(closest.getContactPoint());
+                            HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
+                            return new MouseInputEvent(MouseInputEventType.RMB, pos, mapData.getTile(pos).getHeight(), ray, closest);
+                        }
+                        s = s.getParent();
+                    } while (s != null && !s.getParent().getName().equals(renderSystem.getRenderNodeName()));
+                }
             }
         }
         return null;

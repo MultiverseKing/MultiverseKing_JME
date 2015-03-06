@@ -11,12 +11,12 @@ import hexsystem.area.AreaEventSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
-import org.hexgridapi.core.appstate.MouseControlAppState;
+import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.events.MouseInputEvent;
-import org.hexgridapi.events.MouseInputListener;
+import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.utility.HexCoordinate;
@@ -27,7 +27,7 @@ import utility.ElementalAttribut;
  *
  * @author roah
  */
-public final class AreaEditorSystem extends MapEditorSystem implements TileChangeListener, MouseInputListener {
+public final class AreaEditorSystem extends MapEditorSystem implements TileChangeListener, TileInputListener {
 
     private MapData mapData;
     private ElementalAttribut mapElement;
@@ -54,7 +54,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
         } else {
             generateEmptyArea();
         }
-        app.getStateManager().getState(MouseControlAppState.class).registerTileInputListener(this);
+        app.getStateManager().getState(MouseControlSystem.class).registerTileInputListener(this);
         gui = new AreaEditorGUI(((MultiverseMain)app).getScreen(), ((MultiverseMain)app).getScreen().getElementById("EditorMainMenu"), this);
         return entityData.getEntities(AreaPropsComponent.class, HexPositionComponent.class);
     }
@@ -174,14 +174,14 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
     }
 
     @Override
-    public void leftMouseActionResult(MouseInputEvent event) {
+    public void onMouseAction(MouseInputEvent event) {
         closeTileMenu();
     }
 
     @Override
     public void rightMouseActionResult(MouseInputEvent event) {
-        openWidgetMenu(event.getEventPosition());
-        if(tileEventMenu != null && !event.getEventPosition().equals(tileEventMenu.getInspectedTilePos())){
+        openWidgetMenu(event.getPosition());
+        if(tileEventMenu != null && !event.getPosition().equals(tileEventMenu.getInspectedTilePos())){
             closeTileEventMenu();
         }
     }
@@ -236,7 +236,7 @@ public final class AreaEditorSystem extends MapEditorSystem implements TileChang
 //        app.getStateManager().getState(AreaEventSystem.class).clearAllCurrentEvent();
         
 //        app.getStateManager().detach(app.getStateManager().getState(AreaMouseAppState.class));
-        app.getStateManager().getState(MouseControlAppState.class).removeTileInputListener(this);
+        app.getStateManager().getState(MouseControlSystem.class).removeTileInputListener(this);
 //        app.getStateManager().detach(app.getStateManager().getState(AreaGridSystem.class));
 //        app.getStateManager().detach(app.getStateManager().getState(AreaEventRenderDebugSystem.class));
 //        app.getStateManager().detach(app.getStateManager().getState(AreaEventSystem.class));

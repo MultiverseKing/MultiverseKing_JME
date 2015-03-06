@@ -2,14 +2,13 @@ package hexsystem.area;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import org.hexgridapi.core.appstate.AbstractMapDataAppState;
 import org.hexgridapi.core.MapData;
 
 /**
  *
  * @author roah
  */
-public class MapDataAppState extends AbstractMapDataAppState {
+public class MapDataAppState extends org.hexgridapi.core.appstate.MapDataAppState {
 
     public MapDataAppState(MapData mapData) {
         super(mapData);

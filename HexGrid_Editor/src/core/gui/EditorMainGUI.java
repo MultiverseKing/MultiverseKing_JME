@@ -1,9 +1,11 @@
 package core.gui;
 
 import com.jme3.math.Vector2f;
-import core.EditorMainSystem;
-import gui.EditorWindow;
+import core.EditorSystem;
+import gui.deprecated.control.EditorWindow;
+import org.hexgridapi.core.appstate.MouseControlSystem;
 import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.controls.lists.Spinner.ChangeType;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
@@ -14,15 +16,14 @@ import tonegod.gui.effects.Effect;
  * @author roah
  */
 public class EditorMainGUI extends EditorWindow {
-
-    private EditorMainSystem system;
+    
     private String currentSelectedBtn = "0";
     private EditorTileProperties tileWindow;
 
-    public EditorMainGUI(Screen screen, Element parent, EditorMainSystem system) {
+    public EditorMainGUI(Screen screen, Element parent, MouseControlSystem mouseSystem, EditorSystem editorSystem) {
         super(screen, parent, "HexTile Editor");
-        this.system = system;
 //        addButtonList("CurrentTool", "Tool", HAlign.left, new String[]{"disable", "cursorSelect"}, HAlign.left, ButtonType.IMG, 1);
+        addCheckBoxField("showGrid", "Hide Ghost", true);
         addLabelField("Data", "No data", HAlign.left);
 //        InputContext iContext = InputContext.getInstance();
 //        String local = iContext.getLocale().toString();
@@ -31,7 +32,7 @@ public class EditorMainGUI extends EditorWindow {
         
         show();
         populateHelp();
-        tileWindow = new EditorTileProperties(screen, getWindow(), system);
+        tileWindow = new EditorTileProperties(screen, getWindow(), mouseSystem, editorSystem);
     }
 
     private void show() {
@@ -95,7 +96,7 @@ public class EditorMainGUI extends EditorWindow {
     }
 
     @Override
-    protected void onSpinnerChange(String sTrigger, int currentIndex) {
+    protected void onSpinnerChange(String sTrigger, int currentIndex, ChangeType type) {
     }
 
     @Override

@@ -11,8 +11,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
-import java.util.Set;
-import org.hexgridapi.core.HexGridManager;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.control.ChunkControl;
 import org.hexgridapi.core.control.GridRayCastControl;
@@ -28,12 +27,12 @@ import org.hexgridapi.utility.Vector2Int;
 public class GhostControl extends ChunkControl {
 
     private final GridRayCastControl rayControl;
-    private final HexGridManager system;
+    private final HexGrid system;
     private Geometry collisionPlane;
 
-    public GhostControl(SimpleApplication app, MeshParameter meshParam, Vector2Int pos, HexGridManager system) {
+    public GhostControl(SimpleApplication app, MeshParameter meshParam, Vector2Int pos, HexGrid system) {
         super(meshParam, app.getAssetManager(), false, true, pos);
-        this.rayControl = new GridRayCastControl(app, ColorRGBA.Green, true);
+        this.rayControl = new GridRayCastControl(app, app.getRootNode(), ColorRGBA.Green, true);
         this.system = system;
     }
 
@@ -54,30 +53,30 @@ public class GhostControl extends ChunkControl {
     protected void controlUpdate(float tpf) {
         if (spatial != null && !spatial.getCullHint().equals(Spatial.CullHint.Always)) {
             MouseInputEvent event = rayControl.castRay(null);
-            HexCoordinate pos = event.getEventPosition();
+            HexCoordinate pos = event.getPosition();
             if (pos != null) {
-                setPosition(HexGridManager.getChunkGridPosition(pos));
+                setPosition(HexGrid.getChunkGridPosition(pos));
             }
         }
     }
 
     private void updatePosition() {
-        Vector3f pos = HexGridManager.getChunkWorldPosition(chunkPosition);
+        Vector3f pos = HexGrid.getChunkWorldPosition(chunkPosition);
         spatial.setLocalTranslation(new Vector3f(pos.x, pos.y - 0.01f, pos.z));
         updateCulling();
     }
 
     public void updateCulling() {
-        Set<Vector2Int> list = system.getChunksNodes();
-        for (int x = -1; x < 2; x++) {
-            for (int y = -1; y < 2; y++) {
-                if (list.contains(chunkPosition.add(x, y))) {
-                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
-                } else {
-                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
-                }
-            }
-        }
+//        Set<Vector2Int> list = system.getChunksNodes();
+//        for (int x = -1; x < 2; x++) {
+//            for (int y = -1; y < 2; y++) {
+//                if (list.contains(chunkPosition.add(x, y))) {
+//                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
+//                } else {
+//                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
+//                }
+//            }
+//        }
     }
 
     private boolean isInRange(Vector2Int pos) {
@@ -99,11 +98,11 @@ public class GhostControl extends ChunkControl {
     }
 
     public void show() {
-        spatial.setCullHint(Spatial.CullHint.Inherit);
+//        spatial.setCullHint(Spatial.CullHint.Inherit);
     }
 
     public void hide() {
-        spatial.setCullHint(Spatial.CullHint.Always);
+//        spatial.setCullHint(Spatial.CullHint.Always);
     }
 
     private Mesh genQuad(int radius) {
@@ -153,8 +152,9 @@ public class GhostControl extends ChunkControl {
                 if (!(x == 0 && y == 0)) {
                     Geometry geo = new Geometry("NO_TILE." + x + "|" + y, mesh);
                     geo.setMaterial(mat);
-                    geo.setLocalTranslation(HexGridManager.getChunkWorldPosition(chunkPosition.add(x, y)));
+                    geo.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
                     ((Node) spatial).attachChild(geo);
+                    geo.setCullHint(Spatial.CullHint.Always);
                 }
             }
         }

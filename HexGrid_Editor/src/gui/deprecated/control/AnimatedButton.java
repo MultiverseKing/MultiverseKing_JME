@@ -1,4 +1,4 @@
-package gui;
+package gui.deprecated.control;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;

@@ -1,4 +1,4 @@
-package gui;
+package gui.deprecated.control;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
@@ -121,7 +121,7 @@ public abstract class LayoutWindow {
         } else {
             window.setWindowTitle("   " + name);
         }
-        window.setIgnoreMouse(true);
+//        window.setIgnoreMouse(true);
         window.getDragBar().setIgnoreMouse(true);
         if (parent == null) {
             screen.addElement(window);

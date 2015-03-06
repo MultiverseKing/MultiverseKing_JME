@@ -1,13 +1,14 @@
-package gui.control;
+package gui.deprecated;
 
+import gui.deprecated.WidgetSubMenu;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import core.EditorMainSystem;
-import gui.AnimatedButton;
-import gui.CameraTrackWindow;
+import core.EditorSystem;
+import gui.deprecated.control.AnimatedButton;
+import gui.deprecated.control.CameraTrackWindow;
 import java.util.ArrayList;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.utility.HexCoordinate;
@@ -25,10 +26,10 @@ public class TileWidgetMenu extends CameraTrackWindow {
     private ArrayList<AnimatedButton> animatedButton = new ArrayList<>();
     private ArrayList<WidgetSubMenu> widgetMenu = new ArrayList<>(2);
     private WidgetSubMenu textureSelectionMenu = null;
-    private EditorMainSystem system;
+    private EditorSystem system;
     private Element textureIcons;
 
-    public TileWidgetMenu(Screen screen, Camera camera, EditorMainSystem system, HexCoordinate tilePos) {
+    public TileWidgetMenu(Screen screen, Camera camera, EditorSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "TileWidgetMenu", new Vector2f(),
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/Widget/rouage.png");
@@ -107,7 +108,7 @@ public class TileWidgetMenu extends CameraTrackWindow {
                 new Vector2f(45, 45), Vector4f.ZERO, "Textures/Icons/Widget/arrow.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(inspectedPosition, (byte) 1);
+                system.setTilePropertiesUp();
             }
         };
         holder.addChild(upBtn);
@@ -116,7 +117,7 @@ public class TileWidgetMenu extends CameraTrackWindow {
                 new Vector2f(45, 45), Vector4f.ZERO, "Textures/Icons/Widget/arrow.png") {
             @Override
             public void onButtonMouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                system.setTileProperties(inspectedPosition, (byte) -1);
+                system.setTilePropertiesDown();
             }
         };
         downBtn.setLocalRotation(downBtn.getLocalRotation().fromAngles(0, 0, 180 * FastMath.DEG_TO_RAD));
@@ -125,7 +126,7 @@ public class TileWidgetMenu extends CameraTrackWindow {
     }
 
     private void loadTextureIcon(Element parent) {
-        String key = system.getTileTextureKey(inspectedPosition);
+        String key = system.getTileTextureKey();
         String icoPath = "Textures/Icons/TileTextures/" + key + ".png";
 
         textureIcons = new Element(screen, screenElement.getUID() + ":TexturesIco", new Vector2f(15, 15),
@@ -153,17 +154,17 @@ public class TileWidgetMenu extends CameraTrackWindow {
         if (textureSelectionMenu == null) {
             textureSelectionMenu = new WidgetSubMenu(screen, camera, system, this, new Vector2f(100, 35), new Vector2f(150, 50), "Textures/Icons/Widget/emptyMenu.png");
             if (inspectedSpatialHeight != Integer.MIN_VALUE) {
-                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(inspectedPosition), inspectedSpatialHeight);
+                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(), inspectedSpatialHeight);
             } else {
-                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(inspectedPosition));
+                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey());
             }
         } else if (textureSelectionMenu.isVisible()) {
             textureSelectionMenu.hide();
         } else {
             if (inspectedSpatialHeight != Integer.MIN_VALUE) {
-                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(inspectedPosition), inspectedSpatialHeight);
+                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(), inspectedSpatialHeight);
             } else {
-                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey(inspectedPosition));
+                textureSelectionMenu.show(inspectedPosition, system.getTileTextureKey());
             }
         }
         screen.updateZOrder(screenElement);
@@ -199,7 +200,7 @@ public class TileWidgetMenu extends CameraTrackWindow {
                     new Vector2f(62, 62), "Textures/Icons/Widget/rouageRight.png", 1.5f, true) {
                 @Override
                 public void MouseLeftUp(MouseButtonEvent evt, boolean toggled) {
-                    system.setTileProperties(inspectedPosition, new HexTile());
+                    system.setNewTile();
                     screen.getElementById(screenElement.getUID() + ":GhostBtnBackground").hide();
                 }
             };
@@ -236,9 +237,9 @@ public class TileWidgetMenu extends CameraTrackWindow {
     }
 
     public void updateIcon() {
-        String key = system.getTileTextureKey(inspectedPosition);
+        String key = system.getTileTextureKey();
         textureIcons.setColorMap("Textures/Icons/TileTextures/" + key + ".png");
-        updateGhostTileBtn(system.getTileTextureValue(inspectedPosition) < 0 ? true : false);
+        updateGhostTileBtn(system.getTileTextureValue() < 0 ? true : false);
     }
 
     @Override

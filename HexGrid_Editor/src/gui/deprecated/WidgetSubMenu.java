@@ -1,11 +1,11 @@
-package gui.control;
+package gui.deprecated;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import core.EditorMainSystem;
-import gui.CameraTrackWindow;
+import core.EditorSystem;
+import gui.deprecated.control.CameraTrackWindow;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
@@ -18,12 +18,12 @@ import tonegod.gui.core.ElementManager;
  */
 class WidgetSubMenu extends CameraTrackWindow {
 
-    private final EditorMainSystem system;
+    private final EditorSystem system;
     private final CameraTrackWindow elementParent;
     private Element iconContainer = null;
     private String ignoredIcon;
 
-    WidgetSubMenu(ElementManager screen, Camera camera, EditorMainSystem system, CameraTrackWindow parent, Vector2f position, Vector2f dimensions, String defaultImg) {
+    WidgetSubMenu(ElementManager screen, Camera camera, EditorSystem system, CameraTrackWindow parent, Vector2f position, Vector2f dimensions, String defaultImg) {
         super(screen, camera, position);
         this.system = system;
         this.elementParent = parent;
@@ -123,7 +123,7 @@ class WidgetSubMenu extends CameraTrackWindow {
 
     private void buttonTrigger(String button) {
         String textureKey = button.split(":")[1].split("Icon")[0];
-        system.setTileProperties(((TileWidgetMenu) elementParent).getInspectedSpatialPosition(), textureKey);
+        system.setTilePropertiesTexTure(textureKey);
         updateTextureIcon(textureKey);
 //        ((TileWidgetMenu) elementParent).updateIcon();
         hide();

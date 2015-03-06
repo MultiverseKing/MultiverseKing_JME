@@ -1,11 +1,15 @@
 package core.gui;
 
 import com.jme3.math.Vector2f;
-import core.EditorMainSystem;
-import gui.EditorWindow;
-import org.hexgridapi.core.HexGridManager;
+import core.EditorSystem;
+import gui.deprecated.control.EditorWindow;
+import org.hexgridapi.core.HexGrid;
+import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.control.TileSelectionControl;
+import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
+import tonegod.gui.controls.lists.Spinner.ChangeType;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
@@ -16,19 +20,28 @@ import tonegod.gui.core.Screen;
  */
 public class EditorTileProperties extends EditorWindow {
 
-    private final EditorMainSystem system;
+    private final MouseControlSystem mouseSystem;
+    private final EditorSystem editorSystem;
 //    private HexCoordinate tilePosition;// = new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int());
-    private Boolean currentIsGhost = null; // if inspected tile exist in MapData
     private boolean currentIsGroup = false; // if inspected tile exist in MapData
     private EditorWindow textureSelectionMenu;
+    private Boolean currentIsGhost;
 
-    public EditorTileProperties(Screen screen, Element parent, EditorMainSystem system) {
+    public EditorTileProperties(Screen screen, Element parent, MouseControlSystem mouseSystem, EditorSystem editorSystem) {
         super(screen, parent, "Tile Properties");
-        this.system = system;
+        this.mouseSystem = mouseSystem;
+        this.editorSystem = editorSystem;
         addLabelField("data", "No data", HAlign.left);
         show();
         window.setIsCollapse();
+        mouseSystem.getSelectionControl().registerTileListener(selectionListener);
     }
+    private TileSelectionListener selectionListener = new TileSelectionListener() {
+        @Override
+        public void onTileSelectionUpdate(HexCoordinate currentSelection) {
+            updateWindow();
+        }
+    };
 
     private void show() {
         if (parent != null) {
@@ -39,83 +52,70 @@ public class EditorTileProperties extends EditorWindow {
         window.setUseCloseButton(false);
         window.setUseCollapseButton(true);
     }
-    
-    public void updatePosition(boolean isGhost, boolean isGroup) {
-//        this.tilePosition = position;
-        if (currentIsGhost == null || currentIsGhost != isGhost || isGroup != currentIsGroup) {
-            this.currentIsGhost = isGhost;
-            initialise(isGroup);
+
+    private void updateWindow() {
+        boolean isGroup = mouseSystem.getSelectionControl().getSelectedList().isEmpty();
+        if (currentIsGhost == null || isGroup != currentIsGroup || (editorSystem.getTile() != null ? false : true) != currentIsGhost) {
+            initialiseValue();
         } else {
-            update(isGroup);
+            updateValue();
         }
-        update(false);
     }
 
-    private void updateTexture(String label) {
-        ButtonAdapter btn = getButtonField(null, "Texture", system.getTileTextureKey(), ButtonType.IMG);
-        btn.setColorMap("Textures/Icons/Buttons/"+label+".png");
-        Element btnParent = btn.getElementParent();
-        btnParent.removeChild(btn);
-        btn.setUID(label + btn.getUID().substring(system.getTileTextureKey().length()));
-        btnParent.addChild(btn);
-        system.setTilePropertiesTexTure(label);
-    }
-
-    public void update(boolean isGroup) {
-    }
-
-    private void initialise(boolean isGroup) {
-        if (parent != null) {
-            window.getElementParent().removeChild(window);
-        } else {
-            parent.removeChild(window);
+    private void initialiseValue() {
+        super.removeFromScreen();
+        TileSelectionControl control = mouseSystem.getSelectionControl();
+        if (control.getSelectedList().isEmpty()) {
+            addLabelPropertieField("Coordinate", control.getSelectedPos().getAsOffset(), HAlign.left);
+            addLabelPropertieField("Chunk", HexGrid.getChunkGridPosition(control.getSelectedPos()), HAlign.left);
         }
-        elementList.clear();
-        if (!isGroup) {
-            addLabelPropertieField("Coordinate", tilePosition.getAsOffset(), HAlign.left);
-            addLabelPropertieField("Chunk", HexGridManager.getChunkGridPosition(tilePosition), HAlign.left);
-        }
-        if(isGroup) {
-            addButtonField(null, "Texture", HAlign.left, system.getTileTextureKey(tilePosition), HAlign.left, ButtonType.IMG);
+        if (!control.getSelectedList().isEmpty()) {
+            addButtonField(null, "Texture", HAlign.left, editorSystem.getTextureDefault(), HAlign.left, ButtonType.IMG); // @todo
             addButtonList(null, "Height", HAlign.left, new String[]{"dec", "inc"}, HAlign.left, ButtonType.TEXT, 1);
-        } else if (!currentIsGhost) {
-            addButtonField(null, "Texture", HAlign.left, system.getTileTextureKey(tilePosition), HAlign.left, ButtonType.IMG);
-            addHeighField();
+            addButtonField(null, "Initialise/reset", HAlign.full, ButtonType.TEXT);
             addButtonField(null, "Destroy", HAlign.full, ButtonType.TEXT);
-        } else if (currentIsGhost) {
-            addButtonField(null, "Generate", HAlign.full, ButtonType.TEXT);
+        } else if (editorSystem.getTile() != null) {
+            addButtonField(null, "Texture", HAlign.left, editorSystem.getTileTextureKey(), HAlign.left, ButtonType.IMG);
+            addSpinnerField("Height", "Height", new int[]{-100, 100, 1, editorSystem.getTileHeight()}, HAlign.left);
+            addButtonField(null, "Destroy", HAlign.full, ButtonType.TEXT);
+        } else {
+            addButtonField(null, "Initialise/reset", HAlign.full, ButtonType.TEXT);
         }
-        currentIsGroup = isGroup;
+        currentIsGhost = editorSystem.getTile() != null ? false : true;
+        currentIsGroup = control.getSelectedList().isEmpty();
         show();
     }
 
-    /**
-     * @todo
-     */
-    private void addHeighField() {
-        addSpinnerField("Height", "Height", new int[]{-100, 100, 1, system.getTileHeight(tilePosition)}, HAlign.left);
-//        Label label = generateLabel("Height", HAlign.left, false);
-//        elementList.put("Height", label);
-//        label.addChild(generateSpinner("Height", "Height", new int[]{-100, 100, 1, system.getTileHeight(tilePosition)}));
+    private void updateValue() {
+        getField(null, "coordinate");
+    }
+
+    private void updateTexture(String label) {
+        ButtonAdapter btn = getButtonField(null, "Texture", editorSystem.getTileTextureKey(), ButtonType.IMG);
+        btn.setColorMap("Textures/Icons/Buttons/" + label + ".png");
+        Element btnParent = btn.getElementParent();
+        btnParent.removeChild(btn);
+        btn.setUID(label + btn.getUID().substring(editorSystem.getTileTextureKey().length()));
+        btnParent.addChild(btn);
     }
 
     @Override
     protected void onButtonTrigger(String label) {
         boolean updateSelection = false;
-        if (label.equals("Generate")) {
-            system.setTileProperties(tilePosition);
-            updatePosition(tilePosition, false, currentIsGroup);
+        if (label.equals("Initialise/reset")) {
+            editorSystem.setNewTile();
+            updateWindow();
         } else if (label.equals("Destroy")) {
-            system.removeTile(tilePosition);
-            updatePosition(tilePosition, true, currentIsGroup);
+            editorSystem.removeTile();
+            updateWindow();
         } else if (label.equals("inc")) {
-            system.setTilePropertiesUp(tilePosition);
+            editorSystem.setTilePropertiesUp();
         } else if (label.equals("dec")) {
-            system.setTilePropertiesDown(tilePosition);
+            editorSystem.setTilePropertiesDown();
         } else {
             updateSelection = true;
         }
-        if(updateSelection) {
+        if (updateSelection) {
             selectionMenu(label);
         }
     }
@@ -124,14 +124,13 @@ public class EditorTileProperties extends EditorWindow {
         if (textureSelectionMenu != null) {
             textureSelectionMenu.removeFromScreen();
         }
-        System.err.println(ignoredKey);
         textureSelectionMenu = new EditorWindow(screen, getButtonField(null, "Texture", ignoredKey, ButtonType.IMG),
-                "Textures", new Vector2f(spacement + (system.getTextureKeys().size() - 1) * 16, 18)) {
+                "Textures", new Vector2f(spacement + (editorSystem.getTextureKeys().size() - 1) * 16, 18)) {
             @Override
             public void setVisible() {
-                String[] list = new String[system.getTextureKeys().size()-1];
+                String[] list = new String[editorSystem.getTextureKeys().size() - 1];
                 int i = 0;
-                for (String s : system.getTextureKeys()) {
+                for (String s : editorSystem.getTextureKeys()) {
                     if (!s.equals(ignoredKey)) {
                         list[i] = s.toUpperCase();
                         i++;
@@ -152,6 +151,7 @@ public class EditorTileProperties extends EditorWindow {
             @Override
             protected void onButtonTrigger(String label) {
                 updateTexture(label);
+                editorSystem.setTilePropertiesTexTure(label);
                 window.hide();
             }
 
@@ -168,7 +168,7 @@ public class EditorTileProperties extends EditorWindow {
             }
 
             @Override
-            protected void onSpinnerChange(String sTrigger, int currentIndex) {
+            protected void onSpinnerChange(String sTrigger, int currentIndex, ChangeType type) {
             }
         };
         textureSelectionMenu.setVisible();
@@ -191,7 +191,11 @@ public class EditorTileProperties extends EditorWindow {
     }
 
     @Override
-    protected void onSpinnerChange(String sTrigger, int currentIndex) {
-        system.setTileProperties(tilePosition, currentIndex);
+    protected void onSpinnerChange(String sTrigger, int currentIndex, ChangeType type) {
+        if (type.equals(ChangeType.INC)) {
+            editorSystem.setTilePropertiesUp();
+        } else {
+            editorSystem.setTilePropertiesDown();
+        }
     }
 }

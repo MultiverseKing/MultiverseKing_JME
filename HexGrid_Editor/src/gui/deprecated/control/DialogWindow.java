@@ -1,7 +1,9 @@
-package gui;
+package gui.deprecated.control;
 
+import gui.deprecated.listener.DialogWindowListener;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
+import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
 
@@ -32,19 +34,19 @@ public class DialogWindow extends EditorWindow {
     }
 
     public void addButton(String labelName) {
-        addButtonField(labelName, HAlign.full, ButtonType.TEXT);
+        addButtonField(null, labelName, HAlign.full, ButtonType.TEXT);
     }
 
     public void addSpinnerField(String labelName, int[] value) {
-        addSpinnerField(labelName, value, HAlign.left);
+        addSpinnerField(null, labelName, value, HAlign.left);
     }
 
     public void addLabelField(String labelText){
-        addLabelField(labelText, HAlign.left, new Vector2f());
+        addLabelField(null, labelText, HAlign.left);
     }
     
     public void showText(String string) {
-        addLabelField(string, HAlign.left, new Vector2f());
+        addLabelField(null, string, HAlign.left);
     }
 
     @Override
@@ -101,11 +103,11 @@ public class DialogWindow extends EditorWindow {
     }
 
     public String getTextInput(String name) {
-        return getTextField(name).getText();
+        return getTextField(null, name).getText();
     }
 
     public int getSpinnerInput(String name) {
-        return getSpinnerField(name).getSelectedIndex();
+        return getSpinnerField(null, name).getSelectedIndex();
     }
 
     @Override
@@ -142,7 +144,7 @@ public class DialogWindow extends EditorWindow {
     }
 
     @Override
-    protected void onSpinnerChange(String sTrigger, int currentIndex) {
+    protected void onSpinnerChange(String sTrigger, int currentIndex, Spinner.ChangeType type) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

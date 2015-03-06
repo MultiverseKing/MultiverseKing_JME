@@ -1,6 +1,8 @@
-package gui;
+package gui.deprecated;
 
+import gui.deprecated.listener.DialogWindowListener;
 import com.jme3.math.Vector2f;
+import gui.deprecated.control.DialogWindow;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -34,8 +36,8 @@ public class FileManagerPopup extends DialogWindow {
         if (labelName.equals((isLoading ? "Load from files." : "Override existing.")) && loadingList == null) {
             initializeLoading();
         } else if (labelName.equals((isLoading ? "Load from files." : "Override existing."))) {
-            loadingList.showMenu(null, getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
-                    getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
+            loadingList.showMenu(null, getField(null, (isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
+                    getField(null, (isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
         } else if (labelName.equals("Confirm") && getTextInput("Name").length() < 2) {
         } else {
             super.onButtonTrigger(labelName);
@@ -48,10 +50,10 @@ public class FileManagerPopup extends DialogWindow {
             Logger.getLogger(FileManagerPopup.class.getName()).log(Level.SEVERE, "Cannot locate the MapData Folder.", FileNotFoundException.class);
         }
         loadingList = new Menu(screen, "mapFileList", new Vector2f(), 
-                new Vector2f(getField((isLoading ? "Load from files." : "Override existing.")).getDimensions().x, getLayoutGridSize().y), false) {
+                new Vector2f(getField(null, (isLoading ? "Load from files." : "Override existing.")).getDimensions().x, getLayoutGridSize().y), false) {
             @Override
             public void onMenuItemClicked(int index, Object value, boolean isToggled) {
-                getTextField("Name").setText((String) value);
+                getTextField(null, "Name").setText((String) value);
                 listener.onDialogTrigger(getUID(), true);
             }
         };
@@ -65,8 +67,8 @@ public class FileManagerPopup extends DialogWindow {
             }
         }
         screen.addElement(loadingList);
-        loadingList.showMenu(null, getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
-                getField((isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
+        loadingList.showMenu(null, getField(null, (isLoading ? "Load from files." : "Override existing.")).getAbsoluteX(),
+                getField(null, (isLoading ? "Load from files." : "Override existing.")).getAbsoluteY() - loadingList.getHeight());
     }
 
     public String getInput() {

@@ -4,9 +4,10 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.RenderManager;
-import core.EditorMainSystem;
+import core.EditorSystem;
 import java.util.logging.Level;
 import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.appstate.MapDataAppState;
 import tonegod.gui.core.Screen;
 
 /**
@@ -64,6 +65,8 @@ public class TestMain extends SimpleApplication {
      * @todo Init system only when needed.
      */
     public void initSystem() {
-        stateManager.attach(new EditorMainSystem(new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager)));
+        MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager);
+        stateManager.attach(new MapDataAppState(mapData));
+        stateManager.attach(new EditorSystem(mapData, assetManager, getRootNode()));
     }
 }

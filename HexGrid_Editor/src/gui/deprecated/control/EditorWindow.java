@@ -1,4 +1,4 @@
-package gui;
+package gui.deprecated.control;
 
 import com.jme3.input.KeyInput;
 import com.jme3.input.event.KeyInputEvent;
@@ -6,15 +6,16 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import static gui.LayoutWindow.HAlign.full;
-import static gui.LayoutWindow.HAlign.left;
-import static gui.LayoutWindow.HAlign.right;
+import static gui.deprecated.control.LayoutWindow.HAlign.full;
+import static gui.deprecated.control.LayoutWindow.HAlign.left;
+import static gui.deprecated.control.LayoutWindow.HAlign.right;
 import java.util.ArrayList;
 import org.hexgridapi.utility.Vector2Int;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.CheckBox;
 import tonegod.gui.controls.lists.SelectBox;
 import tonegod.gui.controls.lists.Spinner;
+import tonegod.gui.controls.lists.Spinner.ChangeType;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.text.TextField;
 import tonegod.gui.core.Element;
@@ -75,7 +76,6 @@ public abstract class EditorWindow extends LayoutWindow {
     }
 
     // </editor-fold>
-    
     // <editor-fold defaultstate="collapsed" desc="Add Method">
     /**
      * Add an empty space into the grid.
@@ -188,9 +188,11 @@ public abstract class EditorWindow extends LayoutWindow {
      * @param offset value to be added on top of the gridPosition.
      */
     protected final void addCheckBoxField(String UID, String labelName, boolean active) {
-        CheckBox b = new CheckBox(screen, UID + "." + getUID() + "CheckBox", new Vector2f(spacement, spacement));
+        CheckBox b = new CheckBox(screen, (UID != null ? UID : labelName) + "." 
+                + getUID() + "CheckBox", new Vector2f(2, spacement), new Vector2f(15,15));
+        b.setIsChecked(active);
         b.setLabelText(labelName);
-        elementList.put(UID, b);
+        elementList.put(UID != null ? UID : labelName, b);
     }
 
     /**
@@ -207,10 +209,10 @@ public abstract class EditorWindow extends LayoutWindow {
     protected final void addSpinnerField(String UID, String labelName, int[] value, HAlign hAlign) {
         if (labelName != null) {
             Label label = generateLabel(labelName, hAlign, false);
+            elementList.put(UID != null ? UID : generateUID(labelName), label);
             label.addChild(generateSpinner(UID, labelName, value));
-            elementList.put(UID, label);
         } else {
-            elementList.put(UID, generateSpinner(UID, labelName, value));
+            elementList.put(UID != null ? UID : generateUID(labelName), generateSpinner(UID, labelName, value));
         }
     }
 
@@ -289,7 +291,7 @@ public abstract class EditorWindow extends LayoutWindow {
      * @param hAlign horizontal alignemenet to use.
      */
     protected final void addLabelField(String UID, String labelName, HAlign hAlign) {
-        if(UID == null) {
+        if (UID == null) {
             UID = generateUID(labelName);
         }
         elementList.put(UID, generateLabel(labelName, hAlign, true));
@@ -438,18 +440,20 @@ public abstract class EditorWindow extends LayoutWindow {
         selectBox.setSelectedIndex(baseValue.ordinal());
     }
 
-    protected final Spinner generateSpinner(final String UID, final String labelName, int[] value) {
-        final int startIndex = (int) (FastMath.abs(value[0]) + FastMath.abs(value[1])) / 2 + value[3];
+    protected final Spinner generateSpinner(final String UID, final String labelName, int[] intValue) {
+        final int startIndex = (int) (FastMath.abs(intValue[0]) + FastMath.abs(intValue[1])) / 2 + intValue[3];
         Spinner spinner = new Spinner(screen, (labelName != null ? labelName : UID) + "." + getUID() + ".Spinner",
-                new Vector2f((labelName != null ? elementList.get(UID).getDimensions().x : 0), 4),
-                new Vector2f((labelName != null ? layoutGridSize.x - elementList.get(UID).getDimensions().x - spacement : 0), layoutGridSize.y),
+                new Vector2f((labelName != null ? elementList.get(UID != null ? UID
+                : generateUID(labelName)).getDimensions().x : 0), 4),
+                new Vector2f((labelName != null ? layoutGridSize.x - elementList.get(
+                UID != null ? UID : generateUID(labelName)).getDimensions().x - spacement : 0), layoutGridSize.y),
                 Spinner.Orientation.HORIZONTAL, true) {
             @Override
-            public void onChange(int selectedIndex, String value) {
-                onSpinnerChange(labelName != null ? labelName : UID, selectedIndex - startIndex);
+            public void onChange(int selectedIndex, String value, ChangeType type) {
+                onSpinnerChange(labelName != null ? labelName : UID, selectedIndex, type);
             }
         };
-        spinner.setStepIntegerRange(value[0], value[1], value[2]);
+        spinner.setStepIntegerRange(intValue[0], intValue[1], intValue[2]);
         spinner.setSelectedIndex(startIndex);
         return spinner;
     }
@@ -626,7 +630,7 @@ public abstract class EditorWindow extends LayoutWindow {
 
     protected abstract void onSelectBoxFieldChange(Enum value);
 
-    protected abstract void onSpinnerChange(String sTrigger, int currentIndex);
+    protected abstract void onSpinnerChange(String sTrigger, int currentIndex, ChangeType type);
     // </editor-fold>
 
     public enum ButtonType {

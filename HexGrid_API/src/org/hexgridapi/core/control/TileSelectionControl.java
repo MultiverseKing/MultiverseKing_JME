@@ -30,7 +30,7 @@ import org.hexgridapi.utility.HexCoordinate;
  *
  * @author roah
  */
-public class TileSelectionControl extends AbstractControl {
+public class TileSelectionControl extends AbstractControl implements TileInputListener {
 
     private final Node node = new Node("tileSelectionNode");
     private static HashMap<Integer, Mesh> singleTile = new HashMap<Integer, Mesh>();
@@ -44,10 +44,10 @@ public class TileSelectionControl extends AbstractControl {
 
     public TileSelectionControl(MouseControlSystem system) {
         this.system = system;
-        system.registerTileInputListener(tileInputListener);
+        system.registerTileInputListener(this);
     }
-    
-    public void initialise(Application app){
+
+    public void initialise(Application app) {
         if (mat == null) {
             mat = app.getAssetManager().loadMaterial("Materials/hexMat.j3m");
             mat.setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/EMPTY_TEXTURE_KEY.png"));
@@ -68,7 +68,6 @@ public class TileSelectionControl extends AbstractControl {
         node.addControl(this);
         ((Node) app.getViewPort().getScenes().get(0)).attachChild(node);
     }
-    
     /**
      * Listeners.
      */
@@ -90,20 +89,7 @@ public class TileSelectionControl extends AbstractControl {
             }
         }
     };
-    private final TileInputListener tileInputListener = new TileInputListener() {
-        @Override
-        public void onMouseAction(MouseInputEvent event) {
-            if (event.getEventType().equals(MouseInputEvent.MouseInputEventType.LMB) && event.getEventPosition() != null) {
-//                HexTile tile = mapData.getTile(event.getEventPosition());
-                addTile(event.getEventPosition());
-//                editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getTileCount());
-            } else {
-                setSelected(event.getEventPosition());
-//                cursorControl.setPosition(event.getEventPosition(), system.getTileHeight(event.getEventPosition()));
-            }
-        }
-    };
-    private final TileChangeListener tileChangeListener= new TileChangeListener() {
+    private final TileChangeListener tileChangeListener = new TileChangeListener() {
         @Override
         public void onTileChange(TileChangeEvent... events) {
             for (int i = 0; i < events.length; i++) {
@@ -120,6 +106,8 @@ public class TileSelectionControl extends AbstractControl {
                         cursorControl.setHeight(0);
                         //                    tile.setLocalTranslation(event.getTilePos().convertToWorldPosition());
                     }
+                } else if (selectedTile.equals(events[i].getTilePos()) && events[i].getNewTile() != null){
+                    cursorControl.setHeight(events[i].getNewTile().getHeight());
                 }
             }
         }
@@ -128,41 +116,48 @@ public class TileSelectionControl extends AbstractControl {
     public void registerTileListener(TileSelectionListener listener) {
         this.listeners.add(listener);
     }
-
-//    @Override
-//    public void setSpatial(Spatial spatial) {
-//        super.setSpatial(spatial);
-//        if (spatial instanceof Node) {
-//            //initialise
-//        } else {
-//            throw new UnsupportedOperationException("spatial must be an instance of node.");
-//        }
-//    }
-
-    public void setSpatial(Application app, Spatial spatial){
-        super.setSpatial(spatial);
-    }
     
-    private void addTile(HexCoordinate pos) {
-        setSelected(pos);
+    @Override
+    public void onMouseAction(MouseInputEvent event) {
+        if (event.getType().equals(MouseInputEvent.MouseInputEventType.LMB) && event.getPosition() != null) {
+//                HexTile tile = mapData.getTile(event.getEventPosition());
+            addTile(event.getPosition(), event.getHeight());
+//                editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getTileCount());
+        } else if (event.getPosition() != null) {
+            setSelected(event.getPosition(), event.getHeight());
+//                cursorControl.setPosition(event.getEventPosition(), system.getTileHeight(event.getEventPosition()));
+        }
+    }
+
+    private void addTile(HexCoordinate pos, int height) {
         if (isSelectionGroup) {
+//            if (coords.isEmpty() && selectedTile != null) {
+//                addGeo(selectedTile, selectedTileHeight);
+//                coords.add(selectedTile);
+//            }
             if (!coords.contains(pos)) {
-                Geometry geo = new Geometry(pos.getAsOffset().toString(), getMesh(system.getTileHeight()));
-                geo.setMaterial(mat);
-                geo.setLocalTranslation(pos.convertToWorldPosition());
-                ((Node) spatial).attachChild(geo);
+                addGeo(pos, height);
                 coords.add(pos);
             } else {
                 ((Node) spatial).getChild(pos.getAsOffset().toString()).removeFromParent();
                 coords.remove(pos);
             }
         }
-        updateListeners();
+        setSelected(pos, height);
     }
 
-    private void setSelected(HexCoordinate pos) {
+    private void setSelected(HexCoordinate pos, int height) {
         selectedTile = pos;
-        cursorControl.setPosition(pos, system.getTileHeight());
+        cursorControl.setPosition(pos, height);
+        updateListeners();
+    }
+    
+    private void addGeo(HexCoordinate pos, int height){
+        Geometry geo = new Geometry(pos.getAsOffset().toString(), getMesh(height));
+        geo.setMaterial(mat);
+        geo.setLocalTranslation(pos.convertToWorldPosition());
+        ((Node) spatial).attachChild(geo);
+        
     }
 
     @Override

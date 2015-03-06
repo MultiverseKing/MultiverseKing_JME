@@ -23,6 +23,7 @@ public class CursorControl {
         animShader.setInt("Speed", 16);
         cursor.setMaterial(animShader);
         ((Node) app.getViewPort().getScenes().get(0)).attachChild(cursor);
+        cursor.setCullHint(Spatial.CullHint.Always);
     }
 
     public void setHeight(int height) {

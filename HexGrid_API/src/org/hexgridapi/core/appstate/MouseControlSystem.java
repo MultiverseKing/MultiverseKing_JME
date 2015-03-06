@@ -128,22 +128,17 @@ public class MouseControlSystem extends AbstractAppState {
     }
     private final ActionListener tileActionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (name.equals("Confirm") && !isPressed) {
-                if (listenerPulseIndex == -1) {
+            if (listenerPulseIndex == -1) {
+                if (name.equals("Confirm") && !isPressed) {
                     castRay(MouseInputEventType.LMB);
-                } else {
-                    inputListeners.get(listenerPulseIndex).onMouseAction(
-                            new MouseInputEvent(MouseInputEventType.LMB, tileSelectionControl.getSelectedPos(),//new HexCoordinate(cursor.getLocalTranslation()),
-                            rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
-                }
-            } else if (name.equals("Cancel") && !isPressed) {
-                if (listenerPulseIndex == -1) {
+                } else if (name.equals("Cancel") && !isPressed) {
                     castRay(MouseInputEventType.RMB);
-                } else {
-                    inputListeners.get(listenerPulseIndex).onMouseAction(
-                            new MouseInputEvent(MouseInputEventType.RMB, tileSelectionControl.getSelectedPos(),//new HexCoordinate(cursor.getLocalTranslation()),
-                            rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
                 }
+            } else {
+                inputListeners.get(listenerPulseIndex).onMouseAction(
+                        new MouseInputEvent(MouseInputEventType.PULSE, tileSelectionControl.getSelectedPos(), 
+                        mapData.getTile(tileSelectionControl.getSelectedPos()).getHeight(),//new HexCoordinate(cursor.getLocalTranslation()),
+                        rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
             }
         }
     };
@@ -166,7 +161,6 @@ public class MouseControlSystem extends AbstractAppState {
 ////        float z = mapData.getTile(new HexCoordinate(HexCoordinate.OFFSET, 0, 0)).getHeight() * HexSettings.FLOOR_OFFSET + 0.01f;
 ////        cursor.setLocalTranslation(new Vector3f(0f, z + 0.01f, cursorOffset));
 //    }
-
     @Override
     public void update(float tpf) {
         if (listenerPulseIndex != -1) {
@@ -224,22 +218,21 @@ public class MouseControlSystem extends AbstractAppState {
         Ray ray = rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE);
         MouseInputEvent event = null;
         if (!mouseInput.equals(MouseInputEventType.PULSE)) {
-            event = callRayActionListeners(mouseInput, ray);
-        }
-        if (event == null) {
-            event = rayCastControl.castRay(ray);
-            if (event != null) {// && !event.getEventPosition().equals(lastHexPos)) {
-                setNewRayEvent(new MouseInputEvent(mouseInput, rayCastControl.castRay(ray)));
+                event = callRayActionListeners(mouseInput, ray);
+            if (event == null) {
+                event = rayCastControl.castRay(ray);
+                if (event != null && event.getPosition() != null) { // && !event.getEventPosition().equals(lastHexPos)) {
+                    HexTile tile = mapData.getTile(event.getPosition());
+                    callMouseInputActionListeners(new MouseInputEvent(event, mouseInput,
+                            tile != null ? tile.getHeight() : 0));
+                }
+            } else {// if (!event.getEventPosition().equals(lastHexPos)) {
+                callMouseInputActionListeners(event);
+                rayCastControl.setDebugPosition(event.getCollisionResult().getContactPoint());
             }
-        } else {// if (!event.getEventPosition().equals(lastHexPos)) {
-            setNewRayEvent(event);
-            rayCastControl.setDebugPosition(event.getCollisionResult().getContactPoint());
+        } else {
+            tileSelectionControl.onMouseAction(rayCastControl.castRay(ray));
         }
-    }
-
-    private void setNewRayEvent(MouseInputEvent event) {
-//        moveCursor(event.getEventPosition());
-        callMouseInputActionListeners(event);
     }
 
     /**
@@ -272,45 +265,36 @@ public class MouseControlSystem extends AbstractAppState {
 //    public void setCursor(HexCoordinate tilePos) {
 //        moveCursor(tilePos);
 //    }
-    
-    public TileSelectionControl getSelectionControl(){
+    public TileSelectionControl getSelectionControl() {
         return tileSelectionControl;
     }
-    /**
-     * @return the currently selected tile.
-     */
-    public HexTile getSelectedTile() {
-        return mapData.getTile(tileSelectionControl.getSelectedPos());
-//        return mapData.getTile(tileSelectionControl.getTileList().toArray(new HexCoordinate[tileSelectionControl.getTileList().size()]));
-    }
-    
-    public int getTileHeight() {
-        HexTile tile = getSelectedTile();
-        if (tile != null) {
-            return tile.getHeight();
-        } else {
-            return 0;
-        }
-    }
 
-    public int getTileTextureValue() {
-        HexTile tile = getSelectedTile();
-        if (tile != null) {
-            return tile.getTextureKey();
-        } else {
-            return 0;
-        }
-    }
-
-    public String getTileTextureKey() {
-        HexTile tile = getSelectedTile();
-        if (tile != null) {
-            return mapData.getTextureValue(tile.getTextureKey());
-        } else {
-            return mapData.getTextureValue(0);
-        }
-    }
-
+//    public int getTileHeight() {
+//        HexTile tile = mapData.getTile(tileSelectionControl.getSelectedPos());
+//        if (tile != null) {
+//            return tile.getHeight();
+//        } else {
+//            return 0;
+//        }
+//    }
+//
+//    public int getTileTextureValue() {
+//        HexTile tile = mapData.getTile(tileSelectionControl.getSelectedPos());
+//        if (tile != null) {
+//            return tile.getTextureKey();
+//        } else {
+//            return 0;
+//        }
+//    }
+//
+//    public String getTileTextureKey() {
+//        HexTile tile = mapData.getTile(tileSelectionControl.getSelectedPos());
+//        if (tile != null) {
+//            return mapData.getTextureValue(tile.getTextureKey());
+//        } else {
+//            return mapData.getTextureValue(0);
+//        }
+//    }
 //    private void moveCursor(HexCoordinate tilePos) {
 ////        if(enable <= 0){
 //        if (!isLock) {
@@ -332,7 +316,6 @@ public class MouseControlSystem extends AbstractAppState {
 ////            enable--;
 ////        }
 //    }
-
 //    public void clearCursor() {
 //        if (cursor != null && rootNode.hasChild(cursor)) {
 //            cursor.removeFromParent();
@@ -347,7 +330,6 @@ public class MouseControlSystem extends AbstractAppState {
 //        this.isLock = false;
 //        moveCursor(lastHexPos);
 //    }
-
     @Override
     public void cleanup() {
         super.cleanup();

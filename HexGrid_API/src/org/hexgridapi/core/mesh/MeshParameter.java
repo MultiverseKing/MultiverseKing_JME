@@ -13,7 +13,9 @@ import org.hexgridapi.utility.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
- * Used to generate the needed data used by the MeshManager.
+ * Used to generate the needed data used by the MeshManager to generate all
+ * mesh contained in the chunk, mesh are split by used texture.
+ * 1 texture can have mutilple mesh since it's split by height.
  *
  * @author roah
  */
@@ -40,17 +42,14 @@ public final class MeshParameter {
     /**
      * Current element param returned.
      */
-    private String currentElement;
-    private int currentIndex;
+    private String inspectedTexture;
+    private int inspectedMesh;
     private int groundHeight = 0;
 
     /**
      * Generate all parameter needed to create a grid from defined value.
      *
-     * @param mapData Reference.
-     * @param chunkSize max radius.
-     * @param onlyGround generate only the top face ?
-     * @param chunkShape shape to use when generating the chunk.
+     * @param mapData Reference used to get the data from.
      */
     public MeshParameter(MapData mapData) {
         this.mapData = mapData;
@@ -63,7 +62,7 @@ public final class MeshParameter {
         /**
          * x && y == coord local
          */
-        int posInList = 0;
+        int elementID = 0;
         for (int y = 0; y < isVisited.length; y++) {
             for (int x = 0; x < isVisited.length; x++) {
                 if (!isVisited[x][y]) {
@@ -94,7 +93,7 @@ public final class MeshParameter {
                         ArrayList<Integer> list = new ArrayList<Integer>();
                         elementTypeRef.put(textValue, list);
                     }
-                    elementTypeRef.get(textValue).add(posInList);
+                    elementTypeRef.get(textValue).add(elementID);
 
                     Integer tileHeight = currentTile == null ? null : currentTile.getHeight();
                     if (tileHeight != null && tileHeight < groundHeight) {
@@ -108,17 +107,17 @@ public final class MeshParameter {
 //                    Integer tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
 
                     this.add(new Vector2Int(x, y), new Vector2Int(1, 1), tileHeight);
-                    setSizeX(centerPosition, radius, posInList, isVisited, currentTile, currentIsInRange, chunkOffset);
-                    posInList++;
+                    setSizeX(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkOffset);
+                    elementID++;
                 }
             }
         }
     }
 
-    private void setSizeX(HexCoordinate centerPos, int radius, int posInList, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
-        for (int x = 1; x < isVisited.length - position.get(posInList).x; x++) {
-            boolean alreadyVisited = isVisited[position.get(posInList).x + x][position.get(posInList).y];
-            HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, 0, chunkOffset));
+    private void setSizeX(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+        for (int x = 1; x < isVisited.length - position.get(inspectedID).x; x++) {
+            boolean alreadyVisited = isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y];
+            HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, inspectedID, x, 0, chunkOffset));
 //            if (mode.equals(GhostMode.FULL)) {
 //                nextTile = null;
 //            } else {
@@ -128,24 +127,24 @@ public final class MeshParameter {
                     || !alreadyVisited && centerPos == null && currentTile != null && nextTile != null
                     && currentTile.getTextureKey() == nextTile.getTextureKey() && currentTile.getHeight() == nextTile.getHeight()
                     || !alreadyVisited && centerPos != null && currentTile != null && nextTile != null
-                    && getIsInRange(radius, posInList, x, 0) == currentIsInRange
+                    && getIsInRange(radius, inspectedID, x, 0) == currentIsInRange
                     && currentTile.getHeight() == nextTile.getHeight()) {
-                this.size.get(posInList).x++;
-                isVisited[x + position.get(posInList).x][position.get(posInList).y] = true;
+                this.size.get(inspectedID).x++;
+                isVisited[x + position.get(inspectedID).x][position.get(inspectedID).y] = true;
             } else {
-                setSizeY(centerPos, radius, posInList, isVisited, currentTile, currentIsInRange, chunkOffset);
+                setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
                 return;
             }
         }
-        setSizeY(centerPos, radius, posInList, isVisited, currentTile, currentIsInRange, chunkOffset);
+        setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
     }
 
-    private void setSizeY(HexCoordinate centerPos, int radius, int posInList, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
-        for (int y = 1; y < isVisited.length - position.get(posInList).y; y++) {
+    private void setSizeY(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+        for (int y = 1; y < isVisited.length - position.get(inspectedID).y; y++) {
             //We check if the next Y line got the same properties
-            for (int x = 0; x < size.get(posInList).x; x++) {
-                boolean alreadyVisited = isVisited[position.get(posInList).x + x][position.get(posInList).y + y];
-                HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, y, chunkOffset));
+            for (int x = 0; x < size.get(inspectedID).x; x++) {
+                boolean alreadyVisited = isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y + y];
+                HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, inspectedID, x, y, chunkOffset));
 //                if (mode.equals(GhostMode.FULL)) {
 //                    nextTile = null;
 //                } else {
@@ -156,7 +155,7 @@ public final class MeshParameter {
                         && !mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
                         || centerPos == null && currentTile != null && nextTile != null && nextTile.getHeight() != currentTile.getHeight()
                         || centerPos != null && currentTile != null && nextTile != null
-                        && getIsInRange(radius, posInList, x, y) != currentIsInRange
+                        && getIsInRange(radius, inspectedID, x, y) != currentIsInRange
                         || centerPos != null && currentTile != null && nextTile != null
                         && nextTile.getHeight() != currentTile.getHeight()) {
                     //if one tile didn't match the requirement we stop the search
@@ -164,22 +163,22 @@ public final class MeshParameter {
                 }
             }
             //all tile meet the requirement we increase the size Y
-            size.get(posInList).y++;
+            size.get(inspectedID).y++;
             //we set that line as visited so we don't do any operation later for them
-            for (int x = 0; x < size.get(posInList).x; x++) {
-                isVisited[position.get(posInList).x + x][position.get(posInList).y + y] = true;
+            for (int x = 0; x < size.get(inspectedID).x; x++) {
+                isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y + y] = true;
             }
         }
     }
 
-    private boolean getIsInRange(int radius, Integer posInList, int x, int y) {
+    private boolean getIsInRange(int radius, Integer inspectedID, int x, int y) {
         return new HexCoordinate(Coordinate.OFFSET, radius, radius).hasInRange(
-                new HexCoordinate(Coordinate.OFFSET, (posInList != null ? position.get(posInList).x : 0) + x, (posInList != null ? position.get(posInList).y : 0) + y), radius);
+                new HexCoordinate(Coordinate.OFFSET, (inspectedID != null ? position.get(inspectedID).x : 0) + x, (inspectedID != null ? position.get(inspectedID).y : 0) + y), radius);
     }
 
-    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Integer posInList, int x, int y, Vector2Int chunkOffset) {
+    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Integer inspectedID, int x, int y, Vector2Int chunkOffset) {
         if (centerPos != null) {
-            Vector2Int coord = new Vector2Int(x + (posInList != null ? position.get(posInList).x : 0) - radius, y + (posInList != null ? position.get(posInList).y : 0) - radius);
+            Vector2Int coord = new Vector2Int(x + (inspectedID != null ? position.get(inspectedID).x : 0) - radius, y + (inspectedID != null ? position.get(inspectedID).y : 0) - radius);
             if ((radius & 1) == 0) {
                 if ((centerPos.getAsOffset().y & 1) == 0) {
                     return centerPos.add(coord);
@@ -202,7 +201,7 @@ public final class MeshParameter {
                 }
             }
         } else {
-            return new HexCoordinate(Coordinate.OFFSET, x + position.get(posInList).x + chunkOffset.x, y + position.get(posInList).y + chunkOffset.y);
+            return new HexCoordinate(Coordinate.OFFSET, x + position.get(inspectedID).x + chunkOffset.x, y + position.get(inspectedID).y + chunkOffset.y);
         }
     }
 
@@ -257,8 +256,8 @@ public final class MeshParameter {
         HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
         for (String value : elementTypeRef.keySet()) {
             if (value.equals("NO_TILE") && debugMode || !value.equals("NO_TILE")) {
-                currentElement = value;
-                currentIndex = -1;
+                inspectedTexture = value;
+                inspectedMesh = -1;
                 mesh.put(value, MeshGenerator.getInstance().getMesh(this));
             }
         }
@@ -269,7 +268,7 @@ public final class MeshParameter {
      * @return index list of all mesh of the current element.
      */
     public ArrayList<Integer> getElementMeshIndex() {
-        return this.elementTypeRef.get(currentElement);
+        return this.elementTypeRef.get(inspectedTexture);
     }
 
     /**
@@ -283,21 +282,21 @@ public final class MeshParameter {
      * @return position in chunk of the current element mesh visited.
      */
     public Vector2Int getPositionParam() {
-        return position.get(elementTypeRef.get(currentElement).get(currentIndex));
+        return position.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
     }
 
     /**
      * @return the size of the current element mesh visited.
      */
     public Vector2Int getSizeParam() {
-        return size.get(elementTypeRef.get(currentElement).get(currentIndex));
+        return size.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
     }
 
     /**
      * @return height of the current element mesh visited.
      */
     public int getHeightParam() {
-        return height.get(elementTypeRef.get(currentElement).get(currentIndex));
+        return height.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
     }
 
     /**
@@ -319,7 +318,7 @@ public final class MeshParameter {
      * @return
      */
     public int getElementMeshCount() {
-        return elementTypeRef.get(currentElement).size();
+        return elementTypeRef.get(inspectedTexture).size();
     }
 
     /**
@@ -328,8 +327,8 @@ public final class MeshParameter {
      * @return
      */
     public boolean hasNext() {
-        currentIndex++;
-        if (elementTypeRef.get(currentElement).size() > currentIndex) {
+        inspectedMesh++;
+        if (elementTypeRef.get(inspectedTexture).size() > inspectedMesh) {
             return true;
         } else {
             return false;
@@ -337,6 +336,10 @@ public final class MeshParameter {
     }
     // </editor-fold>
 
+    /**
+     * Culling data corresponding to the currently inspected Mesh
+     * @return 
+     */
     public CullingData getCullingData() {
         return new CullingData();
     }
@@ -351,47 +354,47 @@ public final class MeshParameter {
         boolean[][][] culling = new boolean[4][][];
 
         private CullingData() {
-            int currentChunk = elementTypeRef.get(currentElement).get(currentIndex);
-            boolean isOddStart = (position.get(currentChunk).y & 1) == 0;
+            int inspectedID = elementTypeRef.get(inspectedTexture).get(inspectedMesh);
+            boolean isOddStart = (position.get(inspectedID).y & 1) == 0;
 
             HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
-                    position.get(currentChunk).x, position.get(currentChunk).y);
+                    position.get(inspectedID).x, position.get(inspectedID).y);
             for (int i = 0; i < 4; i++) {
-                int currentSize = (i == 0 || i == 1 ? size.get(currentChunk).x : size.get(currentChunk).y);
+                int currentSize = (i == 0 || i == 1 ? size.get(inspectedID).x : size.get(inspectedID).y);
                 culling[i] = new boolean[currentSize][3];
                 for (int j = 0; j < currentSize; j++) {
                     if (i == 0) { // top chunk = -(Z)
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(j, 0));
-                        culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                        culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
+                        culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
+                        culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
                         culling[i][j][2] = true;
                     } else if (i == 1) { //bot chunk = (Z)
-                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(currentChunk).y - 1));
-                        culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
-                        culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(inspectedID).y+1));
+                        culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
+                        culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
                         culling[i][j][2] = true;
                     } else if (i == 2) { // left chunk = -(X)
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(0, j));
-                        culling[i][j][0] = neightbors[3] == null || neightbors[3].getHeight() < height.get(currentChunk) ? false : true; // left
+                        culling[i][j][0] = neightbors[3] == null || neightbors[3].getHeight() < height.get(inspectedID) ? false : true; // left
                         if (isOddStart && (j & 1) == 0) {
-                            culling[i][j][1] = j != 0 && neightbors[2] == null || j != 0 && neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
+                            culling[i][j][1] = j != 0 && neightbors[2] == null || j != 0 && neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
                         } else if (!isOddStart && (j & 1) != 0) {
-                            culling[i][j][1] = neightbors[2] == null || neightbors[2].getHeight() < height.get(currentChunk) ? false : true; // top left
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(currentChunk) ? false : true; // bot left
+                            culling[i][j][1] = neightbors[2] == null || neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
                         } else {
                             culling[i][j][1] = true; // top left ignored
                             culling[i][j][2] = true; // bot left ignored
                         }
                     } else { // right chunk = (X)
-                        HexTile[] neightbors = mapData.getNeightbors(coord.add(size.get(currentChunk).x - 1, j));
-                        culling[i][j][0] = neightbors[0] == null || neightbors[0].getHeight() < height.get(currentChunk) ? false : true; // right
+                        HexTile[] neightbors = mapData.getNeightbors(coord.add(size.get(inspectedID).x - 1, j));
+                        culling[i][j][0] = neightbors[0] == null || neightbors[0].getHeight() < height.get(inspectedID) ? false : true; // right
                         if (!isOddStart && (j & 1) == 0) {
-                            culling[i][j][1] = j != 0 && neightbors[1] == null || j != 0 && neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                            culling[i][j][1] = j != 0 && neightbors[1] == null || j != 0 && neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
                         } else if (isOddStart && (j & 1) != 0) {
-                            culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(currentChunk) ? false : true; // top right
-                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(currentChunk) ? false : true; // bot right
+                            culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
+                            culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
                         } else {
                             culling[i][j][1] = true; // top right ignored
                             culling[i][j][2] = true; // bot right ignored

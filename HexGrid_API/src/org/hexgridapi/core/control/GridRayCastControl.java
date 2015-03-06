@@ -88,7 +88,7 @@ public class GridRayCastControl {
                 CollisionResult closest = results.getClosestCollision();
                 setDebugPosition(closest.getContactPoint());
                 HexCoordinate newPos = convertMouseCollision(results);
-                return new MouseInputEvent(null, newPos, ray, closest);
+                return new MouseInputEvent(null, newPos, null, ray, closest);
             }
             return null;
         } else {

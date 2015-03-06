@@ -126,6 +126,15 @@ public final class MapData {
 
     /**
      * Change the designed tile(s) properties.
+     *
+     * @param tilePos position of the tile to change.
+     * @param tile tile to change.
+     */
+    public void setTile(HexCoordinate tilePos, HexTile tile) {
+        setTile(new HexCoordinate[]{tilePos}, new HexTile[]{tile});
+    }
+    /**
+     * Change the designed tile(s) properties.
      * if tile array size is == 1 the given properties will be apply on all
      * position,
      * else the two array size must match.

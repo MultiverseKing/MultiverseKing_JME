@@ -170,7 +170,7 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
 
     private void updateListeners() {
         for (int i = 0; i < listeners.size(); i++) {
-            listeners.get(i).onTileSelectionUpdate(selectedTile);
+            listeners.get(i).onTileSelectionUpdate(selectedTile, coords);
         }
     }
 

@@ -182,6 +182,20 @@ public final class HexCoordinate {
             if (coord.getAsAxial().x == q && coord.getAsAxial().y == r) {
                 return true;
             }
+        } else if (obj instanceof Vector2Int) {
+            Vector2Int coord = (Vector2Int) obj;
+            if (coord.x == getAsOffset().x && coord.y == getAsOffset().y) {
+                return true;
+            }
+        } else if (obj instanceof String) {
+            try {
+                HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET, new Vector2Int((String) obj));
+                if (coord.getAsAxial().x == q && coord.getAsAxial().y == r) {
+                    return true;
+                }
+            } catch (NumberFormatException e){
+                return false;
+            }
         }
         return false;
     }

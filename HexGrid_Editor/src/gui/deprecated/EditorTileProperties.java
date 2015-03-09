@@ -1,4 +1,4 @@
-package core.gui;
+package gui.deprecated;
 
 import com.jme3.math.Vector2f;
 import core.HexMapSystem;

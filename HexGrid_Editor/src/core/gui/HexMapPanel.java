@@ -1,5 +1,7 @@
-package core;
+package core.gui;
 
+import core.HexMapSystem;
+import core.gui.ComboBoxRenderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -45,7 +47,7 @@ public class HexMapPanel extends AbstractAction {
     private HashMap<String, JComponent> comps = new HashMap<>();
     private boolean update = true;
 
-    HexMapPanel(EditorMain editorMain, MouseControlSystem mouseSystem, HexMapSystem editorSystem) {
+    public HexMapPanel(EditorMain editorMain, MouseControlSystem mouseSystem, HexMapSystem editorSystem) {
         this.mouseSystem = mouseSystem;
         this.editorSystem = editorSystem;
         this.editorMain = editorMain;

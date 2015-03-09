@@ -1,4 +1,4 @@
-package core;
+package core.gui;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.texture.Image;

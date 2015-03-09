@@ -1,16 +1,14 @@
 package core;
 
+import core.gui.HexMapPanel;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
-import com.jme3.input.KeyInput;
-import com.jme3.input.controls.KeyTrigger;
 import com.jme3.scene.Node;
 import core.control.GhostControl;
-import core.gui.EditorMainGUI;
+import gui.deprecated.EditorMainGUI;
 import gui.deprecated.FileManagerPopup;
-import gui.deprecated.TileWidgetMenu;
 import java.util.List;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexTile;
@@ -21,8 +19,6 @@ import org.hexgridapi.core.control.TileSelectionControl;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import test.EditorMain;
-import tonegod.gui.core.Element;
-import tonegod.gui.core.Screen;
 
 /**
  * To be extended to create other editor.
@@ -31,31 +27,14 @@ import tonegod.gui.core.Screen;
  */
 public final class HexMapSystem extends AbstractHexGridAppState {
 
-    private Screen screen;
     private SimpleApplication app;
-    private Element rootElement;
     private GhostControl ghostControl;
-//    private TileSelectionControl tileSelectionControl;
-
-    /* todo */
-    private TileWidgetMenu tileWidgetMenu;
-    private boolean initMenu = true;
-    private FileManagerPopup popup = null;
-//    private EditorTileProperties gui;
     private EditorMainGUI editorMainGUI;
-//    private TileSelectionControl tileSelectionControl;
     private TileSelectionControl tileSelectionControl;
-    private int defaultkeyTexture = 0;
     private HexMapPanel hexMapPanel;
 
     public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
-        this(mapData, assetManager, rootNode, null, null);
-    }
-
-    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode, Screen screen, Element rootMenu) {
         super(mapData, assetManager, rootNode, true);
-        this.screen = screen;
-        this.rootElement = rootMenu;
     }
 
     @Override
@@ -69,15 +48,8 @@ public final class HexMapSystem extends AbstractHexGridAppState {
         }
         tileSelectionControl = mouseControl.getSelectionControl();
 
-        if (screen == null) {
-            this.screen = new Screen(app);
-            this.app.getGuiNode().addControl(screen);
-        }
-
         hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
         initialiseGhostGrid((SimpleApplication) app);
-
-        screen.getApplication().getInputManager().addMapping("help", new KeyTrigger(KeyInput.KEY_F1)); //@todo
     }
 
     protected void initialiseGhostGrid(SimpleApplication app) {
@@ -269,35 +241,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     @Override
     protected void removedChunk(Vector2Int pos) {
         ghostControl.updateCulling();
-    }
-
-    /**
-     * Window related to the selected hex.
-     *
-     * @param coord of the selected hex
-     * @deprecated
-     */
-    private void openWidgetMenu(HexCoordinate tilePos) {
-        if (tileWidgetMenu == null) {
-            tileWidgetMenu = new TileWidgetMenu(screen, app.getCamera(), this, tilePos);
-        }
-        HexTile tile = mapData.getTile(tilePos);
-        if (tile != null) {
-            tileWidgetMenu.show(tilePos, tile.getHeight());
-        } else {
-            tileWidgetMenu.show(tilePos);
-        }
-    }
-
-    /**
-     * @deprecated
-     */
-    private void closeTileMenu() {
-        if (tileWidgetMenu != null && tileWidgetMenu.isVisible()) {
-            tileWidgetMenu.hide();
-        }
-//        mouseControl.unlockCursor();
-        initMenu = true;
     }
 
     public void loadFromFile(FileManagerPopup popup) {

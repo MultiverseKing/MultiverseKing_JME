@@ -1,8 +1,9 @@
 package core.gui;
 
 import com.jme3.math.Vector2f;
-import core.EditorSystem;
+import core.HexMapSystem;
 import gui.deprecated.control.EditorWindow;
+import java.util.ArrayList;
 import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.control.TileSelectionControl;
@@ -21,13 +22,13 @@ import tonegod.gui.core.Screen;
 public class EditorTileProperties extends EditorWindow {
 
     private final MouseControlSystem mouseSystem;
-    private final EditorSystem editorSystem;
+    private final HexMapSystem editorSystem;
 //    private HexCoordinate tilePosition;// = new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int());
     private boolean currentIsGroup = false; // if inspected tile exist in MapData
     private EditorWindow textureSelectionMenu;
     private Boolean currentIsGhost;
 
-    public EditorTileProperties(Screen screen, Element parent, MouseControlSystem mouseSystem, EditorSystem editorSystem) {
+    public EditorTileProperties(Screen screen, Element parent, MouseControlSystem mouseSystem, HexMapSystem editorSystem) {
         super(screen, parent, "Tile Properties");
         this.mouseSystem = mouseSystem;
         this.editorSystem = editorSystem;
@@ -38,8 +39,8 @@ public class EditorTileProperties extends EditorWindow {
     }
     private TileSelectionListener selectionListener = new TileSelectionListener() {
         @Override
-        public void onTileSelectionUpdate(HexCoordinate currentSelection) {
-            updateWindow();
+        public void onTileSelectionUpdate(HexCoordinate currentSelection, ArrayList<HexCoordinate> selectedList) {
+            updateWindow(selectedList);
         }
     };
 
@@ -53,9 +54,9 @@ public class EditorTileProperties extends EditorWindow {
         window.setUseCollapseButton(true);
     }
 
-    private void updateWindow() {
-        boolean isGroup = mouseSystem.getSelectionControl().getSelectedList().isEmpty();
-        if (currentIsGhost == null || isGroup != currentIsGroup || (editorSystem.getTile() != null ? false : true) != currentIsGhost) {
+    private void updateWindow(ArrayList<HexCoordinate> selectedList) {
+        if (currentIsGhost == null || selectedList != null && selectedList.isEmpty() != currentIsGroup 
+                || (editorSystem.getTile() != null ? false : true) != currentIsGhost) {
             initialiseValue();
         } else {
             updateValue();
@@ -104,10 +105,10 @@ public class EditorTileProperties extends EditorWindow {
         boolean updateSelection = false;
         if (label.equals("Initialise/reset")) {
             editorSystem.setNewTile();
-            updateWindow();
+            updateWindow(null);
         } else if (label.equals("Destroy")) {
             editorSystem.removeTile();
-            updateWindow();
+            updateWindow(null);
         } else if (label.equals("inc")) {
             editorSystem.setTilePropertiesUp();
         } else if (label.equals("dec")) {

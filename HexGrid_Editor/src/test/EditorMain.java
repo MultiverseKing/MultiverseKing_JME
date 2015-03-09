@@ -6,22 +6,17 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
-import core.EditorSystem;
-import gui.JHexEditor;
+import core.HexMapSystem;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import tonegod.gui.core.Screen;
 
 /**
  * test
@@ -29,26 +24,22 @@ import tonegod.gui.core.Screen;
  * @author normenhansen, Roah
  */
 public class EditorMain extends SimpleApplication {
-
-//    public static void main(String[] args) {
-//        TestMain1 app = new TestMain1();
-//        java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
-//        app.start();
-//    }
+    
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 // ... see below ...
                 AppSettings settings = new AppSettings(true);
-                settings.setWidth(640);
-                settings.setHeight(480);
+                settings.setWidth(1024);
+                settings.setHeight(768);
                 java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 
                 JFrame rootWindow = new JFrame("Hex Grid Editor");
                 rootWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                JPanel rootPanel = new JPanel(new GridBagLayout());
-                EditorMain editorMain = new EditorMain(rootWindow, rootPanel);
+                rootWindow.getContentPane().setLayout(new BorderLayout());
+//                JPanel rootPanel = new JPanel(new GridBagLayout());
+                EditorMain editorMain = new EditorMain(rootWindow);
 
                 editorMain.setSettings(settings);
                 editorMain.createCanvas(); // create canvas!
@@ -66,25 +57,9 @@ public class EditorMain extends SimpleApplication {
                 JMenuItem item = new JMenuItem(new JHexEditor("New Map", editorMain));
                 menu.add(item);
                 //-------------
-
-                GridBagConstraints bagConstraints = new GridBagConstraints();
-                bagConstraints.gridx = 1;
-                bagConstraints.gridy = 1;
-                bagConstraints.gridwidth = 1;
-                bagConstraints.gridheight = 1;
-                bagConstraints.weightx = 0;
-                bagConstraints.weighty = 0;
-                bagConstraints.insets = new Insets(5, 5, 5, 5);
-                bagConstraints.anchor = GridBagConstraints.CENTER;
-                bagConstraints.fill = GridBagConstraints.BOTH;
-                // add the JME canvas
-                bagConstraints.gridx = 0;
-                bagConstraints.weightx = 1;
-                bagConstraints.weighty = 1;
-                rootPanel.add(ctx.getCanvas(), bagConstraints);
-
-
-                rootWindow.add(rootPanel);
+                
+                rootWindow.getContentPane().add(ctx.getCanvas(), BorderLayout.CENTER);
+                
                 rootWindow.pack();
                 rootWindow.setVisible(true);
                 rootWindow.setLocationRelativeTo(null);
@@ -94,25 +69,19 @@ public class EditorMain extends SimpleApplication {
         });
     }
     private final JFrame rootWindow;
-    private final JPanel rootPanel;
-    private Screen screen;
     private RTSCamera rtsCam;
+    private boolean isStart = false;
 
-    public EditorMain(JFrame rootWindow, JPanel rootPanel) {
+    public EditorMain(JFrame rootWindow) {
         this.rootWindow = rootWindow;
-        this.rootPanel = rootPanel;
     }
 
-    public JFrame getRootWindow() {
-        return rootWindow;
-    }
-
-    public JPanel getRootPanel() {
-        return rootPanel;
+    public boolean isStart(){
+        return isStart;
     }
     
-    public Screen getScreen() {
-        return screen;
+    public JFrame getRootWindow() {
+        return rootWindow;
     }
 
     public RTSCamera getRtsCam() {
@@ -128,24 +97,21 @@ public class EditorMain extends SimpleApplication {
     }
 
     public void startEditor() {
-        screen = new Screen(this);
         this.enqueue(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
                 inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-
-                //Create a new screen for tonegodGUI to work with.
-                guiNode.addControl(screen);
                 //init the Entity && Hex System
 
                 MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager);
                 stateManager.attach(new MapDataAppState(mapData));
-                stateManager.attach(new EditorSystem(mapData, assetManager, getRootNode()));
+                stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
 
                 return null;
             }
         });
+        isStart = true;
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.hexgridapi.core.control.ChunkControl;
 import org.hexgridapi.core.control.TileSelectionControl;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
+import test.EditorMain;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
@@ -28,7 +29,7 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public final class EditorSystem extends AbstractHexGridAppState {
+public final class HexMapSystem extends AbstractHexGridAppState {
 
     private Screen screen;
     private SimpleApplication app;
@@ -45,12 +46,13 @@ public final class EditorSystem extends AbstractHexGridAppState {
 //    private TileSelectionControl tileSelectionControl;
     private TileSelectionControl tileSelectionControl;
     private int defaultkeyTexture = 0;
+    private HexMapPanel hexMapPanel;
 
-    public EditorSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
+    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
         this(mapData, assetManager, rootNode, null, null);
     }
 
-    public EditorSystem(MapData mapData, AssetManager assetManager, Node rootNode, Screen screen, Element rootMenu) {
+    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode, Screen screen, Element rootMenu) {
         super(mapData, assetManager, rootNode, true);
         this.screen = screen;
         this.rootElement = rootMenu;
@@ -66,26 +68,18 @@ public final class EditorSystem extends AbstractHexGridAppState {
             app.getStateManager().attach(mouseControl);
         }
         tileSelectionControl = mouseControl.getSelectionControl();
-//        mouseControl.registerTileInputListener(tileInputListener);
 
         if (screen == null) {
             this.screen = new Screen(app);
             this.app.getGuiNode().addControl(screen);
         }
-        editorMainGUI = new EditorMainGUI(screen, rootElement, mouseControl, this);
-//        gui = new EditorTileProperties(screen, editorRoot.getWindow(), this);
+
+        hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
         initialiseGhostGrid((SimpleApplication) app);
-//        initialiseTileSelectionControl();
 
         screen.getApplication().getInputManager().addMapping("help", new KeyTrigger(KeyInput.KEY_F1)); //@todo
     }
 
-//    protected final void initialiseTileSelectionControl() {
-//        Node node = new Node("tileSelectionNode");
-//        tileSelectionControl = new TileSelectionControl(app, this);
-//        node.addControl(tileSelectionControl);
-//        ((Node) app.getViewPort().getScenes().get(0)).attachChild(node);
-//    }
     protected void initialiseGhostGrid(SimpleApplication app) {
         Node node = new Node("GhostNode");
         ghostControl = new GhostControl(app, meshParam, new Vector2Int(), this);
@@ -119,7 +113,7 @@ public final class EditorSystem extends AbstractHexGridAppState {
     }
 
     public void setTilePropertiesTexTure(String textureKey) {
-        if(!tileSelectionControl.getSelectedList().isEmpty()){
+        if (!tileSelectionControl.getSelectedList().isEmpty()) {
             HexCoordinate[] tileList = tileSelectionControl.getSelectedList().toArray(
                     new HexCoordinate[tileSelectionControl.getSelectedList().size()]);
             HexTile[] t = mapData.getTile(tileList);
@@ -132,8 +126,8 @@ public final class EditorSystem extends AbstractHexGridAppState {
             }
             mapData.setTile(tileList, t);
         } else {
-            HexTile t  = mapData.getTile(tileSelectionControl.getSelectedPos());
-            if(t != null){
+            HexTile t = mapData.getTile(tileSelectionControl.getSelectedPos());
+            if (t != null) {
                 t = t.cloneChangedTextureKey(mapData.getTextureKey(textureKey));
             } else {
                 t = new HexTile(0, mapData.getTextureKey(textureKey));
@@ -161,7 +155,7 @@ public final class EditorSystem extends AbstractHexGridAppState {
             mapData.setTile(tileList, t);
         } else {
             HexTile t = mapData.getTile(tileSelectionControl.getSelectedPos());
-            if(t != null){
+            if (t != null) {
                 t = t.cloneChangedHeight(t.getHeight() + 1);
             } else {
                 t = new HexTile(1);
@@ -185,7 +179,7 @@ public final class EditorSystem extends AbstractHexGridAppState {
             mapData.setTile(tileList, t);
         } else {
             HexTile t = mapData.getTile(tileSelectionControl.getSelectedPos());
-            if(t != null){
+            if (t != null) {
                 t = t.cloneChangedHeight(t.getHeight() - 1);
             } else {
                 t = new HexTile(-1);

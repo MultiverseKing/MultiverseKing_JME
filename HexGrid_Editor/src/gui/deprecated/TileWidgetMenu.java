@@ -6,7 +6,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import core.EditorSystem;
+import core.HexMapSystem;
 import gui.deprecated.control.AnimatedButton;
 import gui.deprecated.control.CameraTrackWindow;
 import java.util.ArrayList;
@@ -26,10 +26,10 @@ public class TileWidgetMenu extends CameraTrackWindow {
     private ArrayList<AnimatedButton> animatedButton = new ArrayList<>();
     private ArrayList<WidgetSubMenu> widgetMenu = new ArrayList<>(2);
     private WidgetSubMenu textureSelectionMenu = null;
-    private EditorSystem system;
+    private HexMapSystem system;
     private Element textureIcons;
 
-    public TileWidgetMenu(Screen screen, Camera camera, EditorSystem system, HexCoordinate tilePos) {
+    public TileWidgetMenu(Screen screen, Camera camera, HexMapSystem system, HexCoordinate tilePos) {
         super(screen, camera);
         super.screenElement = new Element(screen, "TileWidgetMenu", new Vector2f(),
                 new Vector2f(150, 150), Vector4f.ZERO, "Textures/Icons/Widget/rouage.png");

@@ -1,7 +1,7 @@
 package core.gui;
 
 import com.jme3.math.Vector2f;
-import core.EditorSystem;
+import core.HexMapSystem;
 import gui.deprecated.control.EditorWindow;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -20,7 +20,7 @@ public class EditorMainGUI extends EditorWindow {
     private String currentSelectedBtn = "0";
     private EditorTileProperties tileWindow;
 
-    public EditorMainGUI(Screen screen, Element parent, MouseControlSystem mouseSystem, EditorSystem editorSystem) {
+    public EditorMainGUI(Screen screen, Element parent, MouseControlSystem mouseSystem, HexMapSystem editorSystem) {
         super(screen, parent, "HexTile Editor");
 //        addButtonList("CurrentTool", "Tool", HAlign.left, new String[]{"disable", "cursorSelect"}, HAlign.left, ButtonType.IMG, 1);
         addCheckBoxField("showGrid", "Hide Ghost", true);

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -150,7 +151,7 @@ public class EntityLoader {
             JSONArray key = (JSONArray) value.get("key");
             ArrayList<HexCoordinate> collisionCoord = new ArrayList<>();
             for (int j = 0; j < key.size(); j++) {
-                collisionCoord.add(new HexCoordinate(HexCoordinate.OFFSET, new Vector2Int((String) key.get(j))));
+                collisionCoord.add(new HexCoordinate(Coordinate.OFFSET, new Vector2Int((String) key.get(j))));
             }
             collision.addLayer(layer.byteValue(), collision.new CollisionData(areaRange.byteValue(), collisionCoord));
         }

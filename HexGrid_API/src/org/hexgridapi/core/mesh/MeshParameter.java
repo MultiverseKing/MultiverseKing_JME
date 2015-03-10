@@ -45,6 +45,7 @@ public final class MeshParameter {
     private String inspectedTexture;
     private int inspectedMesh;
     private int groundHeight = 0;
+    private Vector2Int inspectedChunk;
 
     /**
      * Generate all parameter needed to create a grid from defined value.
@@ -55,10 +56,11 @@ public final class MeshParameter {
         this.mapData = mapData;
     }
 
-    private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround, Vector2Int chunkOffset) {
+    private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround) {
         clear();
         this.onlyGround = onlyGround;
         boolean[][] isVisited = getVisitedList(radius);
+        Vector2Int chunkInitTile = HexGrid.getTileFromChunk(new Vector2Int(), inspectedChunk);
         /**
          * x && y == coord local
          */
@@ -71,14 +73,14 @@ public final class MeshParameter {
                     boolean currentIsInRange;
                     HexCoordinate currentTileMapCoord; //global coord -> used in map data and range check
                     if (centerPosition != null && radius > 0) {
-                        currentTileMapCoord = getNextTileCoord(centerPosition, radius, null, x, y, chunkOffset);
+                        currentTileMapCoord = getNextTileCoord(centerPosition, radius, null, x, y, chunkInitTile);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = getIsInRange(radius, null, x, y);
 //                    } else if (mode.equals(GhostMode.FULL)) {
 //                        currentTile = null;
 //                        currentIsInRange = false;
                     } else {
-                        currentTileMapCoord = new HexCoordinate(Coordinate.OFFSET, x + chunkOffset.x, y + chunkOffset.y);
+                        currentTileMapCoord = new HexCoordinate(Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = false;
                     }
@@ -107,7 +109,7 @@ public final class MeshParameter {
 //                    Integer tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
 
                     this.add(new Vector2Int(x, y), new Vector2Int(1, 1), tileHeight);
-                    setSizeX(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkOffset);
+                    setSizeX(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkInitTile);
                     elementID++;
                 }
             }
@@ -231,8 +233,9 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return list of all generated mesh. (1 mesh by texture)
      */
-    public HashMap<String, Mesh> getMesh(boolean onlyGround, boolean debugMode, Vector2Int chunkPosition) {
-        initialize(null, 0, onlyGround, HexGrid.getTileFromChunk(new Vector2Int(), chunkPosition));
+    public HashMap<String, Mesh> getMesh(boolean onlyGround, boolean debugMode, Vector2Int inspectedChunk) {
+        this.inspectedChunk = inspectedChunk;
+        initialize(null, 0, onlyGround);
         return getMesh(debugMode);
     }
 
@@ -244,11 +247,12 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return
      */
-    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, boolean debugMode, Vector2Int chunkPosition) {
+    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, boolean debugMode, Vector2Int inspectedChunk) {
+        this.inspectedChunk = inspectedChunk;
         if (radius <= 0) {
             radius = 1;
         }
-        initialize(centerPosition, radius, onlyGround, HexGrid.getTileFromChunk(new Vector2Int(), chunkPosition));
+        initialize(centerPosition, radius, onlyGround);
         return getMesh(debugMode);
     }
 
@@ -356,9 +360,10 @@ public final class MeshParameter {
         private CullingData() {
             int inspectedID = elementTypeRef.get(inspectedTexture).get(inspectedMesh);
             boolean isOddStart = (position.get(inspectedID).y & 1) == 0;
-
+            
+            Vector2Int chunkInitTile = HexGrid.getTileFromChunk(new Vector2Int(), inspectedChunk);
             HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
-                    position.get(inspectedID).x, position.get(inspectedID).y);
+                    position.get(inspectedID).x + chunkInitTile.x, position.get(inspectedID).y + chunkInitTile.y);
             for (int i = 0; i < 4; i++) {
                 int currentSize = (i == 0 || i == 1 ? size.get(inspectedID).x : size.get(inspectedID).y);
                 culling[i] = new boolean[currentSize][3];
@@ -369,7 +374,7 @@ public final class MeshParameter {
                         culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
                         culling[i][j][2] = true;
                     } else if (i == 1) { //bot chunk = (Z)
-                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(inspectedID).y+1));
+                        HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(inspectedID).y-1));
                         culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
                         culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
                         culling[i][j][2] = true;

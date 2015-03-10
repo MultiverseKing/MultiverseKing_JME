@@ -368,6 +368,7 @@ public final class MeshParameter {
                 int currentSize = (i == 0 || i == 1 ? size.get(inspectedID).x : size.get(inspectedID).y);
                 culling[i] = new boolean[currentSize][3];
                 for (int j = 0; j < currentSize; j++) {
+                    
                     if (i == 0) { // top chunk = -(Z)
                         HexTile[] neightbors = mapData.getNeightbors(coord.add(j, 0));
                         culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left

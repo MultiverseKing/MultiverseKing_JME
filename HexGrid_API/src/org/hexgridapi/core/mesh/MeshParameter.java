@@ -42,6 +42,7 @@ public final class MeshParameter {
     /**
      * Current element param returned.
      */
+    private final int depth;
     private String inspectedTexture;
     private int inspectedMesh;
     private int groundHeight = 0;
@@ -52,8 +53,9 @@ public final class MeshParameter {
      *
      * @param mapData Reference used to get the data from.
      */
-    public MeshParameter(MapData mapData) {
+    public MeshParameter(MapData mapData, int depth) {
         this.mapData = mapData;
+        this.depth = depth;
     }
 
     private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround) {
@@ -98,7 +100,7 @@ public final class MeshParameter {
                     elementTypeRef.get(textValue).add(elementID);
 
                     Integer tileHeight = currentTile == null ? null : currentTile.getHeight();
-                    if (tileHeight != null && tileHeight < groundHeight) {
+                    if (tileHeight != null && tileHeight < groundHeight+depth) {
                         groundHeight = tileHeight;
                     }
 //                    if(!mode.equals(GhostMode.FULL)){
@@ -313,7 +315,7 @@ public final class MeshParameter {
     }
 
     public int getGroundHeight() {
-        return groundHeight;
+        return groundHeight+depth;
     }
 
     /**

@@ -174,6 +174,28 @@ public final class HexCoordinate {
         }
         return null;
     }
+
+    /**
+     * Return the chunk who hold the tile.
+     */
+    public Vector2Int getCorrespondingChunk() {
+        Vector2Int tileOffset = getAsOffset();
+        int x = ((int) FastMath.abs(tileOffset.x) + (tileOffset.x < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
+        int y = ((int) FastMath.abs(tileOffset.y) + (tileOffset.y < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
+        Vector2Int result = new Vector2Int(tileOffset.x < 0 ? (x + 1) * -1 : x, tileOffset.y < 0 ? (y + 1) * -1 : y);
+        return result;
+    }
+
+    /**
+     * Return the tile position inside his corresponding chunk.
+     */
+    public final HexCoordinate getTilePosInChunk() {
+        Vector2Int chunk = getCorrespondingChunk();
+        Vector2Int tileOffset = getAsOffset();
+        return new HexCoordinate(Coordinate.OFFSET,
+                (int) (FastMath.abs(tileOffset.x) - FastMath.abs(chunk.x) * HexSetting.CHUNK_SIZE),
+                (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * HexSetting.CHUNK_SIZE));
+    }
     
     @Override
     public boolean equals(Object obj) {

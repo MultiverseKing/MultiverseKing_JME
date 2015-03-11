@@ -5,7 +5,6 @@ import org.hexgridapi.core.control.AreaRangeControl;
 import org.hexgridapi.core.control.ChunkControl;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.hexgridapi.events.TileChangeListener;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.utility.HexCoordinate;
-import org.hexgridapi.utility.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
@@ -45,7 +43,7 @@ public class HexGrid {
             if (events.length > 1) {
                 HashSet<Vector2Int> updatedChunk = new HashSet<Vector2Int>();
                 for (int i = 0; i < events.length; i++) {
-                    Vector2Int pos = getChunkGridPosition(events[i].getTilePos());
+                    Vector2Int pos = events[i].getTilePos().getCorrespondingChunk();
                     if (chunksNodes.containsKey(pos)) {
                         if (updatedChunk.add(pos)) {
                             //updateChunk
@@ -68,7 +66,7 @@ public class HexGrid {
 
     public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode, boolean debugMode) {
         this.assetManager = assetManager;
-        this.meshParam = new MeshParameter(mapData);
+        this.meshParam = new MeshParameter(mapData, -5);
         this.debugMode = debugMode;
         this.mapData = mapData;
         rootNode.attachChild(gridNode);
@@ -90,7 +88,7 @@ public class HexGrid {
      */
     private void updateChunk(TileChangeEvent event) {
         if (event.getTilePos() != null) {
-            Vector2Int chunkPos = getChunkGridPosition(event.getTilePos());
+            Vector2Int chunkPos = event.getTilePos().getCorrespondingChunk();
             if (!chunksNodes.containsKey(chunkPos)) {
                 addChunk(chunkPos);
             } else if (!(event.getNewTile() == null && event.getOldTile() == null)) {
@@ -162,43 +160,15 @@ public class HexGrid {
     }
 
     /**
-     * Return the tile position inside his corresponding chunk.
-     *
-     * @param tilePos tile hexMap position to convert.
-     * @return tile chunk position or null.
-     */
-    public final HexCoordinate getTilePosInChunk(HexCoordinate tilePos) {
-        Vector2Int chunk = getChunkGridPosition(tilePos);
-        Vector2Int tileOffset = tilePos.getAsOffset();
-        return new HexCoordinate(Coordinate.OFFSET,
-                (int) (FastMath.abs(tileOffset.x) - FastMath.abs(chunk.x) * HexSetting.CHUNK_SIZE),
-                (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * HexSetting.CHUNK_SIZE));
-    }
-
-    /**
-     * Return the chunk who hold the specifiated tile.
-     *
-     * @param tilePos hexMap coordinate of the tile.
-     * @return Position of the chunk in mapData if exist, else null.
-     */
-    public static Vector2Int getChunkGridPosition(HexCoordinate tilePos) {
-        Vector2Int tileOffset = tilePos.getAsOffset();
-        int x = ((int) FastMath.abs(tileOffset.x) + (tileOffset.x < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
-        int y = ((int) FastMath.abs(tileOffset.y) + (tileOffset.y < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
-        Vector2Int result = new Vector2Int(tileOffset.x < 0 ? (x + 1) * -1 : x, tileOffset.y < 0 ? (y + 1) * -1 : y);
-        return result;
-    }
-
-    /**
      * Convert chunk position in hexMap to world unit.
      *
-     * @param position
-     * @hint chunk world unit position is the same than the chunk node.
+     * @param chunkPosition
+     * @hint world unit position is the same than the node containing the chunk.
      * @return chunk world unit position.
      */
-    public static Vector3f getChunkWorldPosition(Vector2Int position) {
-        return new Vector3f((position.x * HexSetting.CHUNK_SIZE) * HexSetting.HEX_WIDTH, 0,
-                (position.y * HexSetting.CHUNK_SIZE) * (float) (HexSetting.HEX_RADIUS * 1.5));
+    public static Vector3f getChunkWorldPosition(Vector2Int chunkPosition) {
+        return new Vector3f((chunkPosition.x * HexSetting.CHUNK_SIZE) * HexSetting.HEX_WIDTH, 0,
+                (chunkPosition.y * HexSetting.CHUNK_SIZE) * (float) (HexSetting.HEX_RADIUS * 1.5));
     }
 
     /**

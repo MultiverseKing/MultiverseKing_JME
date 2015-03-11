@@ -4,12 +4,10 @@ import com.jme3.asset.AssetManager;
 import org.hexgridapi.events.TileChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.loader.HexGridMapLoader;
 import org.hexgridapi.utility.HexCoordinate;
-import org.hexgridapi.utility.Vector2Int;
 
 /**
  * This class holds the hex data of the map.
@@ -20,11 +18,12 @@ import org.hexgridapi.utility.Vector2Int;
  */
 public final class MapData {
 
-    private final AssetManager assetManager;
-    private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
+    private final AssetManager assetManager; //used for loading map
+//    private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
+    private final ChunkData chunkData = new ChunkData();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private final HexGridMapLoader hexGridMapLoader;
-    private String mapName;// = "Reset";
+    private String mapName = "Undefined";// = "Reset";
     /**
      * Key index :
      * -2 = and below used for non existant tile or ghost tile
@@ -97,7 +96,8 @@ public final class MapData {
      * @return true if there is data.
      */
     public boolean containTilesData() {
-        return !tileData.isEmpty();
+//        return !tileData.isEmpty();
+        return !chunkData.isEmpty();
     }
 
     /**
@@ -106,8 +106,9 @@ public final class MapData {
      * @param tilePos Offset position of the tile.
      * @return can be null
      */
-    public HexTile getTile(HexCoordinate tile) {
-        return tileData.get(tile.getAsOffset());
+    public HexTile getTile(HexCoordinate tilePos) {
+//        return tileData.get(tile.getAsOffset());
+        return chunkData.getTile(tilePos);
     }
 
     /**
@@ -119,7 +120,8 @@ public final class MapData {
     public HexTile[] getTile(HexCoordinate[] tilePos) {
         HexTile[] result = new HexTile[tilePos.length];
         for (int i = 0; i < tilePos.length; i++) {
-            result[i] = tileData.get(tilePos[i].getAsOffset());
+            result[i] = chunkData.getTile(tilePos[i]);
+//            result[i] = tileData.get(tilePos[i].getAsOffset());
         }
         return result;
     }
@@ -182,7 +184,18 @@ public final class MapData {
 //        updateTileListeners(tceList);
 //    }
     
-
+    private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
+        HexTile oldTile;
+        if (tile != null) {
+            oldTile = chunkData.add(tilePos, tile);
+//            oldTile = tileData.put(tilePos.getAsOffset(), tile);
+        } else {
+            oldTile = chunkData.remove(tilePos);
+//            oldTile = tileData.remove(tilePos.getAsOffset());
+        }
+        return new TileChangeEvent(tilePos, oldTile, tile);
+    }
+    
     public boolean saveArea(String mapName) {
         this.mapName = mapName;
         return hexGridMapLoader.saveArea(mapName);
@@ -191,28 +204,19 @@ public final class MapData {
     public boolean loadArea(String mapName) {
         return hexGridMapLoader.loadArea(mapName);
     }
-    
-    private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
-        HexTile oldTile;
-        if (tile != null) {
-            oldTile = tileData.put(tilePos.getAsOffset(), tile);
-        } else {
-            oldTile = tileData.remove(tilePos.getAsOffset());
-        }
-        return new TileChangeEvent(tilePos, oldTile, tile);
-    }
 
     /**
      * The texture used when adding a tile with no texture.
      *
      * @param Key texture to use as default
+     * @todo 
      */
-    public void setDefaultTexture(String Key) {
-        for (Vector2Int coord : tileData.keySet()) {
-            tileData.put(coord, tileData.get(coord).cloneChangedTextureKey(getTextureKey(Key)));
-        }
-        updateTileListeners(new TileChangeEvent(null, new HexTile(Integer.MIN_VALUE, getTextureKey(Key)), new HexTile(Integer.MIN_VALUE, Integer.MIN_VALUE)));
-    }
+//    public void setDefaultTexture(String Key) {
+//        for (Vector2Int coord : tileData.keySet()) {
+//            tileData.put(coord, tileData.get(coord).cloneChangedTextureKey(getTextureKey(Key)));
+//        }
+//        updateTileListeners(new TileChangeEvent(null, new HexTile(Integer.MIN_VALUE, getTextureKey(Key)), new HexTile(Integer.MIN_VALUE, Integer.MIN_VALUE)));
+//    }
 
     /**
      * Get all tile around the defined position, return null for tile who
@@ -231,7 +235,8 @@ public final class MapData {
         HexCoordinate[] coords = position.getNeighbours();
         HexTile[] neighbours = new HexTile[coords.length];
         for (int i = 0; i < neighbours.length; i++) {
-            neighbours[i] = tileData.get(coords[i].getAsOffset());
+            neighbours[i] = chunkData.getTile(coords[i]);
+//            neighbours[i] = tileData.get(coords[i].getAsOffset());
         }
         return neighbours;
     }
@@ -253,8 +258,8 @@ public final class MapData {
     public void Cleanup() {
         //Todo remove all file from the temps folder
 //        chunkPos.clear();
-//        chunkData.clear();
-        tileData.clear();
+        chunkData.clear();
+//        tileData.clear();
 //        updateTile(new TileChangeEvent(null, null, null));
     }
 

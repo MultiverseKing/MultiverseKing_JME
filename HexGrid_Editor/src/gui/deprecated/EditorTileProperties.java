@@ -4,7 +4,6 @@ import com.jme3.math.Vector2f;
 import core.HexMapSystem;
 import gui.deprecated.control.EditorWindow;
 import java.util.ArrayList;
-import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.control.TileSelectionControl;
 import org.hexgridapi.events.TileSelectionListener;
@@ -55,7 +54,7 @@ public class EditorTileProperties extends EditorWindow {
     }
 
     private void updateWindow(ArrayList<HexCoordinate> selectedList) {
-        if (currentIsGhost == null || selectedList != null && selectedList.isEmpty() != currentIsGroup 
+        if (currentIsGhost == null || selectedList != null && selectedList.isEmpty() != currentIsGroup
                 || (editorSystem.getTile() != null ? false : true) != currentIsGhost) {
             initialiseValue();
         } else {
@@ -68,7 +67,7 @@ public class EditorTileProperties extends EditorWindow {
         TileSelectionControl control = mouseSystem.getSelectionControl();
         if (control.getSelectedList().isEmpty()) {
             addLabelPropertieField("Coordinate", control.getSelectedPos().getAsOffset(), HAlign.left);
-            addLabelPropertieField("Chunk", HexGrid.getChunkGridPosition(control.getSelectedPos()), HAlign.left);
+            addLabelPropertieField("Chunk", control.getSelectedPos().getCorrespondingChunk(), HAlign.left);
         }
         if (!control.getSelectedList().isEmpty()) {
             addButtonField(null, "Texture", HAlign.left, editorSystem.getTextureDefault(), HAlign.left, ButtonType.IMG); // @todo

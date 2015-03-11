@@ -132,12 +132,13 @@ public final class RTSCamera extends AbstractAppState {
 //        "BUTTON1", "BUTTON2", "BUTTON3"};
     private static String[] mappings = new String[]{
         "+SIDE", "+FWD", "+ROTATE", "-SIDE", "-FWD", "-ROTATE", "+WHEEL", "-WHEEL"};
+    private boolean keyBoardSwitch = false;
 
     /**
      *
      * @param up
      */
-    public RTSCamera(UpVector up) {
+    public RTSCamera(UpVector up, String keyLayout) {
         this.up = up;
 
         setMinMaxValues(DoF.SIDE, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
@@ -151,6 +152,9 @@ public final class RTSCamera extends AbstractAppState {
         setMaxSpeed(DoF.ROTATE, 2f, 0.4f);
         setMaxSpeed(DoF.TILT, 1f, 0.4f);
         setMaxSpeed(DoF.DISTANCE, 15f, 0.4f);
+        if(keyLayout.equals("AZERTY")){
+            keyBoardSwitch = true;
+        }
     }
 
     /**
@@ -324,9 +328,9 @@ public final class RTSCamera extends AbstractAppState {
         }
 
         if (up == UpVector.Y_UP) {
-            position.x = center.x + (float) (distance * sinRot);
-            position.y = center.y + (float) (distance);
-            position.z = center.z + (float) (distance * cosRot);
+            position.x = center.x + distance * sinRot;
+            position.y = center.y + distance;
+            position.z = center.z + distance * cosRot;
 //            position.x = center.x + (float) (distance * cosTilt * sinRot);
 //            position.y = center.y + (float) (distance * sinTilt);
 //            position.z = center.z + (float) (distance * cosTilt * cosRot);
@@ -337,9 +341,9 @@ public final class RTSCamera extends AbstractAppState {
                 }
             }
         } else {
-            position.x = center.x + (float) (distance * sinRot);
-            position.y = center.y + (float) (distance * cosRot);
-            position.z = center.z + (float) (distance);
+            position.x = center.x + distance * sinRot;
+            position.y = center.y + distance * cosRot;
+            position.z = center.z + distance;
 //            position.x = center.x + (float) (distance * cosTilt * sinRot);
 //            position.y = center.y + (float) (distance * cosTilt * cosRot);
 //            position.z = center.z + (float) (distance * sinTilt);
@@ -535,7 +539,7 @@ public final class RTSCamera extends AbstractAppState {
         KeyTrigger posRot = new KeyTrigger(KeyInput.KEY_Q);
         KeyTrigger negFWD = new KeyTrigger(KeyInput.KEY_W);
 //        KeyTrigger negDistance = new KeyTrigger(KeyInput.KEY_Z);
-        if (local.equals("fr_FR") && iContext.isCompositionEnabled()) {
+        if (keyBoardSwitch){//local.equals("fr_FR") && iContext.isCompositionEnabled()) {
             negSide = new KeyTrigger(KeyInput.KEY_Q);
             posRot = new KeyTrigger(KeyInput.KEY_A);
             negFWD = new KeyTrigger(KeyInput.KEY_Z);
@@ -572,6 +576,7 @@ public final class RTSCamera extends AbstractAppState {
 
     private class InternalListener implements ActionListener, AnalogListener {
 
+        @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (!isEnabled()) {
                 return;

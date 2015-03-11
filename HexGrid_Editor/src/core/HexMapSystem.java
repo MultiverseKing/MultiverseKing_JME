@@ -27,7 +27,7 @@ import test.EditorMain;
  */
 public final class HexMapSystem extends AbstractHexGridAppState {
 
-    private SimpleApplication app;
+    private EditorMain app;
     private GhostControl ghostControl;
     private EditorMainGUI editorMainGUI;
     private TileSelectionControl tileSelectionControl;
@@ -39,7 +39,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     public void initializeSystem(AppStateManager stateManager, Application app) {
-        this.app = (SimpleApplication) app;
+        this.app = (EditorMain) app;
 
         MouseControlSystem mouseControl = app.getStateManager().getState(MouseControlSystem.class);
         if (mouseControl == null) {
@@ -60,6 +60,11 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters && Setters">
+
+    public String getMapName() {
+        return mapData.getMapName();
+    }
+    
     public void enableGhostUpdate(boolean enable) {
         ghostControl.setEnabled(true);
     }
@@ -160,13 +165,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
         }
     }
 
-//    public void setTileProperties(HexCoordinate coord, int height) {
-//        if(!tileSelectionControl.getList().isEmpty()){
-//            mapData.setTilesHeight(height, tileSelectionControl.getList().toArray(new HexCoordinate[tileSelectionControl.getList().size()]));
-//        } else {
-//            mapData.setTilesHeight(height, coord);
-//        }
-//    }
     /**
      * @return the currently selected tile.
      */
@@ -220,9 +218,9 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     // </editor-fold>
 
     public void save(FileManagerPopup popup) {
-        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
-            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
-        }
+//        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
+//            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
+//        }
     }
 
     @Override
@@ -257,7 +255,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
             reloadSystem();
         }
     }
-
+    
     /**
      * @deprecated
      */

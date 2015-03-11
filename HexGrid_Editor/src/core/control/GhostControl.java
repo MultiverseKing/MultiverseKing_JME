@@ -11,6 +11,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
+import java.util.Set;
 import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.control.ChunkControl;
@@ -55,7 +56,7 @@ public class GhostControl extends ChunkControl {
             MouseInputEvent event = rayControl.castRay(null);
             HexCoordinate pos = event.getPosition();
             if (pos != null) {
-                setPosition(HexGrid.getChunkGridPosition(pos));
+                setPosition(pos.getCorrespondingChunk());
             }
         }
     }
@@ -67,16 +68,16 @@ public class GhostControl extends ChunkControl {
     }
 
     public void updateCulling() {
-//        Set<Vector2Int> list = system.getChunksNodes();
-//        for (int x = -1; x < 2; x++) {
-//            for (int y = -1; y < 2; y++) {
-//                if (list.contains(chunkPosition.add(x, y))) {
-//                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
-//                } else {
-//                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
-//                }
-//            }
-//        }
+        Set<Vector2Int> list = system.getChunksNodes();
+        for (int x = -1; x < 2; x++) {
+            for (int y = -1; y < 2; y++) {
+                if (list.contains(chunkPosition.add(x, y))) {
+                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
+                } else {
+                    ((Node) spatial).getChild("NO_TILE." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
+                }
+            }
+        }
     }
 
     private boolean isInRange(Vector2Int pos) {
@@ -98,11 +99,11 @@ public class GhostControl extends ChunkControl {
     }
 
     public void show() {
-//        spatial.setCullHint(Spatial.CullHint.Inherit);
+        spatial.setCullHint(Spatial.CullHint.Inherit);
     }
 
     public void hide() {
-//        spatial.setCullHint(Spatial.CullHint.Always);
+        spatial.setCullHint(Spatial.CullHint.Always);
     }
 
     private Mesh genQuad(int radius) {

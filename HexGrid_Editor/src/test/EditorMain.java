@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 
@@ -123,9 +124,9 @@ public class EditorMain extends SimpleApplication {
                 inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
                 inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
-                MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager);
+                MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, true);
                 stateManager.attach(new MapDataAppState(mapData));
-                stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
+                stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode(), HexGrid.GhostMode.GHOST));
 
                 return null;
             }

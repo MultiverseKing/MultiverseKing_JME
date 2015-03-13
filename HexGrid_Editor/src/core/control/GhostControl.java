@@ -31,8 +31,8 @@ public class GhostControl extends ChunkControl {
     private final HexGrid system;
     private Geometry collisionPlane;
 
-    public GhostControl(SimpleApplication app, MeshParameter meshParam, Vector2Int pos, HexGrid system) {
-        super(meshParam, app.getAssetManager(), false, true, pos);
+    public GhostControl(SimpleApplication app, MeshParameter meshParam, HexGrid.GhostMode mode, Vector2Int pos, HexGrid system) {
+        super(meshParam, app.getAssetManager(), mode, pos, false);
         this.rayControl = new GridRayCastControl(app, app.getRootNode(), ColorRGBA.Green, true);
         this.system = system;
     }

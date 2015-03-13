@@ -16,6 +16,7 @@ import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.AbstractHexGridAppState;
 import org.hexgridapi.core.control.ChunkControl;
 import org.hexgridapi.core.control.TileSelectionControl;
+import org.hexgridapi.core.mapgenerator.MapGenerator;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import test.EditorMain;
@@ -33,8 +34,8 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     private TileSelectionControl tileSelectionControl;
     private HexMapPanel hexMapPanel;
 
-    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
-        super(mapData, assetManager, rootNode, true);
+    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
+        super(mapData, assetManager, rootNode, mode);
     }
 
     @Override
@@ -47,20 +48,23 @@ public final class HexMapSystem extends AbstractHexGridAppState {
             app.getStateManager().attach(mouseControl);
         }
         tileSelectionControl = mouseControl.getSelectionControl();
-
         hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
         initialiseGhostGrid((SimpleApplication) app);
     }
 
     protected void initialiseGhostGrid(SimpleApplication app) {
         Node node = new Node("GhostNode");
-        ghostControl = new GhostControl(app, meshParam, new Vector2Int(), this);
+        ghostControl = new GhostControl(app, meshParam, mode, new Vector2Int(), this);
         node.addControl(ghostControl);
         gridNode.attachChild(node);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters && Setters">
-
+    
+    public int getSeed() {
+        return mapData.getSeed();
+    }
+    
     public String getMapName() {
         return mapData.getMapName();
     }
@@ -221,6 +225,10 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 //        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
 //            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
 //        }
+    }
+
+    public void generateFromSeed() {
+        System.err.println("Generate procedural Map using a defined Seed Number");
     }
 
     @Override

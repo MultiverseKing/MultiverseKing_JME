@@ -26,7 +26,6 @@ import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicArrowButton;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
-import org.hexgridapi.core.mapgenerator.MapGenerator;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.events.TileSelectionListener;
@@ -113,18 +112,23 @@ public class HexMapPanel extends AbstractAction {
         mapGenerator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 18));
         hexMapPanel.add(mapGenerator);
 
+        /*-------       Map Generator       ------*/
         JPanel seedPan = new JPanel();
         seedPan.setLayout(new BoxLayout(seedPan, BoxLayout.LINE_AXIS));
         seedPan.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         seedPan.setAlignmentX(0);
-        JLabel currentSeed = new JLabel(String.valueOf(MapGenerator.getInstance().getCurrentSeed()));
+
+        JLabel currentSeed = new JLabel(String.valueOf(editorSystem.getSeed()));
         comps.put("currentSeed", currentSeed);
         seedPan.add(currentSeed);
         seedPan.add(Box.createRigidArea(new Dimension(5, 0)));
         JButton genSeed = new JButton(new AbstractAction("Gen Seed") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ((JLabel) comps.get("currentSeed")).setText(String.valueOf(MapGenerator.getInstance().generateNewSeed()));
+                /**
+                 * @todo update the map when changing the seed
+                 */
+                ((JLabel) comps.get("currentSeed")).setText(String.valueOf(editorSystem.generateNewSeed()));
             }
         });
         genSeed.setPreferredSize(new Dimension(50, 23));
@@ -132,18 +136,20 @@ public class HexMapPanel extends AbstractAction {
         comps.put("genSeed", genSeed);
         addComp(hexMapPanel, seedPan);
 //        hexMapPanel.add(seedPan);
-        hexMapPanel.add(Box.createRigidArea(new Dimension(0,3)));
-        JButton genMap = new JButton(new AbstractAction("GenerateMap") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onAction(e);
-            }
-        });
-        genMap.setAlignmentX(0);
-        genMap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        comps.put("GenerateMap", genMap);
-        hexMapPanel.add(genMap);
-        
+        hexMapPanel.add(Box.createRigidArea(new Dimension(0, 3)));
+//        JButton genMap = new JButton(new AbstractAction("GenerateMap") {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                onAction(e);
+//            }
+//        });
+//        genMap.setAlignmentX(0);
+//        genMap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+//        comps.put("GenerateMap", genMap);
+//        hexMapPanel.add(genMap);
+
+        /*-------*/
+
         separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setMaximumSize(
                 new Dimension(Integer.MAX_VALUE, 2));
@@ -186,7 +192,6 @@ public class HexMapPanel extends AbstractAction {
                     return null;
                 }
             });
-            update = false;
             return;
         } else if (e.getActionCommand().contains("comboBox")) {
             update = true;
@@ -194,7 +199,7 @@ public class HexMapPanel extends AbstractAction {
         }
         switch (e.getActionCommand()) {
             case "GenerateMap":
-                MapGenerator.getInstance().generateMap(Integer.valueOf(((JLabel)comps.get("currentSeed")).getText()));
+                editorSystem.generateFromSeed();
                 break;
             case "Save Map":
                 CustomDialog customDialog = new CustomDialog(editorMain.getRootWindow(), ((JTextField) comps.get("mapName")).getText());
@@ -252,7 +257,6 @@ public class HexMapPanel extends AbstractAction {
                         return null;
                     }
                 });
-//                System.err.println("TODO : " + e.getActionCommand());
                 break;
             default:
                 System.err.println("No associated action for : " + e.getActionCommand());
@@ -454,7 +458,6 @@ public class HexMapPanel extends AbstractAction {
     private void updateSingleTileMenu() {
         currentIsGhost = editorSystem.getTile() == null ? true : false;
         if (!currentIsGhost) {
-            ((JComboBox) comps.get("textureList")).setSelectedItem(editorSystem.getTileTextureKey());
             ((JLabel) comps.get("height")).setText("height : " + editorSystem.getTileHeight());
             update = false;
             editorMain.enqueue(new Callable<Void>() {

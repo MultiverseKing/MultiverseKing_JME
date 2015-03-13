@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import org.hexgridapi.core.mapgenerator.MapGenerator;
+import org.hexgridapi.core.mapgenerator.ProceduralChunk;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
@@ -31,9 +33,10 @@ public class HexGrid {
      */
     protected MapData mapData;
     protected final Node gridNode = new Node("HexGridNode");
-    protected boolean debugMode;
+    protected GhostMode mode;
     protected HashMap chunksNodes = new HashMap<Vector2Int, Node>();
     protected Node areaRangeNode;
+    protected MapGenerator mapGenerator;
     protected AssetManager assetManager;
     /**
      * Listeners.
@@ -61,13 +64,13 @@ public class HexGrid {
     };
 
     public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode) {
-        this(mapData, assetManager, rootNode, false);
+        this(mapData, assetManager, rootNode, GhostMode.NONE);
     }
 
-    public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode, boolean debugMode) {
+    public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
         this.assetManager = assetManager;
-        this.meshParam = new MeshParameter(mapData, -5);
-        this.debugMode = debugMode;
+        this.meshParam = new MeshParameter(mapData);
+        this.mode = mode;
         this.mapData = mapData;
         rootNode.attachChild(gridNode);
         mapData.registerTileChangeListener(tileChangeListener);
@@ -79,6 +82,31 @@ public class HexGrid {
 
     public final Set<Vector2Int> getChunksNodes() {
         return Collections.unmodifiableSet(chunksNodes.keySet());
+    }
+
+    /**
+     * generate procedural temp data, on the specifiate position +1 radius.
+     *
+     * @param position
+     */
+    public void genProcedural(Vector2Int pos) {
+//        for (int x = pos.x - 1; x <= pos.x + 1; x++) {
+//            for (int y = pos.y - 1; y <= pos.y + 1; y++) {
+//                ProceduralChunk chunk = MapGenerator.getInstance().getChunkValue(x, y);
+//                setTile(chunk.getTilePos(), chunk.getTileData());
+//            }
+//        }
+    }
+
+    /**
+     * Unstable
+     * @see org.hexgridapi.core.MapData#setSeed(int)
+     * @return
+     */
+    public int generateNewSeed() {
+        int seed = MapGenerator.generateSeed();
+        mapData.setSeed(seed);
+        return seed;
     }
 
     /**
@@ -117,7 +145,7 @@ public class HexGrid {
     private void addChunk(Vector2Int chunkPos) {
         Node chunk = new Node(chunkPos.toString());
         chunksNodes.put(chunkPos, chunk);
-        chunk.addControl(new ChunkControl(meshParam, assetManager, false, debugMode, chunkPos));
+        chunk.addControl(new ChunkControl(meshParam, assetManager, mode, chunkPos, false));
         chunk.setLocalTranslation(getChunkWorldPosition(chunkPos));
         gridNode.attachChild(chunk);
         insertedChunk(chunk.getControl(ChunkControl.class));
@@ -132,10 +160,8 @@ public class HexGrid {
     public final void showAreaRange(HexCoordinate centerPosition, int radius, ColorRGBA color) {
         if (areaRangeNode == null && radius > 0) {
             areaRangeNode = new Node("areaRangeNode");
-            AreaRangeControl control = new AreaRangeControl(meshParam, assetManager, debugMode, centerPosition, radius, color);
+            AreaRangeControl control = new AreaRangeControl(meshParam, assetManager, mode, centerPosition, radius, color);
             areaRangeNode.addControl(control);
-
-
         } else if (areaRangeNode != null && radius > 0) {
             areaRangeNode.getControl(AreaRangeControl.class).update(centerPosition, radius, color);
         } else if (areaRangeNode != null && radius <= 0) {
@@ -179,12 +205,39 @@ public class HexGrid {
      * @param chunkPos position of the chunk
      * @return global tile position in offset.
      */
-    public static Vector2Int getTileFromChunk(Vector2Int tilePos, Vector2Int chunkPos) {
-        return new Vector2Int(chunkPos.x * HexSetting.CHUNK_SIZE + tilePos.x,
-                chunkPos.y * HexSetting.CHUNK_SIZE + tilePos.y);
+    public static Vector2Int getInitialChunkTile(Vector2Int chunkPos) {
+        return new Vector2Int(chunkPos.x * HexSetting.CHUNK_SIZE,
+                chunkPos.y * HexSetting.CHUNK_SIZE);
     }
 
     public void cleanup() {
         mapData.removeTileChangeListener(tileChangeListener);
+    }
+    
+    /**
+     * Used to define how the chunk will handle tiles if they does not exist.
+     */
+    public enum GhostMode {
+
+        /**
+         * null chunk will be ignored, 
+         * null tiles will be ignored.
+         */
+        NONE,
+        /**
+         * null chunk will be generated as ghost,
+         * null tiles will be generated as ghost.
+         */
+        GHOST,
+        /**
+         * null chunk will be generated proceduraly,
+         * null tile will be ignored.
+         */
+        PROCEDURAL,
+        /**
+         * null chunk will be generated proceduraly, 
+         * null tile will be generated as ghost.
+         */
+        GHOST_PROCEDURAL;
     }
 }

@@ -26,6 +26,10 @@ public final class HexSetting {
      */
     public final static int CHUNK_SIZE = 8; //must be power of two
     /**
+     * The initial depth given to any generated chunk.
+     */
+    public final static int CHUNK_DEPTH = -5; //must lesser than 0
+    /**
      * WU distance between two hex of different height.
      */
     public final static float FLOOR_OFFSET = 1f;
@@ -36,7 +40,7 @@ public final class HexSetting {
      */
     public final static int GROUND_HEIGHT = 5;
     /**
-     * Used to know how many chunk to keep in memory before start deleting.
+     * Used to know how many chunk to keep in memory before purging it.
      * Unused for the time being.
      */
     public final static int CHUNK_DATA_LIMIT = 4;

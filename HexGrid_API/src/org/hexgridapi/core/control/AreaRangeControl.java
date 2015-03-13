@@ -14,6 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.mesh.MeshParameter;
 import org.hexgridapi.utility.HexCoordinate;
 
@@ -28,12 +29,12 @@ public class AreaRangeControl extends AbstractControl {
     private int radius = 0;
     private HexCoordinate centerPosition;
     private ColorRGBA color;
-    private boolean debugMode;
+    private final HexGrid.GhostMode mode;
 
-    public AreaRangeControl(MeshParameter meshParam, AssetManager assetManager, boolean debugMode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
+    public AreaRangeControl(MeshParameter meshParam, AssetManager assetManager, HexGrid.GhostMode mode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
-        this.debugMode = debugMode;
+        this.mode = mode;
         this.centerPosition = centerPosition;
         this.radius = radius;
         this.color = color;
@@ -93,7 +94,7 @@ public class AreaRangeControl extends AbstractControl {
         /**
          * generate the new tile.
          */
-        HashMap<String, Mesh> mesh = meshParam.getMesh(centerPosition, radius, true, debugMode, null);
+        HashMap<String, Mesh> mesh = meshParam.getMesh(centerPosition, radius, true, mode, null);
 
         /**
          * remove the old tile from the chunk.
@@ -109,17 +110,18 @@ public class AreaRangeControl extends AbstractControl {
                 tile = new Geometry(value, mesh.get(value));
                 tile.setMaterial(mat);
                 ((Node) spatial).attachChild(tile);
-            } else if (debugMode) {
-                Material tmp = assetManager.loadMaterial("Materials/hexMat.j3m");
-                Texture text = assetManager.loadTexture("/Textures/EMPTY_TEXTURE_KEY.png");
-                text.setWrap(Texture.WrapMode.Repeat);
-                tmp.setTexture("ColorMap", text);
-                tmp.setColor("Color", color);
-                tile = new Geometry(value, mesh.get(value));
-                tmp.getAdditionalRenderState().setWireframe(true);
-                tile.setMaterial(tmp);
-                ((Node) spatial).attachChild(tile);
-            }
+            } 
+//            else if (debug) {
+//                Material tmp = assetManager.loadMaterial("Materials/hexMat.j3m");
+//                Texture text = assetManager.loadTexture("/Textures/EMPTY_TEXTURE_KEY.png");
+//                text.setWrap(Texture.WrapMode.Repeat);
+//                tmp.setTexture("ColorMap", text);
+//                tmp.setColor("Color", color);
+//                tile = new Geometry(value, mesh.get(value));
+//                tmp.getAdditionalRenderState().setWireframe(true);
+//                tile.setMaterial(tmp);
+//                ((Node) spatial).attachChild(tile);
+//            }
             if (tile != null) {
 //                tile.setQueueBucket(RenderQueue.Bucket.Inherit);
 //                tile.setShadowMode(RenderQueue.ShadowMode.Off);

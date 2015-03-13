@@ -29,10 +29,10 @@ public abstract class AbstractHexGridAppState extends HexGrid implements AppStat
      *
      * @param mapData tile dataHandler of the grid.
      * @param enableGhostTile is inexisting tile should be generated as ghost ?
-     * @param debugMode generate the grid on wireframe
+     * @param mode generate the grid following this param
      */
-    public AbstractHexGridAppState(MapData mapData, AssetManager assetManager, Node rootNode, boolean debugMode) {
-        super(mapData, assetManager, rootNode, debugMode);
+    public AbstractHexGridAppState(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
+        super(mapData, assetManager, rootNode, mode);
     }
 
     public final void initialize(AppStateManager stateManager, Application app) {

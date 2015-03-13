@@ -39,10 +39,7 @@ public final class MeshParameter {
      * Used to define which algorithm to use with meshmanager.
      */
     private boolean onlyGround;
-    /**
-     * Current element param returned.
-     */
-    private final int depth;
+//    private final int depth;
     private String inspectedTexture;
     private int inspectedMesh;
     private int groundHeight = 0;
@@ -53,16 +50,15 @@ public final class MeshParameter {
      *
      * @param mapData Reference used to get the data from.
      */
-    public MeshParameter(MapData mapData, int depth) {
+    public MeshParameter(MapData mapData) {
         this.mapData = mapData;
-        this.depth = depth;
     }
 
     private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround) {
         clear();
         this.onlyGround = onlyGround;
         boolean[][] isVisited = getVisitedList(radius);
-        Vector2Int chunkInitTile = HexGrid.getTileFromChunk(new Vector2Int(), inspectedChunk);
+        Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk);
         /**
          * x && y == coord local
          */
@@ -100,7 +96,7 @@ public final class MeshParameter {
                     elementTypeRef.get(textValue).add(elementID);
 
                     Integer tileHeight = currentTile == null ? null : currentTile.getHeight();
-                    if (tileHeight != null && tileHeight < groundHeight+depth) {
+                    if (tileHeight != null && tileHeight < groundHeight+HexSetting.CHUNK_DEPTH) {
                         groundHeight = tileHeight;
                     }
 //                    if(!mode.equals(GhostMode.FULL)){
@@ -235,10 +231,10 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return list of all generated mesh. (1 mesh by texture)
      */
-    public HashMap<String, Mesh> getMesh(boolean onlyGround, boolean debugMode, Vector2Int inspectedChunk) {
+    public HashMap<String, Mesh> getMesh(boolean onlyGround, HexGrid.GhostMode mode, Vector2Int inspectedChunk) {
         this.inspectedChunk = inspectedChunk;
         initialize(null, 0, onlyGround);
-        return getMesh(debugMode);
+        return getMesh(mode);
     }
 
     /**
@@ -249,19 +245,21 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return
      */
-    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, boolean debugMode, Vector2Int inspectedChunk) {
+    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, HexGrid.GhostMode mode, Vector2Int inspectedChunk) {
         this.inspectedChunk = inspectedChunk;
         if (radius <= 0) {
             radius = 1;
         }
         initialize(centerPosition, radius, onlyGround);
-        return getMesh(debugMode);
+        return getMesh(mode);
     }
 
-    private HashMap<String, Mesh> getMesh(boolean debugMode) {
+    private HashMap<String, Mesh> getMesh(HexGrid.GhostMode mode) {
         HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
         for (String value : elementTypeRef.keySet()) {
-            if (value.equals("NO_TILE") && debugMode || !value.equals("NO_TILE")) {
+            if (value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST) 
+                    || value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST_PROCEDURAL) 
+                    || !value.equals("NO_TILE")) {
                 inspectedTexture = value;
                 inspectedMesh = -1;
                 mesh.put(value, MeshGenerator.getInstance().getMesh(this));
@@ -315,7 +313,7 @@ public final class MeshParameter {
     }
 
     public int getGroundHeight() {
-        return groundHeight+depth;
+        return groundHeight+HexSetting.CHUNK_DEPTH;
     }
 
     /**
@@ -363,7 +361,7 @@ public final class MeshParameter {
             int inspectedID = elementTypeRef.get(inspectedTexture).get(inspectedMesh);
             boolean isOddStart = (position.get(inspectedID).y & 1) == 0;
             
-            Vector2Int chunkInitTile = HexGrid.getTileFromChunk(new Vector2Int(), inspectedChunk);
+            Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk);
             HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
                     position.get(inspectedID).x + chunkInitTile.x, position.get(inspectedID).y + chunkInitTile.y);
             for (int i = 0; i < 4; i++) {

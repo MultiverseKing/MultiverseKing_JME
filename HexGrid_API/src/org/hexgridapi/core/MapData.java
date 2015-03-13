@@ -5,6 +5,7 @@ import org.hexgridapi.events.TileChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.hexgridapi.core.mapgenerator.MapGenerator;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.loader.HexGridMapLoader;
 import org.hexgridapi.utility.HexCoordinate;
@@ -18,11 +19,11 @@ import org.hexgridapi.utility.HexCoordinate;
  */
 public final class MapData {
 
-    private final AssetManager assetManager; //used for loading map
-//    private final HashMap<Vector2Int, HexTile> tileData = new HashMap<Vector2Int, HexTile>();
+    private final AssetManager assetManager; //used for save/loading map
     private final ChunkData chunkData = new ChunkData();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private final HexGridMapLoader hexGridMapLoader;
+    private int currentProceduralSeed;
     private String mapName = "Undefined";// = "Reset";
     /**
      * Key index :
@@ -34,21 +35,16 @@ public final class MapData {
     private ArrayList<String> textureKeys = new ArrayList<String>();
 
     public MapData(AssetManager assetManager) {
-        this(null, assetManager);
+        this(null, assetManager, true);
     }
-
-//    public MapData(Enum[] textureKeys, AssetManager assetManager) {
-//        this(textureKeys, assetManager);
-//    }
-//
-//    public MapData(String[] textureKeys, AssetManager assetManager) {
-//        this(textureKeys, assetManager);
-//    }
     
-    public MapData(Object[] textureKeys, AssetManager assetManager){
+    public MapData(Object[] textureKeys, AssetManager assetManager, boolean useGenerator){
         this.assetManager = assetManager;
         hexGridMapLoader = new HexGridMapLoader(assetManager);
         genTextureKeys(textureKeys);
+        if(useGenerator){
+            currentProceduralSeed = MapGenerator.generateSeed();
+        }
     }
 
     private void genTextureKeys(Object[] userKey) {
@@ -59,7 +55,7 @@ public final class MapData {
             }
         }
     }
-
+    
     /**
      * Register a listener to respond to Tile Event.
      *
@@ -194,6 +190,18 @@ public final class MapData {
 //            oldTile = tileData.remove(tilePos.getAsOffset());
         }
         return new TileChangeEvent(tilePos, oldTile, tile);
+    }
+    
+    public int getSeed() {
+        return currentProceduralSeed;
+    }
+    /**
+     * This lead to some issue if used on runtime as all generated data 
+     * use the old seed and new data will use the new seed...
+     * @param seed 
+     */
+    public void setSeed(int seed) {
+        currentProceduralSeed = seed;
     }
     
     public boolean saveArea(String mapName) {

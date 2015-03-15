@@ -1,5 +1,6 @@
 package org.hexgridapi.core;
 
+import com.jme3.app.Application;
 import org.hexgridapi.core.mesh.MeshParameter;
 import org.hexgridapi.core.control.AreaRangeControl;
 import org.hexgridapi.core.control.ChunkControl;
@@ -12,8 +13,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import org.hexgridapi.core.mapgenerator.MapGenerator;
-import org.hexgridapi.core.mapgenerator.ProceduralChunk;
+import org.hexgridapi.core.control.GhostControl;
+import org.hexgridapi.core.mapgenerator.ProceduralGenerator;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
@@ -29,14 +30,18 @@ public class HexGrid {
      */
     protected final MeshParameter meshParam;
     /**
+     * Node Containing all hex related data.
+     */
+    protected final Node gridNode = new Node("HexGridNode");
+    /**
      * Node containing all Tiles.
      */
+    protected final Node tileNode = new Node("HexTileNode");
     protected MapData mapData;
-    protected final Node gridNode = new Node("HexGridNode");
-    protected GhostMode mode;
+    private GhostControl ghostControl;
     protected HashMap chunksNodes = new HashMap<Vector2Int, Node>();
     protected Node areaRangeNode;
-    protected MapGenerator mapGenerator;
+    protected ProceduralGenerator mapGenerator;
     protected AssetManager assetManager;
     /**
      * Listeners.
@@ -62,40 +67,38 @@ public class HexGrid {
             }
         }
     };
-
+    
     public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode) {
-        this(mapData, assetManager, rootNode, GhostMode.NONE);
-    }
-
-    public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
         this.assetManager = assetManager;
         this.meshParam = new MeshParameter(mapData);
-        this.mode = mode;
         this.mapData = mapData;
+        gridNode.attachChild(tileNode);
         rootNode.attachChild(gridNode);
         mapData.registerTileChangeListener(tileChangeListener);
     }
 
+    protected void initialiseGhostGrid(Application app) {
+        Node node = new Node("GhostNode");
+        ghostControl = new GhostControl(app, meshParam, mapData.getMode(), new Vector2Int(), this);
+        tileNode.attachChild(node);
+        node.addControl(ghostControl);
+    }
+
+    /**
+     * @return the node containing all the API Node. (include tileNode)
+     */
     public final Node getGridNode() {
         return gridNode;
+    }
+    /**
+     * @return the node containing all tile.
+     */
+    public final Node getTileNode() {
+        return tileNode;
     }
 
     public final Set<Vector2Int> getChunksNodes() {
         return Collections.unmodifiableSet(chunksNodes.keySet());
-    }
-
-    /**
-     * generate procedural temp data, on the specifiate position +1 radius.
-     *
-     * @param position
-     */
-    public void genProcedural(Vector2Int pos) {
-//        for (int x = pos.x - 1; x <= pos.x + 1; x++) {
-//            for (int y = pos.y - 1; y <= pos.y + 1; y++) {
-//                ProceduralChunk chunk = MapGenerator.getInstance().getChunkValue(x, y);
-//                setTile(chunk.getTilePos(), chunk.getTileData());
-//            }
-//        }
     }
 
     /**
@@ -104,7 +107,7 @@ public class HexGrid {
      * @return
      */
     public int generateNewSeed() {
-        int seed = MapGenerator.generateSeed();
+        int seed = ProceduralGenerator.generateSeed();
         mapData.setSeed(seed);
         return seed;
     }
@@ -125,6 +128,7 @@ public class HexGrid {
             } else {
                 System.err.println("old && new tile is null, an error have occurs, this will be ignored.");
             }
+            ghostControl.updateCulling();
         } else {
             /**
              * Update the whole Map
@@ -145,9 +149,9 @@ public class HexGrid {
     private void addChunk(Vector2Int chunkPos) {
         Node chunk = new Node(chunkPos.toString());
         chunksNodes.put(chunkPos, chunk);
-        chunk.addControl(new ChunkControl(meshParam, assetManager, mode, chunkPos, false));
+        chunk.addControl(new ChunkControl(meshParam, assetManager, mapData.getMode(), chunkPos, false));
         chunk.setLocalTranslation(getChunkWorldPosition(chunkPos));
-        gridNode.attachChild(chunk);
+        tileNode.attachChild(chunk);
         insertedChunk(chunk.getControl(ChunkControl.class));
     }
 
@@ -160,7 +164,7 @@ public class HexGrid {
     public final void showAreaRange(HexCoordinate centerPosition, int radius, ColorRGBA color) {
         if (areaRangeNode == null && radius > 0) {
             areaRangeNode = new Node("areaRangeNode");
-            AreaRangeControl control = new AreaRangeControl(meshParam, assetManager, mode, centerPosition, radius, color);
+            AreaRangeControl control = new AreaRangeControl(meshParam, assetManager, mapData.getMode(), centerPosition, radius, color);
             areaRangeNode.addControl(control);
         } else if (areaRangeNode != null && radius > 0) {
             areaRangeNode.getControl(AreaRangeControl.class).update(centerPosition, radius, color);
@@ -212,32 +216,5 @@ public class HexGrid {
 
     public void cleanup() {
         mapData.removeTileChangeListener(tileChangeListener);
-    }
-    
-    /**
-     * Used to define how the chunk will handle tiles if they does not exist.
-     */
-    public enum GhostMode {
-
-        /**
-         * null chunk will be ignored, 
-         * null tiles will be ignored.
-         */
-        NONE,
-        /**
-         * null chunk will be generated as ghost,
-         * null tiles will be generated as ghost.
-         */
-        GHOST,
-        /**
-         * null chunk will be generated proceduraly,
-         * null tile will be ignored.
-         */
-        PROCEDURAL,
-        /**
-         * null chunk will be generated proceduraly, 
-         * null tile will be generated as ghost.
-         */
-        GHOST_PROCEDURAL;
     }
 }

@@ -12,8 +12,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
-import org.hexgridapi.core.HexGrid;
-import org.hexgridapi.core.HexGrid.GhostMode;
+import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.MapData.GhostMode;
 import org.hexgridapi.core.mesh.MeshParameter;
 import org.hexgridapi.utility.Vector2Int;
 
@@ -24,7 +24,7 @@ import org.hexgridapi.utility.Vector2Int;
  */
 public class ChunkControl extends AbstractControl {
 
-    private final GhostMode mode;
+    protected final GhostMode mode;
     protected final AssetManager assetManager;
     protected final MeshParameter meshParam;
     protected final String texturePath = "Textures/HexField/";
@@ -52,6 +52,7 @@ public class ChunkControl extends AbstractControl {
         if (spatial != null && spatial instanceof Node) {
             // initialize
             super.setSpatial(spatial);
+            ((Node) spatial).attachChild(new Node("TILES.0|0"));
 //            spatial.setShadowMode(RenderQueue.ShadowMode.Inherit);
             update();
         } else if (spatial == null) {
@@ -79,24 +80,25 @@ public class ChunkControl extends AbstractControl {
         /**
          * remove the old tile from the chunk.
          */
-        ((Node) spatial).detachAllChildren();
+        ((Node)((Node) spatial).getChild("TILES.0|0")).detachAllChildren();
         /**
          * Generate the tile and attach them with the right texture.
          * 1 geometry by texture.
          */
-//        HashMap<String, Mesh> mesh = meshParam.getMesh(onlyGround);
-        setMesh(meshParam.getMesh(onlyGround, mode, chunkPosition));
+//        Node node = (Node)((Node) spatial).getChild("TILES.0|0");
+        setMesh((Node)((Node) spatial).getChild("TILES.0|0"),
+                meshParam.getMesh(onlyGround, chunkPosition));
     }
 
-    public void setMesh(HashMap<String, Mesh> mesh) {
+    protected void setMesh(Node parent, HashMap<String, Mesh> mesh) {
         for (String value : mesh.keySet()) {
             Geometry tile = new Geometry(value, mesh.get(value));
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             Texture text;
             if (value.equals("EMPTY_TEXTURE_KEY")) {
                 text = assetManager.loadTexture("/Textures/" + value + ".png");
-            } else if (value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST)
-                    || value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST_PROCEDURAL)) {
+            } else if (value.equals("NO_TILE") && mode.equals(MapData.GhostMode.GHOST)
+                    || value.equals("NO_TILE") && mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)) {
                 text = assetManager.loadTexture("/Textures/" + "EMPTY_TEXTURE_KEY" + ".png");
                 mat.setColor("Color", ColorRGBA.Blue);
             } else {
@@ -109,7 +111,7 @@ public class ChunkControl extends AbstractControl {
 //            tile.getMesh().setMode(Mesh.Mode.Points);
             tile.setMaterial(mat);
 //            tile.setShadowMode(RenderQueue.ShadowMode.Inherit);
-            ((Node) spatial).attachChild(tile);
+            parent.attachChild(tile);
         }
     }
 
@@ -125,10 +127,10 @@ public class ChunkControl extends AbstractControl {
      * return true. </p>
      */
     public boolean isEmpty() {
-        if (mode.equals(HexGrid.GhostMode.GHOST) && ((Node) spatial).getChildren().size() < 2
-                || mode.equals(HexGrid.GhostMode.GHOST_PROCEDURAL) && ((Node) spatial).getChildren().size() < 2
-                || mode.equals(HexGrid.GhostMode.NONE) && ((Node) spatial).getChildren().isEmpty()
-                || mode.equals(HexGrid.GhostMode.PROCEDURAL) && ((Node) spatial).getChildren().isEmpty()) {
+        if (mode.equals(MapData.GhostMode.GHOST) && ((Node) spatial).getChildren().size() < 2
+                || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL) && ((Node) spatial).getChildren().size() < 2
+                || mode.equals(MapData.GhostMode.NONE) && ((Node) spatial).getChildren().isEmpty()
+                || mode.equals(MapData.GhostMode.PROCEDURAL) && ((Node) spatial).getChildren().isEmpty()) {
             return true;
         } else {
             return false;

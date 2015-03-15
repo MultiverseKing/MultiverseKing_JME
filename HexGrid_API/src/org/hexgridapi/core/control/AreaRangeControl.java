@@ -14,7 +14,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
-import org.hexgridapi.core.HexGrid;
+import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.mesh.MeshParameter;
 import org.hexgridapi.utility.HexCoordinate;
 
@@ -26,12 +26,12 @@ public class AreaRangeControl extends AbstractControl {
 
     private final AssetManager assetManager;
     private final MeshParameter meshParam;
+    private final MapData.GhostMode mode;
     private int radius = 0;
     private HexCoordinate centerPosition;
     private ColorRGBA color;
-    private final HexGrid.GhostMode mode;
 
-    public AreaRangeControl(MeshParameter meshParam, AssetManager assetManager, HexGrid.GhostMode mode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
+    public AreaRangeControl(MeshParameter meshParam, AssetManager assetManager, MapData.GhostMode mode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
         this.mode = mode;
@@ -94,7 +94,7 @@ public class AreaRangeControl extends AbstractControl {
         /**
          * generate the new tile.
          */
-        HashMap<String, Mesh> mesh = meshParam.getMesh(centerPosition, radius, true, mode, null);
+        HashMap<String, Mesh> mesh = meshParam.getMesh(centerPosition, radius, true, null);
 
         /**
          * remove the old tile from the chunk.

@@ -5,7 +5,7 @@ import org.hexgridapi.events.TileChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.hexgridapi.core.mapgenerator.MapGenerator;
+import org.hexgridapi.core.mapgenerator.ProceduralGenerator;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.loader.HexGridMapLoader;
 import org.hexgridapi.utility.HexCoordinate;
@@ -23,7 +23,8 @@ public final class MapData {
     private final ChunkData chunkData = new ChunkData();
     private final ArrayList<TileChangeListener> tileListeners = new ArrayList<TileChangeListener>();
     private final HexGridMapLoader hexGridMapLoader;
-    private int currentProceduralSeed;
+    private GhostMode mode;
+    private ProceduralGenerator generator;
     private String mapName = "Undefined";// = "Reset";
     /**
      * Key index :
@@ -35,16 +36,17 @@ public final class MapData {
     private ArrayList<String> textureKeys = new ArrayList<String>();
 
     public MapData(AssetManager assetManager) {
-        this(null, assetManager, true);
+        this(null, assetManager, GhostMode.PROCEDURAL);
     }
     
-    public MapData(Object[] textureKeys, AssetManager assetManager, boolean useGenerator){
+    public MapData(Object[] textureKeys, AssetManager assetManager, GhostMode mode){
         this.assetManager = assetManager;
         hexGridMapLoader = new HexGridMapLoader(assetManager);
         genTextureKeys(textureKeys);
-        if(useGenerator){
-            currentProceduralSeed = MapGenerator.generateSeed();
+        if(!mode.equals(GhostMode.NONE)){
+            generator = new ProceduralGenerator(ProceduralGenerator.generateSeed(), this.textureKeys.size());
         }
+        this.mode = mode;
     }
 
     private void genTextureKeys(Object[] userKey) {
@@ -88,11 +90,14 @@ public final class MapData {
         this.mapName = mapName;
     }
 
+    public GhostMode getMode() {
+        return mode;
+    }
+
     /**
      * @return true if there is data.
      */
     public boolean containTilesData() {
-//        return !tileData.isEmpty();
         return !chunkData.isEmpty();
     }
 
@@ -103,8 +108,12 @@ public final class MapData {
      * @return can be null
      */
     public HexTile getTile(HexCoordinate tilePos) {
-//        return tileData.get(tile.getAsOffset());
-        return chunkData.getTile(tilePos);
+        HexTile t = chunkData.getTile(tilePos);
+        if(t == null && mode.equals(GhostMode.GHOST_PROCEDURAL)
+                    || mode.equals(GhostMode.PROCEDURAL)){
+            t = generator.getTileValue(tilePos);
+        }
+        return t;
     }
 
     /**
@@ -117,7 +126,10 @@ public final class MapData {
         HexTile[] result = new HexTile[tilePos.length];
         for (int i = 0; i < tilePos.length; i++) {
             result[i] = chunkData.getTile(tilePos[i]);
-//            result[i] = tileData.get(tilePos[i].getAsOffset());
+            if(result[i] == null && mode.equals(GhostMode.GHOST_PROCEDURAL)
+                    || mode.equals(GhostMode.PROCEDURAL)){
+                result[i] = generator.getTileValue(tilePos[i]);
+            }
         }
         return result;
     }
@@ -184,16 +196,14 @@ public final class MapData {
         HexTile oldTile;
         if (tile != null) {
             oldTile = chunkData.add(tilePos, tile);
-//            oldTile = tileData.put(tilePos.getAsOffset(), tile);
         } else {
             oldTile = chunkData.remove(tilePos);
-//            oldTile = tileData.remove(tilePos.getAsOffset());
         }
         return new TileChangeEvent(tilePos, oldTile, tile);
     }
     
     public int getSeed() {
-        return currentProceduralSeed;
+        return generator.getSeed();
     }
     /**
      * This lead to some issue if used on runtime as all generated data 
@@ -201,7 +211,7 @@ public final class MapData {
      * @param seed 
      */
     public void setSeed(int seed) {
-        currentProceduralSeed = seed;
+        generator.setSeed(seed);
     }
     
     public boolean saveArea(String mapName) {
@@ -244,7 +254,6 @@ public final class MapData {
         HexTile[] neighbours = new HexTile[coords.length];
         for (int i = 0; i < neighbours.length; i++) {
             neighbours[i] = chunkData.getTile(coords[i]);
-//            neighbours[i] = tileData.get(coords[i].getAsOffset());
         }
         return neighbours;
     }
@@ -265,10 +274,7 @@ public final class MapData {
      */
     public void Cleanup() {
         //Todo remove all file from the temps folder
-//        chunkPos.clear();
         chunkData.clear();
-//        tileData.clear();
-//        updateTile(new TileChangeEvent(null, null, null));
     }
 
     /**
@@ -318,5 +324,32 @@ public final class MapData {
      */
     public List<String> getTextureKeys() {
         return Collections.unmodifiableList(textureKeys);
+    }
+    
+    /**
+     * Used to define how the chunk will handle tiles if they does not exist.
+     */
+    public enum GhostMode {
+
+        /**
+         * null chunk will be ignored, 
+         * null tiles will be ignored.
+         */
+        NONE,
+        /**
+         * null chunk will be generated as ghost,
+         * null tiles will be generated as ghost.
+         */
+        GHOST,
+        /**
+         * null chunk will be generated proceduraly,
+         * null tile will be ignored.
+         */
+        PROCEDURAL,
+        /**
+         * null chunk will be generated proceduraly, 
+         * null tile will be generated as ghost.
+         */
+        GHOST_PROCEDURAL;
     }
 }

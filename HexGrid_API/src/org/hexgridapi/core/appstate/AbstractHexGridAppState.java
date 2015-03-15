@@ -31,13 +31,16 @@ public abstract class AbstractHexGridAppState extends HexGrid implements AppStat
      * @param enableGhostTile is inexisting tile should be generated as ghost ?
      * @param mode generate the grid following this param
      */
-    public AbstractHexGridAppState(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
-        super(mapData, assetManager, rootNode, mode);
+    public AbstractHexGridAppState(MapData mapData, AssetManager assetManager, Node rootNode) {
+        super(mapData, assetManager, rootNode);
     }
 
     public final void initialize(AppStateManager stateManager, Application app) {
 //        mapData.registerChunkChangeListener(this);
 //        mapData.registerTileChangeListener(this);
+        if(!mapData.getMode().equals(MapData.GhostMode.NONE)){
+            initialiseGhostGrid(app);
+        }
 //        ((Node)app.getViewPort().getScenes().get(0)).attachChild(gridNode);
         initializeSystem(stateManager, app);
         initialized = true;

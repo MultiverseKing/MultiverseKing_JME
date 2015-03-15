@@ -14,7 +14,7 @@ import org.hexgridapi.utility.Vector2Int;
  *
  * @author roah
  */
-public final class MapGenerator {
+public final class ProceduralGenerator {
 
     private static Random GENERATOR = new Random(System.currentTimeMillis());
 
@@ -28,11 +28,12 @@ public final class MapGenerator {
     /**
      * Used to know the minimum/maximum Heigth when generating the map.
      */
-    private int heightMin = -5;
+    private int heightMin = -2;
     private int heightMax = 15;
+    private int textureCount;
 
-    public MapGenerator(int seed) {
-        this(seed, null, null);
+    public ProceduralGenerator(int seed, int textureCount) {
+        this(seed, null, null, textureCount);
     }
 
     /**
@@ -42,7 +43,7 @@ public final class MapGenerator {
      * @param heightMin must be lesser or equal to 0
      * @param heightMax must be greater than 0
      */
-    public MapGenerator(int seed, Integer heightMin, Integer heightMax) {
+    public ProceduralGenerator(int seed, Integer heightMin, Integer heightMax, int textureCount) {
         if (validateSeed(seed)) {
             if (heightMin != null && heightMin <= 0) {
                 this.heightMin = heightMin;
@@ -50,25 +51,37 @@ public final class MapGenerator {
             if (heightMax != null && heightMax > 0) {
                 this.heightMax = heightMax;
             }
-            perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_FAST);
+            this.textureCount = textureCount;
+            perlin.setFrequency(1.0);
+//            perlin.setPersistence(0.5);
+            perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_BEST);
             perlin.setSeed(seed);
         }
     }
 
     private boolean validateSeed(int seed) {
         String s = String.valueOf(seed);
-        if(s.toCharArray().length == 9 && s.matches("\\d{9}")){
-            System.out.println("seed validated");
+        if (s.toCharArray().length == 9 && s.matches("\\d{9}")) {
             return true;
         }
         return false;
     }
-    
+
+    public int getSeed() {
+        return perlin.getSeed();
+    }
+
+    public void setSeed(int seed) {
+        if (validateSeed(seed)) {
+            perlin.setSeed(seed);
+        }
+    }
+
     /**
      * @todo incomplete
      * @param posX
      * @param posY
-     * @return 
+     * @return
      */
     public ProceduralChunk getChunkValue(int posX, int posY) {
         Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(new Vector2Int(posY, posY));
@@ -79,22 +92,43 @@ public final class MapGenerator {
                 HexCoordinate tilePos = new HexCoordinate(
                         HexCoordinate.Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
                 chunk.add(tilePos, new HexTile(
-                        convertToHeight(getTileValue(tilePos.getAsOffset().x, tilePos.getAsOffset().y))));
+                        convertToHeight(getTileValue(tilePos.getAsOffset().x, tilePos.getAsOffset().y, 0))));
             }
         }
         return chunk;
     }
 
-    private double getTileValue(int posX, int posY) {
-        return perlin.getValue(posX, posY, 0);
+    public HexTile getTileValue(HexCoordinate tilePos) {
+        int height = convertToHeight(getTileValue(
+                tilePos.getAsOffset().x, tilePos.getAsOffset().y, 0));
+        int text = convertToTexturKey(getTileValue(
+                tilePos.getAsOffset().x, tilePos.getAsOffset().y, 1));
+        return new HexTile(height, text);
     }
 
     /**
-     * @todo incomplete
+     *
+     * @param param 0 == height <=> 1 == textureKey
+     * @return
+     */
+    private double getTileValue(int posX, int posY, int param) {
+        return perlin.getValue(posX*0.01, posY*0.01, param);
+    }
+
+    /**
+     * @todo wip
      * @param generatedValue
-     * @return 
+     * @return
      */
     private int convertToHeight(double generatedValue) {
-        return (int) (generatedValue * (heightMax + FastMath.abs(heightMin)));
+        return (int) (generatedValue * (heightMax + FastMath.abs(heightMin)) - FastMath.abs(heightMin));
+    }
+
+    private int convertToTexturKey(double generatedValue) {
+        int val = (int) (generatedValue * (textureCount + 1) - 1);
+        if (val == -1) {
+            val = -2;
+        }
+        return val;
     }
 }

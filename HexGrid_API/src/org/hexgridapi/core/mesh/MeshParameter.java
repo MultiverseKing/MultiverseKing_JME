@@ -39,7 +39,6 @@ public final class MeshParameter {
      * Used to define which algorithm to use with meshmanager.
      */
     private boolean onlyGround;
-//    private final int depth;
     private String inspectedTexture;
     private int inspectedMesh;
     private int groundHeight = 0;
@@ -231,10 +230,10 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return list of all generated mesh. (1 mesh by texture)
      */
-    public HashMap<String, Mesh> getMesh(boolean onlyGround, HexGrid.GhostMode mode, Vector2Int inspectedChunk) {
+    public HashMap<String, Mesh> getMesh(boolean onlyGround, Vector2Int inspectedChunk) {
         this.inspectedChunk = inspectedChunk;
         initialize(null, 0, onlyGround);
-        return getMesh(mode);
+        return getMesh();
     }
 
     /**
@@ -245,20 +244,20 @@ public final class MeshParameter {
      * @param onlyGround generate side face ?
      * @return
      */
-    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, HexGrid.GhostMode mode, Vector2Int inspectedChunk) {
+    public HashMap<String, Mesh> getMesh(HexCoordinate centerPosition, int radius, boolean onlyGround, Vector2Int inspectedChunk) {
         this.inspectedChunk = inspectedChunk;
         if (radius <= 0) {
             radius = 1;
         }
         initialize(centerPosition, radius, onlyGround);
-        return getMesh(mode);
+        return getMesh();
     }
 
-    private HashMap<String, Mesh> getMesh(HexGrid.GhostMode mode) {
+    private HashMap<String, Mesh> getMesh() {
         HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
         for (String value : elementTypeRef.keySet()) {
-            if (value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST) 
-                    || value.equals("NO_TILE") && mode.equals(HexGrid.GhostMode.GHOST_PROCEDURAL) 
+            if (value.equals("NO_TILE") && mapData.getMode().equals(MapData.GhostMode.GHOST) 
+                    || value.equals("NO_TILE") && mapData.getMode().equals(MapData.GhostMode.GHOST_PROCEDURAL) 
                     || !value.equals("NO_TILE")) {
                 inspectedTexture = value;
                 inspectedMesh = -1;

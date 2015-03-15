@@ -35,17 +35,11 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
     private final Node node = new Node("tileSelectionNode");
     private static HashMap<Integer, Mesh> singleTile = new HashMap<Integer, Mesh>();
     private static Material mat;
-    private final MouseControlSystem system;
     private ArrayList<HexCoordinate> coords = new ArrayList<HexCoordinate>();
     private ArrayList<TileSelectionListener> listeners = new ArrayList<TileSelectionListener>();
     private boolean isSelectionGroup = false;
     private HexCoordinate selectedTile;
     private CursorControl cursorControl;
-
-    public TileSelectionControl(MouseControlSystem system) {
-        this.system = system;
-        system.registerTileInputListener(this);
-    }
 
     public void initialise(Application app) {
         if (mat == null) {
@@ -63,9 +57,13 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
         /**
          * Register listener.
          */
+        app.getStateManager().getState(MouseControlSystem.class).registerTileInputListener(this);
         app.getStateManager().getState(MapDataAppState.class).getMapData().registerTileChangeListener(tileChangeListener);
         cursorControl = new CursorControl(app);
         node.addControl(this);
+        /**
+         * @todo attach to hexGridNode and not to rootNode
+         */
         ((Node) app.getViewPort().getScenes().get(0)).attachChild(node);
     }
     /**

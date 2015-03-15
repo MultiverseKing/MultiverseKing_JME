@@ -77,7 +77,7 @@ public class GhostControl extends ChunkControl {
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
         if (spatial != null && spatial instanceof Node) {
-            ((Node)spatial).getParent().getParent().attachChild(collisionNode);
+            ((Node) spatial).getParent().getParent().attachChild(collisionNode);
             genGhost();
             updatePosition();
         } else if (spatial == null) {
@@ -97,17 +97,17 @@ public class GhostControl extends ChunkControl {
                 for (int y = -1; y < 2; y++) {
                     if (!(x == 0 && y == 0)) {
                         Node tileNode;
-                        if(((Node)spatial).getChild("TILES." + x + "|" + y) != null){
-                            tileNode = (Node) ((Node)spatial).getChild("TILES." + x + "|" + y);
+                        if (((Node) spatial).getChild("TILES." + x + "|" + y) != null) {
+                            tileNode = (Node) ((Node) spatial).getChild("TILES." + x + "|" + y);
                             tileNode.detachAllChildren();
                             tileNode.getParent().detachChild(tileNode);
                         } else {
-                             tileNode = new Node("TILES." + x + "|" + y);
-                             tileNode.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
+                            tileNode = new Node("TILES." + x + "|" + y);
+                            tileNode.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
                         }
                         setMesh(tileNode, meshParam.getMesh(onlyGround, chunkPosition.add(x, y)));
-                        if(((Node)spatial).getChild("TILES." + x + "|" + y) == null){
-                            ((Node)spatial).attachChild(tileNode);
+                        if (((Node) spatial).getChild("TILES." + x + "|" + y) == null) {
+                            ((Node) spatial).attachChild(tileNode);
                         }
                     }
                 }
@@ -156,8 +156,8 @@ public class GhostControl extends ChunkControl {
         collisionNode.setLocalTranslation(pos);
         if (mode.equals(MapData.GhostMode.GHOST)) {
             updateCulling();
-        } else if(mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
-                ||mode.equals(MapData.GhostMode.PROCEDURAL)){
+        } else if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
+                || mode.equals(MapData.GhostMode.PROCEDURAL)) {
             update();
             genGhost();
         }

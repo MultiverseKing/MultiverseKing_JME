@@ -2,11 +2,9 @@ package core;
 
 import core.gui.HexMapPanel;
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
-import core.control.GhostControl;
 import gui.deprecated.EditorMainGUI;
 import gui.deprecated.FileManagerPopup;
 import java.util.List;
@@ -16,7 +14,6 @@ import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.AbstractHexGridAppState;
 import org.hexgridapi.core.control.ChunkControl;
 import org.hexgridapi.core.control.TileSelectionControl;
-import org.hexgridapi.core.mapgenerator.MapGenerator;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import test.EditorMain;
@@ -29,13 +26,12 @@ import test.EditorMain;
 public final class HexMapSystem extends AbstractHexGridAppState {
 
     private EditorMain app;
-    private GhostControl ghostControl;
     private EditorMainGUI editorMainGUI;
     private TileSelectionControl tileSelectionControl;
     private HexMapPanel hexMapPanel;
 
-    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode, GhostMode mode) {
-        super(mapData, assetManager, rootNode, mode);
+    public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
+        super(mapData, assetManager, rootNode);
     }
 
     @Override
@@ -44,19 +40,11 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
         MouseControlSystem mouseControl = app.getStateManager().getState(MouseControlSystem.class);
         if (mouseControl == null) {
-            mouseControl = new MouseControlSystem(this.app.getRootNode());
+            mouseControl = new MouseControlSystem();
             app.getStateManager().attach(mouseControl);
         }
         tileSelectionControl = mouseControl.getSelectionControl();
         hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
-        initialiseGhostGrid((SimpleApplication) app);
-    }
-
-    protected void initialiseGhostGrid(SimpleApplication app) {
-        Node node = new Node("GhostNode");
-        ghostControl = new GhostControl(app, meshParam, mode, new Vector2Int(), this);
-        node.addControl(ghostControl);
-        gridNode.attachChild(node);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters && Setters">
@@ -67,10 +55,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     
     public String getMapName() {
         return mapData.getMapName();
-    }
-    
-    public void enableGhostUpdate(boolean enable) {
-        ghostControl.setEnabled(true);
     }
 
     public void removeTile() {
@@ -215,10 +199,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     public String getTextureValueFromKey(int textureKey) {
         return mapData.getTextureValue(textureKey);
     }
-
-    public void setEnabledGhost(boolean enable) {
-        ghostControl.setEnabled(enable);
-    }
     // </editor-fold>
 
     public void save(FileManagerPopup popup) {
@@ -237,7 +217,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     protected void insertedChunk(ChunkControl control) {
-        ghostControl.updateCulling();
     }
 
     @Override
@@ -246,7 +225,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     protected void removedChunk(Vector2Int pos) {
-        ghostControl.updateCulling();
     }
 
     public void loadFromFile(FileManagerPopup popup) {

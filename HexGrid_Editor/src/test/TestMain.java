@@ -66,8 +66,8 @@ public class TestMain extends SimpleApplication {
      * @todo Init system only when needed.
      */
     public void initSystem() {
-        MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, true);
+        MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, MapData.GhostMode.GHOST);
         stateManager.attach(new MapDataAppState(mapData));
-        stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode(), HexGrid.GhostMode.GHOST));
+        stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
     }
 }

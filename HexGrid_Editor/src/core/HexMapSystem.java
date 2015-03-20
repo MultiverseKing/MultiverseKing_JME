@@ -69,7 +69,13 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     public void setNewTile() {
         if (tileSelectionControl.getSelectedList().isEmpty()) {
-            mapData.setTile(tileSelectionControl.getSelectedPos(), new HexTile());
+            HexTile t = getTile();
+            if(t != null){
+                t.cloneChangedTextureKey(0);
+            } else {
+                t = new HexTile();
+            }
+            mapData.setTile(tileSelectionControl.getSelectedPos(), t);
         } else {
             mapData.setTile(tileSelectionControl.getSelectedList().toArray(
                     new HexCoordinate[tileSelectionControl.getSelectedList().size()]),
@@ -153,12 +159,20 @@ public final class HexMapSystem extends AbstractHexGridAppState {
         }
     }
 
+    public boolean tileExist(){
+        HexTile t = getTile();
+        if(t != null){
+            return mapData.getTextureValue(t.getTextureKey()).equals("NO_TILE") ? false : true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * @return the currently selected tile.
      */
     public HexTile getTile() {
         return mapData.getTile(tileSelectionControl.getSelectedPos());
-//        return mapData.getTile(tileSelectionControl.getTileList().toArray(new HexCoordinate[tileSelectionControl.getTileList().size()]));
     }
 
     public int getTileHeight() {

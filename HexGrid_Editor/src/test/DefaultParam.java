@@ -66,7 +66,7 @@ public class DefaultParam {
         app.getFlyByCamera().setEnabled(false);
         rtsCam = new RTSCamera(RTSCamera.UpVector.Y_UP, "AZERTY");
 //        rtsCam.setCenter(new Vector3f(8, 15f, 8));
-        rtsCam.setCenter(new Vector3f(8, 7, 8));
+        rtsCam.setCenter(new Vector3f(8, 17, 8));
         rtsCam.setRot(120);
         app.getStateManager().attach(rtsCam);
     }

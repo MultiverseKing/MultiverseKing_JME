@@ -265,15 +265,15 @@ public class HexMapPanel extends AbstractAction {
     private TileSelectionListener selectionListener = new TileSelectionListener() {
         @Override
         public void onTileSelectionUpdate(HexCoordinate currentSelection, ArrayList<HexCoordinate> selectedList) {
-            if (currentIsGhost == null || selectedList != null && !selectedList.isEmpty() != currentIsGroup
-                    || (editorSystem.getTile() == null ? true : false) != currentIsGhost) {
-                if (selectedList != null && !selectedList.isEmpty()) {
+            if (currentIsGhost == null || !selectedList.isEmpty() != currentIsGroup
+                    || !editorSystem.tileExist() != currentIsGhost) {
+                if (!selectedList.isEmpty()) {
                     buildMultiTileMenu(selectedList);
                 } else {
                     buildSingleTileMenu();
                 }
             } else {
-                if (selectedList != null && !selectedList.isEmpty()) {
+                if (!selectedList.isEmpty()) {
 //                    updateMultiTileMenu(selectedList);
                 } else {
                     updateSingleTileMenu();
@@ -288,7 +288,7 @@ public class HexMapPanel extends AbstractAction {
         public void onTileChange(TileChangeEvent... events) {
             if (!currentIsGroup && events.length == 1
                     && events[0].getTilePos().equals(mouseSystem.getSelectionControl().getSelectedPos())) {
-                if ((editorSystem.getTile() == null ? true : false) != currentIsGhost) {
+                if (!editorSystem.tileExist() != currentIsGhost) {
                     buildSingleTileMenu();
                 } else {
                     updateSingleTileMenu();
@@ -298,7 +298,7 @@ public class HexMapPanel extends AbstractAction {
     };
 
     private void buildTileMenu() {
-        currentIsGhost = editorSystem.getTile() == null ? true : false;
+        currentIsGhost = !editorSystem.tileExist();
         if (tileProperties == null) {
             tileProperties = new JPanel();
             tileProperties.setLayout(new BoxLayout(tileProperties, BoxLayout.PAGE_AXIS));
@@ -410,7 +410,6 @@ public class HexMapPanel extends AbstractAction {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     onAction(new ActionEvent(e.getSource(), e.getID(), e.getActionCommand() + "." + ((JComboBox) comps.get("textureList")).getSelectedIndex()));
-//                        System.err.println(editorSystem.getTextureKeys().get(((JComboBox)comps.get("textureList")).getSelectedIndex()));
                 }
             });
             textureList.setRenderer(combo);
@@ -419,9 +418,6 @@ public class HexMapPanel extends AbstractAction {
             textureList.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
             addComp(tileProperties, textureList);
             comps.put("textureList", textureList);
-//                int var = editorSystem.getTextureKeys().indexOf(editorSystem.getTileTextureKey());
-//                ((JComboBox)comps.get("textureList")).setSelectedIndex(var);
-//                update = false;
         } else {
             addComp(tileProperties, comps.get("textureList"));
             update = false;
@@ -456,7 +452,7 @@ public class HexMapPanel extends AbstractAction {
 
     // </editor-fold>
     private void updateSingleTileMenu() {
-        currentIsGhost = editorSystem.getTile() == null ? true : false;
+        currentIsGhost = !editorSystem.tileExist();
         if (!currentIsGhost) {
             ((JLabel) comps.get("height")).setText("height : " + editorSystem.getTileHeight());
             update = false;

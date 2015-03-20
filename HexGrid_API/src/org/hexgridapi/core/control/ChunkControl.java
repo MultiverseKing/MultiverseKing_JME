@@ -121,16 +121,16 @@ public class ChunkControl extends AbstractControl {
 
     /**
      * @return false if the chunk contain no tile (excluding ghost tile).
-     * <p>If GhostMode.GHOST && GhostMode.GHOST_PROCEDURAL && only ghost tile<br>
+     * <p>If GhostMode.GHOST || GhostMode.GHOST_PROCEDURAL && only ghost tile<br>
      * return true. </p>
-     * <p>If GhostMode.NONE && GhostMode.PROCEDURAL && contain no tile<br>
+     * <p>If GhostMode.NONE || GhostMode.PROCEDURAL && contain no tile<br>
      * return true. </p>
      */
     public boolean isEmpty() {
-        if (mode.equals(MapData.GhostMode.GHOST) && ((Node) spatial).getChildren().size() < 2
-                || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL) && ((Node) spatial).getChildren().size() < 2
-                || mode.equals(MapData.GhostMode.NONE) && ((Node) spatial).getChildren().isEmpty()
-                || mode.equals(MapData.GhostMode.PROCEDURAL) && ((Node) spatial).getChildren().isEmpty()) {
+        if ((mode.equals(MapData.GhostMode.GHOST) || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0")).getChildren().size() < 2
+                || (mode.equals(MapData.GhostMode.NONE) || mode.equals(MapData.GhostMode.PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0")).getChildren().isEmpty()) {
             return true;
         } else {
             return false;

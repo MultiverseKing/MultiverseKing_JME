@@ -122,23 +122,21 @@ public class HexGrid {
             Vector2Int chunkPos = event.getTilePos().getCorrespondingChunk();
             if (!chunksNodes.containsKey(chunkPos)) {
                 addChunk(chunkPos);
+                ghostControl.updateCulling();
             } else if (!(event.getNewTile() == null && event.getOldTile() == null)) {
-//                System.err.println("Not implemented : Add or Delete Tile from chunk");
                 updateChunk(chunkPos);
             } else {
                 System.err.println("old && new tile is null, an error have occurs, this will be ignored.");
             }
-            ghostControl.updateCulling();
         } else {
             /**
-             * Update the whole Map
+             * Update the whole Map !?
              */
         }
     }
 
     private void updateChunk(Vector2Int chunkPos) {
         ((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class).update();
-
         if (((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class).isEmpty()) {
             removeChunk(chunkPos);
         } else {

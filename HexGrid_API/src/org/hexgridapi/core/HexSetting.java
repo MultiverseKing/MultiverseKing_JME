@@ -24,7 +24,7 @@ public final class HexSetting {
     /**
      * Number of hex contain in a chunk.
      */
-    public final static int CHUNK_SIZE = 8; //must be power of two
+    public final static int CHUNK_SIZE = 12; //must be multiple of two
     /**
      * The initial depth given to any generated chunk.
      */

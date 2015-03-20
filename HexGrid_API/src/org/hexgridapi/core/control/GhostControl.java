@@ -90,25 +90,12 @@ public class GhostControl extends ChunkControl {
     private void genGhost() {
         if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
                 || mode.equals(MapData.GhostMode.PROCEDURAL)) {
-            /**
-             * @todo
-             */
+            Set<Vector2Int> list = system.getChunksNodes();
             for (int x = -1; x < 2; x++) {
                 for (int y = -1; y < 2; y++) {
-                    if (!(x == 0 && y == 0)) {
-                        Node tileNode;
-                        if (((Node) spatial).getChild("TILES." + x + "|" + y) != null) {
-                            tileNode = (Node) ((Node) spatial).getChild("TILES." + x + "|" + y);
-                            tileNode.detachAllChildren();
-                            tileNode.getParent().detachChild(tileNode);
-                        } else {
-                            tileNode = new Node("TILES." + x + "|" + y);
-                            tileNode.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
-                        }
-                        setMesh(tileNode, meshParam.getMesh(onlyGround, chunkPosition.add(x, y)));
-                        if (((Node) spatial).getChild("TILES." + x + "|" + y) == null) {
-                            ((Node) spatial).attachChild(tileNode);
-                        }
+                    if (!(x == 0 && y == 0)
+                            && !list.contains(chunkPosition.add(x, y))) {
+                        genProcedural(x, y);
                     }
                 }
             }
@@ -132,6 +119,21 @@ public class GhostControl extends ChunkControl {
                     }
                 }
             }
+        }
+    }
+
+    private void genProcedural(int x, int y) {
+        Node tileNode;
+        if (((Node) spatial).getChild("TILES." + x + "|" + y) != null) {
+            tileNode = (Node) ((Node) spatial).getChild("TILES." + x + "|" + y);
+            tileNode.detachAllChildren();
+        } else {
+            tileNode = new Node("TILES." + x + "|" + y);
+            tileNode.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
+        }
+        setMesh(tileNode, meshParam.getMesh(onlyGround, chunkPosition.add(x, y)));
+        if (((Node) spatial).getChild("TILES." + x + "|" + y) == null) {
+            ((Node) spatial).attachChild(tileNode);
         }
     }
 
@@ -168,9 +170,17 @@ public class GhostControl extends ChunkControl {
         for (int x = -1; x < 2; x++) {
             for (int y = -1; y < 2; y++) {
                 if (list.contains(chunkPosition.add(x, y))) {
-                    ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
+                    if (mode.equals(MapData.GhostMode.GHOST)) {
+                        ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
+                    } else {
+                        ((Node)((Node) spatial).getChild("TILES." + x + "|" + y)).detachAllChildren();
+                    }
                 } else {
-                    ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
+                    if (mode.equals(MapData.GhostMode.GHOST)) {
+                        ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
+                    } else {
+//                        genProcedural(x, y);
+                    }
                 }
             }
         }

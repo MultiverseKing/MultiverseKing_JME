@@ -28,8 +28,8 @@ public final class ProceduralGenerator {
     /**
      * Used to know the minimum/maximum Heigth when generating the map.
      */
-    private int heightMin = -2;
-    private int heightMax = 15;
+    private int heightMin = 2; // is always count as < 0 (ex: 2 mean -2)
+    private int heightMax = 15; // is always count as > 0
     private int textureCount;
 
     public ProceduralGenerator(int seed, int textureCount) {
@@ -45,14 +45,14 @@ public final class ProceduralGenerator {
      */
     public ProceduralGenerator(int seed, Integer heightMin, Integer heightMax, int textureCount) {
         if (validateSeed(seed)) {
-            if (heightMin != null && heightMin <= 0) {
-                this.heightMin = heightMin;
+            if (heightMin != null) {
+                this.heightMin = (int) (heightMin <= 0 ? FastMath.abs(heightMin) : heightMin);
             }
             if (heightMax != null && heightMax > 0) {
                 this.heightMax = heightMax;
             }
             this.textureCount = textureCount;
-            perlin.setFrequency(1.0);
+            perlin.setFrequency(2.0);
 //            perlin.setPersistence(0.5);
             perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_BEST);
             perlin.setSeed(seed);
@@ -121,7 +121,7 @@ public final class ProceduralGenerator {
      * @return
      */
     private int convertToHeight(double generatedValue) {
-        return (int) (generatedValue * (heightMax + FastMath.abs(heightMin)) - FastMath.abs(heightMin));
+        return (int) (generatedValue * (heightMax + heightMin) - heightMin);
     }
 
     private int convertToTexturKey(double generatedValue) {

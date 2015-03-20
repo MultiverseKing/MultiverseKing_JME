@@ -28,6 +28,7 @@ import org.hexgridapi.utility.Vector2Int;
 public class GhostControl extends ChunkControl {
 
     private final Node collisionNode = new Node("GhostCollision");
+    private final int radius = 2;
     private final HexGrid system;
     private final Camera cam;
     private GridRayCastControl rayControl;
@@ -39,7 +40,7 @@ public class GhostControl extends ChunkControl {
             throw new UnsupportedOperationException(mode + " isn't allowed for Ghost Control");
         }
         this.cam = app.getCamera();
-        Geometry collisionPlane = new Geometry("ghostCollision", genQuad(2.5f));
+        Geometry collisionPlane = new Geometry("ghostCollision", genQuad(3f));
         Material mat = assetManager.loadMaterial("Materials/ghostCollision.j3m");
         collisionPlane.setMaterial(mat);
         collisionNode.attachChild(collisionPlane);
@@ -91,8 +92,8 @@ public class GhostControl extends ChunkControl {
         if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
                 || mode.equals(MapData.GhostMode.PROCEDURAL)) {
             Set<Vector2Int> list = system.getChunksNodes();
-            for (int x = -1; x < 2; x++) {
-                for (int y = -1; y < 2; y++) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
                     if (!(x == 0 && y == 0)
                             && !list.contains(chunkPosition.add(x, y))) {
                         genProcedural(x, y);
@@ -101,7 +102,6 @@ public class GhostControl extends ChunkControl {
             }
         } else {
             Geometry child = (Geometry) ((Node) ((Node) spatial).getChild("TILES.0|0")).getChild(0);
-//            Mesh mesh = ((Geometry) ((Node) spatial).getChild("TILES.0|0")).getMesh();
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             mat.setTexture("ColorMap", child.getMaterial().getTextureParam("ColorMap").getTextureValue());
             mat.setColor("Color", new ColorRGBA(0, 0, 1, 0.5f));
@@ -167,8 +167,8 @@ public class GhostControl extends ChunkControl {
 
     public void updateCulling() {
         Set<Vector2Int> list = system.getChunksNodes();
-        for (int x = -1; x < 2; x++) {
-            for (int y = -1; y < 2; y++) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
                 if (list.contains(chunkPosition.add(x, y))) {
                     if (mode.equals(MapData.GhostMode.GHOST)) {
                         ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
@@ -187,8 +187,8 @@ public class GhostControl extends ChunkControl {
     }
 
     private boolean isInRange(Vector2Int pos) {
-        for (int x = -1; x < 2; x++) {
-            for (int y = -1; y < 2; y++) {
+        for (int x = -(radius-1); x <= (radius-1); x++) {
+            for (int y = -(radius-1); y <= (radius-1); y++) {
                 if (pos.equals(chunkPosition.add(x, y))) {
                     return true;
                 }

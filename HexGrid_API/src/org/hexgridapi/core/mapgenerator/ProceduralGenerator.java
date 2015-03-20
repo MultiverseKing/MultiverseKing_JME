@@ -28,8 +28,8 @@ public final class ProceduralGenerator {
     /**
      * Used to know the minimum/maximum Heigth when generating the map.
      */
-    private int heightMin = 2; // is always count as < 0 (ex: 2 mean -2)
-    private int heightMax = 15; // is always count as > 0
+    private int heightMin = 3; // is always count as < 0 (ex: 2 mean -2)
+    private int heightMax = 12; // is always count as > 0
     private int textureCount;
 
     public ProceduralGenerator(int seed, int textureCount) {
@@ -52,7 +52,7 @@ public final class ProceduralGenerator {
                 this.heightMax = heightMax;
             }
             this.textureCount = textureCount;
-            perlin.setFrequency(2.0);
+//            perlin.setFrequency(2.0);
 //            perlin.setPersistence(0.5);
             perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_BEST);
             perlin.setSeed(seed);
@@ -91,19 +91,24 @@ public final class ProceduralGenerator {
             for (int y = 0; y < HexSetting.CHUNK_SIZE; y++) {
                 HexCoordinate tilePos = new HexCoordinate(
                         HexCoordinate.Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
-                chunk.add(tilePos, new HexTile(
-                        convertToHeight(getTileValue(tilePos.getAsOffset().x, tilePos.getAsOffset().y, 0))));
+                chunk.add(tilePos, getTileValue(tilePos));
             }
         }
         return chunk;
     }
 
+    /**
+     * @todo
+     * @param tilePos
+     * @return 
+     */
     public HexTile getTileValue(HexCoordinate tilePos) {
-        int height = convertToHeight(getTileValue(
-                tilePos.getAsOffset().x, tilePos.getAsOffset().y, 0));
-        int text = convertToTexturKey(getTileValue(
-                tilePos.getAsOffset().x, tilePos.getAsOffset().y, 1));
-        return new HexTile(height, text);
+        int height = getHeight(tilePos.getAsOffset().x, tilePos.getAsOffset().y);
+        if(height <= 0){
+            return null;
+        }
+        return new HexTile(height,0);
+//                getTexture(tilePos.getAsOffset().x, tilePos.getAsOffset().y));
     }
 
     /**
@@ -112,7 +117,7 @@ public final class ProceduralGenerator {
      * @return
      */
     private double getTileValue(int posX, int posY, int param) {
-        return perlin.getValue(posX*0.01, posY*0.01, param);
+        return FastMath.abs((float) perlin.getValue(posX*0.01, posY*0.01, param));
     }
 
     /**
@@ -120,15 +125,15 @@ public final class ProceduralGenerator {
      * @param generatedValue
      * @return
      */
-    private int convertToHeight(double generatedValue) {
-        return (int) (generatedValue * (heightMax + heightMin) - heightMin);
+    private int getHeight(int x, int y) {
+        return (int) NoiseGen.MakeInt32Range((getTileValue(x, y, 0) * (heightMax + heightMin)) - heightMin);
     }
 
-    private int convertToTexturKey(double generatedValue) {
-        int val = (int) (generatedValue * (textureCount + 1) - 1);
-        if (val == -1) {
-            val = -2;
+    private int getTexture(int x, int y) {
+        int result = (int) NoiseGen.MakeInt32Range((getTileValue(x, y, 1) * (textureCount + 1) - 1));
+        if (result == -1) {
+            result = -2;
         }
-        return val;
+        return result;
     }
 }

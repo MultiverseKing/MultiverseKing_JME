@@ -125,12 +125,19 @@ public class ChunkControl extends AbstractControl {
      * return true. </p>
      * <p>If GhostMode.NONE || GhostMode.PROCEDURAL && contain no tile<br>
      * return true. </p>
+     * @deprecated See {@see MapData#contain(Vector2Int)}
      */
     public boolean isEmpty() {
-        if ((mode.equals(MapData.GhostMode.GHOST) || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))
-                && ((Node)((Node) spatial).getChild("TILES.0|0")).getChildren().size() < 2
-                || (mode.equals(MapData.GhostMode.NONE) || mode.equals(MapData.GhostMode.PROCEDURAL))
-                && ((Node)((Node) spatial).getChild("TILES.0|0")).getChildren().isEmpty()) {
+        if ((mode.equals(MapData.GhostMode.GHOST) 
+                || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().size() < 2 
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().get(0).getName().equals("NO_TILE")
+                || (mode.equals(MapData.GhostMode.NONE) 
+                || mode.equals(MapData.GhostMode.PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().isEmpty()) {
             return true;
         } else {
             return false;

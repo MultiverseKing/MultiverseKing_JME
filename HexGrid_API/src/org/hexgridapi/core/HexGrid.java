@@ -43,31 +43,7 @@ public class HexGrid {
     protected Node areaRangeNode;
     protected ProceduralGenerator mapGenerator;
     protected AssetManager assetManager;
-    /**
-     * Listeners.
-     */
-    private final TileChangeListener tileChangeListener = new TileChangeListener() {
-        public final void onTileChange(TileChangeEvent... events) {
-            if (events.length > 1) {
-                HashSet<Vector2Int> updatedChunk = new HashSet<Vector2Int>();
-                for (int i = 0; i < events.length; i++) {
-                    Vector2Int pos = events[i].getTilePos().getCorrespondingChunk();
-                    if (chunksNodes.containsKey(pos)) {
-                        if (updatedChunk.add(pos)) {
-                            //updateChunk
-                            updateChunk(pos);
-                        }
-                    } else if (updatedChunk.add(pos)) {
-                        //add chunk
-                        addChunk(pos);
-                    }
-                }
-            } else {
-                updateChunk(events[0]);
-            }
-        }
-    };
-    
+
     public HexGrid(MapData mapData, AssetManager assetManager, Node rootNode) {
         this.assetManager = assetManager;
         this.meshParam = new MeshParameter(mapData);
@@ -90,6 +66,7 @@ public class HexGrid {
     public final Node getGridNode() {
         return gridNode;
     }
+
     /**
      * @return the node containing all tile.
      */
@@ -103,6 +80,7 @@ public class HexGrid {
 
     /**
      * Unstable
+     *
      * @see org.hexgridapi.core.MapData#setSeed(int)
      * @return
      */
@@ -111,6 +89,27 @@ public class HexGrid {
         mapData.setSeed(seed);
         return seed;
     }
+    private final TileChangeListener tileChangeListener = new TileChangeListener() {
+        public final void onTileChange(TileChangeEvent... events) {
+            if (events.length > 1) {
+                HashSet<Vector2Int> updatedChunk = new HashSet<Vector2Int>();
+                for (int i = 0; i < events.length; i++) {
+                    Vector2Int pos = events[i].getTilePos().getCorrespondingChunk();
+                    if (updatedChunk.add(pos)) {
+                        //updateChunk
+                        updateChunk(events[i]);
+//                        if (chunksNodes.containsKey(pos)) {
+//                        } else {
+//                            //add chunk
+//                            addChunk(pos);
+//                        }
+                    }
+                }
+            } else {
+                updateChunk(events[0]);
+            }
+        }
+    };
 
     /**
      * Make change to tile according to the event.
@@ -118,26 +117,23 @@ public class HexGrid {
      * @param events contain information on the last tile event.
      */
     private void updateChunk(TileChangeEvent event) {
-        if (event.getTilePos() != null) {
-            Vector2Int chunkPos = event.getTilePos().getCorrespondingChunk();
-            if (!chunksNodes.containsKey(chunkPos)) {
-                addChunk(chunkPos);
-                ghostControl.updateCulling();
-            } else if (!(event.getNewTile() == null && event.getOldTile() == null)) {
-                updateChunk(chunkPos);
-            } else {
-                System.err.println("old && new tile is null, an error have occurs, this will be ignored.");
-            }
+        Vector2Int chunkPos = event.getTilePos().getCorrespondingChunk();
+        if (!chunksNodes.containsKey(chunkPos)) {
+            addChunk(chunkPos);
+            ghostControl.updateCulling();
+//        } else if (!(event.getNewTile() == null && event.getOldTile() == null)) {
+//            updateChunk(chunkPos);
         } else {
-            /**
-             * Update the whole Map !?
-             */
+//            System.err.println("old && new tile is null, an error have occurs, this will be ignored.");
+//            Used when forcing a tile to be ignored even by the procedural generator
+            updateChunk(chunkPos);
         }
     }
 
     private void updateChunk(Vector2Int chunkPos) {
         ((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class).update();
-        if (((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class).isEmpty()) {
+//        if (((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class).isEmpty()) {
+        if (!mapData.contain(chunkPos)) {
             removeChunk(chunkPos);
         } else {
             updatedChunk(((Node) chunksNodes.get(chunkPos)).getControl(ChunkControl.class));

@@ -9,6 +9,7 @@ import org.hexgridapi.core.mapgenerator.ProceduralGenerator;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.loader.HexGridMapLoader;
 import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Vector2Int;
 
 /**
  * This class holds the hex data of the map.
@@ -93,12 +94,26 @@ public final class MapData {
     public GhostMode getMode() {
         return mode;
     }
-
+    
     /**
+     * Check if there is any data currently stored.
+     * 
      * @return true if there is data.
      */
     public boolean containTilesData() {
         return !chunkData.isEmpty();
+    }
+    
+
+    
+    /**
+     * Check if the specifiate chunk got any tile data stored.
+     * 
+     * @param chunkPos inspected chunk.
+     * @return true the specifiate chunk got any tile stored.
+     */
+    public boolean contain(Vector2Int chunkPos) {
+        return chunkData.contain(chunkPos);
     }
 
     /**
@@ -109,8 +124,9 @@ public final class MapData {
      */
     public HexTile getTile(HexCoordinate tilePos) {
         HexTile t = chunkData.getTile(tilePos);
-        if(t == null && mode.equals(GhostMode.GHOST_PROCEDURAL)
-                    || mode.equals(GhostMode.PROCEDURAL)){
+        if(t == null && !chunkData.contain(tilePos)
+                && (mode.equals(GhostMode.GHOST_PROCEDURAL)
+                    || mode.equals(GhostMode.PROCEDURAL))){
             t = generator.getTileValue(tilePos);
         }
         return t;
@@ -198,6 +214,9 @@ public final class MapData {
             oldTile = chunkData.add(tilePos, tile);
         } else {
             oldTile = chunkData.remove(tilePos);
+            if(oldTile == null && mode.equals(GhostMode.GHOST_PROCEDURAL)){
+                chunkData.add(tilePos, null);
+            }
         }
         return new TileChangeEvent(tilePos, oldTile, tile);
     }

@@ -106,8 +106,8 @@ public class GhostControl extends ChunkControl {
             mat.setTexture("ColorMap", child.getMaterial().getTextureParam("ColorMap").getTextureValue());
             mat.setColor("Color", new ColorRGBA(0, 0, 1, 0.5f));
             child.getMaterial().setColor("Color", new ColorRGBA(0, 0, 1, 0.7f));
-            for (int x = -1; x < 2; x++) {
-                for (int y = -1; y < 2; y++) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y < radius; y++) {
                     if (!(x == 0 && y == 0)) {
                         Node tileNode = new Node("TILES." + x + "|" + y);
                         Geometry tileGeo = new Geometry("NO_TILE", child.getMesh());
@@ -144,8 +144,9 @@ public class GhostControl extends ChunkControl {
             MouseInputEvent event = rayControl.castRay(null);
             if (event != null) {
                 HexCoordinate pos = event.getPosition();
-                if (pos != null) {
-                    setPosition(pos.getCorrespondingChunk());
+                if (pos != null && !isInRange(pos.getCorrespondingChunk())) {
+                    this.chunkPosition = pos.getCorrespondingChunk();
+                    updatePosition();
                 }
                 oldCamPosition = cam.getLocation().clone();
             }
@@ -157,12 +158,12 @@ public class GhostControl extends ChunkControl {
         spatial.setLocalTranslation(pos);
         collisionNode.setLocalTranslation(pos);
         if (mode.equals(MapData.GhostMode.GHOST)) {
-            updateCulling();
         } else if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
                 || mode.equals(MapData.GhostMode.PROCEDURAL)) {
             update();
             genGhost();
         }
+        updateCulling();
     }
 
     public void updateCulling() {
@@ -173,22 +174,18 @@ public class GhostControl extends ChunkControl {
                     if (mode.equals(MapData.GhostMode.GHOST)) {
                         ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Always);
                     } else {
-                        ((Node)((Node) spatial).getChild("TILES." + x + "|" + y)).detachAllChildren();
+                        ((Node) ((Node) spatial).getChild("TILES." + x + "|" + y)).detachAllChildren();
                     }
-                } else {
-                    if (mode.equals(MapData.GhostMode.GHOST)) {
-                        ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
-                    } else {
-//                        genProcedural(x, y);
-                    }
+                } else if (mode.equals(MapData.GhostMode.GHOST)) {
+                    ((Node) spatial).getChild("TILES." + x + "|" + y).setCullHint(Spatial.CullHint.Inherit);
                 }
             }
         }
     }
 
     private boolean isInRange(Vector2Int pos) {
-        for (int x = -(radius-1); x <= (radius-1); x++) {
-            for (int y = -(radius-1); y <= (radius-1); y++) {
+        for (int x = -(radius - 1); x <= (radius - 1); x++) {
+            for (int y = -(radius - 1); y <= (radius - 1); y++) {
                 if (pos.equals(chunkPosition.add(x, y))) {
                     return true;
                 }
@@ -197,18 +194,11 @@ public class GhostControl extends ChunkControl {
         return false;
     }
 
-    private void setPosition(Vector2Int pos) {
-        if (!isInRange(pos)) {
-            this.chunkPosition = pos;
-            updatePosition();
-        }
-    }
-
     public void show() {
         spatial.setCullHint(Spatial.CullHint.Inherit);
     }
 
     public void hide() {
         spatial.setCullHint(Spatial.CullHint.Always);
-    }
+    }   
 }

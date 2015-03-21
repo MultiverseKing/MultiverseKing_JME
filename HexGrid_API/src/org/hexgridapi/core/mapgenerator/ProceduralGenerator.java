@@ -28,7 +28,7 @@ public final class ProceduralGenerator {
     /**
      * Used to know the minimum/maximum Heigth when generating the map.
      */
-    private int heightMin = 3; // is always count as < 0 (ex: 2 mean -2)
+    private int heightMin = 0; // is always count as < 0 (ex: 2 mean -2)
     private int heightMax = 12; // is always count as > 0
     private int textureCount;
 

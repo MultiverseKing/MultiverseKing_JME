@@ -6,7 +6,6 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.RenderManager;
 import core.HexMapSystem;
 import java.util.logging.Level;
-import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import tonegod.gui.core.Screen;

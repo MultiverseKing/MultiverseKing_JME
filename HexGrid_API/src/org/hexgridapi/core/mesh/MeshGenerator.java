@@ -175,12 +175,16 @@ public final class MeshGenerator {
 
         for (int i = 0; i < size.x * 4; i += 4) {
             currentHexPos = j * HexSetting.HEX_WIDTH + (position.x * HexSetting.HEX_WIDTH);
-            vertices[i] = new Vector3f(currentHexPos + startTriOffsetA, height * HexSetting.FLOOR_OFFSET, -(HexSetting.HEX_RADIUS / 2) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
-            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetB, height * HexSetting.FLOOR_OFFSET, -HexSetting.HEX_RADIUS + (position.y * HexSetting.HEX_RADIUS * 1.5f));
+            vertices[i] = new Vector3f(currentHexPos + startTriOffsetA, height * HexSetting.FLOOR_OFFSET,
+                    -(HexSetting.HEX_RADIUS / 2) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
+            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetB, height * HexSetting.FLOOR_OFFSET,
+                    -HexSetting.HEX_RADIUS + (position.y * HexSetting.HEX_RADIUS * 1.5f));
             vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetA, height * HexSetting.FLOOR_OFFSET,
-                    (HexSetting.HEX_RADIUS * size.y) + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2)) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
+                    (HexSetting.HEX_RADIUS * size.y) + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2))
+                    + (position.y * HexSetting.HEX_RADIUS * 1.5f));
             vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetB, height * HexSetting.FLOOR_OFFSET,
-                    ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2) + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2)) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
+                    ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2)
+                    + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2)) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
             j++;
         }
 
@@ -188,7 +192,8 @@ public final class MeshGenerator {
         vertices[size.x * 4] = new Vector3f(currentHexPos, height * HexSetting.FLOOR_OFFSET,
                 -HexSetting.HEX_RADIUS / 2 + (position.y * HexSetting.HEX_RADIUS * 1.5f));
         vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, height * HexSetting.FLOOR_OFFSET,
-                ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2) + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2)) + (position.y * (HexSetting.HEX_RADIUS * 1.5f)));
+                ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2) + ((size.y - 1)
+                * (HexSetting.HEX_RADIUS / 2)) + (position.y * (HexSetting.HEX_RADIUS * 1.5f)));
 
         if (((size.y - 1 + position.y) & 1) == 0) {
             vertices[size.x * 4 + 1].x -= HexSetting.HEX_WIDTH / 2;
@@ -378,26 +383,29 @@ public final class MeshGenerator {
         height = (int) (FastMath.abs(groundHeight) + height);
         /**
          * Side-tri coord.
+         * K define if bot or top tri. (vertice on Z+ or Z-)
          */
         for (int k = 0; k < 2; k++) {
             for (int i = 0; i < size.x * 4; i += 4) {
-                if ((i & 1) == 0) {
-                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                } else {
+//                if ((i & 1) == 0) {
+//                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+//                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+//                } else {
                     texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
                     texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
                     texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
                     texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                }
-                texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), (k == 1 ? 1f : 0.75f));
-                texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), (k == 1 ? 0.75f : 1f));
+//                }
             }
+            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1);
         }
         /**
          * Side-quad coord.
+         * k define if left or right quad
+         * quad on the first row are calculated outside the loop.
          */
         texCoord[(size.x * 4 + 2)] = new Vector2f(0f, 1f);
         texCoord[(size.x * 4 + 2) + 1] = new Vector2f(0f, 1f);
@@ -412,7 +420,6 @@ public final class MeshGenerator {
         for (int k = 0; k < 2; k++) {
             int index = (size.x * 4 + 2) + 4;
             for (int i = 0; i < size.y - 1; i++) {
-
                 if ((i & 1) == 0) {
                     texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
                     texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);

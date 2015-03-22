@@ -14,8 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;

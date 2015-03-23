@@ -5,8 +5,8 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
-import gui.deprecated.EditorMainGUI;
-import gui.deprecated.FileManagerPopup;
+//import gui.deprecated.EditorMainGUI;
+//import gui.deprecated.FileManagerPopup;
 import java.util.List;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexTile;
@@ -26,7 +26,7 @@ import test.EditorMain;
 public final class HexMapSystem extends AbstractHexGridAppState {
 
     private EditorMain app;
-    private EditorMainGUI editorMainGUI;
+//    private EditorMainGUI editorMainGUI;
     private TileSelectionControl tileSelectionControl;
     private HexMapPanel hexMapPanel;
 
@@ -215,11 +215,11 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     }
     // </editor-fold>
 
-    public void save(FileManagerPopup popup) {
-//        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
-//            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
-//        }
-    }
+//    public void save(FileManagerPopup popup) {
+////        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
+////            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
+////        }
+//    }
 
     public void generateFromSeed() {
         System.err.println("Generate procedural Map using a defined Seed Number");
@@ -241,27 +241,27 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     protected void removedChunk(Vector2Int pos) {
     }
 
-    public void loadFromFile(FileManagerPopup popup) {
-        if (popup != null && popup.getInput() != null) {
-            if (!mapData.loadArea(popup.getInput())) {
-                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
-            } else {
-                popup.removeFromScreen();
-            }
-        } else {
-            if (popup != null) {
-                popup.popupBox("    " + "There is nothing to load.");
-            }
-            reloadSystem();
-        }
-    }
+//    public void loadFromFile(FileManagerPopup popup) {
+//        if (popup != null && popup.getInput() != null) {
+//            if (!mapData.loadArea(popup.getInput())) {
+//                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
+//            } else {
+//                popup.removeFromScreen();
+//            }
+//        } else {
+//            if (popup != null) {
+//                popup.popupBox("    " + "There is nothing to load.");
+//            }
+//            reloadSystem();
+//        }
+//    }
     
     /**
      * @deprecated
      */
     public void clearSelectionGroup() {
 //        tileSelectionControl.clearSelectionGroup();
-        editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getSelectedList().size());
+//        editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getSelectedList().size());
     }
 
     public void reloadSystem() {

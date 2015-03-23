@@ -118,22 +118,22 @@ public class HexMapPanel extends AbstractAction {
         seedPan.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         seedPan.setAlignmentX(0);
 
-        JLabel currentSeed = new JLabel(String.valueOf(editorSystem.getSeed()));
+        JLabel currentSeed = new JLabel("Seed : " +String.valueOf(editorSystem.getSeed()));
         comps.put("currentSeed", currentSeed);
         seedPan.add(currentSeed);
         seedPan.add(Box.createRigidArea(new Dimension(5, 0)));
-        JButton genSeed = new JButton(new AbstractAction("Gen Seed") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                /**
-                 * @todo update the map when changing the seed
-                 */
-                ((JLabel) comps.get("currentSeed")).setText(String.valueOf(editorSystem.generateNewSeed()));
-            }
-        });
-        genSeed.setPreferredSize(new Dimension(50, 23));
-        seedPan.add(genSeed);
-        comps.put("genSeed", genSeed);
+//        JButton genSeed = new JButton(new AbstractAction("Gen Seed") {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                /**
+//                 * @todo update the map when changing the seed
+//                 */
+//                ((JLabel) comps.get("currentSeed")).setText(String.valueOf(editorSystem.generateNewSeed()));
+//            }
+//        });
+//        genSeed.setPreferredSize(new Dimension(50, 23));
+//        seedPan.add(genSeed);
+//        comps.put("genSeed", genSeed);
         addComp(hexMapPanel, seedPan);
 //        hexMapPanel.add(seedPan);
         hexMapPanel.add(Box.createRigidArea(new Dimension(0, 3)));
@@ -166,10 +166,10 @@ public class HexMapPanel extends AbstractAction {
         cursorProperties.setBorder(BorderFactory.createTitledBorder("Cursor Property"));
         cursorProperties.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
         cursorProperties.add(Box.createRigidArea(new Dimension(0, 3)));
-        JLabel coordinate = new JLabel("Coordinate : null");
+        JLabel coordinate = new JLabel("Hex pos : null");
         addComp(cursorProperties, coordinate);
         comps.put("coordinate", coordinate);
-        JLabel chunkPos = new JLabel("Chunk : null");
+        JLabel chunkPos = new JLabel("Chunk pos: null");
         addComp(cursorProperties, chunkPos);
         comps.put("chunkPos", chunkPos);
         cursorProperties.add(Box.createRigidArea(new Dimension(0, 3)));
@@ -211,7 +211,7 @@ public class HexMapPanel extends AbstractAction {
                     editorMain.enqueue(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            editorSystem.save(null);
+//                            editorSystem.save(null);
                             return null;
                         }
                     });
@@ -279,8 +279,8 @@ public class HexMapPanel extends AbstractAction {
                     updateSingleTileMenu();
                 }
             }
-            ((JLabel) comps.get("coordinate")).setText("Coordinate : " + currentSelection.getAsOffset());
-            ((JLabel) comps.get("chunkPos")).setText("Coordinate : " + currentSelection.getCorrespondingChunk());
+            ((JLabel) comps.get("coordinate")).setText("Hex pos : " + currentSelection.getAsOffset());
+            ((JLabel) comps.get("chunkPos")).setText("Chunk pos : " + currentSelection.getCorrespondingChunk());
         }
     };
     private TileChangeListener tileListener = new TileChangeListener() {
@@ -318,8 +318,8 @@ public class HexMapPanel extends AbstractAction {
         if (currentIsGhost) {
             compCount += addGenerateBtn();
         } else {
-            compCount += addHeightBtn(false);
             compCount += addTextureList();
+            compCount += addHeightBtn(false);
             compCount += addDestroyBtn();
             tileProperties.add(Box.createRigidArea(new Dimension(0, 5)));
         }

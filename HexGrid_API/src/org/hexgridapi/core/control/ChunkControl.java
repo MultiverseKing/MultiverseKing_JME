@@ -1,6 +1,7 @@
 package org.hexgridapi.core.control;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.TextureKey;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
@@ -96,13 +97,13 @@ public class ChunkControl extends AbstractControl {
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             Texture text;
             if (value.equals("EMPTY_TEXTURE_KEY")) {
-                text = assetManager.loadTexture("/Textures/" + value + ".png");
-            } else if (value.equals("NO_TILE") && mode.equals(MapData.GhostMode.GHOST)
-                    || value.equals("NO_TILE") && mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)) {
-                text = assetManager.loadTexture("/Textures/" + "EMPTY_TEXTURE_KEY" + ".png");
+                text = assetManager.loadTexture(new TextureKey("/Textures/" + value + ".png", false));
+            } else if (value.equals("NO_TILE") && (mode.equals(MapData.GhostMode.GHOST)
+                    || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
+                text = assetManager.loadTexture(new TextureKey("/Textures/EMPTY_TEXTURE_KEY.png", false));
                 mat.setColor("Color", ColorRGBA.Blue);
             } else {
-                text = assetManager.loadTexture(texturePath + value + ".png");
+                text = assetManager.loadTexture(new TextureKey(texturePath + value + ".png", false));
             }
             text.setWrap(Texture.WrapMode.Repeat);
 

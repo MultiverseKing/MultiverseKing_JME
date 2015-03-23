@@ -210,12 +210,12 @@ public final class MeshGenerator {
         for (int i = 0; i < size.x * 4; i += 4) {
             texCoord[i] = new Vector2f(j, 0.25f);
             texCoord[i + 1] = new Vector2f(j + 0.5f, 0f);
-            texCoord[i + 2] = new Vector2f(j + 0.5f, 0f);
-            texCoord[i + 3] = new Vector2f(j, 0.25f);//Y+
+            texCoord[i + 2] = new Vector2f(j + 1f, 0.25f);
+            texCoord[i + 3] = new Vector2f(j + 0.5f, 0f);//Y+
             j++;
         }
         texCoord[size.x * 4] = new Vector2f(j, 0.25f);
-        texCoord[size.x * 4 + 1] = new Vector2f(j, 0.25f);
+        texCoord[size.x * 4 + 1] = new Vector2f(j+0.5f, 0f);
         return texCoord;
     }
 
@@ -313,19 +313,19 @@ public final class MeshGenerator {
         for (int i = 1 + position.y; i < size.y + position.y; i++) {
 
             if ((i & 1) == 0) {
-                texCoord[index] = new Vector2f(0.5f, 0.002f);
-                texCoord[index + 1] = new Vector2f(size.x + 0.5f, 0.002f);
+                texCoord[index] = new Vector2f(0.5f, 0f);
+                texCoord[index + 1] = new Vector2f(size.x + 0.5f, 0f);
                 texCoord[index + 2] = new Vector2f(0f, 0.25f);
                 texCoord[index + 3] = new Vector2f(size.x, 0.25f);
                 texCoord[index + 4] = new Vector2f(0f, 0.75f);
                 texCoord[index + 5] = new Vector2f(size.x, 0.75f);
             } else {
-                texCoord[index] = new Vector2f(-0.5f, 0.002f);
-                texCoord[index + 1] = new Vector2f(-(size.x + 0.5f), 0.002f);
-                texCoord[index + 2] = new Vector2f(-1f, 0.25f);
-                texCoord[index + 3] = new Vector2f(-(size.x + 1f), 0.25f);
-                texCoord[index + 4] = new Vector2f(-1f, 0.75f);
-                texCoord[index + 5] = new Vector2f(-(size.x + 1f), 0.75f);
+                texCoord[index] = new Vector2f(-0.5f, 0f);
+                texCoord[index + 1] = new Vector2f(size.x - 0.5f, 0f);
+                texCoord[index + 2] = new Vector2f(0f, 0.25f);
+                texCoord[index + 3] = new Vector2f(size.x, 0.25f);
+                texCoord[index + 4] = new Vector2f(0f, 0.75f);
+                texCoord[index + 5] = new Vector2f(size.x, 0.75f);
             }
             index += 6;
         }
@@ -393,14 +393,14 @@ public final class MeshGenerator {
 //                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
 //                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
 //                } else {
-                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1f);
+                texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0f), 0.75f);
+                texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0f), 0.75f);
+                texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1f);
 //                }
             }
-            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1);
-            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1);
         }
         /**
          * Side-quad coord.
@@ -420,21 +420,21 @@ public final class MeshGenerator {
         for (int k = 0; k < 2; k++) {
             int index = (size.x * 4 + 2) + 4;
             for (int i = 0; i < size.y - 1; i++) {
-                if ((i & 1) == 0) {
-                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                } else {
-                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                }
+//                if ((i & 1) == 0) {
+                texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+                texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+//                } else {
+//                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+//                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
+//                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
+//                }
                 index += 6;
             }
         }

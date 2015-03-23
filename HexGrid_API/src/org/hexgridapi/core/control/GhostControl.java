@@ -6,6 +6,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -28,7 +29,7 @@ import org.hexgridapi.utility.Vector2Int;
 public class GhostControl extends ChunkControl {
 
     private final Node collisionNode = new Node("GhostCollision");
-    private final int radius = 2;
+    private final int radius = 1;
     private final HexGrid system;
     private final Camera cam;
     private GridRayCastControl rayControl;
@@ -44,6 +45,7 @@ public class GhostControl extends ChunkControl {
         Material mat = assetManager.loadMaterial("Materials/ghostCollision.j3m");
         collisionPlane.setMaterial(mat);
         collisionNode.attachChild(collisionPlane);
+        collisionPlane.setShadowMode(RenderQueue.ShadowMode.Off);
         this.rayControl = new GridRayCastControl(app, collisionNode, ColorRGBA.Green);
         this.system = system;
     }
@@ -78,8 +80,10 @@ public class GhostControl extends ChunkControl {
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
         if (spatial != null && spatial instanceof Node) {
-            ((Node) spatial).getParent().getParent().attachChild(collisionNode);
-            genGhost();
+            ((Node) spatial).getParent().getParent().attachChild(collisionNode); //@todo check if it is HexGridNode
+            if(mode.equals(MapData.GhostMode.GHOST)){
+                genGhost();
+            }
             updatePosition();
         } else if (spatial == null) {
             // cleanup
@@ -107,7 +111,7 @@ public class GhostControl extends ChunkControl {
             mat.setColor("Color", new ColorRGBA(0, 0, 1, 0.5f));
             child.getMaterial().setColor("Color", new ColorRGBA(0, 0, 1, 0.7f));
             for (int x = -radius; x <= radius; x++) {
-                for (int y = -radius; y < radius; y++) {
+                for (int y = -radius; y <= radius; y++) {
                     if (!(x == 0 && y == 0)) {
                         Node tileNode = new Node("TILES." + x + "|" + y);
                         Geometry tileGeo = new Geometry("NO_TILE", child.getMesh());
@@ -115,7 +119,7 @@ public class GhostControl extends ChunkControl {
                         tileNode.attachChild(tileGeo);
                         tileNode.setLocalTranslation(HexGrid.getChunkWorldPosition(chunkPosition.add(x, y)));
                         ((Node) spatial).attachChild(tileNode);
-                        tileNode.setCullHint(Spatial.CullHint.Always);
+                        tileNode.setCullHint(Spatial.CullHint.Inherit);
                     }
                 }
             }
@@ -157,8 +161,7 @@ public class GhostControl extends ChunkControl {
         Vector3f pos = HexGrid.getChunkWorldPosition(chunkPosition);
         spatial.setLocalTranslation(pos);
         collisionNode.setLocalTranslation(pos);
-        if (mode.equals(MapData.GhostMode.GHOST)) {
-        } else if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
+        if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
                 || mode.equals(MapData.GhostMode.PROCEDURAL)) {
             update();
             genGhost();

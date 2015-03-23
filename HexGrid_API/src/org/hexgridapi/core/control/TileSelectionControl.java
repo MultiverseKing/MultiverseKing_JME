@@ -1,6 +1,7 @@
 package org.hexgridapi.core.control;
 
 import com.jme3.app.Application;
+import com.jme3.asset.TextureKey;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -44,7 +45,7 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
     public void initialise(Application app) {
         if (mat == null) {
             mat = app.getAssetManager().loadMaterial("Materials/hexMat.j3m");
-            mat.setTexture("ColorMap", app.getAssetManager().loadTexture("Textures/EMPTY_TEXTURE_KEY.png"));
+            mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
             mat.setColor("Color", new ColorRGBA(1, 0, 0, 0.3f));
             mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Additive);
         }

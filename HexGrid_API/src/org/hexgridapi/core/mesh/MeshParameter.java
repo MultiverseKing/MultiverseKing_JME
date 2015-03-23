@@ -258,9 +258,9 @@ public final class MeshParameter {
     private HashMap<String, Mesh> getMesh() {
         HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
         for (String value : elementTypeRef.keySet()) {
-            if (value.equals("NO_TILE") && mapData.getMode().equals(MapData.GhostMode.GHOST)
-                    || value.equals("NO_TILE") && mapData.getMode().equals(MapData.GhostMode.GHOST_PROCEDURAL)
-                    || !value.equals("NO_TILE")) {
+            if (!value.equals("NO_TILE") || value.equals("NO_TILE") 
+                    && (mapData.getMode().equals(MapData.GhostMode.GHOST)
+                    || mapData.getMode().equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
                 inspectedTexture = value;
                 inspectedMesh = -1;
                 mesh.put(value, MeshGenerator.getInstance().getMesh(this));

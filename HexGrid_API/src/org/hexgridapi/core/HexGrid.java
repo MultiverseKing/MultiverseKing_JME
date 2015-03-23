@@ -7,6 +7,7 @@ import org.hexgridapi.core.control.ChunkControl;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import org.hexgridapi.events.TileChangeListener;
 import java.util.Collections;
@@ -50,6 +51,7 @@ public class HexGrid {
         this.mapData = mapData;
         gridNode.attachChild(tileNode);
         rootNode.attachChild(gridNode);
+        tileNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         mapData.registerTileChangeListener(tileChangeListener);
     }
 

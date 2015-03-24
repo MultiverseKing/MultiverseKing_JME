@@ -6,7 +6,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -29,13 +28,14 @@ import org.hexgridapi.utility.Vector2Int;
 public class GhostControl extends ChunkControl {
 
     private final Node collisionNode = new Node("GhostCollision");
-    private final int radius = 1;
+    private final int radius = 2;
     private final HexGrid system;
     private final Camera cam;
     private GridRayCastControl rayControl;
     private Vector3f oldCamPosition = new Vector3f();
 
-    public GhostControl(Application app, MeshParameter meshParam, MapData.GhostMode mode, Vector2Int pos, HexGrid system) {
+    public GhostControl(Application app, MeshParameter meshParam,
+            MapData.GhostMode mode, Vector2Int pos, HexGrid system) {
         super(meshParam, app.getAssetManager(), mode, pos, false);
         if (mode.equals(MapData.GhostMode.NONE)) {
             throw new UnsupportedOperationException(mode + " isn't allowed for Ghost Control");
@@ -45,7 +45,7 @@ public class GhostControl extends ChunkControl {
         Material mat = assetManager.loadMaterial("Materials/ghostCollision.j3m");
         collisionPlane.setMaterial(mat);
         collisionNode.attachChild(collisionPlane);
-        collisionPlane.setShadowMode(RenderQueue.ShadowMode.Off);
+//        collisionPlane.setShadowMode(RenderQueue.ShadowMode.Off);
         this.rayControl = new GridRayCastControl(app, collisionNode, ColorRGBA.Green);
         this.system = system;
     }
@@ -81,7 +81,7 @@ public class GhostControl extends ChunkControl {
         super.setSpatial(spatial);
         if (spatial != null && spatial instanceof Node) {
             ((Node) spatial).getParent().getParent().attachChild(collisionNode); //@todo check if it is HexGridNode
-            if(mode.equals(MapData.GhostMode.GHOST)){
+            if (mode.equals(MapData.GhostMode.GHOST)) {
                 genGhost();
             }
             updatePosition();
@@ -203,5 +203,5 @@ public class GhostControl extends ChunkControl {
 
     public void hide() {
         spatial.setCullHint(Spatial.CullHint.Always);
-    }   
+    }
 }

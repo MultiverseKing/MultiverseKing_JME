@@ -51,7 +51,7 @@ public class HexGrid {
         this.mapData = mapData;
         gridNode.attachChild(tileNode);
         rootNode.attachChild(gridNode);
-        tileNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+//        tileNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         mapData.registerTileChangeListener(tileChangeListener);
     }
 
@@ -61,7 +61,7 @@ public class HexGrid {
         tileNode.attachChild(node);
         node.addControl(ghostControl);
     }
-
+    
     /**
      * @return the node containing all the API Node. (include tileNode)
      */
@@ -212,5 +212,10 @@ public class HexGrid {
 
     public void cleanup() {
         mapData.removeTileChangeListener(tileChangeListener);
+    }
+    
+    public enum MatType {
+        DEFAULT,
+        TOON;
     }
 }

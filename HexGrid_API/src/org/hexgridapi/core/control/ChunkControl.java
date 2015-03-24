@@ -13,6 +13,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
+import org.hexgridapi.core.HexGrid.MatType;
+import static org.hexgridapi.core.HexGrid.MatType.TOON;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.MapData.GhostMode;
 import org.hexgridapi.core.mesh.MeshParameter;
@@ -40,7 +42,8 @@ public class ChunkControl extends AbstractControl {
      * @param debugMode used to know if null tile need to be generated.
      * @param chunkPosition initial position.
      */
-    public ChunkControl(MeshParameter meshParam, AssetManager assetManager, GhostMode mode, Vector2Int chunkPosition, boolean onlyGround) {
+    public ChunkControl(MeshParameter meshParam, AssetManager assetManager,
+            GhostMode mode, Vector2Int chunkPosition, boolean onlyGround) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
         this.mode = mode;
@@ -97,10 +100,10 @@ public class ChunkControl extends AbstractControl {
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             Texture text;
             if (value.equals("EMPTY_TEXTURE_KEY")) {
-                text = assetManager.loadTexture(new TextureKey("/Textures/" + value + ".png", false));
+                text = assetManager.loadTexture(new TextureKey("Textures/" + value + ".png", false));
             } else if (value.equals("NO_TILE") && (mode.equals(MapData.GhostMode.GHOST)
                     || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
-                text = assetManager.loadTexture(new TextureKey("/Textures/EMPTY_TEXTURE_KEY.png", false));
+                text = assetManager.loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false));
                 mat.setColor("Color", ColorRGBA.Blue);
             } else {
                 text = assetManager.loadTexture(new TextureKey(texturePath + value + ".png", false));

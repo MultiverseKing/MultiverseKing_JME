@@ -17,6 +17,7 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.mesh.MeshGenerator;
@@ -31,7 +32,7 @@ import org.hexgridapi.utility.HexCoordinate;
  *
  * @author roah
  */
-public class TileSelectionControl extends AbstractControl implements TileInputListener {
+public class TileSelectionControl implements TileInputListener {
 
     private final Node node = new Node("tileSelectionNode");
     private static HashMap<Integer, Mesh> singleTile = new HashMap<Integer, Mesh>();
@@ -41,10 +42,12 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
     private boolean isSelectionGroup = false;
     private HexCoordinate selectedTile;
     private CursorControl cursorControl;
-
+    
     public void initialise(Application app) {
         if (mat == null) {
             mat = app.getAssetManager().loadMaterial("Materials/hexMat.j3m");
+//            mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
+//            mat.setColor("Color", new ColorRGBA(1, 0, 0, 0.3f));
             mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
             mat.setColor("Color", new ColorRGBA(1, 0, 0, 0.3f));
             mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Additive);
@@ -61,7 +64,6 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
         app.getStateManager().getState(MouseControlSystem.class).registerTileInputListener(this);
         app.getStateManager().getState(MapDataAppState.class).getMapData().registerTileChangeListener(tileChangeListener);
         cursorControl = new CursorControl(app);
-        node.addControl(this);
         /**
          * @todo attach to hexGridNode and not to rootNode
          */
@@ -93,7 +95,7 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
         public void onTileChange(TileChangeEvent... events) {
             for (int i = 0; i < events.length; i++) {
                 if (coords.contains(events[i].getTilePos())) {
-                    Spatial tile = ((Node) spatial).getChild(events[i].getTilePos().getAsOffset().toString());
+                    Spatial tile = node.getChild(events[i].getTilePos().getAsOffset().toString());
                     if (events[i].getNewTile() != null) {
                         ((Geometry) tile).setMesh(getMesh(events[i].getNewTile().getHeight()));
                         cursorControl.setHeight(events[i].getNewTile().getHeight());
@@ -138,7 +140,7 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
                 addGeo(pos, height);
                 coords.add(pos);
             } else {
-                ((Node) spatial).getChild(pos.getAsOffset().toString()).removeFromParent();
+                node.getChild(pos.getAsOffset().toString()).removeFromParent();
                 coords.remove(pos);
             }
         }
@@ -155,16 +157,8 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
         Geometry geo = new Geometry(pos.getAsOffset().toString(), getMesh(height));
         geo.setMaterial(mat);
         geo.setLocalTranslation(pos.convertToWorldPosition());
-        ((Node) spatial).attachChild(geo);
+        node.attachChild(geo);
         
-    }
-
-    @Override
-    protected void controlUpdate(float tpf) {
-    }
-
-    @Override
-    protected void controlRender(RenderManager rm, ViewPort vp) {
     }
 
     private void updateListeners() {
@@ -182,7 +176,7 @@ public class TileSelectionControl extends AbstractControl implements TileInputLi
 
     private void clearSelectionGroup() {
         coords.clear();
-        for (Spatial s : ((Node) spatial).getChildren()) {
+        for (Spatial s : node.getChildren()) {
             s.removeFromParent();
         }
     }

@@ -1,9 +1,0 @@
-Material My Material : Common/MatDefs/Light/Lighting.j3md {
-     MaterialParameters {
-        FadeInfo : 0.5 0.5
-        UseAlpha : false
-        Shininess : 0.0
-     }
-    AdditionalRenderState {
-    }
-}

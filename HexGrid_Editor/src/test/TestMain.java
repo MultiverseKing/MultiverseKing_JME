@@ -8,7 +8,6 @@ import core.HexMapSystem;
 import java.util.logging.Level;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import tonegod.gui.core.Screen;
 
 /**
  * test
@@ -22,12 +21,12 @@ public class TestMain extends SimpleApplication {
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
         app.start();
     }
-    private Screen screen;
+//    private Screen screen;
     private RTSCamera rtsCam;
 
-    public Screen getScreen() {
-        return screen;
-    }
+//    public Screen getScreen() {
+//        return screen;
+//    }
 
     public RTSCamera getRtsCam() {
         return rtsCam;
@@ -41,8 +40,8 @@ public class TestMain extends SimpleApplication {
         inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
         //Create a new screen for tonegodGUI to work with.
-        screen = new Screen(this);
-        guiNode.addControl(screen);
+//        screen = new Screen(this);
+//        guiNode.addControl(screen);
         
         rtsCam = new DefaultParam(this, false).getCam();
         

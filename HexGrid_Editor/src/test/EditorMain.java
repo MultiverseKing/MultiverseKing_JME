@@ -147,7 +147,7 @@ public class EditorMain extends SimpleApplication {
                 inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
                 MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, MapData.GhostMode.GHOST_PROCEDURAL);
-                stateManager.attach(new MapDataAppState(mapData));
+                stateManager.attach(new MapDataAppState(mapData));//s
                 stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
 
                 return null;

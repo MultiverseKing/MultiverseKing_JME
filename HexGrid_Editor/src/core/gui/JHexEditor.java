@@ -1,7 +1,8 @@
-package test;
+package core.gui;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import test.EditorMain;
 
 /**
  *

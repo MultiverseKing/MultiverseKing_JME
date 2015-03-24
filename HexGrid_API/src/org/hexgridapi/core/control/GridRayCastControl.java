@@ -24,33 +24,44 @@ import org.hexgridapi.utility.HexCoordinate;
  */
 public class GridRayCastControl {
 
+    private final Application app;
+    private Spatial collisionObj;
     private Node rayDebug;
-    private Node rootNode;
-    private Application app;
-    private ColorRGBA debugColor;
 
-    public GridRayCastControl(Application app, Node rootNode, ColorRGBA debugColor) {
-        this(app, rootNode, debugColor, false);
+    /**
+     * Handle the mouse picking. no debug.
+     *
+     * @param app application running
+     * @param collisionObj the node the ray interact with
+     */
+    public GridRayCastControl(Application app, Spatial collisionObj) {
+        this(app, collisionObj, null);
     }
 
-    public GridRayCastControl(Application app, Node rootNode, ColorRGBA debugColor, boolean debugArrow) {
-        this.debugColor = debugColor;
-        this.rootNode = rootNode;
+    /**
+     * Handle the mouse picking. taking into account the debug.
+     *
+     * @param app currently running app.
+     * @param collisionNode the node the ray interact with
+     * @param debugColor used to show where the ray collide, if null no debug
+     */
+    public GridRayCastControl(Application app, Spatial collisionNode, ColorRGBA debugColor) {
+        this.collisionObj = collisionNode;
         this.app = app;
-        initialiseDebug(debugArrow);
+        if (debugColor != null) {
+            initialiseDebug(debugColor);
+        }
     }
 
-    private void initialiseDebug(boolean debugArrow) {
+    private void initialiseDebug(ColorRGBA debugColor) {
         Sphere sphere = new Sphere(30, 30, 0.2f);
         rayDebug = new Node("DebugRay");
-        Geometry geo = new Geometry("SphereDebugRayCast", sphere);
+        Geometry geo = new Geometry("SphereDebugRayCast" + debugColor, sphere);
         Material mark_mat = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         mark_mat.setColor("Color", debugColor);
         geo.setMaterial(mark_mat);
         rayDebug.attachChild(geo);
-        if (debugArrow) {
-            attachCoordinateAxes();
-        }
+        attachCoordinateAxes();
     }
 
     private void attachCoordinateAxes() {
@@ -77,35 +88,47 @@ public class GridRayCastControl {
         rayDebug.attachChild(g);
         return g;
     }
-    
+
+    /**
+     * Cast the defined ray on the defined collision node then return it
+     * converted as Hex event.
+     *
+     * @param ray Can be get from {
+     * @see #get3DRay(CastFrom)}
+     * @return null if no collision.
+     */
     public MouseInputEvent castRay(Ray ray) {
         CollisionResults results = new CollisionResults();
         ray = ray != null ? ray : get3DRay(CastFrom.SCREEN_CENTER);
-
-        rootNode.getChild("HexGridNode").collideWith(ray, results);
+        collisionObj.collideWith(ray, results);
         if (results.size() != 0) {
-            if (results.size() > 0) {
-                CollisionResult closest = results.getClosestCollision();
-                setDebugPosition(closest.getContactPoint());
-                HexCoordinate newPos = convertMouseCollision(results);
-                return new MouseInputEvent(null, newPos, null, ray, closest);
+            for (int i = 0; i < results.size(); i++) {
+                CollisionResult closest = results.getCollision(i);
+                if (!closest.getGeometry().getName().contains("SphereDebugRayCast")) {
+                    setDebugPosition(closest.getContactPoint());
+                    HexCoordinate newPos = convertMouseCollision(results);
+                    return new MouseInputEvent(null, newPos, null, ray, closest);
+                }
             }
             return null;
         } else {
             //Error catching.
             System.out.println("null raycast");
-            rootNode.detachChild(rayDebug);
+            if (collisionObj instanceof Node) {
+                ((Node) collisionObj).detachChild(rayDebug);
+            } else if (collisionObj.getParent() != null) {
+                collisionObj.getParent().detachChild(rayDebug);
+            }
             return null;
         }
     }
 
     /**
-     * Convert the 2d screen coordinates of the mouse to 3D world coordinates,
-     * then cast a ray from it. Got his own class cause it could be used for
-     * more then the mouse left clic.
+     * Generate a new ray by converting 2d screen coordinates
+     * to 3D world coordinates.
      *
-     * @param app
-     * @return
+     * @param from Which 2d screen coordinate as parameter
+     * @return Newly generated ray from parameter
      */
     public Ray get3DRay(CastFrom from) {
         Vector2f click2d;
@@ -151,14 +174,27 @@ public class GridRayCastControl {
 //        return null;
     }
 
-    public void setDebugPosition(Vector3f pos) {
-        if (rayDebug != null) {
-            if (rootNode.hasChild(rayDebug)) {
-                rayDebug.setLocalTranslation(pos);
-            } else {
-                rootNode.attachChild(rayDebug);
-                rayDebug.setLocalTranslation(pos);
+    public void setCollisionNode(Spatial collisionNode) {
+        clearRayDebug();
+        this.collisionObj = collisionNode;
+    }
+
+    private void setDebugPosition(Vector3f pos) {
+        if (rayDebug != null && collisionObj != null) {
+            Node parent = (Node) (collisionObj instanceof Node ? collisionObj : collisionObj.getParent());
+            while (parent != null) {
+                if (parent.getName().equals("HexGridNode")) {
+                    if (parent.hasChild(rayDebug)) {
+                        rayDebug.setLocalTranslation(pos);
+                    } else {
+                        parent.attachChild(rayDebug);
+                        rayDebug.setLocalTranslation(pos);
+                    }
+                    return;
+                }
+                parent = parent.getParent();
             }
+            throw new NullPointerException("HexGridNode cannot be found.");
         }
     }
 
@@ -172,7 +208,7 @@ public class GridRayCastControl {
         SCREEN_CENTER;
     }
 
-    public void clear() {
+    public void clearRayDebug() {
         rayDebug.removeFromParent();
     }
 }

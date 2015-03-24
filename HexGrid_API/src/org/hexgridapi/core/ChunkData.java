@@ -16,9 +16,9 @@ public class ChunkData {
     /**
      * Map holding all chunk on the current memory.
      */
-    protected HashMap<Vector2Int, HashMap> chunks = new HashMap<Vector2Int, HashMap>();
+    private HashMap<Vector2Int, HashMap> chunks = new HashMap<Vector2Int, HashMap>();
 
-    public HexTile add(HexCoordinate tilePos, HexTile tile) {
+    HexTile add(HexCoordinate tilePos, HexTile tile) {
         if (!chunks.containsKey(tilePos.getCorrespondingChunk())) {
             chunks.put(tilePos.getCorrespondingChunk(), new HashMap<HexCoordinate, HexTile>());
         }
@@ -30,7 +30,7 @@ public class ChunkData {
      * @param tilePos
      * @return old Contained tile.
      */
-    public HexTile remove(HexCoordinate tilePos){
+    HexTile remove(HexCoordinate tilePos){
         if (chunks.containsKey(tilePos.getCorrespondingChunk())) {
             return (HexTile) chunks.get(tilePos.getCorrespondingChunk()).remove(tilePos);
         }
@@ -43,14 +43,14 @@ public class ChunkData {
      * @param tilePos tilePos inside the chunk.
      * @return null if the tile doesn't exist.
      */
-    public HexTile getTile(HexCoordinate tilePos) {
+    HexTile getTile(HexCoordinate tilePos) {
         if (chunks.containsKey(tilePos.getCorrespondingChunk())) {
             return (HexTile) chunks.get(tilePos.getCorrespondingChunk()).get(tilePos);
         }
         return null;
     }
     
-    public boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
+    boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
         if (chunks.containsKey(chunk)) {
             if (chunks.get(chunk).containsKey(tilePos.getAsOffset())) {
                 return true;
@@ -59,7 +59,7 @@ public class ChunkData {
         return false;
     }
 
-    public Collection getChunkTiles(Vector2Int chunkPos) {
+    Collection getChunkTiles(Vector2Int chunkPos) {
         return Collections.unmodifiableCollection(chunks.get(chunkPos).values());
     }
 
@@ -80,11 +80,36 @@ public class ChunkData {
 //            }
 //        }
 //    }
-    public void clear() {
+
+
+    /**
+     * Check if the specifiate chunk is currently stored.
+     * 
+     * @param chunkPos inspected chunk.
+     * @return true if stored.
+     */
+    boolean contain(Vector2Int chunkPos) {
+        return chunks.containsKey(chunkPos);
+    }
+    
+    /**
+     * Check if the specifiate tile is currently stored.
+     * 
+     * @param tilePos inspected tile.
+     * @return true if stored.
+     */
+    boolean contain(HexCoordinate tilePos) {
+        if (contain(tilePos.getCorrespondingChunk())) {
+            return chunks.get(tilePos.getCorrespondingChunk()).containsKey(tilePos);
+        }
+        return false;
+    }
+    
+    void clear() {
         chunks.clear();
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return chunks.isEmpty();
     }
 }

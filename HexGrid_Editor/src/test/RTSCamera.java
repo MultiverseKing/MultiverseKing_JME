@@ -133,11 +133,10 @@ public final class RTSCamera extends AbstractAppState {
     private static String[] mappings = new String[]{
         "+SIDE", "+FWD", "+ROTATE", "-SIDE", "-FWD", "-ROTATE", "+WHEEL", "-WHEEL"};
     private boolean keyBoardSwitch = false;
-
-    /**
-     *
-     * @param up
-     */
+    
+    public RTSCamera(UpVector up) {
+        this(up, "");
+    }
     public RTSCamera(UpVector up, String keyLayout) {
         this.up = up;
 

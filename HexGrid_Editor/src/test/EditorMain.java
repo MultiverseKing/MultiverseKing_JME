@@ -1,5 +1,6 @@
 package test;
 
+import core.gui.JHexEditor;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -11,6 +12,8 @@ import core.gui.CustomDialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
@@ -40,11 +43,23 @@ public class EditorMain extends SimpleApplication {
                 java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 
                 final JFrame rootWindow = new JFrame("Hex Grid Editor");
-//                rootWindow.setExtendedState(JFrame.MAXIMIZED_BOTH); 
                 rootWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 rootWindow.getContentPane().setLayout(new BorderLayout());
-                EditorMain editorMain = new EditorMain(rootWindow);
-
+                final EditorMain editorMain = new EditorMain(rootWindow);
+                rootWindow.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(final ComponentEvent e) {
+                        super.componentResized(e);
+                        editorMain.enqueue(new Callable<Void>() {
+                            @Override
+                            public Void call() throws Exception {
+                                editorMain.getCamera().resize(e.getComponent().getWidth(), e.getComponent().getHeight(), true);
+                                return null;
+                            }
+                        });
+                    }
+                    
+                });
                 editorMain.setSettings(settings);
                 editorMain.createCanvas(); // create canvas!
                 JmeCanvasContext ctx = (JmeCanvasContext) editorMain.getContext();
@@ -81,9 +96,17 @@ public class EditorMain extends SimpleApplication {
                 rootWindow.pack();
                 rootWindow.setLocationRelativeTo(null);
                 rootWindow.setVisible(true);
-//                rootWindow.setResizable(false);
+                rootWindow.setMinimumSize(dim);
 
                 editorMain.startCanvas();
+            }
+
+            class resizeListener extends ComponentAdapter {
+
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    //Recalculate the variable you mentioned
+                }
             }
         });
     }
@@ -123,7 +146,7 @@ public class EditorMain extends SimpleApplication {
                 inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
                 inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
-                MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager);
+                MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, MapData.GhostMode.GHOST_PROCEDURAL);
                 stateManager.attach(new MapDataAppState(mapData));
                 stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
 
@@ -136,6 +159,9 @@ public class EditorMain extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
+//         cam.setFrustumPerspective( 45.0f, (float) DisplaySystem.getDisplaySystem().getRenderer().getWidth()
+//
+//        / (float) DisplaySystem.getDisplaySystem().getRenderer().getHeight(), 1, 1000 );
     }
 
     @Override

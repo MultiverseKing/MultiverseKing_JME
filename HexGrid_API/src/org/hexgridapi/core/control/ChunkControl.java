@@ -1,6 +1,7 @@
 package org.hexgridapi.core.control;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.TextureKey;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
@@ -12,6 +13,10 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
+import org.hexgridapi.core.HexGrid.MatType;
+import static org.hexgridapi.core.HexGrid.MatType.TOON;
+import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.MapData.GhostMode;
 import org.hexgridapi.core.mesh.MeshParameter;
 import org.hexgridapi.utility.Vector2Int;
 
@@ -22,17 +27,26 @@ import org.hexgridapi.utility.Vector2Int;
  */
 public class ChunkControl extends AbstractControl {
 
-    private boolean debugMode;
+    protected final GhostMode mode;
     protected final AssetManager assetManager;
     protected final MeshParameter meshParam;
     protected final String texturePath = "Textures/HexField/";
     protected boolean onlyGround;
     protected Vector2Int chunkPosition;
 
-    public ChunkControl(MeshParameter meshParam, AssetManager assetManager, boolean onlyGround, boolean debugMode, Vector2Int chunkPosition) {
+    /**
+     * Crete a new chunk.
+     * @param meshParam instance of mesh generator to use.
+     * @param assetManager used to load texture and materials.
+     * @param onlyGround used to know if depth have to be added to the chunk.
+     * @param debugMode used to know if null tile need to be generated.
+     * @param chunkPosition initial position.
+     */
+    public ChunkControl(MeshParameter meshParam, AssetManager assetManager,
+            GhostMode mode, Vector2Int chunkPosition, boolean onlyGround) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
-        this.debugMode = debugMode;
+        this.mode = mode;
         this.chunkPosition = chunkPosition;
         this.onlyGround = onlyGround;
     }
@@ -42,6 +56,7 @@ public class ChunkControl extends AbstractControl {
         if (spatial != null && spatial instanceof Node) {
             // initialize
             super.setSpatial(spatial);
+            ((Node) spatial).attachChild(new Node("TILES.0|0"));
 //            spatial.setShadowMode(RenderQueue.ShadowMode.Inherit);
             update();
         } else if (spatial == null) {
@@ -69,27 +84,29 @@ public class ChunkControl extends AbstractControl {
         /**
          * remove the old tile from the chunk.
          */
-        ((Node) spatial).detachAllChildren();
+        ((Node)((Node) spatial).getChild("TILES.0|0")).detachAllChildren();
         /**
          * Generate the tile and attach them with the right texture.
          * 1 geometry by texture.
          */
-//        HashMap<String, Mesh> mesh = meshParam.getMesh(onlyGround);
-        setMesh(meshParam.getMesh(onlyGround, debugMode, chunkPosition));
+//        Node node = (Node)((Node) spatial).getChild("TILES.0|0");
+        setMesh((Node)((Node) spatial).getChild("TILES.0|0"),
+                meshParam.getMesh(onlyGround, chunkPosition));
     }
 
-    public void setMesh(HashMap<String, Mesh> mesh) {
+    protected void setMesh(Node parent, HashMap<String, Mesh> mesh) {
         for (String value : mesh.keySet()) {
             Geometry tile = new Geometry(value, mesh.get(value));
             Material mat = assetManager.loadMaterial("Materials/hexMat.j3m");
             Texture text;
             if (value.equals("EMPTY_TEXTURE_KEY")) {
-                text = assetManager.loadTexture("/Textures/" + value + ".png");
-            } else if (value.equals("NO_TILE") && debugMode) {
-                text = assetManager.loadTexture("/Textures/" + "EMPTY_TEXTURE_KEY" + ".png");
+                text = assetManager.loadTexture(new TextureKey("Textures/" + value + ".png", false));
+            } else if (value.equals("NO_TILE") && (mode.equals(MapData.GhostMode.GHOST)
+                    || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
+                text = assetManager.loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false));
                 mat.setColor("Color", ColorRGBA.Blue);
             } else {
-                text = assetManager.loadTexture(texturePath + value + ".png");
+                text = assetManager.loadTexture(new TextureKey(texturePath + value + ".png", false));
             }
             text.setWrap(Texture.WrapMode.Repeat);
 
@@ -98,7 +115,7 @@ public class ChunkControl extends AbstractControl {
 //            tile.getMesh().setMode(Mesh.Mode.Points);
             tile.setMaterial(mat);
 //            tile.setShadowMode(RenderQueue.ShadowMode.Inherit);
-            ((Node) spatial).attachChild(tile);
+            parent.attachChild(tile);
         }
     }
 
@@ -106,9 +123,25 @@ public class ChunkControl extends AbstractControl {
         return chunkPosition;
     }
 
+    /**
+     * @return false if the chunk contain no tile (excluding ghost tile).
+     * <p>If GhostMode.GHOST || GhostMode.GHOST_PROCEDURAL && only ghost tile<br>
+     * return true. </p>
+     * <p>If GhostMode.NONE || GhostMode.PROCEDURAL && contain no tile<br>
+     * return true. </p>
+     * @deprecated See {@see MapData#contain(Vector2Int)}
+     */
     public boolean isEmpty() {
-        if (debugMode && ((Node) spatial).getChildren().size() < 2
-                || !debugMode && ((Node) spatial).getChildren().isEmpty()) {
+        if ((mode.equals(MapData.GhostMode.GHOST) 
+                || mode.equals(MapData.GhostMode.GHOST_PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().size() < 2 
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().get(0).getName().equals("NO_TILE")
+                || (mode.equals(MapData.GhostMode.NONE) 
+                || mode.equals(MapData.GhostMode.PROCEDURAL))
+                && ((Node)((Node) spatial).getChild("TILES.0|0"))
+                .getChildren().isEmpty()) {
             return true;
         } else {
             return false;

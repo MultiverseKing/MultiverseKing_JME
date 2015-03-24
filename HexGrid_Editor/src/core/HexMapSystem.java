@@ -2,14 +2,13 @@ package core;
 
 import core.gui.HexMapPanel;
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
-import core.control.GhostControl;
-import gui.deprecated.EditorMainGUI;
-import gui.deprecated.FileManagerPopup;
+//import gui.deprecated.EditorMainGUI;
+//import gui.deprecated.FileManagerPopup;
 import java.util.List;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
@@ -28,45 +27,35 @@ import test.EditorMain;
 public final class HexMapSystem extends AbstractHexGridAppState {
 
     private EditorMain app;
-    private GhostControl ghostControl;
-    private EditorMainGUI editorMainGUI;
+//    private EditorMainGUI editorMainGUI;
     private TileSelectionControl tileSelectionControl;
     private HexMapPanel hexMapPanel;
 
     public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
-        super(mapData, assetManager, rootNode, true);
+        super(mapData, assetManager, rootNode);
     }
-
+    
     @Override
     public void initializeSystem(AppStateManager stateManager, Application app) {
         this.app = (EditorMain) app;
 
         MouseControlSystem mouseControl = app.getStateManager().getState(MouseControlSystem.class);
         if (mouseControl == null) {
-            mouseControl = new MouseControlSystem(this.app.getRootNode());
+            mouseControl = new MouseControlSystem();
             app.getStateManager().attach(mouseControl);
         }
         tileSelectionControl = mouseControl.getSelectionControl();
-
         hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
-        initialiseGhostGrid((SimpleApplication) app);
-    }
-
-    protected void initialiseGhostGrid(SimpleApplication app) {
-        Node node = new Node("GhostNode");
-        ghostControl = new GhostControl(app, meshParam, new Vector2Int(), this);
-        node.addControl(ghostControl);
-        gridNode.attachChild(node);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters && Setters">
-
-    public String getMapName() {
-        return mapData.getMapName();
+    
+    public int getSeed() {
+        return mapData.getSeed();
     }
     
-    public void enableGhostUpdate(boolean enable) {
-        ghostControl.setEnabled(true);
+    public String getMapName() {
+        return mapData.getMapName();
     }
 
     public void removeTile() {
@@ -81,7 +70,13 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     public void setNewTile() {
         if (tileSelectionControl.getSelectedList().isEmpty()) {
-            mapData.setTile(tileSelectionControl.getSelectedPos(), new HexTile());
+            HexTile t = getTile();
+            if(t != null){
+                t.cloneChangedTextureKey(0);
+            } else {
+                t = new HexTile();
+            }
+            mapData.setTile(tileSelectionControl.getSelectedPos(), t);
         } else {
             mapData.setTile(tileSelectionControl.getSelectedList().toArray(
                     new HexCoordinate[tileSelectionControl.getSelectedList().size()]),
@@ -165,12 +160,20 @@ public final class HexMapSystem extends AbstractHexGridAppState {
         }
     }
 
+    public boolean tileExist(){
+        HexTile t = getTile();
+        if(t != null){
+            return mapData.getTextureValue(t.getTextureKey()).equals("NO_TILE") ? false : true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * @return the currently selected tile.
      */
     public HexTile getTile() {
         return mapData.getTile(tileSelectionControl.getSelectedPos());
-//        return mapData.getTile(tileSelectionControl.getTileList().toArray(new HexCoordinate[tileSelectionControl.getTileList().size()]));
     }
 
     public int getTileHeight() {
@@ -211,16 +214,16 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     public String getTextureValueFromKey(int textureKey) {
         return mapData.getTextureValue(textureKey);
     }
-
-    public void setEnabledGhost(boolean enable) {
-        ghostControl.setEnabled(enable);
-    }
     // </editor-fold>
 
-    public void save(FileManagerPopup popup) {
-//        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
-//            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
-//        }
+//    public void save(FileManagerPopup popup) {
+////        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
+////            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
+////        }
+//    }
+
+    public void generateFromSeed() {
+        System.err.println("Generate procedural Map using a defined Seed Number");
     }
 
     @Override
@@ -229,7 +232,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     protected void insertedChunk(ChunkControl control) {
-        ghostControl.updateCulling();
     }
 
     @Override
@@ -238,30 +240,29 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     protected void removedChunk(Vector2Int pos) {
-        ghostControl.updateCulling();
     }
 
-    public void loadFromFile(FileManagerPopup popup) {
-        if (popup != null && popup.getInput() != null) {
-            if (!mapData.loadArea(popup.getInput())) {
-                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
-            } else {
-                popup.removeFromScreen();
-            }
-        } else {
-            if (popup != null) {
-                popup.popupBox("    " + "There is nothing to load.");
-            }
-            reloadSystem();
-        }
-    }
+//    public void loadFromFile(FileManagerPopup popup) {
+//        if (popup != null && popup.getInput() != null) {
+//            if (!mapData.loadArea(popup.getInput())) {
+//                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
+//            } else {
+//                popup.removeFromScreen();
+//            }
+//        } else {
+//            if (popup != null) {
+//                popup.popupBox("    " + "There is nothing to load.");
+//            }
+//            reloadSystem();
+//        }
+//    }
     
     /**
      * @deprecated
      */
     public void clearSelectionGroup() {
 //        tileSelectionControl.clearSelectionGroup();
-        editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getSelectedList().size());
+//        editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getSelectedList().size());
     }
 
     public void reloadSystem() {

@@ -4,6 +4,6 @@ Material My Material : Common/MatDefs/Misc/ColoredTextured.j3md {
     AdditionalRenderState {
       Blend Off
       DepthTest Off
-      FaceCull FrontAndBack
+        FaceCull FrontAndBack
     }
 }

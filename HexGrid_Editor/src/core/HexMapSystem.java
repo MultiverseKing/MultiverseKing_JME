@@ -8,6 +8,7 @@ import com.jme3.scene.Node;
 //import gui.deprecated.EditorMainGUI;
 //import gui.deprecated.FileManagerPopup;
 import java.util.List;
+import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
@@ -33,7 +34,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
         super(mapData, assetManager, rootNode);
     }
-
+    
     @Override
     public void initializeSystem(AppStateManager stateManager, Application app) {
         this.app = (EditorMain) app;

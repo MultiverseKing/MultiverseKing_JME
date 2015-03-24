@@ -1,5 +1,6 @@
 package test;
 
+import core.gui.JHexEditor;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -13,7 +14,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
@@ -46,9 +46,10 @@ public class EditorMain extends SimpleApplication {
                 rootWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 rootWindow.getContentPane().setLayout(new BorderLayout());
                 final EditorMain editorMain = new EditorMain(rootWindow);
-                rootWindow.addComponentListener(new ComponentListener() {
+                rootWindow.addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(final ComponentEvent e) {
+                        super.componentResized(e);
                         editorMain.enqueue(new Callable<Void>() {
                             @Override
                             public Void call() throws Exception {
@@ -57,20 +58,8 @@ public class EditorMain extends SimpleApplication {
                             }
                         });
                     }
-
-                    @Override
-                    public void componentMoved(ComponentEvent e) {
-                    }
-
-                    @Override
-                    public void componentShown(ComponentEvent e) {
-                    }
-
-                    @Override
-                    public void componentHidden(ComponentEvent e) {
-                    }
+                    
                 });
-
                 editorMain.setSettings(settings);
                 editorMain.createCanvas(); // create canvas!
                 JmeCanvasContext ctx = (JmeCanvasContext) editorMain.getContext();

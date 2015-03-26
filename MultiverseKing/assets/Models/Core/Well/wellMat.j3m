@@ -1,13 +1,10 @@
-Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+Material MyMaterial : ShaderBlow/MatDefs/LightBlow/LightBlow.j3md {
     MaterialParameters {
         DiffuseMap : Repeat Models/Core/Well/DifuseGroup.png
-        GlowColor : 0.0 0.0 0.0 1.0
-        Specular : 0.0 0.0 0.0 1.0
-        Diffuse : 0.8 0.8 0.8 1.0
-        UseMaterialColors : true
-        ParallaxHeight : 0.05
-        Ambient : 0.8 0.8 0.8 1.0
-        Shininess : 12.5
+        Toon : true
+        EdgesColor : 1.0 0.0 0.0 1.0
+        EdgeSize : 0.5
+        Nor_Inv_Y : false
     }
     AdditionalRenderState {
       FaceCull Back

@@ -1,0 +1,33 @@
+MaterialDef SimpleSprite {
+
+    MaterialParameters {
+
+        Texture2D AniTexMap
+
+        // Number of Tiles U and V
+        Int numTilesU
+        Int numTilesV
+        Int Speed
+
+        // Multiply Color system
+        Color Multiply_Color
+
+    }
+
+    Technique {
+        VertexShader GLSL100: Shaders/ShaderBlow_SimpleSpirit.vert
+        FragmentShader GLSL100: Shaders/ShaderBlow_SimpleSpirit.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            Time
+        }
+
+        Defines {
+
+            MULTIPLY_COLOR : Multiply_Color
+
+        }
+    } 
+
+}

@@ -1,0 +1,13 @@
+Material My Material : MatDefs/ShaderBlow_SimpleSpirit.j3md {
+     MaterialParameters {
+        AniTexMap : Flip Repeat Textures/hex_void_anim.png
+        Speed : 16
+        numTilesV : 1
+        numTilesU : 8
+     }
+    AdditionalRenderState {
+      Blend Alpha
+      Wireframe Off
+      AlphaTestFalloff 0.0
+    }
+}

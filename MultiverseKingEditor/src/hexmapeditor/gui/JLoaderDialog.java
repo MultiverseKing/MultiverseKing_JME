@@ -28,7 +28,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package core.gui;
+package hexmapeditor.gui;
 
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
@@ -38,7 +38,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 /* 1.4 example used by DialogDemo.java. */
-public class CustomDialog extends JDialog implements ActionListener, PropertyChangeListener {
+public class JLoaderDialog extends JDialog implements ActionListener, PropertyChangeListener {
 
     private String typedText = null;
     private JTextField textField;
@@ -47,7 +47,7 @@ public class CustomDialog extends JDialog implements ActionListener, PropertyCha
     private JOptionPane optionPane;
     private String btnString1 = "Enter";
     private String btnString2 = "Cancel";
-    private final boolean isSave;
+//    private final boolean isSave;
 
     /**
      * Returns null if the typed string was invalid;
@@ -60,20 +60,19 @@ public class CustomDialog extends JDialog implements ActionListener, PropertyCha
     /**
      * Used when saving.
      */
-    public CustomDialog(Frame aFrame, String defaultValue) {
+    public JLoaderDialog(Frame aFrame, String defaultValue) {
         this(aFrame, true, defaultValue);
     }
     
-    public CustomDialog(Frame aFrame, boolean isSave) {
+    public JLoaderDialog(Frame aFrame, boolean isSave) {
         this(aFrame, isSave, null);
     }
     /**
      * Creates the reusable dialog.
      */
-    public CustomDialog(Frame aFrame, boolean isSave, String defaultValue) {
+    public JLoaderDialog(Frame aFrame, boolean isSave, String defaultValue) {
         super(aFrame, true);
-        this.isSave = isSave;
-
+//        isSave = isSave;
         textField = new JTextField(10);
 
         //Create an array of the text and components to be displayed.
@@ -135,7 +134,6 @@ public class CustomDialog extends JDialog implements ActionListener, PropertyCha
 
         //Register an event handler that reacts to option pane state changes.
         optionPane.addPropertyChangeListener(this);
-
     }
 
     /**
@@ -183,7 +181,7 @@ public class CustomDialog extends JDialog implements ActionListener, PropertyCha
                     //text was invalid
                     textField.selectAll();
                     JOptionPane.showMessageDialog(
-                            CustomDialog.this,
+                            JLoaderDialog.this,
                             "Sorry, \"" + typedText + "\" "
                             + "isn't a valid name.\n",
                             "Try again",

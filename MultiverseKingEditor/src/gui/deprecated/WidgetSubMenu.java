@@ -4,7 +4,7 @@ import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import core.HexMapSystem;
+import hexmapeditor.HexMapSystem;
 import gui.deprecated.control.CameraTrackWindow;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;

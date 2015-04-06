@@ -1,18 +1,15 @@
-package core.gui;
+package gui.control;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.texture.Image;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import jme3tools.converters.ImageToAwt;
+import utility.ImageConverter;
 
 /**
  *
@@ -36,7 +33,6 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer {
         for (int i = 0; i < textureKeys.size(); i++) {
             intArray[i] = new Integer(i);
             images[i] = createImageIcon(textureKeys.get(i));
-//            images[i].getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_DEFAULT);
             if (images[i] != null) {
                 images[i].setDescription(textureKeys.get(i));
             }
@@ -55,30 +51,11 @@ public class ComboBoxRenderer extends JLabel implements ListCellRenderer {
                 "Textures/Icons/Buttons/" + name + ".png").getImage();
 //        java.net.URL imgURL = CustomComboBoxDemo.class.getResource(path);
         if (img != null) {
-            BufferedImage imgConvert = createFlipped(ImageToAwt.convert(img, false, false, 0));
-            return new ImageIcon(imgConvert.getScaledInstance(18, 18, java.awt.Image.SCALE_FAST));
+            return ImageConverter.convertToIcon(img, 18, 18);
         } else {
             System.err.println("Couldn't find img : " + name);
             return null;
         }
-    }
-
-    private static BufferedImage createFlipped(BufferedImage image) {
-        AffineTransform at = new AffineTransform();
-        at.concatenate(AffineTransform.getScaleInstance(1, -1));
-        at.concatenate(AffineTransform.getTranslateInstance(0, -image.getHeight()));
-        return createTransformed(image, at);
-    }
-
-    private static BufferedImage createTransformed(BufferedImage image, AffineTransform at) {
-        BufferedImage newImage = new BufferedImage(
-                image.getWidth(), image.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = newImage.createGraphics();
-        g.transform(at);
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        return newImage;
     }
 
     /*

@@ -1,14 +1,10 @@
-package core;
+package hexmapeditor;
 
-import core.gui.HexMapPanel;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
-//import gui.deprecated.EditorMainGUI;
-//import gui.deprecated.FileManagerPopup;
 import java.util.List;
-import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.HexTile;
 import org.hexgridapi.core.MapData;
@@ -17,19 +13,17 @@ import org.hexgridapi.core.control.ChunkControl;
 import org.hexgridapi.core.control.TileSelectionControl;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import test.EditorMain;
+import core.EditorMain;
 
 /**
- * To be extended to create other editor.
+ * Bridge between swing and hexgridAPI.
  *
  * @author roah
  */
 public final class HexMapSystem extends AbstractHexGridAppState {
 
     private EditorMain app;
-//    private EditorMainGUI editorMainGUI;
     private TileSelectionControl tileSelectionControl;
-    private HexMapPanel hexMapPanel;
 
     public HexMapSystem(MapData mapData, AssetManager assetManager, Node rootNode) {
         super(mapData, assetManager, rootNode);
@@ -38,14 +32,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     @Override
     public void initializeSystem(AppStateManager stateManager, Application app) {
         this.app = (EditorMain) app;
-
-        MouseControlSystem mouseControl = app.getStateManager().getState(MouseControlSystem.class);
-        if (mouseControl == null) {
-            mouseControl = new MouseControlSystem();
-            app.getStateManager().attach(mouseControl);
-        }
-        tileSelectionControl = mouseControl.getSelectionControl();
-        hexMapPanel = new HexMapPanel((EditorMain) app, mouseControl, this);
+        tileSelectionControl = app.getStateManager().getState(MouseControlSystem.class).getSelectionControl();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters && Setters">
@@ -54,6 +41,10 @@ public final class HexMapSystem extends AbstractHexGridAppState {
         return mapData.getSeed();
     }
     
+    public void setMapName(String name) {
+        mapData.setMapName(name);
+    }
+
     public String getMapName() {
         return mapData.getMapName();
     }
@@ -216,12 +207,6 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     }
     // </editor-fold>
 
-//    public void save(FileManagerPopup popup) {
-////        if (!mapData.containTilesData() || !mapData.saveArea(popup.getInput())) {
-////            popup.popupBox("    " + popup.getInput() + " couldn't be saved.");
-////        }
-//    }
-
     public void generateFromSeed() {
         System.err.println("Generate procedural Map using a defined Seed Number");
     }
@@ -241,29 +226,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     @Override
     protected void removedChunk(Vector2Int pos) {
     }
-
-//    public void loadFromFile(FileManagerPopup popup) {
-//        if (popup != null && popup.getInput() != null) {
-//            if (!mapData.loadArea(popup.getInput())) {
-//                popup.popupBox("    " + popup.getInput() + " couldn't be loaded.");
-//            } else {
-//                popup.removeFromScreen();
-//            }
-//        } else {
-//            if (popup != null) {
-//                popup.popupBox("    " + "There is nothing to load.");
-//            }
-//            reloadSystem();
-//        }
-//    }
     
-    /**
-     * @deprecated
-     */
-    public void clearSelectionGroup() {
-//        tileSelectionControl.clearSelectionGroup();
-//        editorMainGUI.showCurrentSelectionCount(tileSelectionControl.getSelectedList().size());
-    }
 
     public void reloadSystem() {
         mapData.Cleanup();
@@ -271,6 +234,5 @@ public final class HexMapSystem extends AbstractHexGridAppState {
 
     @Override
     public void cleanupSystem() {
-//        app.getStateManager().getState(MouseControlAppState.class).removeTileInputListener(this);
     }
 }

@@ -1,4 +1,4 @@
-package test;
+package core;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
@@ -46,40 +46,16 @@ public final class RTSCamera extends AbstractAppState {
      */
     public enum DoF {
 
-        /**
-         *
-         */
         SIDE,
-        /**
-         *
-         */
         FWD,
-        /**
-         *
-         */
         ROTATE,
-        /**
-         *
-         */
         TILT,
-        /**
-         *
-         */
-        DISTANCE
+        DISTANCE;
     }
 
-    /**
-     *
-     */
     public enum UpVector {
 
-        /**
-         *
-         */
         Y_UP(Vector3f.UNIT_Y),
-        /**
-         *
-         */
         Z_UP(Vector3f.UNIT_Z);
         final Vector3f upVector;
 
@@ -133,10 +109,11 @@ public final class RTSCamera extends AbstractAppState {
     private static String[] mappings = new String[]{
         "+SIDE", "+FWD", "+ROTATE", "-SIDE", "-FWD", "-ROTATE", "+WHEEL", "-WHEEL"};
     private boolean keyBoardSwitch = false;
-    
+
     public RTSCamera(UpVector up) {
         this(up, "");
     }
+
     public RTSCamera(UpVector up, String keyLayout) {
         this.up = up;
 
@@ -151,7 +128,7 @@ public final class RTSCamera extends AbstractAppState {
         setMaxSpeed(DoF.ROTATE, 2f, 0.4f);
         setMaxSpeed(DoF.TILT, 1f, 0.4f);
         setMaxSpeed(DoF.DISTANCE, 15f, 0.4f);
-        if(keyLayout.equals("AZERTY")){
+        if (keyLayout.equals("AZERTY")) {
             keyBoardSwitch = true;
         }
     }
@@ -251,7 +228,7 @@ public final class RTSCamera extends AbstractAppState {
                 return null;
         }
     }
-    
+
     /**
      * Use MouseInput.BUTTON_ constants to indicate which buttons should be used
      * for rotation and dragging with mouse Defaults are BUTTON_MIDDLE for
@@ -384,30 +361,15 @@ public final class RTSCamera extends AbstractAppState {
             return value;
         }
     }
-
-    /**
-     *
-     * @param dg
-     * @return
-     */
+    
     public float getMaxSpeed(DoF dg) {
         return maxSpeedPerSecondOfAccell[dg.ordinal()];
     }
-
-    /**
-     *
-     * @param dg
-     * @return
-     */
+    
     public float getMinValue(DoF dg) {
         return minValue[dg.ordinal()];
     }
-
-    /**
-     *
-     * @param dg
-     * @return
-     */
+    
     public float getMaxValue(DoF dg) {
         return maxValue[dg.ordinal()];
     }
@@ -423,81 +385,43 @@ public final class RTSCamera extends AbstractAppState {
         minValue[dg.ordinal()] = min;
         maxValue[dg.ordinal()] = max;
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public Vector3f getPosition() {
         return position;
     }
-
-    /**
-     *
-     * @param center
-     */
+    
     public void setCenter(Vector3f center) {
         this.center.set(center);
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public Vector3f getCenter() {
         return center;
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public float getDistance() {
         return distance;
     }
-
-    /**
-     *
-     * @return
-     */
+    
     public float getRot() {
         return rot;
     }
-
-    /**
-     *
-     * @return
-     */
+    
 //    public float getTilt() {
 //        return tilt;
 //    }
-    /**
-     *
-     * @param distance
-     */
+    
     public void setDistance(float distance) {
         this.distance = distance;
     }
-
-    /**
-     *
-     * @param rot
-     */
+    
     public void setRot(float rot) {
         this.rot = rot;
     }
-
-    /**
-     *
-     * @param tilt
-     */
+    
 //    public void setTilt(float tilt) {
 //        this.tilt = tilt;
 //    }
-    /**
-     *
-     * @return
-     */
+    
     public Camera getCamera() {
         return cam;
     }
@@ -524,21 +448,21 @@ public final class RTSCamera extends AbstractAppState {
         inputManager.addListener(listener, mappings);
     }
 
-    private void registerMouse(){
+    private void registerMouse() {
         inputManager.addMapping("-WHEEL", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
         inputManager.addMapping("+WHEEL", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-        
+
     }
-    
-    private void registerKeys(){
+
+    private void registerKeys() {
         InputContext iContext = InputContext.getInstance();
         String local = iContext.getLocale().toString();
-        
+
         KeyTrigger negSide = new KeyTrigger(KeyInput.KEY_A);
         KeyTrigger posRot = new KeyTrigger(KeyInput.KEY_Q);
         KeyTrigger negFWD = new KeyTrigger(KeyInput.KEY_W);
 //        KeyTrigger negDistance = new KeyTrigger(KeyInput.KEY_Z);
-        if (keyBoardSwitch){//local.equals("fr_FR") && iContext.isCompositionEnabled()) {
+        if (keyBoardSwitch) {//local.equals("fr_FR") && iContext.isCompositionEnabled()) {
             negSide = new KeyTrigger(KeyInput.KEY_Q);
             posRot = new KeyTrigger(KeyInput.KEY_A);
             negFWD = new KeyTrigger(KeyInput.KEY_Z);
@@ -560,7 +484,7 @@ public final class RTSCamera extends AbstractAppState {
         inputManager.addMapping("+FWD", new KeyTrigger(KeyInput.KEY_S));
         inputManager.addMapping("-FWD", negFWD);
     }
-    
+
     @Override
     public void cleanup() {
         super.cleanup();

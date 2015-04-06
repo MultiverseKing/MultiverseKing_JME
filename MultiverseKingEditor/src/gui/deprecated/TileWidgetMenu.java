@@ -6,7 +6,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import com.jme3.renderer.Camera;
-import core.HexMapSystem;
+import hexmapeditor.HexMapSystem;
 import gui.deprecated.control.AnimatedButton;
 import gui.deprecated.control.CameraTrackWindow;
 import java.util.ArrayList;

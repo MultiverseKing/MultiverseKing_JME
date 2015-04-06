@@ -1,11 +1,14 @@
-package core.gui;
+package hexmapeditor.gui;
 
-import core.HexMapSystem;
+import gui.control.ComboBoxRenderer;
+import gui.control.JPropertiesPanel;
+import hexmapeditor.HexMapSystem;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -18,7 +21,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
@@ -30,67 +32,45 @@ import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.utility.HexCoordinate;
-import test.EditorMain;
+import core.EditorMain;
 
 /**
  *
  * @author roah
  */
-public class HexMapPanel extends AbstractAction {
+public class JHexPropertiesPanel extends JPropertiesPanel {
 
-    private final HexMapSystem editorSystem;
-    private final MouseControlSystem mouseSystem;
     private final EditorMain editorMain;
-    private JPanel hexMapPanel;
+    private HexMapSystem editorSystem;
+    private MouseControlSystem mouseSystem;
     private Boolean currentIsGhost;
     private boolean currentIsGroup = false;
     private JPanel tileProperties;
     private HashMap<String, JComponent> comps = new HashMap<>();
     private boolean update = true;
 
-    public HexMapPanel(EditorMain editorMain, MouseControlSystem mouseSystem, HexMapSystem editorSystem) {
-        this.mouseSystem = mouseSystem;
-        this.editorSystem = editorSystem;
+    public JHexPropertiesPanel(EditorMain editorMain) {
+        super(editorMain.getAssetManager().loadTexture(
+                "Textures/Icons/Buttons/configKey.png").getImage(), "HexMapConfig");
         this.editorMain = editorMain;
+        mouseSystem = editorMain.getStateManager().getState(MouseControlSystem.class);
+        editorSystem = editorMain.getStateManager().getState(HexMapSystem.class);
 
-        for (Component menu : editorMain.getRootWindow().getJMenuBar().getComponents()) {
-            if (((JMenu) menu).getActionCommand().equals("Hex Editor")) {
-                ((JMenu) menu).add(new AbstractAction("Save Map") {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        onAction(e);
-                    }
-                });
-            }
-        }
-        editorMain.getRootWindow().add(buildMenu(), BorderLayout.EAST);
-        editorMain.getRootWindow().revalidate();
-
-        register();
+        editorMain.getStateManager().getState(MouseControlSystem.class).getSelectionControl().registerTileListener(selectionListener);
+        editorMain.getStateManager().getState(MapDataAppState.class).getMapData().registerTileChangeListener(tileListener);
+        
+        buildMenu();
     }
 
-    private void register() {
-        editorMain.enqueue(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-
-                mouseSystem.getSelectionControl().registerTileListener(selectionListener);
-                editorMain.getStateManager().getState(MapDataAppState.class).getMapData().registerTileChangeListener(tileListener);
-                return null;
-            }
-        });
-    }
-
-    private JPanel buildMenu() {
-        hexMapPanel = new JPanel();
-        hexMapPanel.setLayout(new BoxLayout(hexMapPanel, BoxLayout.PAGE_AXIS));
-        hexMapPanel.setAlignmentX(0);
-        hexMapPanel.setBorder(BorderFactory.createTitledBorder("Map Property"));
-        hexMapPanel.setPreferredSize(new Dimension(170, 300));
+    private void buildMenu() {
+        setBorder(BorderFactory.createTitledBorder("Map Property"));
+        setPreferredSize(new Dimension(170, 300));
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
-        addComp(hexMapPanel, separator);
-
+        addComp(separator);
+        
+        add(new JCursorPanel(editorMain.getStateManager().getState(MouseControlSystem.class)));
+        
         JCheckBox box = new JCheckBox(new AbstractAction("Show ghost") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,87 +79,57 @@ public class HexMapPanel extends AbstractAction {
         });
         box.setSelected(true);
         box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
-        addComp(hexMapPanel, box);
+        box.setAlignmentX(0);
+        addComp(box);
+        
         JLabel mapNameLabel = new JLabel("Map Name : ");
         mapNameLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 18));
-        hexMapPanel.add(mapNameLabel);
+        add(mapNameLabel);
+
         JTextField mapName = new JTextField(editorSystem.getMapName());
+        mapName.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                editorMain.enqueue(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        editorSystem.setMapName(((JTextField)comps.get("mapName")).getText());
+                        return null;
+                    }
+                });
+            }
+        });
         comps.put("mapName", mapName);
         mapName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        hexMapPanel.add(mapName);
-
-        JLabel mapGenerator = new JLabel("Random Generator : ");
-        mapGenerator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 18));
-        hexMapPanel.add(mapGenerator);
+        mapName.setAlignmentX(0);
+        add(mapName);
 
         /*-------       Map Generator       ------*/
+        JLabel mapGenerator = new JLabel("Random Generator : ");
+        mapGenerator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 18));
+        add(mapGenerator);
+
         JPanel seedPan = new JPanel();
         seedPan.setLayout(new BoxLayout(seedPan, BoxLayout.LINE_AXIS));
         seedPan.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         seedPan.setAlignmentX(0);
 
-        JLabel currentSeed = new JLabel("Seed : " +String.valueOf(editorSystem.getSeed()));
+        JLabel currentSeed = new JLabel("Seed : " + String.valueOf(editorSystem.getSeed()));
         comps.put("currentSeed", currentSeed);
         seedPan.add(currentSeed);
         seedPan.add(Box.createRigidArea(new Dimension(5, 0)));
-//        JButton genSeed = new JButton(new AbstractAction("Gen Seed") {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                /**
-//                 * @todo update the map when changing the seed
-//                 */
-//                ((JLabel) comps.get("currentSeed")).setText(String.valueOf(editorSystem.generateNewSeed()));
-//            }
-//        });
-//        genSeed.setPreferredSize(new Dimension(50, 23));
-//        seedPan.add(genSeed);
-//        comps.put("genSeed", genSeed);
-        addComp(hexMapPanel, seedPan);
-//        hexMapPanel.add(seedPan);
-        hexMapPanel.add(Box.createRigidArea(new Dimension(0, 3)));
-//        JButton genMap = new JButton(new AbstractAction("GenerateMap") {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                onAction(e);
-//            }
-//        });
-//        genMap.setAlignmentX(0);
-//        genMap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-//        comps.put("GenerateMap", genMap);
-//        hexMapPanel.add(genMap);
+        add(seedPan);
 
         /*-------*/
-
         separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setMaximumSize(
                 new Dimension(Integer.MAX_VALUE, 2));
-        addComp(hexMapPanel, separator);
-
-        buildCursorMenu();
-        return hexMapPanel;
-    }
-
-    private void buildCursorMenu() {
-        JPanel cursorProperties = new JPanel();
-        cursorProperties.setLayout(new BoxLayout(cursorProperties, BoxLayout.PAGE_AXIS));
-        cursorProperties.setAlignmentX(0);
-        cursorProperties.setBorder(BorderFactory.createTitledBorder("Cursor Property"));
-        cursorProperties.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
-        cursorProperties.add(Box.createRigidArea(new Dimension(0, 3)));
-        JLabel coordinate = new JLabel("Hex pos : null");
-        addComp(cursorProperties, coordinate);
-        comps.put("coordinate", coordinate);
-        JLabel chunkPos = new JLabel("Chunk pos: null");
-        addComp(cursorProperties, chunkPos);
-        comps.put("chunkPos", chunkPos);
-        cursorProperties.add(Box.createRigidArea(new Dimension(0, 3)));
-
-        addComp(hexMapPanel, cursorProperties);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        onAction(e);
+        add(separator);
     }
 
     private void onAction(ActionEvent e) {
@@ -200,23 +150,6 @@ public class HexMapPanel extends AbstractAction {
         switch (e.getActionCommand()) {
             case "GenerateMap":
                 editorSystem.generateFromSeed();
-                break;
-            case "Save Map":
-                CustomDialog customDialog = new CustomDialog(editorMain.getRootWindow(), ((JTextField) comps.get("mapName")).getText());
-                customDialog.setLocationRelativeTo(editorMain.getRootWindow());
-                customDialog.setVisible(true);
-                String s = customDialog.getValidatedText();
-                if (s != null) {
-                    //The text is valid.
-                    editorMain.enqueue(new Callable<Void>() {
-                        @Override
-                        public Void call() throws Exception {
-//                            editorSystem.save(null);
-                            return null;
-                        }
-                    });
-                    System.err.println("Save Map " + s);
-                }
                 break;
             case "Show ghost":
                 //TODO
@@ -279,8 +212,6 @@ public class HexMapPanel extends AbstractAction {
                     updateSingleTileMenu();
                 }
             }
-            ((JLabel) comps.get("coordinate")).setText("Hex pos : " + currentSelection.getAsOffset());
-            ((JLabel) comps.get("chunkPos")).setText("Chunk pos : " + currentSelection.getCorrespondingChunk());
         }
     };
     private TileChangeListener tileListener = new TileChangeListener() {
@@ -298,13 +229,14 @@ public class HexMapPanel extends AbstractAction {
     };
 
     private void buildTileMenu() {
+
         currentIsGhost = !editorSystem.tileExist();
         if (tileProperties == null) {
             tileProperties = new JPanel();
             tileProperties.setLayout(new BoxLayout(tileProperties, BoxLayout.PAGE_AXIS));
             tileProperties.setAlignmentX(0);
             tileProperties.setBorder(BorderFactory.createTitledBorder("Tile Property"));
-            addComp(hexMapPanel, tileProperties);
+            addComp(tileProperties);
         } else {
             tileProperties.removeAll();
         }
@@ -323,8 +255,8 @@ public class HexMapPanel extends AbstractAction {
             compCount += addDestroyBtn();
             tileProperties.add(Box.createRigidArea(new Dimension(0, 5)));
         }
-        tileProperties.setMaximumSize(new Dimension(hexMapPanel.getMaximumSize().width, compCount * 23 + 10));
-        hexMapPanel.revalidate();
+        tileProperties.setMaximumSize(new Dimension(getMaximumSize().width, compCount * 23 + 10));
+        revalidate();
     }
 
     private void buildMultiTileMenu(ArrayList<HexCoordinate> selectedList) {
@@ -335,9 +267,9 @@ public class HexMapPanel extends AbstractAction {
         compCount += addHeightBtn(true);
         compCount += addGenerateBtn();
         compCount += addDestroyBtn();
-        tileProperties.setMaximumSize(new Dimension(hexMapPanel.getMaximumSize().width, compCount * 23 + 10));
+        tileProperties.setMaximumSize(new Dimension(getMaximumSize().width, compCount * 23 + 10));
 
-        hexMapPanel.revalidate();
+        revalidate();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Add Component Method">
@@ -445,11 +377,6 @@ public class HexMapPanel extends AbstractAction {
         return 1;
     }
 
-    private void addComp(JPanel pan, Component comp) {
-        pan.add(Box.createRigidArea(new Dimension(0, 3)));
-        pan.add(comp);
-    }
-
     // </editor-fold>
     private void updateSingleTileMenu() {
         currentIsGhost = !editorSystem.tileExist();
@@ -465,7 +392,7 @@ public class HexMapPanel extends AbstractAction {
                 }
             });
         }
-        hexMapPanel.revalidate();
+        revalidate();
     }
 
     private void updateMultiTileMenu(ArrayList<HexCoordinate> selectedList) {
@@ -476,5 +403,13 @@ public class HexMapPanel extends AbstractAction {
 
     public JComponent getComponent(String UID) {
         return comps.get(UID);
+    }
+
+    @Override
+    public void isShow() {
+    }
+
+    @Override
+    public void isHidden() {
     }
 }

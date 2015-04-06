@@ -1,7 +1,7 @@
 package gui.deprecated;
 
 import com.jme3.math.Vector2f;
-import core.HexMapSystem;
+import hexmapeditor.HexMapSystem;
 import gui.deprecated.control.EditorWindow;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import tonegod.gui.controls.buttons.ButtonAdapter;

@@ -1,33 +1,34 @@
-package test;
+package core;
 
-import core.gui.JHexEditor;
+import hexmapeditor.gui.JHexEditorMenu;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
-import core.HexMapSystem;
-import core.gui.CustomDialog;
+import hexmapeditor.HexMapSystem;
+import hexmapeditor.gui.JHexEditorMenu.HexMenuAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
+import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.multiversekingesapi.EntityDataAppState;
+import org.multiversekingesapi.field.AreaEventSystem;
+import org.multiversekingesapi.field.position.HexPositionSystem;
+import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
+import org.multiversekingesapi.render.RenderSystem;
 
 /**
- * test
  *
- * @author normenhansen, Roah
+ * @author normenhansen, roah
  */
 public class EditorMain extends SimpleApplication {
 
@@ -35,7 +36,6 @@ public class EditorMain extends SimpleApplication {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // ... see below ...
                 AppSettings settings = new AppSettings(true);
                 Dimension dim = new Dimension(1024, 768);
                 settings.setWidth(dim.width);
@@ -58,7 +58,6 @@ public class EditorMain extends SimpleApplication {
                             }
                         });
                     }
-                    
                 });
                 editorMain.setSettings(settings);
                 editorMain.createCanvas(); // create canvas!
@@ -66,47 +65,22 @@ public class EditorMain extends SimpleApplication {
                 ctx.setSystemListener(editorMain);
                 ctx.getCanvas().setPreferredSize(dim);
 
-
                 //-------------
                 JMenuBar menuBar = new JMenuBar();
-                JMenu menu = new JMenu("Hex Editor");
-                menuBar.add(menu);
-                rootWindow.setJMenuBar(menuBar);
-                JMenuItem item = new JMenuItem(new JHexEditor("New Map", editorMain));
-                menu.add(item);
-                menu.add(new AbstractAction("Load Map") {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        CustomDialog customDialog = new CustomDialog(rootWindow, false);
-                        customDialog.setLocationRelativeTo(rootWindow);
-                        customDialog.setVisible(true);
+                JHexEditorMenu editorMenu = new JHexEditorMenu(editorMain);
+                editorMenu.setAction(HexMenuAction.New);
+                editorMenu.setAction(HexMenuAction.Load);
+                menuBar.add(editorMenu);
 
-                        String s = customDialog.getValidatedText();
-                        if (s != null) {
-                            //The text is valid.
-                            System.err.println("Load Map " + s);
-                        }
-                    }
-                });
-//                item = new JMenuItem(new JHexEditor("Load Map", editorMain));
+                rootWindow.setJMenuBar(menuBar);
                 //-------------
 
-                rootWindow.getContentPane().add(ctx.getCanvas(), BorderLayout.CENTER);
-
                 rootWindow.pack();
+                rootWindow.setMinimumSize(dim);
                 rootWindow.setLocationRelativeTo(null);
                 rootWindow.setVisible(true);
-                rootWindow.setMinimumSize(dim);
 
                 editorMain.startCanvas();
-            }
-
-            class resizeListener extends ComponentAdapter {
-
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    //Recalculate the variable you mentioned
-                }
             }
         });
     }
@@ -132,36 +106,32 @@ public class EditorMain extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-        //Init general input 
         super.inputManager.clearMappings();
-//        getFlyByCamera().setEnabled(false);
         rtsCam = new DefaultParam(this, false).getCam();
     }
 
-    public void startEditor() {
-        this.enqueue(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                //init the Entity && Hex System
-                inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-                inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+    public void startAreaEditor() {
+        inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
-                MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, MapData.GhostMode.GHOST_PROCEDURAL);
-                stateManager.attach(new MapDataAppState(mapData));
-                stateManager.attach(new HexMapSystem(mapData, assetManager, getRootNode()));
+        MapData mapData = new MapData(new String[]{"EARTH", "ICE", "NATURE", "VOLT"}, assetManager, MapData.GhostMode.GHOST_PROCEDURAL);
+        stateManager.attachAll(
+                new MapDataAppState(mapData),
+                new EntityDataAppState(),
+                new RenderSystem(),
+                new HexPositionSystem(),
+                new MouseControlSystem(), 
+                new HexMapSystem(mapData, assetManager, getRootNode()),
+                new AreaEventSystem(),
+                new AreaEventRenderDebugSystem());
 
-                return null;
-            }
-        });
+        rootWindow.getContentPane().add(((JmeCanvasContext) this.getContext()).getCanvas(), BorderLayout.CENTER);
         isStart = true;
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
-//         cam.setFrustumPerspective( 45.0f, (float) DisplaySystem.getDisplaySystem().getRenderer().getWidth()
-//
-//        / (float) DisplaySystem.getDisplaySystem().getRenderer().getHeight(), 1, 1000 );
     }
 
     @Override

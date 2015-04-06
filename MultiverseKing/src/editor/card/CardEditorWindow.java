@@ -2,13 +2,13 @@ package editor.card;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.Vector2f;
-import entitysystem.ability.AbilityComponent;
-import entitysystem.attribut.Rarity;
-import entitysystem.card.AbilityProperties;
-import entitysystem.card.CardProperties;
-import entitysystem.loader.EntityLoader;
-import entitysystem.loader.GameProperties;
-import entitysystem.render.RenderComponent.RenderType;
+import org.multiversekingesapi.ability.AbilityComponent;
+import org.multiversekingesapi.card.attribut.Rarity;
+import org.multiversekingesapi.loader.AbilityProperties;
+import org.multiversekingesapi.loader.CardProperties;
+import org.multiversekingesapi.loader.EntityLoader;
+import org.multiversekingesapi.loader.GameProperties;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.EditorWindow;
@@ -17,7 +17,7 @@ import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  *

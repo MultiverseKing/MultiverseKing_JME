@@ -9,7 +9,7 @@ import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.ElementManager;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  * Menu showing all invalable element to change the hex to.

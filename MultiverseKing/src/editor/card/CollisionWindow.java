@@ -1,6 +1,6 @@
 package editor.card;
 
-import entitysystem.field.Collision;
+import org.multiversekingesapi.field.Collision;
 import gui.DialogWindowListener;
 import gui.DialogWindow;
 import gui.EditorWindow;

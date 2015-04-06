@@ -7,7 +7,7 @@ import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.buttons.RadioButtonGroup;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.ElementManager;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  * Context menu used to let you chose the element for map to change to.

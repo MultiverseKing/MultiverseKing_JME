@@ -1,10 +1,10 @@
 package editor.area;
 
 import gui.EditorWindow;
-import hexsystem.area.AreaEventComponent;
-import hexsystem.area.AreaEventComponent.Event;
-import static hexsystem.area.AreaEventComponent.Event.Trigger;
-import hexsystem.area.AreaEventSystem;
+import org.multiversekingesapi.field.component.AreaEventComponent;
+import org.multiversekingesapi.field.component.AreaEventComponent.Event;
+import static org.multiversekingesapi.field.component.AreaEventComponent.Event.Trigger;
+import org.multiversekingesapi.field.AreaEventSystem;
 import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -73,7 +73,7 @@ public class TileEventMenu extends EditorWindow {
         currentEvent.clear();
         AreaEventComponent comp = system.getValue(inspectedTilePos);
         if (comp != null) {
-            for (Event e : comp.getEvent()) {
+            for (Event e : comp.getEvents()) {
                 currentEvent.add(e);
             }
         }

@@ -1,8 +1,8 @@
 package editor.card;
 
-import entitysystem.card.AbilityProperties;
-import entitysystem.field.Collision;
-import entitysystem.render.RenderComponent.RenderType;
+import org.multiversekingesapi.loader.AbilityProperties;
+import org.multiversekingesapi.field.Collision;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import gui.EditorWindow;
 import org.hexgridapi.utility.Vector2Int;
 import tonegod.gui.controls.lists.Spinner;

@@ -12,33 +12,33 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import com.simsilica.es.PersistentComponent;
-import editor.area.AreaEventRenderDebugSystem;
-import entitysystem.EntitySystemAppState;
-import entitysystem.attribut.Animation;
-import entitysystem.attribut.CardRenderPosition;
-import entitysystem.card.CardRenderComponent;
-import entitysystem.field.CollisionSystem;
-import entitysystem.field.position.HexPositionComponent;
-import entitysystem.field.position.MoveToComponent;
-import entitysystem.field.position.MovementSystem;
-import entitysystem.render.AnimationComponent;
-import entitysystem.loader.EntityLoader;
-import entitysystem.loader.TitanLoader;
-import entitysystem.render.AnimationSystem;
-import entitysystem.render.RenderComponent;
-import entitysystem.render.RenderSystem;
-import entitysystem.SubSystem;
-import entitysystem.field.HealthComponent;
-import entitysystem.field.InfluenceComponent;
-import entitysystem.loader.PlayerProperties;
-import entitysystem.render.RenderComponent.RenderType;
-import hexsystem.area.AreaEventSystem;
-import hexsystem.area.AreaGridSystem;
-import hexsystem.area.MapDataAppState;
+import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
+import org.multiversekingesapi.EntitySystemAppState;
+import org.multiversekingesapi.render.animation.Animation;
+import org.multiversekingesapi.card.attribut.CardRenderPosition;
+import org.multiversekingesapi.card.CardRenderComponent;
+import org.multiversekingesapi.field.CollisionSystem;
+import org.multiversekingesapi.field.position.HexPositionComponent;
+import org.multiversekingesapi.field.position.MoveToComponent;
+import org.multiversekingesapi.field.position.MovementSystem;
+import org.multiversekingesapi.render.animation.AnimationComponent;
+import org.multiversekingesapi.loader.EntityLoader;
+import org.multiversekingesapi.loader.TitanLoader;
+import org.multiversekingesapi.render.animation.AnimationSystem;
+import org.multiversekingesapi.render.RenderComponent;
+import org.multiversekingesapi.render.RenderSystem;
+import org.multiversekingesapi.SubSystem;
+import org.multiversekingesapi.field.component.HealthComponent;
+import org.multiversekingesapi.field.component.InfluenceComponent;
+import org.multiversekingesapi.loader.PlayerProperties;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
+import org.multiversekingesapi.field.AreaEventSystem;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.appstate.AbstractHexGridAppState;
+import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
@@ -93,7 +93,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     @Override
-    public String getSubSystemName() {
+    public String getSubSystemID() {
         return "BattleSystem";
     }
 
@@ -105,16 +105,16 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
         PlayerProperties properties = PlayerProperties.getInstance(app.getAssetManager());
         playerCore = entityData.createEntity();
-        entityData.setComponents(playerCore, new HexPositionComponent(startPosition),
-                new RenderComponent("Well", RenderType.Core, this),
+        entityData.setComponents(playerCore,
+                new RenderComponent(startPosition, "Well", RenderType.Core),
                 new AnimationComponent(Animation.SUMMON),
                 new HealthComponent(properties.getLevel() * 10),
                 new InfluenceComponent((byte) (1 + FastMath.floor((float) properties.getLevel() / 25f))));
     }
-    
-    private void removePlayerCore(){
+
+    private void removePlayerCore() {
         HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-        if(debugSystem != null){
+        if (debugSystem != null) {
             debugSystem.showDebug(true, startPosition, this);
         }
         entityData.removeEntity(playerCore);
@@ -149,8 +149,8 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         TitanLoader load = loader.loadTitanStats(name);
 //        HexCoordinate position = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
         entityData.setComponents(entityData.createEntity(),
-                new CardRenderComponent(CardRenderPosition.FIELD, name),
-                new RenderComponent(name, RenderType.Titan),
+                new CardRenderComponent(name, CardRenderPosition.FIELD, RenderType.Titan),
+                new RenderComponent(position, Rotation.C, name, RenderType.Titan),
                 new HexPositionComponent(position, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 new TimeBreakComponent(),
@@ -168,25 +168,24 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
 
     @Override
     public void onMouseAction(MouseInputEvent event) {
-        if (currentAction != null) {
-            confirmAction(event.getPosition());
-        } else {
-            Entity e = checkEntities(event.getPosition());
-            if (e != null) {
-                openEntityPropertiesMenu(e);
+        if (event.getType().equals(MouseInputEventType.LMB)) {
+            if (currentAction != null) {
+                confirmAction(event.getPosition());
+            } else {
+                Entity e = checkEntities(event.getPosition());
+                if (e != null) {
+                    openEntityPropertiesMenu(e);
+                }
             }
-        }
-    }
-
-    /**
-     * Used when the spatial is not selected directly.
-     */
-    @Override
-    public void rightMouseActionResult(MouseInputEvent event) {
-        if (currentAction == null) {
-            Entity e = checkEntities(event.getPosition());
-            if (e != null && entityData.getComponent(e.getId(), MoveToComponent.class) == null) {
-                openEntityActionMenu(e, event.getPosition());
+        } else if (event.getType().equals(MouseInputEventType.RMB)) {
+            /**
+             * Used when the spatial is not selected directly.
+             */
+            if (currentAction == null) {
+                Entity e = checkEntities(event.getPosition());
+                if (e != null && entityData.getComponent(e.getId(), MoveToComponent.class) == null) {
+                    openEntityActionMenu(e, event.getPosition());
+                }
             }
         }
     }
@@ -208,7 +207,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
         if (entities.isEmpty()) {
             return null;
         }
-        if(mouseInputType.equals(MouseInputEventType.RMB)) {
+        if (mouseInputType.equals(MouseInputEventType.RMB)) {
             CollisionResults results = renderSystem.subSystemCollideWith(this, ray);
             if (results.size() > 0) {
                 CollisionResult closest = results.getClosestCollision();
@@ -216,7 +215,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
                     Spatial s = closest.getGeometry().getParent();
                     do {
                         if (s != null && s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
-    //                        mouseSystem.setDebugPosition(closest.getContactPoint());
+                            //                        mouseSystem.setDebugPosition(closest.getContactPoint());
                             HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
                             return new MouseInputEvent(MouseInputEventType.RMB, pos, mapData.getTile(pos).getHeight(), ray, closest);
                         }
@@ -243,7 +242,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
                 case Core:
                     comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
                     comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
-                    app.getStateManager().getState(AreaGridSystem.class).showAreaRange(
+                    app.getStateManager().getState(AbstractHexGridAppState.class).showAreaRange(
                             e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
                     break;
                 case Debug:
@@ -296,7 +295,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     private void actionCancel() {
-        mouseSystem.setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
+        mouseSystem.getSelectionControl().setCursor(entityData.getComponent(inspectedId, HexPositionComponent.class).getPosition());
         currentAction = null;
         unregisterInput();
     }
@@ -335,7 +334,7 @@ public class BattleTrainingSystem extends EntitySystemAppState implements MouseR
     }
 
     @Override
-    public void removeSubSystem() {
+    public void rootSystemIsRemoved() {
         app.getStateManager().detach(this);
     }
 

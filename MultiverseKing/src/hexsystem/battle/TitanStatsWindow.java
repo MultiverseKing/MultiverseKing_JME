@@ -1,7 +1,7 @@
 package hexsystem.battle;
 
 import com.simsilica.es.Entity;
-import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
+import org.multiversekingesapi.loader.TitanLoader.InitialTitanStatsComponent;
 import tonegod.gui.core.ElementManager;
 
 /**

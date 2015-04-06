@@ -2,9 +2,9 @@ package gui;
 
 import com.simsilica.es.EntityId;
 import com.simsilica.es.PersistentComponent;
-import entitysystem.field.HealthComponent;
-import entitysystem.field.InfluenceComponent;
-import entitysystem.render.RenderComponent.RenderType;
+import org.multiversekingesapi.field.component.HealthComponent;
+import org.multiversekingesapi.field.component.InfluenceComponent;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import java.util.ArrayList;
 import org.hexgridapi.utility.Vector2Int;
 import tonegod.gui.core.Element;

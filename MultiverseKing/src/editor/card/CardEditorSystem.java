@@ -5,16 +5,16 @@ import com.jme3.math.Vector3f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import entitysystem.EntitySystemAppState;
-import entitysystem.attribut.CardRenderPosition;
-import entitysystem.card.CardRenderComponent;
-import entitysystem.render.RenderComponent;
-import entitysystem.render.RenderComponent.RenderType;
-import hexsystem.area.MapDataAppState;
+import org.multiversekingesapi.EntitySystemAppState;
+import org.multiversekingesapi.card.attribut.CardRenderPosition;
+import org.multiversekingesapi.card.CardRenderComponent;
+import org.multiversekingesapi.render.RenderComponent;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import java.util.ArrayList;
 import kingofmultiverse.MultiverseMain;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 
@@ -42,7 +42,7 @@ public class CardEditorSystem extends EntitySystemAppState {
         /**
          * Move the camera to the center of the map.
          */
-        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
+        Vector3f center = new HexCoordinate(HexCoordinate.Coordinate.OFFSET,
                 new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
         ((MultiverseMain) app).getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
     }
@@ -60,7 +60,7 @@ public class CardEditorSystem extends EntitySystemAppState {
     void addEntityCard(String name) {
         EntityId cardId = entityData.createEntity();
         entityData.setComponent(cardId, new RenderComponent(name, RenderType.Unit));
-        entityData.setComponent(cardId, new CardRenderComponent(CardRenderPosition.HAND, name));
+        entityData.setComponent(cardId, new CardRenderComponent(name, CardRenderPosition.HAND));
         entity.add(cardId);
     }
 

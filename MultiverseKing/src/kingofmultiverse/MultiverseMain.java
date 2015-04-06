@@ -1,6 +1,6 @@
 package kingofmultiverse;
 
-import utility.JSONLoader;
+import org.multiversekingesapi.utility.JSONLoader;
 import test.Player;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
@@ -8,14 +8,14 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Spatial;
-import entitysystem.EntityDataAppState;
+import org.multiversekingesapi.EntityDataAppState;
 import editor.EditorSystem;
 import hexsystem.area.MapDataAppState;
 import java.util.logging.Level;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.MapData;
 import tonegod.gui.core.Screen;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  * test

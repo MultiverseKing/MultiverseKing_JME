@@ -16,7 +16,7 @@ import gui.DialogWindow;
 import gui.DialogWindowListener;
 import gui.FileManagerPopup;
 import gui.LayoutWindow;
-import hexsystem.area.AreaEventSystem;
+import org.multiversekingesapi.field.AreaEventSystem;
 
 /**
  * rootMenu of the Game Editor.

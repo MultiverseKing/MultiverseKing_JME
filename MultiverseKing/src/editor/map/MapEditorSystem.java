@@ -1,6 +1,6 @@
 package editor.map;
 
-import entitysystem.EntitySystemAppState;
+import org.multiversekingesapi.EntitySystemAppState;
 import gui.FileManagerPopup;
 
 /**

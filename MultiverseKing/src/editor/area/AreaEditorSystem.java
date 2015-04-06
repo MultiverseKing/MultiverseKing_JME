@@ -5,9 +5,9 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import editor.EditorSystem;
 import editor.map.MapEditorSystem;
-import entitysystem.field.position.HexPositionComponent;
+import org.multiversekingesapi.field.position.HexPositionComponent;
 import gui.FileManagerPopup;
-import hexsystem.area.AreaEventSystem;
+import org.multiversekingesapi.field.AreaEventSystem;
 import hexsystem.area.AreaPropsComponent;
 import hexsystem.area.MapDataAppState;
 import kingofmultiverse.MultiverseMain;
@@ -21,7 +21,7 @@ import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  *

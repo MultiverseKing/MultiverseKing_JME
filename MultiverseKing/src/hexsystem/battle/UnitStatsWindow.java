@@ -2,9 +2,9 @@ package hexsystem.battle;
 
 import gui.PropertiesWindowOld;
 import com.simsilica.es.Entity;
-import entitysystem.loader.TitanLoader;
-import entitysystem.loader.TitanLoader.InitialTitanStatsComponent;
-import entitysystem.render.RenderComponent;
+import org.multiversekingesapi.loader.TitanLoader;
+import org.multiversekingesapi.loader.TitanLoader.InitialTitanStatsComponent;
+import org.multiversekingesapi.render.RenderComponent;
 import tonegod.gui.core.ElementManager;
 
 /**

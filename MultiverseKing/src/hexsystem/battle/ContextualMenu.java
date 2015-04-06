@@ -3,7 +3,7 @@ package hexsystem.battle;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.Camera;
 import com.simsilica.es.EntityId;
-import entitysystem.render.RenderComponent.RenderType;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import gui.CameraTrackWindow;
 import hexsystem.battle.BattleTrainingSystem.Action;
 import java.util.logging.Level;

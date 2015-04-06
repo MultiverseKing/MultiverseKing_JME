@@ -3,10 +3,10 @@ package editor.card;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
-import entitysystem.attribut.Rarity;
-import entitysystem.card.CardProperties;
-import entitysystem.card.Hover;
-import entitysystem.render.RenderComponent.RenderType;
+import org.multiversekingesapi.card.attribut.Rarity;
+import org.multiversekingesapi.loader.CardProperties;
+import org.multiversekingesapi.card.gui.Hover;
+import org.multiversekingesapi.render.RenderComponent.RenderType;
 import java.io.File;
 import java.io.FilenameFilter;
 import tonegod.gui.controls.buttons.ButtonAdapter;
@@ -14,7 +14,7 @@ import tonegod.gui.controls.menuing.Menu;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 import tonegod.gui.effects.Effect;
-import utility.ElementalAttribut;
+import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
  *

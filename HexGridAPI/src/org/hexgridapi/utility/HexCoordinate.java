@@ -117,17 +117,6 @@ public final class HexCoordinate {
     
     /**
      * Convert Hex grid position to world position.
-     * Take in account y as Floor as 
-     * this.y = (HexSettings.GROUND_HEIGHT*HexSettings.FLOOR_OFFSET)
-     * @return tile world unit position.
-     */
-    public Vector3f convertToWorldPositionYAsFloor() {
-        Vector3f result = convertToWorldPosition();
-        result.y += HexSetting.GROUND_HEIGHT*HexSetting.FLOOR_OFFSET;
-        return result;
-    }
-    /**
-     * Convert Hex grid position to world position.
      * Tile height converted to world height.
      * @return tile world unit position.
      */

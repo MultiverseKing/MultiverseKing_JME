@@ -8,16 +8,12 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.control.AbstractControl;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.mesh.MeshGenerator;
@@ -42,7 +38,7 @@ public class TileSelectionControl implements TileInputListener {
     private boolean isSelectionGroup = false;
     private HexCoordinate selectedTile;
     private CursorControl cursorControl;
-    
+
     public void initialise(Application app) {
         if (mat == null) {
             mat = app.getAssetManager().loadMaterial("Materials/hexMat.j3m");
@@ -107,7 +103,7 @@ public class TileSelectionControl implements TileInputListener {
                         cursorControl.setHeight(0);
                         //                    tile.setLocalTranslation(event.getTilePos().convertToWorldPosition());
                     }
-                } else if (selectedTile.equals(events[i].getTilePos()) && events[i].getNewTile() != null){
+                } else if (selectedTile.equals(events[i].getTilePos()) && events[i].getNewTile() != null) {
                     cursorControl.setHeight(events[i].getNewTile().getHeight());
                 }
             }
@@ -118,6 +114,10 @@ public class TileSelectionControl implements TileInputListener {
         this.listeners.add(listener);
     }
     
+    public void removeTileListener(TileSelectionListener listener) {
+        this.listeners.remove(listener);
+    }
+
     @Override
     public void onMouseAction(MouseInputEvent event) {
         if (event.getType().equals(MouseInputEvent.MouseInputEventType.LMB) && event.getPosition() != null) {
@@ -152,13 +152,13 @@ public class TileSelectionControl implements TileInputListener {
         cursorControl.setPosition(pos, height);
         updateListeners();
     }
-    
-    private void addGeo(HexCoordinate pos, int height){
+
+    private void addGeo(HexCoordinate pos, int height) {
         Geometry geo = new Geometry(pos.getAsOffset().toString(), getMesh(height));
         geo.setMaterial(mat);
         geo.setLocalTranslation(pos.convertToWorldPosition());
         node.attachChild(geo);
-        
+
     }
 
     private void updateListeners() {

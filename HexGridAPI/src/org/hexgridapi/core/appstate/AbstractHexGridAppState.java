@@ -17,7 +17,7 @@ import org.hexgridapi.core.MapData;
 public abstract class AbstractHexGridAppState extends HexGrid implements AppState {
 
     /**
-     * Is initilized at the first initilisation.
+     * Is initialized on the first initialization.
      */
     private boolean initialized = false;
     /**

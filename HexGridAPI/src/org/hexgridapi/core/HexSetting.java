@@ -34,14 +34,9 @@ public final class HexSetting {
      */
     public final static float FLOOR_OFFSET = 1f;
     /**
-     * Offset value used to put the ground, to have underground without having
-     * to handle negative value, mainly help with the meshManager and how
-     * geometry is handle, generated.
-     */
-    public final static int GROUND_HEIGHT = 5;
-    /**
      * Used to know how many chunk to keep in memory before purging it.
      * Unused for the time being.
+     * @deprecated 
      */
     public final static int CHUNK_DATA_LIMIT = 4;
 }

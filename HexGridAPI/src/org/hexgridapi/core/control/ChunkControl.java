@@ -13,8 +13,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
-import org.hexgridapi.core.HexGrid.MatType;
-import static org.hexgridapi.core.HexGrid.MatType.TOON;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.MapData.GhostMode;
 import org.hexgridapi.core.mesh.MeshParameter;

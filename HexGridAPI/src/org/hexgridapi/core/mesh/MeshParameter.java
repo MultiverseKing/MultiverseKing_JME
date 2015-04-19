@@ -107,15 +107,18 @@ public final class MeshParameter {
 //                    }
 //                    Integer tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
 
-                    this.add(new Vector2Int(x, y), new Vector2Int(1, 1), tileHeight);
-                    setSizeX(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkInitTile);
+                    this.add(new Vector2Int(x, y), tileHeight);
+                    setSize(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkInitTile);
                     elementID++;
                 }
             }
         }
     }
 
-    private void setSizeX(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+    private void setSize(HexCoordinate centerPos, int radius, int inspectedID, 
+            boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+        
+        // Define the size on X.
         for (int x = 1; x < isVisited.length - position.get(inspectedID).x; x++) {
             boolean alreadyVisited = isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y];
             HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, inspectedID, x, 0, chunkOffset));
@@ -133,14 +136,16 @@ public final class MeshParameter {
                 this.size.get(inspectedID).x++;
                 isVisited[x + position.get(inspectedID).x][position.get(inspectedID).y] = true;
             } else {
-                setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
-                return;
+                break;
+//                setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
+//                return;
             }
         }
-        setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
-    }
-
-    private void setSizeY(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+//        setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
+//    }
+//
+//    private void setSizeY(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+        // Define the size on Y.
         for (int y = 1; y < isVisited.length - position.get(inspectedID).y; y++) {
             //We check if the next Y line got the same properties
             for (int x = 0; x < size.get(inspectedID).x; x++) {
@@ -209,6 +214,7 @@ public final class MeshParameter {
     private boolean[][] getVisitedList(int radius) {
         int chunkSize = radius < 1 ? HexSetting.CHUNK_SIZE : (radius * 2) + 1;
         boolean[][] isVisited = new boolean[chunkSize][chunkSize];
+        //todo remove
         for (int y = 0; y < chunkSize; y++) {
             for (int x = 0; x < chunkSize; x++) {
                 isVisited[x][y] = false;
@@ -217,9 +223,9 @@ public final class MeshParameter {
         return isVisited;
     }
 
-    private void add(Vector2Int position, Vector2Int size, Integer height) {
+    private void add(Vector2Int position, Integer height) {
         this.position.add(position);
-        this.size.add(size);
+        this.size.add(new Vector2Int(1,1));
         this.height.add(height == null ? 0 : height);
     }
 

@@ -1,7 +1,7 @@
-package hexmapeditor.gui;
+package hexmapeditor.gui.hexmap;
 
-import gui.control.ComboBoxRenderer;
-import gui.control.JPropertiesPanel;
+import gui.ComboBoxRenderer;
+import gui.JPropertiesPanel;
 import hexmapeditor.HexMapSystem;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -33,6 +33,7 @@ import org.hexgridapi.events.TileChangeListener;
 import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.utility.HexCoordinate;
 import core.EditorMain;
+import hexmapeditor.gui.JCursorPositionPanel;
 
 /**
  *
@@ -69,7 +70,7 @@ public class JHexPropertiesPanel extends JPropertiesPanel {
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
         addComp(separator);
         
-        add(new JCursorPanel(editorMain.getStateManager().getState(MouseControlSystem.class)));
+        add(new JCursorPositionPanel(editorMain.getStateManager().getState(MouseControlSystem.class)));
         
         JCheckBox box = new JCheckBox(new AbstractAction("Show ghost") {
             @Override

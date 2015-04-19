@@ -1,6 +1,8 @@
 package hexmapeditor.gui;
 
-import gui.control.JPropertiesPanel;
+import hexmapeditor.gui.hexmap.JHexPropertiesPanel;
+import hexmapeditor.gui.entitysystem.JESPropertiesPanel;
+import gui.JPropertiesPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

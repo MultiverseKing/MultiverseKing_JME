@@ -1,4 +1,4 @@
-package hexmapeditor.gui;
+package hexmapeditor.gui.entitysystem;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;

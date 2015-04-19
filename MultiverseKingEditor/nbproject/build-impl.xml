@@ -20,10 +20,10 @@ is divided into following sections:
 
         -->
 <project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="MultiverseKingEditor-impl">
-    <import file="assets-impl.xml"/>
     <import file="macapp-impl.xml"/>
-    <import file="launch4j-impl.xml"/>
+    <import file="assets-impl.xml"/>
     <import file="linuxlauncher-impl.xml"/>
+    <import file="launch4j-impl.xml"/>
     <fail message="Please build using Ant 1.8.0 or higher.">
         <condition>
             <not>
@@ -912,8 +912,8 @@ is divided into following sections:
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-jar.properties}"/>
-            <param location="${project.MultiverseKingESAPI}" name="call.subproject"/>
-            <param location="${project.MultiverseKingESAPI}/build.xml" name="call.script"/>
+            <param location="${project.MultiverseKingCore}" name="call.subproject"/>
+            <param location="${project.MultiverseKingCore}/build.xml" name="call.script"/>
             <param name="call.target" value="jar"/>
             <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
         </antcall>
@@ -1049,7 +1049,7 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-post-jar,-linux-launcher,-launch4j-exe,-mac-app" description="Build JAR." name="jar"/>
+    <target depends="init,compile,-pre-jar,-do-jar-with-manifest,-do-jar-without-manifest,-do-jar-with-mainclass,-do-jar-with-libraries,-post-jar,-launch4j-exe,-linux-launcher,-mac-app" description="Build JAR." name="jar"/>
     <!--
                 =================
                 EXECUTION SECTION
@@ -1413,8 +1413,8 @@ is divided into following sections:
         </antcall>
         <antcall target="-maybe-call-dep">
             <param name="call.built.properties" value="${built-clean.properties}"/>
-            <param location="${project.MultiverseKingESAPI}" name="call.subproject"/>
-            <param location="${project.MultiverseKingESAPI}/build.xml" name="call.script"/>
+            <param location="${project.MultiverseKingCore}" name="call.subproject"/>
+            <param location="${project.MultiverseKingCore}/build.xml" name="call.script"/>
             <param name="call.target" value="clean"/>
             <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
         </antcall>

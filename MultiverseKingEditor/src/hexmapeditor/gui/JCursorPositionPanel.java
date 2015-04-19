@@ -19,13 +19,13 @@ import org.hexgridapi.utility.HexCoordinate;
  *
  * @author roah
  */
-public class JCursorPanel extends JPanel {
+public class JCursorPositionPanel extends JPanel {
     
     private static HexCoordinate cursorPos;
     private JLabel cursorPosition = new JLabel("Hex pos : null");
     private JLabel chunkPosition = new JLabel("Chunk pos: null");
 
-    public JCursorPanel(MouseControlSystem system) {
+    public JCursorPositionPanel(MouseControlSystem system) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setAlignmentX(0);
         setBorder(BorderFactory.createTitledBorder("Cursor Property"));

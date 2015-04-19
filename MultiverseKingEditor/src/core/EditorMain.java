@@ -1,6 +1,8 @@
 package core;
 
-import hexmapeditor.gui.JHexEditorMenu;
+import org.multiversekingesapi.RTSCamera;
+import org.multiversekingesapi.DefaultParam;
+import hexmapeditor.gui.hexmap.JHexEditorMenu;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -8,7 +10,8 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 import hexmapeditor.HexMapSystem;
-import hexmapeditor.gui.JHexEditorMenu.HexMenuAction;
+import battle.JPlayEditorMenu;
+import hexmapeditor.gui.hexmap.JHexEditorMenu.HexMenuAction;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
@@ -21,6 +24,7 @@ import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.multiversekingesapi.EntityDataAppState;
+import org.multiversekingesapi.MultiverseCoreApp;
 import org.multiversekingesapi.field.AreaEventSystem;
 import org.multiversekingesapi.field.position.HexPositionSystem;
 import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
@@ -30,7 +34,7 @@ import org.multiversekingesapi.render.RenderSystem;
  *
  * @author normenhansen, roah
  */
-public class EditorMain extends SimpleApplication {
+public class EditorMain extends MultiverseCoreApp {
 
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -85,7 +89,6 @@ public class EditorMain extends SimpleApplication {
         });
     }
     private final JFrame rootWindow;
-    private RTSCamera rtsCam;
     private boolean isStart = false;
 
     public EditorMain(JFrame rootWindow) {
@@ -100,14 +103,11 @@ public class EditorMain extends SimpleApplication {
         return rootWindow;
     }
 
-    public RTSCamera getRtsCam() {
-        return rtsCam;
-    }
-
     @Override
     public void simpleInitApp() {
+        super.simpleInitApp();
         super.inputManager.clearMappings();
-        rtsCam = new DefaultParam(this, false).getCam();
+//        rtsCam = new DefaultParam(this, false).getCam();
     }
 
     public void startAreaEditor() {
@@ -126,6 +126,10 @@ public class EditorMain extends SimpleApplication {
                 new AreaEventRenderDebugSystem());
 
         rootWindow.getContentPane().add(((JmeCanvasContext) this.getContext()).getCanvas(), BorderLayout.CENTER);
+        
+        JPlayEditorMenu playEditorMenu = new JPlayEditorMenu(this);
+        rootWindow.getJMenuBar().add(playEditorMenu);
+                
         isStart = true;
     }
 

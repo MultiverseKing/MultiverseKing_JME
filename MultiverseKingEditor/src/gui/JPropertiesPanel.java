@@ -1,4 +1,4 @@
-package gui.control;
+package gui;
 
 import com.jme3.texture.Image;
 import java.awt.Component;

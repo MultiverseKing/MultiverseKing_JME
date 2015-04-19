@@ -1,4 +1,4 @@
-package hexmapeditor.gui;
+package hexmapeditor.gui.hexmap;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import core.EditorMain;
+import hexmapeditor.gui.JPropertiesPanelHolder;
 
 /**
  *
@@ -14,11 +15,11 @@ import core.EditorMain;
  */
 public final class JHexEditorMenu extends JMenu {
 
-    private final EditorMain editorMain;
+    private final EditorMain main;
 
     public JHexEditorMenu(EditorMain editorMain) {
         super("Hex Editor");
-        this.editorMain = editorMain;
+        this.main = editorMain;
     }
     
     public void setAction(HexMenuAction action){
@@ -34,13 +35,13 @@ public final class JHexEditorMenu extends JMenu {
     public void onAction(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "New Map":
-                if(!editorMain.isStart()){
-                    editorMain.enqueue(new Callable<Void>() {
+                if(!main.isStart()){
+                    main.enqueue(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            editorMain.startAreaEditor();
-                            editorMain.getRootWindow().add(new JPropertiesPanelHolder(editorMain), BorderLayout.EAST);
-                            editorMain.getRootWindow().revalidate();
+                            main.startAreaEditor();
+                            main.getRootWindow().add(new JPropertiesPanelHolder(main), BorderLayout.EAST);
+                            main.getRootWindow().revalidate();
                             return null;
                         }
                     });
@@ -51,8 +52,8 @@ public final class JHexEditorMenu extends JMenu {
                 }
                 break;
             case "Load Map":
-                JLoaderDialog loadDialog = new JLoaderDialog(editorMain.getRootWindow(), false);
-                loadDialog.setLocationRelativeTo(editorMain.getRootWindow());
+                JLoaderDialog loadDialog = new JLoaderDialog(main.getRootWindow(), false);
+                loadDialog.setLocationRelativeTo(main.getRootWindow());
                 loadDialog.setVisible(true);
 
                 String loadName = loadDialog.getValidatedText();
@@ -63,15 +64,15 @@ public final class JHexEditorMenu extends JMenu {
                 loadDialog.dispose();
                 break;
             case "Save Map":
-                JLoaderDialog saveDialog = new JLoaderDialog(editorMain.getRootWindow(), 
-                        editorMain.getStateManager().getState(MapDataAppState.class).getMapData().getMapName());
-                saveDialog.setLocationRelativeTo(editorMain.getRootWindow());
+                JLoaderDialog saveDialog = new JLoaderDialog(main.getRootWindow(), 
+                        main.getStateManager().getState(MapDataAppState.class).getMapData().getMapName());
+                saveDialog.setLocationRelativeTo(main.getRootWindow());
                 saveDialog.setModal(true);
                 saveDialog.setVisible(true);
                 String saveName = saveDialog.getValidatedText();
                 if (saveName != null) {
                     //The text is valid.
-                    editorMain.enqueue(new Callable<Void>() {
+                    main.enqueue(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
 //                            editorSystem.save(null);

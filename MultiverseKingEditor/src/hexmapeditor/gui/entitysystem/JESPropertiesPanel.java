@@ -1,19 +1,17 @@
-package hexmapeditor.gui;
+package hexmapeditor.gui.entitysystem;
 
-import gui.control.JPropertiesPanel;
+import hexmapeditor.gui.entitysystem.JESEventDialog;
+import gui.JPropertiesPanel;
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import core.EditorMain;
+import hexmapeditor.gui.JCursorPositionPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
-import static java.awt.image.ImageObserver.WIDTH;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -35,7 +33,7 @@ import org.multiversekingesapi.field.component.AreaEventComponent;
 public class JESPropertiesPanel extends JPropertiesPanel {
 
     private final EditorMain editorMain;
-    private JCursorPanel cursorPan;
+    private JCursorPositionPanel cursorPan;
     private HashMap<String, Component> comps = new HashMap<>();
     private final AreaEventSystem system;
     private JPanel eventPan = new JPanel();
@@ -52,7 +50,7 @@ public class JESPropertiesPanel extends JPropertiesPanel {
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
         addComp(separator);
 
-        cursorPan = new JCursorPanel(editorMain.getStateManager().getState(MouseControlSystem.class));
+        cursorPan = new JCursorPositionPanel(editorMain.getStateManager().getState(MouseControlSystem.class));
         add(cursorPan);
         editorMain.getStateManager().getState(MouseControlSystem.class).getSelectionControl().registerTileListener(selectionListener);
         system = editorMain.getStateManager().getState(AreaEventSystem.class);

@@ -1,5 +1,9 @@
 package org.multiversekingesapi.battle;
 
+import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
@@ -9,6 +13,7 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import com.simsilica.es.PersistentComponent;
@@ -22,8 +27,8 @@ import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
-import org.multiversekingesapi.EntitySystemAppState;
-import org.multiversekingesapi.MultiverseCoreApp;
+import org.multiversekingesapi.EntityDataAppState;
+import org.multiversekingesapi.IMultiverCoreGUI;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.card.CardRenderComponent;
 import org.multiversekingesapi.card.attribut.CardRenderPosition;
@@ -47,12 +52,15 @@ import org.multiversekingesapi.render.animation.AnimationSystem;
 import tonegod.gui.core.Screen;
 
 /**
- * TODO: This should extends from game Battle system.
+ * TODO: This do too much work should be split on multiple part as :
+ * Battle Unit Control System / Battle Initialisation
  *
  * @author roah
  */
-public class BattleSystem extends EntitySystemAppState implements MouseRayListener, SubSystem {
+public class BattleSystem extends AbstractAppState implements MouseRayListener, SubSystem {
 
+    private SimpleApplication app;
+    private EntityData entityData;
     private MapData mapData;
     private RenderSystem renderSystem;
     private MouseControlSystem mouseSystem;
@@ -67,7 +75,9 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     }
 
     @Override
-    protected EntitySet initialiseSystem() {
+    public void initialize(AppStateManager stateManager, Application app) {
+        this.app = (SimpleApplication) app;
+        entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
         debugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
 //        if (mapData.getAllChunkPos().isEmpty()) {
@@ -94,7 +104,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
 //        addEntityTitan("TuxDoll");
 //        addEntityTitan("Gilga");
 //        camToStartPosition();
-        return entityData.getEntities(HexPositionComponent.class, RenderComponent.class);
+        super.initialized = true;
     }
 
     private void initialisePlayerCore() {
@@ -123,23 +133,14 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     /**
      * Move the camera to the center of the map.
      */
-    private void camToStartPosition() {
-        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-        Vector3f center = startPosition.convertToWorldPosition();
-//        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
-//                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
-        ((MultiverseCoreApp) app).getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
-    }
-
-    @Override
-    protected void updateSystem(float tpf) {
-//        battleGUI.update(tpf);
-    }
-
-    @Override
-    protected void addEntity(Entity e) {
-    }
-
+//    private void camToStartPosition() {
+//        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+//        Vector3f center = startPosition.convertToWorldPosition();
+////        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
+////                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
+//        ((HexGridEditorMain) app).getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
+//    }
+    
     public void addEntityTitan(String name, HexCoordinate position) {
         EntityLoader loader = new EntityLoader(app);
         TitanLoader load = loader.loadTitanStats(name);
@@ -152,17 +153,10 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
                 load.getInitialStatsComponent(),
                 load.getInitialStatsComponent().getMovementComponent());
     }
-
-    @Override
-    protected void updateEntity(Entity e) {
-    }
-
-    @Override
-    protected void removeEntity(Entity e) {
-    }
-
+    
     @Override
     public MouseInputEvent MouseRayInputAction(MouseInputEventType mouseInputType, Ray ray) {
+        EntitySet entities = entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
         if (entities.isEmpty()) {
             return null;
         }
@@ -209,6 +203,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     }
 
     private Entity checkEntities(HexCoordinate coord) {
+        EntitySet entities = entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
         for (Entity e : entities) {
             if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)) {
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
@@ -316,7 +311,7 @@ public class BattleSystem extends EntitySystemAppState implements MouseRayListen
     }
 
     @Override
-    protected void cleanupSystem() {
+    public void cleanup() {
 //        battleGUI.removeFromScreen();
         removePlayerCore();
         mapData.Cleanup();

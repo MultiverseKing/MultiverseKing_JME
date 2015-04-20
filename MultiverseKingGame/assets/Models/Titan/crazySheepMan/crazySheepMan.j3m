@@ -1,0 +1,14 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        DiffuseMap : Models/Units/crazySheepMan/Color.png
+        Specular : 1.0 1.0 1.0 1.0
+        Diffuse : 1.0 1.0 1.0 1.0
+        NormalMap : Models/Units/crazySheepMan/Normal.png
+        SpecularMap : Models/Units/crazySheepMan/SpecularIntensity.png
+        HighQuality : false
+        ColorRamp : Models/Units/TuxDoll/ramp2.png
+     }
+    AdditionalRenderState {
+      ColorWrite On
+    }
+}

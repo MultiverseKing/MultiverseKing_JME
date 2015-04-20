@@ -1,0 +1,20 @@
+Material MyMaterial : ShaderBlow/MatDefs/LightBlow/LightBlow.j3md {
+    MaterialParameters {
+        DiffuseMap : Repeat Models/Core/Well/DifuseGroup.png
+        Toon : true
+        EdgesColor : 1.0 0.0 0.0 1.0
+        EdgeSize : 0.5
+        Nor_Inv_Y : false
+    }
+    AdditionalRenderState {
+      FaceCull Back
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+    }
+}

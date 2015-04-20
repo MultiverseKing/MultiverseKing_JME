@@ -1,0 +1,31 @@
+Material MyMaterial : ShaderBlow/MatDefs/LightBlow/LightBlow.j3md {
+    MaterialParameters {
+        DiffuseMap : Textures/Units/SpiderColor.png
+        ColorRamp : Textures/Units/ramp2.png
+        Specular_Lighting : false
+        Toon : false
+        LATC : false
+        LightMap_G : false
+        Spec_A_Dif : false
+        Multiply_Color : false
+        Fog_Edges : false
+        Linear_Lighting : false
+        Nor_Inv_X : false
+        OverlayLightmap : false
+        SteepParallax : false
+        Shininess : 0.0
+        LightMap_R : false
+        EmissiveMap : false
+    }
+    AdditionalRenderState {
+      FaceCull Back
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.1
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+    }
+}

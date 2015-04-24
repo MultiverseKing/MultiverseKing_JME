@@ -6,9 +6,9 @@
    "UnitStats":{
       "healthPoint":50000,
       "atb":10,
-      "speed":10,
+      "loadSpeed":10,
       "moveRange":5,
-      "moveSpeed":2.8,
+      "moveSpeed":1.5,
       "Ability":[
          "null"
       ],
@@ -23,7 +23,6 @@
     "TitanStats":{
         "atbBurst":5,
         "influenceRange":5,
-        "energy":100,
         "weaponSlots":4
     }
 }

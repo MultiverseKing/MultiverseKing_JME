@@ -7,7 +7,7 @@
    "UnitStats":{
       "healthPoint":100,
       "atb":3,
-      "speed":10,
+      "loadSpeed":10,
       "moveRange":3,
       "moveSpeed":1.5,
       "Ability":[

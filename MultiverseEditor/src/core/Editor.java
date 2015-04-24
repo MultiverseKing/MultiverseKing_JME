@@ -1,6 +1,5 @@
 package core;
 
-import battle.JPlayEditorMenu;
 import core.entitysystem.JESPropertiesPanel;
 import hexmapeditor.gui.JPropertiesPanelHolder;
 import java.awt.Component;
@@ -41,8 +40,8 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
         getStateManager().attachAll(
                 new EntityDataAppState(),
                 new RenderSystem(),
-                new AreaEventSystem(),
                 new HexPositionSystem(),
+                new AreaEventSystem(),
                 new AreaEventRenderDebugSystem());
 
         JPlayEditorMenu playEditorMenu = new JPlayEditorMenu(this);

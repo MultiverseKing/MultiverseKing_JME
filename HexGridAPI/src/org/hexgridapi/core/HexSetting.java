@@ -32,7 +32,7 @@ public final class HexSetting {
     /**
      * WU distance between two hex of different height.
      */
-    public final static float FLOOR_OFFSET = 1f;
+    public final static float FLOOR_OFFSET = 0.5f;
     /**
      * Used to know how many chunk to keep in memory before purging it.
      * Unused for the time being.

@@ -1,6 +1,7 @@
 package org.hexgridapi.pathfinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import org.hexgridapi.core.HexTile;
@@ -10,7 +11,7 @@ import org.hexgridapi.utility.HexCoordinate;
 /**
  * A* algorithm, should be faster than Dijkstra.
  *
- * @author Eike Foede
+ * @author Eike Foede, roah
  */
 public class Astar implements Pathfinder {
 
@@ -56,9 +57,10 @@ public class Astar implements Pathfinder {
                             ArrayList<HexCoordinate> way = new ArrayList<HexCoordinate>();
                             way.add(next);
                             while (point != null) {
-                                way.add(0, point.thisPoint);
+                                way.add(point.thisPoint);
                                 point = point.lastPoint;
                             }
+                            Collections.reverse(way);
 //                                System.out.println((System.nanoTime() - time)/100000);
                             return way;
                         }

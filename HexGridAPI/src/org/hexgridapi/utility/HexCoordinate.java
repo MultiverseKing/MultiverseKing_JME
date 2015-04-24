@@ -129,7 +129,7 @@ public final class HexCoordinate {
     /**
      * Return the distance from this to the provided value.
      * @param other
-     * @return
+     * @return hexDistance
      */
     public int distanceTo(HexCoordinate other) {
         return (Math.abs(q - other.q) + Math.abs(r - other.r)

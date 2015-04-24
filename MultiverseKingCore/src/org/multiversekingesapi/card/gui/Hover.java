@@ -5,7 +5,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import org.multiversekingesapi.card.attribut.Rarity;
 import org.multiversekingesapi.loader.CardProperties;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import org.multiversekingesapi.utility.ElementalAttribut;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;

@@ -4,7 +4,7 @@ import com.simsilica.es.EntityComponent;
 import com.simsilica.es.PersistentComponent;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
-import org.multiversekingesapi.render.utility.Curve;
+import org.multiversekingesapi.SubSystem;
 
 /**
  *
@@ -12,7 +12,7 @@ import org.multiversekingesapi.render.utility.Curve;
  */
 public class HexPositionComponent implements PersistentComponent {
 
-    private final Curve curve;
+    private final SubSystem system;
     private final HexCoordinate position;
     private final Rotation rotation;
 
@@ -24,10 +24,10 @@ public class HexPositionComponent implements PersistentComponent {
         this(position, rotation, null);
     }
 
-    public HexPositionComponent(HexCoordinate position, Rotation rotation, Curve curve) {
+    public HexPositionComponent(HexCoordinate position, Rotation rotation, SubSystem system) {
         this.position = position;
         this.rotation = rotation;
-        this.curve = curve;
+        this.system = system;
     }
 
     /**
@@ -47,58 +47,67 @@ public class HexPositionComponent implements PersistentComponent {
     }
 
     /**
-     * Curve to use when the entity position is updated.
-     *
-     * @return
+     * SubSystem who will take into charge the positioning.
+     * /!\ When settings this the HexPosition System will not handle the positioning,
+     * it have to be handled by the subSystem registered.
      */
-    public Curve getCurve() {
-        return curve;
+    public SubSystem getSubSystem() {
+        return system;
     }
 
     @Override
     public HexPositionComponent clone() {
-        return new HexPositionComponent(position, rotation, curve);
+        return new HexPositionComponent(position, rotation, system);
     }
 
     /**
-     * Create a movement with modifiate rotation.
+     * Clone component with modifiate rotation.
      *
      * @param rot new rotation.
      * @return the cloned component.
      */
     public HexPositionComponent clone(Rotation rot) {
-        return new HexPositionComponent(position, rot, curve);
+        return new HexPositionComponent(position, rot, system);
     }
 
     /**
-     * Create a movement with modifiate position.
+     * Clone component with modifiate position.
      *
      * @param pos new position.
      * @return the cloned component.
      */
     public HexPositionComponent clone(HexCoordinate pos) {
-        return new HexPositionComponent(pos, rotation, curve);
+        return new HexPositionComponent(pos, rotation, system);
     }
 
     /**
-     * Create interpolation from this component.
-     *
-     * @param CurveType interpolation type.
+     * Clone component removing the SubSystem Constraint.
+     * 
      * @return the cloned component.
      */
-    public HexPositionComponent movement(Curve curve) {
-        return new HexPositionComponent(position, rotation, curve);
-    }
-
-    public EntityComponent cloneWithoutCurve() {
+    public EntityComponent cloneWithoutSubSystem() {
         return new HexPositionComponent(position, rotation);
     }
 
-    EntityComponent cloneWithoutCurve(HexCoordinate position) {
+    /**
+     * Clone component removing the SubSystem Constraint
+     * && setting a new position.
+     * 
+     * @param position new position.
+     * @return the cloned component.
+     */
+    EntityComponent cloneWithoutSubSystem(HexCoordinate position) {
         return new HexPositionComponent(position, rotation);
     }
-
-    EntityComponent cloneWithoutCurve(HexCoordinate position, Rotation rotation) {
-        return new HexPositionComponent(position, rotation);
+    
+    /**
+     * Clone component removing the SubSystem Constraint
+     * && setting a new rotation.
+     * 
+     * @param rot new rotation.
+     * @return the cloned component.
+     */
+    EntityComponent cloneWithoutSubSystem(Rotation rot) {
+        return new HexPositionComponent(position, rot);
     }
 }

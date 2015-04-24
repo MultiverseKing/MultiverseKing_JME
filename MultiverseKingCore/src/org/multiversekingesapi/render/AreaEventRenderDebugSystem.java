@@ -1,5 +1,6 @@
 package org.multiversekingesapi.render;
 
+import com.jme3.scene.Node;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import org.multiversekingesapi.EntitySystemAppState;
@@ -10,7 +11,7 @@ import org.hexgridapi.utility.HexCoordinate;
 import org.multiversekingesapi.field.component.AreaEventComponent;
 import org.multiversekingesapi.field.component.AreaEventComponent.Event;
 import org.multiversekingesapi.field.position.HexPositionComponent;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 
 /**
  *

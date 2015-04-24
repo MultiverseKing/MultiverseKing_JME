@@ -1,11 +1,10 @@
 package org.multiversekingesapi.loader;
 
-import org.multiversekingesapi.field.component.WeaponSlotsComponent;
-import org.multiversekingesapi.field.component.EnergyComponent;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
+import org.json.simple.JSONObject;
 import org.multiversekingesapi.field.component.ATBBurstComponent;
 import org.multiversekingesapi.field.component.InfluenceComponent;
-import org.multiversekingesapi.render.Render.RenderType;
-import org.json.simple.JSONObject;
+import org.multiversekingesapi.field.component.WeaponSlotsComponent;
 
 /**
  *
@@ -17,17 +16,15 @@ public class TitanLoader extends UnitLoader {
 
     TitanLoader(JSONObject data, EntityLoader eLoader) {
         super((JSONObject) data.get(RenderType.Unit.toString() + "Stats"), eLoader);
-        JSONObject titanData = (JSONObject) data.get(RenderType.Unit.toString() + "Stats");
+        JSONObject titanData = (JSONObject) data.get(RenderType.Titan.toString() + "Stats");
 
         Number influenceRange = (Number) titanData.get("influenceRange");
         Number atbBurst = (Number) titanData.get("atbBurst");
-        Number energy = (Number) titanData.get("energy");
         Number weaponSlots = (Number) titanData.get("weaponSlots");
 
         initialStatsComponent = new InitialTitanStatsComponent(
                 influenceRange.byteValue(),
                 atbBurst.byteValue(),
-                energy.intValue(),
                 weaponSlots.byteValue(),
                 super.getInitialStatsComponent());
     }
@@ -41,17 +38,18 @@ public class TitanLoader extends UnitLoader {
 
         private final byte influenceRange;
         private final byte maxAtbBurst;
-        private final int maxEnergy;
         private final byte weaponSlots;
 
-        private InitialTitanStatsComponent(byte influenceRange, byte maxAtbBurst, int maxEnergy, byte weaponSlots, InitialUnitStatsComponent stats) {
+        private InitialTitanStatsComponent(byte influenceRange, byte maxAtbBurst, byte weaponSlots, InitialUnitStatsComponent stats) {
             super(stats);
             this.influenceRange = influenceRange;
             this.maxAtbBurst = maxAtbBurst;
-            this.maxEnergy = maxEnergy;
             this.weaponSlots = weaponSlots;
         }
 
+        /**
+         * Range of the titan where he can Corrupt tiles arround him.
+         */
         public byte getInfluenceRange() {
             return influenceRange;
         }
@@ -60,6 +58,9 @@ public class TitanLoader extends UnitLoader {
             return new InfluenceComponent(influenceRange);
         }
 
+        /**
+         * Battle Burst gauge size of the titan.
+         */
         public byte getMaxAtbBurst() {
             return maxAtbBurst;
         }
@@ -68,14 +69,9 @@ public class TitanLoader extends UnitLoader {
             return new ATBBurstComponent(maxAtbBurst);
         }
 
-        public int getMaxEnergy() {
-            return maxEnergy;
-        }
-
-        public EnergyComponent getEnergyComponent() {
-            return new EnergyComponent(maxEnergy);
-        }
-
+        /**
+         * Weapon the titan can hold during battle.
+         */
         public byte getWeaponSlots() {
             return weaponSlots;
         }

@@ -5,7 +5,7 @@ import com.jme3.asset.AssetKey;
 import org.multiversekingesapi.ability.AbilityComponent;
 import org.multiversekingesapi.field.Collision;
 import org.multiversekingesapi.field.Collision.CollisionData;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

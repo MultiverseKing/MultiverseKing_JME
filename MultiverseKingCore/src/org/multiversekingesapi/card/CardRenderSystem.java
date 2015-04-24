@@ -29,15 +29,15 @@ import org.multiversekingesapi.field.component.EAttributComponent;
 //import org.multiversekingesapi.field.position.HexPositionComponent;
 import org.multiversekingesapi.loader.EntityLoader;
 import org.multiversekingesapi.loader.UnitLoader;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
 
 /**
  * System used to render all card on the screen.
  *
- * @todo Render card on a better way.
- * @todo Render the opponent hand, show how many card the opponent got in
+ * @todo AbstractRender card on a better way.
+ * @todo AbstractRender the opponent hand, show how many card the opponent got in
  * hand(opposite side).
  * @author roah
  */
@@ -88,7 +88,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
     /**
      * Show properties of a card currenty previewed.
      *
-     * @todo Render it on a better way.
+     * @todo AbstractRender it on a better way.
      */
     Window castDebug;
     /**

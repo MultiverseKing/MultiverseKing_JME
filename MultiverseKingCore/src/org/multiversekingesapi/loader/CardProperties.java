@@ -1,6 +1,6 @@
 package org.multiversekingesapi.loader;
 
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import org.json.simple.JSONObject;
 import org.multiversekingesapi.card.attribut.Rarity;
 import org.multiversekingesapi.utility.ElementalAttribut;

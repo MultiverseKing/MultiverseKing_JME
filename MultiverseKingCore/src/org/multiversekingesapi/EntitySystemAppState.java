@@ -11,7 +11,7 @@ import com.simsilica.es.EntitySet;
 /**
  * An abstract AppState to allow EntitySystems to easily use Entity.
  *
- * @author Eike Foede, roah
+ * @author Eike Foede
  */
 public abstract class EntitySystemAppState extends AbstractAppState {
 

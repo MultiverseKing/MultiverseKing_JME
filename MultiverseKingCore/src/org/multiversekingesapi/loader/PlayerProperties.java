@@ -13,6 +13,7 @@ public class PlayerProperties {
     private PlayerProperties() {
     }
 
+
     private static class Holder {
 
         private final static PlayerProperties instance = new PlayerProperties();
@@ -28,13 +29,19 @@ public class PlayerProperties {
      */
     private static boolean initialized = false;
     private static int level;
+    private static String blessedTitan;
 
     private static void initialize(AssetManager manager) {
         JSONObject data = (JSONObject) manager.loadAsset(new AssetKey<>("Data/PlayerProperties.json"));
         level = ((Number) data.get("Level")).intValue();
+        blessedTitan = (String) data.get("BlessedTitan");
     }
 
     public int getLevel() {
         return level;
+    }
+    
+    public String getBlessedTitan() {
+        return blessedTitan;
     }
 }

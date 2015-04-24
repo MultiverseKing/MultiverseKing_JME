@@ -1,11 +1,11 @@
 package org.multiversekingesapi.field.position;
 
-import com.jme3.cinematic.MotionPath;
-import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
+import java.util.ArrayList;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
@@ -16,22 +16,41 @@ import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.render.RenderComponent;
 import org.multiversekingesapi.render.RenderSystem;
-import org.multiversekingesapi.render.utility.Curve;
 
 /**
+ * Handle the HEX position rendering of all entity.
  *
  * @author roah
  */
-public class HexPositionSystem extends EntitySystemAppState implements SubSystem, TileChangeListener {
+public class HexPositionSystem extends EntitySystemAppState implements SubSystem {
 
-    private RenderSystem renderSystem;
     private MapData mapData;
+    private RenderSystem renderSystem;
+    private ArrayList<EntityId> subSystems = new ArrayList<>();
+    private TileChangeListener tileChangeListener = new TileChangeListener() {
+        @Override
+        public void onTileChange(TileChangeEvent[] events) {
+            for (Entity e : entities) {
+                HexCoordinate entityPos = e.get(HexPositionComponent.class).getPosition();
+                for (int i = 0; i < events.length; i++) {
+                    if (entityPos.equals(events[i].getTilePos())) {
+                        Spatial s = renderSystem.getSpatial(e.getId());
+                        float posY = events[i].getNewTile().getHeight()
+                                * HexSetting.FLOOR_OFFSET + 0.1f;
+                        s.setLocalTranslation(s.getLocalTranslation().x, posY, s.getLocalTranslation().z);
+                        break;
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
+        renderSystem.registerSubSystem(this);
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
-        mapData.registerTileChangeListener(this);
+        mapData.registerTileChangeListener(tileChangeListener);
         app.getStateManager().getState(RenderSystem.class).registerSubSystem(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
@@ -52,17 +71,36 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
 
     @Override
     protected void removeEntity(Entity e) {
-        if(e.get(RenderComponent.class) == null){
-            entityData.removeComponent(e.getId(), HexPositionComponent.class);
-        } else if (e.get(HexPositionComponent.class) != null) {
+        if(e.get(HexPositionComponent.class) != null){
             entityData.removeComponent(e.getId(), HexPositionComponent.class);
         }
+        subSystems.remove(e.getId());
     }
 
     @Override
     protected void cleanupSystem() {
         app.getStateManager().getState(RenderSystem.class).removeSubSystem(this, false);
-        mapData.removeTileChangeListener(this);
+        mapData.removeTileChangeListener(tileChangeListener);
+    }
+    
+    /**
+     * @todo better implementation in case of multiple system wanting 
+     * to get the control of the position of an entity at the same moment.
+     */
+    public void registerEntityToSubSystem(EntityId id) {
+        subSystems.add(id);
+    }
+    
+    /**
+     * @todo better implementation in case of multiple system wanting 
+     * to get the control of the position of an entity at the same moment.
+     */
+    public void removeEntityFromSubSystem(EntityId id) {
+        subSystems.remove(id);
+        Entity e = entities.getEntity(id);
+        if(e != null){
+            updateSpatialTransform(e);
+        }
     }
 
     @Override
@@ -71,33 +109,11 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
     }
 
     private void updateSpatialTransform(Entity e) {
+        if(subSystems.contains(e.getId())){
+            return;
+        }
         Spatial s = renderSystem.getSpatial(e.getId());
-        if (e.get(HexPositionComponent.class).getCurve() != null && renderSystem.getControl(e.getId(), MotionEvent.class) == null) {
-            Curve curve = e.get(HexPositionComponent.class).getCurve();
-            final MotionPath path = new MotionPath();
-            path.addWayPoint(s.getLocalTranslation());
-            for (int i = 1; i < curve.getWaypoints().size(); i++) {
-                HexCoordinate pos = curve.getWaypoints().get(i);
-                path.addWayPoint(pos.convertToWorldPosition(mapData.getTile(pos).getHeight()));
-            }
-            path.enableDebugShape(app.getAssetManager(), renderSystem.getRenderNode());
-            MotionEvent motionControl = new MotionEvent(s, path, curve.getSpeed() * (curve.getWaypoints().size()));
-            motionControl.setDirectionType(MotionEvent.Direction.Path);
-            motionControl.play();
-        } else if (e.get(HexPositionComponent.class).getCurve() != null && s.getControl(MotionEvent.class) != null) {
-//            MotionEvent motionControl = s.getControl(MotionEvent.class);
-//            motionControl.getPath().disableDebugShape();
-////            motionControl.getPath().setPathSplineType(Spline.SplineType.Linear);
-//            motionControl.getPath().removeWayPoint(motionControl.getPath().getNbWayPoints() - 2);
-//            motionControl.getPath().addWayPoint(targetPos);
-//            motionControl.getPath().enableDebugShape(app.getAssetManager(), renderSystemNode);
-//            motionControl.play();
-        } else {
-            if (s.getControl(MotionEvent.class) != null) {
-                MotionEvent motionControl = s.getControl(MotionEvent.class);
-                motionControl.getPath().disableDebugShape();
-                s.removeControl(MotionEvent.class);
-            }
+        if(s != null){
             Vector3f pos;
             if (mapData.getTile(e.get(HexPositionComponent.class).getPosition()) == null) {
                 pos = e.get(HexPositionComponent.class).getPosition().convertToWorldPosition();
@@ -106,25 +122,9 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
                         .convertToWorldPosition(mapData.getTile(
                         e.get(HexPositionComponent.class).getPosition()).getHeight());
             }
-//            pos.y += 0.1f;
+    //            pos.y += 0.1f;
             s.setLocalTranslation(pos);
             s.setLocalRotation(e.get(HexPositionComponent.class).getRotation().toQuaternion());
-        }
-    }
-
-    @Override
-    public void onTileChange(TileChangeEvent[] events) {
-        for (Entity e : entities) {
-            HexCoordinate entityPos = e.get(HexPositionComponent.class).getPosition();
-            for (int i = 0; i < events.length; i++) {
-                if (entityPos.equals(events[i].getTilePos())) {
-                    Spatial s = renderSystem.getSpatial(e.getId());
-                    float posY = events[i].getNewTile().getHeight()
-                            * HexSetting.FLOOR_OFFSET + 0.1f;
-                    s.setLocalTranslation(s.getLocalTranslation().x, posY, s.getLocalTranslation().z);
-                    break;
-                }
-            }
         }
     }
 }

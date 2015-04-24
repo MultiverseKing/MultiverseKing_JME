@@ -1,4 +1,4 @@
-package org.multiversekingesapi.battle;
+package org.multiversekingesapi.field.battle;
 
 import com.simsilica.es.EntityId;
 import com.simsilica.es.PersistentComponent;
@@ -9,7 +9,7 @@ import org.multiversekingesapi.field.component.InfluenceComponent;
 import org.multiversekingesapi.gui.control.EditorWindow;
 import org.multiversekingesapi.gui.control.LayoutWindow.HAlign;
 import org.multiversekingesapi.gui.control.LayoutWindow.VAlign;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import tonegod.gui.controls.lists.Spinner;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;

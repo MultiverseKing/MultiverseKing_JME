@@ -1,22 +1,20 @@
 package org.multiversekingesapi.render;
 
-import com.simsilica.es.EntityComponent;
 import com.simsilica.es.PersistentComponent;
 import org.multiversekingesapi.SubSystem;
 
 /**
- * TODO: Comments Used by the card system and the render system.
  *
  * @author Eike Foede, roah
  */
-public class RenderComponent extends Render implements PersistentComponent {
+public class RenderComponent extends AbstractRender implements PersistentComponent {
 
     private final SubSystem subSystem;
 
     /**
-     * Component used for rendering. SubSytem == null && visibility == true &&
-     * rotation == Rotation.A.
-     * 
+     * Component used for rendering. rotation == Rotation.A && SubSytem == null 
+     * && visibility == true.
+     *
      * @param name Object name to render.
      * @param renderType type of rendering to use.
      */
@@ -25,16 +23,16 @@ public class RenderComponent extends Render implements PersistentComponent {
     }
 
     /**
-     * Component used for rendering. visibility == true && rotation == Rotation.A.
-     * 
+     * Component used for rendering. visibility == true.
+     *
      * @param name object name to render.
      * @param renderType type of rendering.
-     * @param system  does is to be visible.
+     * @param system does is to be visible.
      */
     public RenderComponent(String name, RenderType renderType, SubSystem system) {
         this(name, renderType, system, true);
     }
-    
+
     /**
      * component used for the rendering.
      *
@@ -51,12 +49,12 @@ public class RenderComponent extends Render implements PersistentComponent {
     public SubSystem getSubSystem() {
         return subSystem;
     }
-    
-    public EntityComponent cloneAndHide() {
+
+    public RenderComponent cloneAndHide() {
         return new RenderComponent(getName(), getRenderType(), subSystem, false);
     }
 
-    public EntityComponent cloneAndShow() {
+    public RenderComponent cloneAndShow() {
         return new RenderComponent(getName(), getRenderType(), subSystem, true);
     }
 }

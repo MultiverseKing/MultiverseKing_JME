@@ -16,6 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hexgridapi.core.HexSetting;
+import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.appstate.MapDataAppState;
+import org.hexgridapi.events.TileChangeEvent;
+import org.hexgridapi.events.TileChangeListener;
+import org.hexgridapi.utility.HexCoordinate;
 import org.multiversekingesapi.field.position.HexPositionComponent;
 
 /**
@@ -28,17 +34,38 @@ import org.multiversekingesapi.field.position.HexPositionComponent;
 public class RenderSystem extends EntitySystemAppState {
 
     private final Node renderSystemNode = new Node("RenderSystemNode");
+    private MapData mapData;
     private HashMap<EntityId, Spatial> spatials = new HashMap<>();
     private ArrayList<SubSystem> subSystems = new ArrayList<>(3);
     private SpatialInitializer spatialInitializer;
+    private TileChangeListener tileChangeListeners = new TileChangeListener() {
+        @Override
+        public void onTileChange(TileChangeEvent[] events) {
+            for (int i = 0; i < events.length; i++) {
+                for (Entity e : entities) {
+                    HexCoordinate entityPos = e.get(HexPositionComponent.class).getPosition();
+                    if (entityPos.equals(events[i].getTilePos())) {
+                        Spatial s = getSpatial(e.getId());
+                        float posY = events[i].getNewTile().getHeight()
+                                * HexSetting.FLOOR_OFFSET + 0.1f;
+                        s.setLocalTranslation(s.getLocalTranslation().x, posY, s.getLocalTranslation().z);
+                        break;
+                    }
+                }
+            }
+        }
+    };
 
     // <editor-fold defaultstate="collapsed" desc="Overrided Method">
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
+        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
+        mapData.registerTileChangeListener(tileChangeListeners);
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow.
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
+
+        return entityData.getEntities(RenderComponent.class);
     }
 
     @Override
@@ -90,6 +117,7 @@ public class RenderSystem extends EntitySystemAppState {
         for (SubSystem s : subSystems) {
             s.rootSystemIsRemoved();
         }
+        mapData.removeTileChangeListener(tileChangeListeners);
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
@@ -126,6 +154,12 @@ public class RenderSystem extends EntitySystemAppState {
         }
     }
 
+    /**
+     * Remove a subSystem ratached to this system.
+     *
+     * @param subSystem the subSystem to remove.
+     * @param clear does all spatial belong to that subSystem have to be purge ?
+     */
     public void removeSubSystem(SubSystem subSystem, boolean clear) {
         if (subSystems.remove(subSystem)) {
             Node n = (Node) renderSystemNode.getChild(subSystem.getClass().getName());

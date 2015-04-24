@@ -2,7 +2,7 @@ package org.multiversekingesapi.card;
 
 import com.simsilica.es.PersistentComponent;
 import org.multiversekingesapi.card.attribut.CardRenderPosition;
-import org.multiversekingesapi.render.Render;
+import org.multiversekingesapi.render.AbstractRender;
 
 /**
  * Used by the card render system, Contain where the Card should be rendered on
@@ -10,7 +10,7 @@ import org.multiversekingesapi.render.Render;
  *
  * @author roah
  */
-public class CardRenderComponent extends Render implements PersistentComponent {
+public class CardRenderComponent extends AbstractRender implements PersistentComponent {
 
     private final CardRenderPosition renderPosition;
 

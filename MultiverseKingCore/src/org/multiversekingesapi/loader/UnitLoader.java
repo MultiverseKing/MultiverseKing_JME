@@ -8,7 +8,7 @@ import org.multiversekingesapi.field.component.HealthComponent;
 import org.multiversekingesapi.field.position.MovementComponent;
 import org.multiversekingesapi.field.component.CollisionComponent;
 import org.multiversekingesapi.field.component.SpeedComponent;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -20,15 +20,15 @@ import org.json.simple.JSONObject;
  */
 public class UnitLoader {
 
+    protected final SimpleApplication app;
     private final CollisionComponent collisionComponent;
     private final InitialUnitStatsComponent initialUnitStatsComponent;
-    private final SimpleApplication app;
 
     UnitLoader(JSONObject data, EntityLoader eLoader) {
         app = eLoader.getApplication();
         Number healthPoint = (Number) data.get("healthPoint");
         Number atb = (Number) data.get("atb");
-        Number speed = (Number) data.get("speed");
+        Number loadSpeed = (Number) data.get("loadSpeed");
         Number moveRange = (Number) data.get("moveRange");
         Number moveSpeed = (Number) data.get("moveSpeed");
 
@@ -41,7 +41,7 @@ public class UnitLoader {
         initialUnitStatsComponent = new InitialUnitStatsComponent(
                 healthPoint.intValue(),
                 atb.byteValue(),
-                speed.floatValue(),
+                loadSpeed.floatValue(),
                 moveRange.byteValue(),
                 moveSpeed.floatValue(),
                 abilityList);
@@ -76,16 +76,16 @@ public class UnitLoader {
 
     public class InitialUnitStatsComponent extends InitialStatsComponent {
 
-        private final byte maxAtb;
-        private final float speed;
+        private final byte atbSize;
+        private final float loadSpeed;
         private final byte moveRange;
         private final float moveSpeed;
         private final String[] abilityList;
 
         public InitialUnitStatsComponent(InitialUnitStatsComponent stats) {
             super(stats.getHealPoint());
-            this.maxAtb = stats.getMaxAtb();
-            this.speed = stats.getSpeed();
+            this.atbSize = stats.getAtbSize();
+            this.loadSpeed = stats.getLoadSpeed();
             this.moveRange = stats.getMoveRange();
             this.moveSpeed = stats.getMoveSpeed();
             this.abilityList = stats.getAbilityList();
@@ -93,33 +93,45 @@ public class UnitLoader {
 
         private InitialUnitStatsComponent(int healthPoint, byte maxAtb, float speed, byte moveRange, float moveSpeed, String[] abilityList) {
             super(healthPoint);
-            this.maxAtb = maxAtb;
-            this.speed = speed;
+            this.atbSize = maxAtb;
+            this.loadSpeed = speed;
             this.moveRange = moveRange;
             this.moveSpeed = moveSpeed;
             this.abilityList = abilityList;
         }
 
-        public byte getMaxAtb() {
-            return maxAtb;
+        /**
+         * Size of the Atb.Action gauge.
+         */
+        public byte getAtbSize() {
+            return atbSize;
         }
 
         public ATBComponent getATBComponent() {
-            return new ATBComponent(maxAtb);
+            return new ATBComponent(atbSize);
         }
-
-        public float getSpeed() {
-            return speed;
+        
+        /**
+         * Speed of the unit to load the gauge.
+         */
+        public float getLoadSpeed() {
+            return loadSpeed;
         }
 
         public SpeedComponent getSpeedComponent() {
-            return new SpeedComponent(speed);
+            return new SpeedComponent(loadSpeed);
         }
-
+        
+        /**
+         * How far the unit can move (Movament gauge Size).
+         */
         public byte getMoveRange() {
             return moveRange;
         }
 
+        /**
+         * How fast the unit can move from one tile to another.
+         */
         public float getMoveSpeed() {
             return moveSpeed;
         }
@@ -128,6 +140,9 @@ public class UnitLoader {
             return new MovementComponent(moveRange, moveSpeed);
         }
 
+        /**
+         * All ability binded to this unit.
+         */
         public String[] getAbilityList() {
             return abilityList;
         }

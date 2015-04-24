@@ -1,4 +1,4 @@
-package org.multiversekingesapi.battle;
+package org.multiversekingesapi.field.battle;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -10,7 +10,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
@@ -28,7 +27,6 @@ import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiversekingesapi.EntityDataAppState;
-import org.multiversekingesapi.IMultiverCoreGUI;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.card.CardRenderComponent;
 import org.multiversekingesapi.card.attribut.CardRenderPosition;
@@ -38,12 +36,12 @@ import org.multiversekingesapi.field.component.HealthComponent;
 import org.multiversekingesapi.field.component.InfluenceComponent;
 import org.multiversekingesapi.field.position.HexPositionComponent;
 import org.multiversekingesapi.field.position.MoveToComponent;
-import org.multiversekingesapi.field.position.MovementSystem;
+import org.multiversekingesapi.field.position.HexMovementSystem;
 import org.multiversekingesapi.loader.EntityLoader;
 import org.multiversekingesapi.loader.PlayerProperties;
 import org.multiversekingesapi.loader.TitanLoader;
 import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import org.multiversekingesapi.render.RenderComponent;
 import org.multiversekingesapi.render.RenderSystem;
 import org.multiversekingesapi.render.animation.Animation;
@@ -56,6 +54,7 @@ import tonegod.gui.core.Screen;
  * Battle Unit Control System / Battle Initialisation
  *
  * @author roah
+ * @deprecated need to be rework
  */
 public class BattleSystem extends AbstractAppState implements MouseRayListener, SubSystem {
 
@@ -83,7 +82,15 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
 //        if (mapData.getAllChunkPos().isEmpty()) {
 //            mapData.addChunk(new Vector2Int(), null);
 //        }
-        app.getStateManager().attachAll(new CollisionSystem(), new AnimationSystem(), new MovementSystem());
+        if(app.getStateManager().getState(CollisionSystem.class) == null){
+            app.getStateManager().attach(new CollisionSystem());
+        }
+        if(app.getStateManager().getState(AnimationSystem.class) == null){
+            app.getStateManager().attach(new AnimationSystem());
+        }
+        if(app.getStateManager().getState(HexMovementSystem.class) == null){
+            app.getStateManager().attach(new HexMovementSystem());
+        }
 
 //        if (app.getStateManager().getState(RenderSystem.class) == null) {
 //            app.getStateManager().attach(new RenderSystem());
@@ -115,8 +122,9 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
 
         PlayerProperties properties = PlayerProperties.getInstance(app.getAssetManager());
         playerCore = entityData.createEntity();
-        entityData.setComponents(playerCore, new HexPositionComponent(startPosition),
-                new RenderComponent("Well", RenderType.Core, this),
+        entityData.setComponents(playerCore,
+                new RenderComponent("Well", RenderType.Core),
+                new HexPositionComponent(startPosition, Rotation.A, this),
                 new AnimationComponent(Animation.SUMMON),
                 new HealthComponent(properties.getLevel() * 10),
                 new InfluenceComponent((byte) (1 + FastMath.floor((float) properties.getLevel() / 25f))));
@@ -318,7 +326,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         renderSystem.removeSubSystem(this, false);
         app.getStateManager().detach(app.getStateManager().getState(CollisionSystem.class));
         app.getStateManager().detach(app.getStateManager().getState(AnimationSystem.class));
-        app.getStateManager().detach(app.getStateManager().getState(MovementSystem.class));
+        app.getStateManager().detach(app.getStateManager().getState(HexMovementSystem.class));
     }
 
     @Override

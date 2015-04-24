@@ -1,4 +1,4 @@
-package org.multiversekingesapi.battle;
+package org.multiversekingesapi.field.battle;
 
 import tonegod.gui.core.ElementManager;
 

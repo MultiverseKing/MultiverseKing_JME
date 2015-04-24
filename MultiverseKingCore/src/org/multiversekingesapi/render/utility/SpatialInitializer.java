@@ -2,7 +2,7 @@ package org.multiversekingesapi.render.utility;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 
 /**
  *

@@ -4,12 +4,12 @@ package org.multiversekingesapi.render;
  * Used to regroup data about rendering.
  * @author roah
  */
-public abstract class Render {
+public abstract class AbstractRender {
     private final String name;
     private final RenderType renderType;
     private final boolean isVisible;
     
-    public Render(String name, RenderType renderType,boolean isVisible) {
+    public AbstractRender(String name, RenderType renderType,boolean isVisible) {
         this.name = name;
         this.renderType = renderType;
         this.isVisible = isVisible;

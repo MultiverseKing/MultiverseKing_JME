@@ -6,6 +6,7 @@ import org.hexgridapi.utility.HexCoordinate;
 /**
  *
  * @author roah
+ * @deprecated The movement system handle the curve internaly
  */
 public class Curve {
 

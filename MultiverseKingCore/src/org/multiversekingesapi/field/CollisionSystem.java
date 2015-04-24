@@ -5,7 +5,7 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import org.multiversekingesapi.EntitySystemAppState;
-import org.multiversekingesapi.render.Render.RenderType;
+import org.multiversekingesapi.render.AbstractRender.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.hexgridapi.utility.HexCoordinate;

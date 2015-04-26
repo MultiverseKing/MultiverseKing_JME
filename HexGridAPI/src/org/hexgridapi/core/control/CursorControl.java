@@ -33,11 +33,11 @@ public class CursorControl {
     public void setPosition(HexCoordinate tilePos, int height) {
 //        if(enable <= 0){
         initCursor();
-        Vector3f pos = tilePos.convertToWorldPosition();
+        Vector3f pos = tilePos.toWorldPosition();
         //        cursor.setLocalTranslation(pos.x, (tile != null ? tile.getHeight() * HexSetting.FLOOR_OFFSET : HexSetting.GROUND_HEIGHT * HexSetting.FLOOR_OFFSET)
-        //                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+        //                + ((tilePos.toOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
         cursor.setLocalTranslation(pos.x, height * HexSetting.FLOOR_OFFSET
-                + ((tilePos.getAsOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
+                + ((tilePos.toOffset().y & 1) == 0 ? 0.01f : 0.02f), pos.z + cursorOffset);
         /**
          * The cursor real position is not updated on pulseMode.
          */

@@ -59,7 +59,7 @@ public final class MeshParameter {
         this.onlyGround = onlyGround;
         this.shapeType = shapeType;
         boolean[][] isVisited = getVisitedList(radius);
-        Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk);
+        Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk).toOffset();
         /**
          * x && y == coord local
          */
@@ -186,7 +186,7 @@ public final class MeshParameter {
         if (centerPos != null) {
             Vector2Int coord = new Vector2Int(x + (inspectedID != null ? position.get(inspectedID).x : 0) - radius, y + (inspectedID != null ? position.get(inspectedID).y : 0) - radius);
             if ((radius & 1) == 0) {
-                if ((centerPos.getAsOffset().y & 1) == 0) {
+                if ((centerPos.toOffset().y & 1) == 0) {
                     return centerPos.add(coord);
                 } else {
                     if ((coord.y & 1) == 0) {
@@ -196,7 +196,7 @@ public final class MeshParameter {
                     }
                 }
             } else {
-                if ((centerPos.getAsOffset().y & 1) == 0) {
+                if ((centerPos.toOffset().y & 1) == 0) {
                     if ((coord.y & 1) == 0) {
                         return centerPos.add(coord);
                     } else {
@@ -376,7 +376,7 @@ public final class MeshParameter {
             int inspectedID = elementTypeRef.get(inspectedTexture).get(inspectedMesh);
             boolean isOddStart = (position.get(inspectedID).y & 1) == 0;
 
-            Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk);
+            Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk).toOffset();
             HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
                     position.get(inspectedID).x + chunkInitTile.x, position.get(inspectedID).y + chunkInitTile.y);
             for (int i = 0; i < 4; i++) {

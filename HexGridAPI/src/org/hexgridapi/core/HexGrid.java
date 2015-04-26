@@ -7,6 +7,7 @@ import org.hexgridapi.core.control.ChunkControl;
 import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import org.hexgridapi.events.TileChangeListener;
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class HexGrid {
      */
     protected final Node tileNode = new Node("HexTileNode");
     protected MapData mapData;
-    private GhostControl ghostControl;
+    protected GhostControl ghostControl;
     protected HashMap chunksNodes = new HashMap<Vector2Int, Node>();
     protected Node areaRangeNode;
     protected ProceduralGenerator mapGenerator;
@@ -50,7 +51,8 @@ public class HexGrid {
         this.mapData = mapData;
         gridNode.attachChild(tileNode);
         rootNode.attachChild(gridNode);
-//        tileNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
+        gridNode.setShadowMode(RenderQueue.ShadowMode.Off);
+        tileNode.setShadowMode(RenderQueue.ShadowMode.Receive);
         mapData.registerTileChangeListener(tileChangeListener);
     }
 
@@ -78,18 +80,7 @@ public class HexGrid {
     public final Set<Vector2Int> getChunksNodes() {
         return Collections.unmodifiableSet(chunksNodes.keySet());
     }
-
-    /**
-     * Unstable
-     *
-     * @see org.hexgridapi.core.MapData#setSeed(int)
-     * @return
-     */
-    public int generateNewSeed() {
-        int seed = ProceduralGenerator.generateSeed();
-        mapData.setSeed(seed);
-        return seed;
-    }
+    
     private final TileChangeListener tileChangeListener = new TileChangeListener() {
         public final void onTileChange(TileChangeEvent... events) {
             if (events.length > 1) {
@@ -171,7 +162,7 @@ public class HexGrid {
         if (!gridNode.hasChild(areaRangeNode)) {
             gridNode.attachChild(areaRangeNode);
         }
-        Vector3f pos = centerPosition.add(-radius + ((centerPosition.getAsOffset().y & 1) == 0 && (radius & 1) != 0 ? -1 : 0), -radius).convertToWorldPosition();
+        Vector3f pos = centerPosition.add(-radius + ((centerPosition.toOffset().y & 1) == 0 && (radius & 1) != 0 ? -1 : 0), -radius).toWorldPosition();
         areaRangeNode.setLocalTranslation(pos.x, pos.y + 0.1f, pos.z);
     }
 
@@ -204,8 +195,9 @@ public class HexGrid {
      * @param chunkPos position of the chunk
      * @return global tile position in offset.
      */
-    public static Vector2Int getInitialChunkTile(Vector2Int chunkPos) {
-        return new Vector2Int(chunkPos.x * HexSetting.CHUNK_SIZE,
+    public static HexCoordinate getInitialChunkTile(Vector2Int chunkPos) {
+        return new HexCoordinate(HexCoordinate.Coordinate.OFFSET, 
+                chunkPos.x * HexSetting.CHUNK_SIZE,
                 chunkPos.y * HexSetting.CHUNK_SIZE);
     }
 

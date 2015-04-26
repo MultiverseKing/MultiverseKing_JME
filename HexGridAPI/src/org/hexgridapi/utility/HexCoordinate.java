@@ -29,18 +29,6 @@ public final class HexCoordinate {
     private static Vector2Int cubicToAxial(Vector3Int data) {
         return new Vector2Int(data.x, data.z);
     }
-    
-    public Vector3Int getAsCubic() {
-        return new Vector3Int(q, -q - r, r);
-    }
-    
-    public Vector2Int getAsOffset() {
-        return new Vector2Int(q + (r - (r & 1)) / 2, r);
-    }
-    
-    public Vector2Int getAsAxial() {
-        return new Vector2Int(q, r);
-    }
 
     /**
      * Only for internal use. (Axial)
@@ -86,9 +74,57 @@ public final class HexCoordinate {
         r = posAxial.y;
     }
     
+    /**
+     * @see <a href="http://www.redblobgames.com/grids/hexagons/#coordinates">redblobgames Coordinate</a>
+     * @return 
+     */
+    public Vector3Int toCubic() {
+        return new Vector3Int(q, -q - r, r);
+    }
+    
+    /**
+     * “odd-r” horizontal layout is the one used.
+     * @see <a href="http://www.redblobgames.com/grids/hexagons/#coordinates">redblobgames Coordinate</a>
+     * @return 
+     */
+    public Vector2Int toOffset() {
+        return new Vector2Int(q + (r - (r & 1)) / 2, r);
+    }
+    
+    /**
+     * @see <a href="http://www.redblobgames.com/grids/hexagons/#coordinates">redblobgames Coordinate</a>
+     * @return 
+     */
+    public Vector2Int toAxial() {
+        return new Vector2Int(q, r);
+    }
+
+    /**
+     * Convert Hex grid position to world position. Convertion work with Odd-R
+     * Offset grid type. (currently used grid type).
+     * Ignore y value so this.y always = 0
+     * @return tile world unit position.
+     */
+    public Vector3f toWorldPosition() {
+        Vector2Int offsetPos = toOffset();
+        return new Vector3f((offsetPos.x) * HexSetting.HEX_WIDTH
+                + ((offsetPos.y & 1) == 0 ? 0 : HexSetting.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSetting.HEX_RADIUS * 1.5f);
+    }
+    
+    /**
+     * Convert Hex grid position to world position.
+     * Tile height converted to world height.
+     * @return tile world unit position.
+     */
+    public Vector3f toWorldPosition(int height) {
+        Vector3f result = toWorldPosition();
+        result.y += height*HexSetting.FLOOR_OFFSET;
+        return result;
+    }
+    
     @Override
     public String toString() {
-        return getAsOffset().x + "|" + getAsOffset().y;
+        return toOffset().x + "|" + toOffset().y;
     }
     
     public HexCoordinate[] getNeighbours() {
@@ -101,29 +137,6 @@ public final class HexCoordinate {
             new HexCoordinate(q, r + 1)
         };
         return neighbours;
-    }
-
-    /**
-     * Convert Hex grid position to world position. Convertion work with Odd-R
-     * Offset grid type. (currently used grid type).
-     * Ignore y value so this.y always = 0
-     * @return tile world unit position.
-     */
-    public Vector3f convertToWorldPosition() {
-        Vector2Int offsetPos = getAsOffset();
-        return new Vector3f((offsetPos.x) * HexSetting.HEX_WIDTH
-                + ((offsetPos.y & 1) == 0 ? 0 : HexSetting.HEX_WIDTH / 2), 0.05f, offsetPos.y * HexSetting.HEX_RADIUS * 1.5f);
-    }
-    
-    /**
-     * Convert Hex grid position to world position.
-     * Tile height converted to world height.
-     * @return tile world unit position.
-     */
-    public Vector3f convertToWorldPosition(int height) {
-        Vector3f result = convertToWorldPosition();
-        result.y += height*HexSetting.FLOOR_OFFSET;
-        return result;
     }
     
     /**
@@ -144,8 +157,8 @@ public final class HexCoordinate {
      * @return 
      */
     public Rotation getDirection(HexCoordinate targetPos) {
-        Vector3Int currentPos = getAsCubic();
-        Vector3Int nextPos = targetPos.getAsCubic();
+        Vector3Int currentPos = toCubic();
+        Vector3Int nextPos = targetPos.toCubic();
         
         Vector3Int result = new Vector3Int(currentPos.x - nextPos.x, currentPos.y - nextPos.y, currentPos.z - nextPos.z);
         if (result.z == 0 && result.x > 0) {
@@ -168,7 +181,7 @@ public final class HexCoordinate {
      * Return the chunk who hold the tile.
      */
     public Vector2Int getCorrespondingChunk() {
-        Vector2Int tileOffset = getAsOffset();
+        Vector2Int tileOffset = toOffset();
         int x = ((int) FastMath.abs(tileOffset.x) + (tileOffset.x < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
         int y = ((int) FastMath.abs(tileOffset.y) + (tileOffset.y < 0 ? -1 : 0)) / HexSetting.CHUNK_SIZE;
         Vector2Int result = new Vector2Int(tileOffset.x < 0 ? (x + 1) * -1 : x, tileOffset.y < 0 ? (y + 1) * -1 : y);
@@ -180,7 +193,7 @@ public final class HexCoordinate {
      */
     public final HexCoordinate getTilePosInChunk() {
         Vector2Int chunk = getCorrespondingChunk();
-        Vector2Int tileOffset = getAsOffset();
+        Vector2Int tileOffset = toOffset();
         return new HexCoordinate(Coordinate.OFFSET,
                 (int) (FastMath.abs(tileOffset.x) - FastMath.abs(chunk.x) * HexSetting.CHUNK_SIZE),
                 (int) (FastMath.abs(tileOffset.y) - FastMath.abs(chunk.y) * HexSetting.CHUNK_SIZE));
@@ -190,18 +203,18 @@ public final class HexCoordinate {
     public boolean equals(Object obj) {
         if (obj instanceof HexCoordinate) {
             HexCoordinate coord = (HexCoordinate) obj;
-            if (coord.getAsAxial().x == q && coord.getAsAxial().y == r) {
+            if (coord.toAxial().x == q && coord.toAxial().y == r) {
                 return true;
             }
         } else if (obj instanceof Vector2Int) {
             Vector2Int coord = (Vector2Int) obj;
-            if (coord.x == getAsOffset().x && coord.y == getAsOffset().y) {
+            if (coord.x == toOffset().x && coord.y == toOffset().y) {
                 return true;
             }
         } else if (obj instanceof String) {
             try {
                 HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET, new Vector2Int((String) obj));
-                if (coord.getAsAxial().x == q && coord.getAsAxial().y == r) {
+                if (coord.toAxial().x == q && coord.toAxial().y == r) {
                     return true;
                 }
             } catch (NumberFormatException e){
@@ -220,25 +233,25 @@ public final class HexCoordinate {
      * Combine two position.
      */
     public HexCoordinate add(HexCoordinate value) {
-        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value.getAsOffset()));
+        return new HexCoordinate(Coordinate.OFFSET, toOffset().add(value.toOffset()));
     }
     /**
      * Combine two position using Vector2Int. (Offset)
      */
     public HexCoordinate add(Vector2Int value) {
-        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value));
+        return new HexCoordinate(Coordinate.OFFSET, toOffset().add(value));
     }
     /**
      * Add the value to the position. (Offset)
      */
     public HexCoordinate add(int value) {
-        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(value));
+        return new HexCoordinate(Coordinate.OFFSET, toOffset().add(value));
     }
     /**
      * Add the value to the position. (Offset)
      */
     public HexCoordinate add(int x, int y) {
-        return new HexCoordinate(Coordinate.OFFSET, getAsOffset().add(x, y));
+        return new HexCoordinate(Coordinate.OFFSET, toOffset().add(x, y));
     }
     
     /**

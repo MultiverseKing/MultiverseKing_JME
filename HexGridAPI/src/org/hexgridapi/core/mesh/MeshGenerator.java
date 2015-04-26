@@ -160,6 +160,7 @@ public final class MeshGenerator {
         float startTriOffsetB;
         float endTriOffsetA = 0;
         float endTriOffsetB = -HexSetting.HEX_WIDTH / 2;
+        float finalHeight = height * HexSetting.FLOOR_OFFSET;
 
         if ((position.y & 1) == 0) {
             startTriOffsetA = -HexSetting.HEX_WIDTH / 2;
@@ -175,23 +176,23 @@ public final class MeshGenerator {
 
         for (int i = 0; i < size.x * 4; i += 4) {
             currentHexPos = j * HexSetting.HEX_WIDTH + (position.x * HexSetting.HEX_WIDTH);
-            vertices[i] = new Vector3f(currentHexPos + startTriOffsetA, height * HexSetting.FLOOR_OFFSET,
+            vertices[i] = new Vector3f(currentHexPos + startTriOffsetA, finalHeight,
                     -(HexSetting.HEX_RADIUS / 2) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
-            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetB, height * HexSetting.FLOOR_OFFSET,
+            vertices[i + 1] = new Vector3f(currentHexPos + startTriOffsetB, finalHeight,
                     -HexSetting.HEX_RADIUS + (position.y * HexSetting.HEX_RADIUS * 1.5f));
-            vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetA, height * HexSetting.FLOOR_OFFSET,
+            vertices[i + 2] = new Vector3f(currentHexPos + endTriOffsetA, finalHeight,
                     (HexSetting.HEX_RADIUS * size.y) + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2))
                     + (position.y * HexSetting.HEX_RADIUS * 1.5f));
-            vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetB, height * HexSetting.FLOOR_OFFSET,
+            vertices[i + 3] = new Vector3f(currentHexPos + endTriOffsetB, finalHeight,
                     ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2)
                     + ((size.y - 1) * (HexSetting.HEX_RADIUS / 2)) + (position.y * HexSetting.HEX_RADIUS * 1.5f));
             j++;
         }
 
         currentHexPos = j * HexSetting.HEX_WIDTH + position.x * HexSetting.HEX_WIDTH;
-        vertices[size.x * 4] = new Vector3f(currentHexPos, height * HexSetting.FLOOR_OFFSET,
+        vertices[size.x * 4] = new Vector3f(currentHexPos, finalHeight,
                 -HexSetting.HEX_RADIUS / 2 + (position.y * HexSetting.HEX_RADIUS * 1.5f));
-        vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, height * HexSetting.FLOOR_OFFSET,
+        vertices[size.x * 4 + 1] = new Vector3f(currentHexPos, finalHeight,
                 ((HexSetting.HEX_RADIUS * size.y) - HexSetting.HEX_RADIUS / 2) + ((size.y - 1)
                 * (HexSetting.HEX_RADIUS / 2)) + (position.y * (HexSetting.HEX_RADIUS * 1.5f)));
 
@@ -215,7 +216,7 @@ public final class MeshGenerator {
             j++;
         }
         texCoord[size.x * 4] = new Vector2f(j, 0.25f);
-        texCoord[size.x * 4 + 1] = new Vector2f(j+0.5f, 0f);
+        texCoord[size.x * 4 + 1] = new Vector2f(j + 0.5f, 0f);
         return texCoord;
     }
 
@@ -372,7 +373,8 @@ public final class MeshGenerator {
         Vector3f[] sideVert = new Vector3f[groundVert.length * 2];
         System.arraycopy(groundVert, 0, sideVert, 0, groundVert.length);
         for (int i = 0; i < groundVert.length; i++) {
-            sideVert[i + groundVert.length] = new Vector3f(groundVert[i].x, groundHeight, groundVert[i].z);
+            sideVert[i + groundVert.length] = new Vector3f(groundVert[i].x, 
+                    groundHeight*HexSetting.FLOOR_OFFSET, groundVert[i].z);
         }
         return sideVert;
     }
@@ -380,66 +382,47 @@ public final class MeshGenerator {
     private Vector2f[] getSideVerticesTextCoord(Vector2Int size, int height, int groundHeight) {
         Vector2f[] texCoord = new Vector2f[((size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2)) * 2];
         int offset = (size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2);
-        height = (int) (FastMath.abs(groundHeight) + height);
+        float texHeight = (int) (FastMath.abs(groundHeight) + height) * 0.5f;
         /**
          * Side-tri coord.
-         * K define if bot or top tri. (vertice on Z+ or Z-)
+         * K define if top or bottom vertices. (vertice on Y+ or Y-)
          */
         for (int k = 0; k < 2; k++) {
             for (int i = 0; i < size.x * 4; i += 4) {
-//                if ((i & 1) == 0) {
-//                    texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-//                    texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                    texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                    texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-//                } else {
-                texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1f);
-                texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0f), 0.75f);
-                texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0f), 0.75f);
-                texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1f);
-//                }
+                texCoord[i + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? texHeight : 0f), 1f);
+                texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? texHeight : 0f), 0.75f);
+                texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? texHeight : 0f), 0.75f);
+                texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? texHeight : 0f), 1f);
             }
-            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1);
-            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0f), 1);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? texHeight : 0f), 1);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? texHeight : 0f), 1);
         }
         /**
          * Side-quad coord.
-         * k define if left or right quad
+         * k define if top or bottom vertices
          * quad on the first row are calculated outside the loop.
          */
-        texCoord[(size.x * 4 + 2)] = new Vector2f(0f, 1f);
-        texCoord[(size.x * 4 + 2) + 1] = new Vector2f(0f, 1f);
-        texCoord[(size.x * 4 + 2) + 2] = new Vector2f(0f, 0.75f);
-        texCoord[(size.x * 4 + 2) + 3] = new Vector2f(0f, 0.75f);
-
-        texCoord[(size.x * 4 + 2) + offset] = new Vector2f(height * 0.5f, 1f);
-        texCoord[(size.x * 4 + 2) + offset + 1] = new Vector2f(height * 0.5f, 1f);
-        texCoord[(size.x * 4 + 2) + offset + 2] = new Vector2f(height * 0.5f, 0.75f);
-        texCoord[(size.x * 4 + 2) + offset + 3] = new Vector2f(height * 0.5f, 0.75f);
+        int index = size.x * 4 + 2;
+        for (int k = 0; k < 2; k++) {
+            texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? texHeight : 0f), 1f);
+            texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? texHeight : 0f), 1f);
+            texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? texHeight : 0f), 0.75f);
+            texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? texHeight : 0f), 0.75f);
+        }
 
         for (int k = 0; k < 2; k++) {
-            int index = (size.x * 4 + 2) + 4;
+            index = (size.x * 4 + 2) + 4;
             for (int i = 0; i < size.y - 1; i++) {
-//                if ((i & 1) == 0) {
-                texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-                texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-                texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-//                } else {
-//                    texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                    texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                    texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-//                    texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? height * 0.5f : 0), 0.75f);
-//                    texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                    texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? height * 0.5f : 0), 1f);
-//                }
+                texCoord[index + (k == 1 ? offset : 0)] = new Vector2f((k == 1 ? texHeight : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector2f((k == 1 ? texHeight : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector2f((k == 1 ? texHeight : 0), 1f);
+                texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector2f((k == 1 ? texHeight : 0), 1f);
+                texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector2f((k == 1 ? texHeight : 0), 0.75f);
+                texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector2f((k == 1 ? texHeight : 0), 0.75f);
                 index += 6;
             }
         }
         return texCoord;
-
     }
 
     private static int[] getSideIndex(Vector2Int size, int arrayOffset, int groundOffset, CullingData culling) {

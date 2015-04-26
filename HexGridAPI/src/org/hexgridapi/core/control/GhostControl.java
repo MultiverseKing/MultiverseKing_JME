@@ -6,6 +6,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -13,6 +14,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.MapData;
@@ -22,7 +25,7 @@ import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
- *
+ * @todo if chunk position is > 1 does not have shadow !?
  * @author roah
  */
 public class GhostControl extends ChunkControl {
@@ -45,7 +48,7 @@ public class GhostControl extends ChunkControl {
         Material mat = assetManager.loadMaterial("Materials/ghostCollision.j3m");
         collisionPlane.setMaterial(mat);
         collisionNode.attachChild(collisionPlane);
-//        collisionPlane.setShadowMode(RenderQueue.ShadowMode.Off);
+        collisionPlane.setShadowMode(RenderQueue.ShadowMode.Off);
         this.rayControl = new GridRayCastControl(app, collisionNode, ColorRGBA.Green);
         this.system = system;
     }
@@ -203,5 +206,23 @@ public class GhostControl extends ChunkControl {
 
     public void hide() {
         spatial.setCullHint(Spatial.CullHint.Always);
+    }
+
+    public void hideGhostTile(boolean hide) {
+        if(mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)){
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
+                    Spatial geo = ((Node) ((Node) spatial).getChild("TILES." + x + "|" + y)).getChild("NO_TILE");
+                    if (geo != null && hide) {
+                        geo.setCullHint(Spatial.CullHint.Always);
+                    } else if (geo != null) {
+                        geo.setCullHint(Spatial.CullHint.Inherit);
+                    }
+                }
+            }
+        } else {
+            Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                    "{0} does not allow the hiding.", mode);
+        }
     }
 }

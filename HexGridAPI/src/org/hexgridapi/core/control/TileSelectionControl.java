@@ -91,17 +91,17 @@ public class TileSelectionControl implements TileInputListener {
         public void onTileChange(TileChangeEvent... events) {
             for (int i = 0; i < events.length; i++) {
                 if (coords.contains(events[i].getTilePos())) {
-                    Spatial tile = node.getChild(events[i].getTilePos().getAsOffset().toString());
+                    Spatial tile = node.getChild(events[i].getTilePos().toOffset().toString());
                     if (events[i].getNewTile() != null) {
                         ((Geometry) tile).setMesh(getMesh(events[i].getNewTile().getHeight()));
                         cursorControl.setHeight(events[i].getNewTile().getHeight());
-                        //                    tile.setLocalTranslation(event.getTilePos().convertToWorldPosition());
+                        //                    tile.setLocalTranslation(event.getTilePos().toWorldPosition());
                         //                    coord.put(event.getTilePos(), event.getNewTile().getHeight());
                     } else {
                         //                    coord.put(event.getTilePos(), 0);
                         ((Geometry) tile).setMesh(getMesh(0));
                         cursorControl.setHeight(0);
-                        //                    tile.setLocalTranslation(event.getTilePos().convertToWorldPosition());
+                        //                    tile.setLocalTranslation(event.getTilePos().toWorldPosition());
                     }
                 } else if (selectedTile.equals(events[i].getTilePos()) && events[i].getNewTile() != null) {
                     cursorControl.setHeight(events[i].getNewTile().getHeight());
@@ -140,7 +140,7 @@ public class TileSelectionControl implements TileInputListener {
                 addGeo(pos, height);
                 coords.add(pos);
             } else {
-                node.getChild(pos.getAsOffset().toString()).removeFromParent();
+                node.getChild(pos.toOffset().toString()).removeFromParent();
                 coords.remove(pos);
             }
         }
@@ -154,9 +154,9 @@ public class TileSelectionControl implements TileInputListener {
     }
 
     private void addGeo(HexCoordinate pos, int height) {
-        Geometry geo = new Geometry(pos.getAsOffset().toString(), getMesh(height));
+        Geometry geo = new Geometry(pos.toOffset().toString(), getMesh(height));
         geo.setMaterial(mat);
-        geo.setLocalTranslation(pos.convertToWorldPosition());
+        geo.setLocalTranslation(pos.toWorldPosition());
         node.attachChild(geo);
 
     }

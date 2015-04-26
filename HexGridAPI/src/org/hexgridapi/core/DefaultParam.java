@@ -1,7 +1,12 @@
 package org.hexgridapi.core;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.ssao.SSAOFilter;
+import com.jme3.shadow.DirectionalLightShadowRenderer;
 import org.hexgridapi.utility.ArrowDebugShape;
 
 /**
@@ -26,10 +31,10 @@ public class DefaultParam {
         /**
          * A white, directional light source.
          */
-//        DirectionalLight sun = new DirectionalLight();
-//        sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
-//        sun.setColor(new ColorRGBA(250, 250, 215, 1));
-//        app.getRootNode().addLight(sun);
+        DirectionalLight sun = new DirectionalLight();
+        sun.setDirection((new Vector3f(-0.5f, -0.5f, -0.5f)).normalizeLocal());
+        sun.setColor(new ColorRGBA(250, 250, 215, 1));
+        app.getRootNode().addLight(sun);
 
         /* this shadow needs a directional light */
 //        FilterPostProcessor fpp = new FilterPostProcessor(app.getAssetManager());
@@ -39,15 +44,15 @@ public class DefaultParam {
         
         /* AO */ 
 //        FilterPostProcessor fpp = new FilterPostProcessor(app.getAssetManager());
-//        SSAOFilter ssaoFilter = new SSAOFilter(1f, 3.2f, 0.2f, 0.1f);
+//        SSAOFilter ssaoFilter = new SSAOFilter();//1f, 3.2f, 0.2f, 0.1f);
 //        fpp.addFilter(ssaoFilter);
-//        app.getViewPort().addProcessor(fpp1);
+//        app.getViewPort().addProcessor(fpp);
          
         /* DropShadow */
-//        final int SHADOWMAP_SIZE=1024;
-//        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(app.getAssetManager(), SHADOWMAP_SIZE, 3);
-//        dlsr.setLight(sun);
-//        app.getViewPort().addProcessor(dlsr);
+        final int SHADOWMAP_SIZE=2048;
+        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(app.getAssetManager(), SHADOWMAP_SIZE, 3);
+        dlsr.setLight(sun);
+        app.getViewPort().addProcessor(dlsr);
  
 //        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(app.getAssetManager(), SHADOWMAP_SIZE, 3);
 //        dlsf.setLight(sun);

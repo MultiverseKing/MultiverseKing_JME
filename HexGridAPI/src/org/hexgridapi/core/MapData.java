@@ -95,6 +95,14 @@ public final class MapData {
         return mode;
     }
     
+    public ProceduralGenerator getGenerator(){
+        return generator;
+    }
+    
+    public int getSeed() {
+        return generator.getSeed();
+    }
+    
     /**
      * Check if there is any data currently stored.
      * 
@@ -185,7 +193,7 @@ public final class MapData {
 //    public void setTilesHeight(byte[] height, HexCoordinate[] tilePos) {
 //        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
 //        for(int i = 0; i < tilePos.length; i++){
-//            HexTile tile = tileData.get(tilePos[i].getAsOffset());
+//            HexTile tile = tileData.get(tilePos[i].toOffset());
 //            if (tile != null) {
 //                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedHeight(height));
 //            } else {
@@ -198,7 +206,7 @@ public final class MapData {
 //    public void setTilesTextureKey(String[] key, HexCoordinate... tilePos) {
 //        TileChangeEvent[] tceList = new TileChangeEvent[tilePos.length];
 //        for(int i = 0; i < tilePos.length; i++){
-//            HexTile tile = tileData.get(tilePos[i].getAsOffset());
+//            HexTile tile = tileData.get(tilePos[i].toOffset());
 //            if (tile != null) {
 //                tceList[i] = updateTileData(tilePos[i], tile.cloneChangedTextureKey(getTextureKey(key)));
 //            } else {
@@ -219,18 +227,6 @@ public final class MapData {
             }
         }
         return new TileChangeEvent(tilePos, oldTile, tile);
-    }
-    
-    public int getSeed() {
-        return generator.getSeed();
-    }
-    /**
-     * This lead to some issue if used on runtime as all generated data 
-     * use the old seed and new data will use the new seed...
-     * @param seed 
-     */
-    public void setSeed(int seed) {
-        generator.setSeed(seed);
     }
     
     public boolean saveArea(String mapName) {

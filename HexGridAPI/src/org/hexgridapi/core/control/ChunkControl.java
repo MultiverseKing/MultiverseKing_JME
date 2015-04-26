@@ -6,6 +6,7 @@ import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -112,7 +113,7 @@ public class ChunkControl extends AbstractControl {
 //            mat.getAdditionalRenderState().setWireframe(true);
 //            tile.getMesh().setMode(Mesh.Mode.Points);
             tile.setMaterial(mat);
-//            tile.setShadowMode(RenderQueue.ShadowMode.Inherit);
+            tile.setShadowMode(RenderQueue.ShadowMode.Inherit);
             parent.attachChild(tile);
         }
     }

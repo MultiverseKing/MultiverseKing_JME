@@ -52,7 +52,7 @@ public class ChunkData {
     
     boolean exist(Vector2Int chunk, HexCoordinate tilePos) {
         if (chunks.containsKey(chunk)) {
-            if (chunks.get(chunk).containsKey(tilePos.getAsOffset())) {
+            if (chunks.get(chunk).containsKey(tilePos.toOffset())) {
                 return true;
             }
         }

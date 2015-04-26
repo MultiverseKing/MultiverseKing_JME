@@ -37,9 +37,7 @@ public final class ProceduralGenerator {
     }
 
     /**
-     * /!\ if the seed change all value change be aware to take care of
-     * updating.
-     *
+     * 
      * @param heightMin must be lesser or equal to 0
      * @param heightMax must be greater than 0
      */
@@ -54,7 +52,7 @@ public final class ProceduralGenerator {
             this.textureCount = textureCount;
 //            perlin.setFrequency(2.0);
 //            perlin.setPersistence(0.5);
-            perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_BEST);
+            perlin.setNoiseQuality(NoiseGen.NoiseQuality.QUALITY_FAST);
             perlin.setSeed(seed);
         }
     }
@@ -71,30 +69,20 @@ public final class ProceduralGenerator {
         return perlin.getSeed();
     }
 
-    public void setSeed(int seed) {
-        if (validateSeed(seed)) {
-            perlin.setSeed(seed);
-        }
-    }
+    public ProceduralChunkData getChunkValue(Vector2Int chunkPos, int[] paramList) {
+        Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(chunkPos).toOffset();
+        ProceduralChunkData chunkData = new ProceduralChunkData();
 
-    /**
-     * @todo incomplete
-     * @param posX
-     * @param posY
-     * @return
-     */
-    public ProceduralChunk getChunkValue(int posX, int posY) {
-        Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(new Vector2Int(posY, posY));
-        ProceduralChunk chunk = new ProceduralChunk(HexSetting.CHUNK_SIZE);
-
-        for (int x = 0; x < HexSetting.CHUNK_SIZE; x++) {
-            for (int y = 0; y < HexSetting.CHUNK_SIZE; y++) {
-                HexCoordinate tilePos = new HexCoordinate(
-                        HexCoordinate.Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
-                chunk.add(tilePos, getTileValue(tilePos));
+        for(int paramValue : paramList){
+            for (int x = 0; x < HexSetting.CHUNK_SIZE; x++) {
+                for (int y = 0; y < HexSetting.CHUNK_SIZE; y++) {
+                    HexCoordinate tilePos = new HexCoordinate(
+                            HexCoordinate.Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
+                    chunkData.add(paramValue, tilePos, getCustom(x, y, paramValue));
+                }
             }
         }
-        return chunk;
+        return chunkData;
     }
 
     /**
@@ -103,12 +91,11 @@ public final class ProceduralGenerator {
      * @return 
      */
     public HexTile getTileValue(HexCoordinate tilePos) {
-        int height = getHeight(tilePos.getAsOffset().x, tilePos.getAsOffset().y);
+        int height = getHeight(tilePos.toOffset().x, tilePos.toOffset().y);
         if(height <= 0){
             return null;
         }
         return new HexTile(height,0);
-//                getTexture(tilePos.getAsOffset().x, tilePos.getAsOffset().y));
     }
 
     /**
@@ -119,7 +106,14 @@ public final class ProceduralGenerator {
     private double getTileValue(int posX, int posY, int param) {
         return FastMath.abs((float) perlin.getValue(posX*0.01, posY*0.01, param));
     }
-
+    
+    private int getCustom(int x, int y, int param) {
+        if(param == 0 || param == 1){
+            throw new IllegalArgumentException("Value of param : " + param  + " is not allowed.");
+        }
+        return (int) NoiseGen.MakeInt32Range((getTileValue(x, y, 0) * (heightMax + heightMin)) - heightMin);
+    }
+    
     /**
      * @todo wip
      * @param generatedValue

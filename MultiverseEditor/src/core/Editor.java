@@ -43,9 +43,9 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
                 new HexPositionSystem(),
                 new AreaEventSystem(),
                 new AreaEventRenderDebugSystem());
-
-        JPlayEditorMenu playEditorMenu = new JPlayEditorMenu(this);
-        rootWindow.getJMenuBar().add(playEditorMenu);
+        
+        rootWindow.getJMenuBar().add(new JPlayEditorMenu(this));
+        
         for (Component c : rootWindow.getContentPane().getComponents()) {
             if (c instanceof JPropertiesPanelHolder) {
                 ((JPropertiesPanelHolder) c).add(new JESPropertiesPanel(this));

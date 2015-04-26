@@ -41,7 +41,7 @@ public class JCursorPositionPanel extends JPanel {
         @Override
         public void onTileSelectionUpdate(HexCoordinate currentSelection, ArrayList<HexCoordinate> selectedList) {
             cursorPos = currentSelection;
-            cursorPosition.setText("Hex pos : " + currentSelection.getAsOffset());
+            cursorPosition.setText("Hex pos : " + currentSelection.toOffset());
             chunkPosition.setText("Chunk pos : " + currentSelection.getCorrespondingChunk());
         }
     };

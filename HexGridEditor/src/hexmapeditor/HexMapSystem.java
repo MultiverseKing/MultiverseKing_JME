@@ -39,6 +39,10 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     public int getSeed() {
         return mapData.getSeed();
     }
+    
+    public void hideGhost(boolean setVisible) {
+        ghostControl.hideGhostTile(setVisible);
+    }
 
     public void setMapName(String name) {
         mapData.setMapName(name);

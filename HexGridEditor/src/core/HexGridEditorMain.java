@@ -110,14 +110,10 @@ public class HexGridEditorMain extends HexGridDefaultApp {
 
         rootWindow.getContentPane().add(((JmeCanvasContext) this.getContext()).getCanvas(), BorderLayout.CENTER);
 
-
         JPropertiesPanelHolder holder = new JPropertiesPanelHolder();
         rootWindow.getContentPane().add(holder, BorderLayout.EAST);
         holder.add(new JHexPropertiesPanel(this));
         rootWindow.revalidate();
-
-//        JPlayEditorMenu playEditorMenu = new JPlayEditorMenu(this);
-//        rootWindow.getJMenuBar().add(playEditorMenu);
 
         isStart = true;
     }

@@ -36,7 +36,9 @@ import core.HexGridEditorMain;
 import hexmapeditor.gui.JCursorPositionPanel;
 
 /**
- *
+ * @todo in short : Add a dropBox to chose the kind of replacement to set when ghost tile isn't visible.
+ * @todo extended : When using showGhost all ghost tile got removed but this lead to ugly 
+ * visual since there is no replacement for it.
  * @author roah
  */
 public class JHexPropertiesPanel extends JPropertiesPanel {
@@ -49,6 +51,7 @@ public class JHexPropertiesPanel extends JPropertiesPanel {
     private JPanel tileProperties;
     private HashMap<String, JComponent> comps = new HashMap<>();
     private boolean update = true;
+    private boolean ghostIsVisible = true;
 
     public JHexPropertiesPanel(HexGridEditorMain editorMain) {
         super(editorMain.getAssetManager().loadTexture(
@@ -78,7 +81,7 @@ public class JHexPropertiesPanel extends JPropertiesPanel {
                 onAction(e);
             }
         });
-        box.setSelected(true);
+        box.setSelected(ghostIsVisible);
         box.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
         box.setAlignmentX(0);
         addComp(box);
@@ -152,8 +155,14 @@ public class JHexPropertiesPanel extends JPropertiesPanel {
                 editorSystem.generateFromSeed();
                 break;
             case "Show ghost":
-                //TODO
-                System.err.println("TODO : " + e.getActionCommand());
+                editorMain.enqueue(new Callable<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        editorSystem.hideGhost(ghostIsVisible);
+                        ghostIsVisible = !ghostIsVisible;
+                        return null;
+                    }
+                });
                 break;
             case "Destroy":
                 editorMain.enqueue(new Callable<Void>() {

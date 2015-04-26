@@ -39,7 +39,7 @@ public final class HexMapSystem extends AbstractHexGridAppState {
     public int getSeed() {
         return mapData.getSeed();
     }
-    
+
     public void hideGhost(boolean setVisible) {
         ghostControl.hideGhostTile(setVisible);
     }

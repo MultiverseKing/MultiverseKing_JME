@@ -1,10 +1,11 @@
-package org.multiversekingesapi.field.position;
+package org.multiversekingesapi.field.exploration;
 
 import com.jme3.animation.LoopMode;
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.MotionPathListener;
 import com.jme3.cinematic.events.MotionEvent;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
@@ -22,6 +23,9 @@ import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiversekingesapi.SubSystem;
+import org.multiversekingesapi.field.position.HexPositionComponent;
+import org.multiversekingesapi.field.position.HexPositionSystem;
+import org.multiversekingesapi.field.position.MoveToComponent;
 import org.multiversekingesapi.loader.EntityLoader;
 import org.multiversekingesapi.render.RenderComponent;
 import org.multiversekingesapi.render.RenderSystem;
@@ -47,7 +51,7 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
         pathfinder.setMapData(mapData);
         renderSystem = app.getStateManager().getState(RenderSystem.class);
-        renderSystem.registerSubSystem(this);
+        renderSystem.registerSubSystem(this, true);
         hexPositionsystem = app.getStateManager().getState(HexPositionSystem.class);
         return entityData.getEntities(HexPositionComponent.class, MoveToComponent.class, RenderComponent.class);
     }
@@ -131,15 +135,20 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
     protected void removeEntity(Entity e) {
 //        System.err.println(renderSystem.getSpatial(e.getId()).getName() + " is removed.");
         movementGoal.remove(e.getId());
-        MotionEvent control = renderSystem.getControl(e.getId(), MotionEvent.class);
-        if (movementUpdateGoal.containsKey(e.getId())
-                && buildNewPath(e.getId(), control, null)) {
-            entityData.setComponent(e.getId(), new MoveToComponent(movementGoal.get(e.getId())));
-            return;
+        Spatial s = renderSystem.getSpatial(e.getId());
+        if (s != null) {
+            MotionEvent control = s.getControl(MotionEvent.class);
+            if (control != null) {
+                control.getPath().disableDebugShape();
+                s.removeControl(control);
+            }
         }
-        control.getPath().disableDebugShape();
+//        if (movementUpdateGoal.containsKey(e.getId())
+//                && buildNewPath(e.getId(), control, null)) {
+//            entityData.setComponent(e.getId(), new MoveToComponent(movementUpdateGoal.get(e.getId())));
+//            return;
+//        }
         hexPositionsystem.removeEntityFromSubSystem(e.getId());
-        renderSystem.getSpatial(e.getId()).removeControl(control);
         entityData.setComponent(e.getId(), new AnimationComponent(Animation.IDLE));
     }
 
@@ -160,9 +169,9 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
         }
         for (int i = 0; i < wayPoint.size(); i++) {
             HexCoordinate pos = wayPoint.get(i);
-            path.addWayPoint(pos.convertToWorldPosition(mapData.getTile(pos).getHeight()));
+            path.addWayPoint(pos.toWorldPosition(mapData.getTile(pos).getHeight()));
         }
-        path.enableDebugShape(app.getAssetManager(), renderSystem.getRenderNode());
+        path.enableDebugShape(app.getAssetManager(), renderSystem.getSubSystemNode(this));
         return path;
     }
 
@@ -171,17 +180,17 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
             @Override
             public void onWayPointReach(MotionEvent control, int wayPointIndex) {
                 if (control.getPath().getNbWayPoints() == wayPointIndex + 1) {
-                    System.err.println(control.getSpatial().getName() + " has finished moving. ");
-//                        entityData.removeComponent(id, MoveToComponent.class);
+//                    System.err.println(control.getSpatial().getName() + " has finished moving. ");
+                    entityData.removeComponent(id, MoveToComponent.class);
                 } else {
-                    System.err.println(control.getSpatial().getName() + " has reached way point " + wayPointIndex);
+//                    System.err.println(control.getSpatial().getName() + " has reached way point " + wayPointIndex);
                 }
                 updatePosition(id, control);
                 if (movementUpdateGoal.containsKey(id)) {
-                    System.err.println("Start a new movement path.");
+//                    System.err.println("Start a new movement path.");
                     buildNewPath(id, control, this);
                 } else if (control.getPath().getNbWayPoints() == wayPointIndex + 1) {
-                    System.err.println("All movement has been done.");
+//                    System.err.println("All movement has been done.");
                     entityData.removeComponent(id, MoveToComponent.class);
                 }
             }
@@ -209,9 +218,9 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
                     entityData.getComponent(id, RenderComponent.class).getName())
                     .getInitialStatsComponent().getMoveSpeed();
             float addedDist = motionControl.getSpatial().getLocalTranslation().distance(
-                    newPath.get(0).convertToWorldPosition(mapData.getTile(newPath.get(0)).getHeight()));
-            float baseDist = newPath.get(0).convertToWorldPosition(mapData.getTile(newPath.get(0)).getHeight())
-                    .distance(newPath.get(1).convertToWorldPosition(mapData.getTile(newPath.get(1)).getHeight()));
+                    newPath.get(0).toWorldPosition(mapData.getTile(newPath.get(0)).getHeight()));
+            float baseDist = newPath.get(0).toWorldPosition(mapData.getTile(newPath.get(0)).getHeight())
+                    .distance(newPath.get(1).toWorldPosition(mapData.getTile(newPath.get(1)).getHeight()));
             motionControl.setInitialDuration(ms * (newPath.size() + 1));// + (ms / baseDist * addedDist));
             if (listeners != null) {
                 newMotion.addListener(listeners);

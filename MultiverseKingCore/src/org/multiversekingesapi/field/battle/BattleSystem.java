@@ -36,7 +36,7 @@ import org.multiversekingesapi.field.component.HealthComponent;
 import org.multiversekingesapi.field.component.InfluenceComponent;
 import org.multiversekingesapi.field.position.HexPositionComponent;
 import org.multiversekingesapi.field.position.MoveToComponent;
-import org.multiversekingesapi.field.position.HexMovementSystem;
+import org.multiversekingesapi.field.exploration.HexMovementSystem;
 import org.multiversekingesapi.loader.EntityLoader;
 import org.multiversekingesapi.loader.PlayerProperties;
 import org.multiversekingesapi.loader.TitanLoader;
@@ -143,9 +143,9 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
      */
 //    private void camToStartPosition() {
 //        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-//        Vector3f center = startPosition.convertToWorldPosition();
+//        Vector3f center = startPosition.toWorldPosition();
 ////        Vector3f center = new HexCoordinate(HexCoordinate.OFFSET,
-////                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).convertToWorldPosition();
+////                new Vector2Int(HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2)).toWorldPosition();
 //        ((HexGridEditorMain) app).getRtsCam().setCenter(new Vector3f(center.x + 3, 15, center.z + 3));
 //    }
     

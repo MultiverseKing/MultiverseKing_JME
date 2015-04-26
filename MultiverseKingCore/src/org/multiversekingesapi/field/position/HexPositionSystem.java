@@ -116,10 +116,10 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
         if(s != null){
             Vector3f pos;
             if (mapData.getTile(e.get(HexPositionComponent.class).getPosition()) == null) {
-                pos = e.get(HexPositionComponent.class).getPosition().convertToWorldPosition();
+                pos = e.get(HexPositionComponent.class).getPosition().toWorldPosition();
             } else {
                 pos = e.get(HexPositionComponent.class).getPosition()
-                        .convertToWorldPosition(mapData.getTile(
+                        .toWorldPosition(mapData.getTile(
                         e.get(HexPositionComponent.class).getPosition()).getHeight());
             }
     //            pos.y += 0.1f;

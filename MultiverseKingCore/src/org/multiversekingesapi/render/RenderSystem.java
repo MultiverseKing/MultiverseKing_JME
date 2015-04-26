@@ -145,10 +145,13 @@ public class RenderSystem extends EntitySystemAppState {
             n = new Node(subSystem.getClass().getName());
             renderSystemNode.attachChild(n);
             for (Entity e : entities) {
-                if (e.get(RenderComponent.class).getSubSystem().equals(subSystem)) {
+                if (e.get(RenderComponent.class).getSubSystem() != null
+                        && e.get(RenderComponent.class).getSubSystem().equals(subSystem)) {
                     n.attachChild(spatials.get(e.getId()));
                 }
             }
+        } else if (addNode && n != null && !n.getName().equals(subSystem.getClass().getName())) {
+            n.setName(subSystem.getClass().getName());
         } else if (!addNode && n != null) {
             renderSystemNode.detachChild(n);
         }
@@ -169,13 +172,32 @@ public class RenderSystem extends EntitySystemAppState {
                         renderSystemNode.attachChild(s);
                     }
                 }
+            } else if (n != null) {
+                renderSystemNode.detachChild(n);
             }
-            renderSystemNode.detachChild(n);
         } else {
-            Logger.getGlobal().log(Level.WARNING, "{0} : Trying to remove a system not initialized : {1} ",
-                    new Object[]{getClass().getName(), subSystem.getClass().getName()});
-
+            Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                    "Trying to remove a subSystem not referenced : {1} ",
+                    new Object[]{subSystem.getClass().getName()});
         }
+    }
+
+    public Node getSubSystemNode(SubSystem subSystem) {
+        if (subSystems.contains(subSystem)) {
+            Node n = (Node) renderSystemNode.getChild(subSystem.getClass().getName());
+            if (n != null) {
+                return n;
+            } else {
+                Logger.getLogger(getClass().getName()).log(Level.INFO,
+                        "No Node referenced for : {1} ",
+                        new Object[]{subSystem.getClass().getName()});
+            }
+        } else {
+            Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                    "Trying to get a Node for a subSystem not referenced : {1} ",
+                    new Object[]{subSystem.getClass().getName()});
+        }
+        return null;
     }
 
     /**
@@ -269,10 +291,9 @@ public class RenderSystem extends EntitySystemAppState {
         return renderSystemNode.getName();
     }
 
-    public Node getRenderNode() {
-        return renderSystemNode;
-    }
-
+//    public Node getRenderNode() {
+//        return renderSystemNode;
+//    }
     public String getSpatialName(EntityId id) {
         return spatials.get(id).getName();
     }

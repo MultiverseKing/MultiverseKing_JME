@@ -132,7 +132,7 @@ public class EntityLoader {
             layer.put("areaRadius", collision.getCollisionLayer(b).getAreaRadius());
             JSONArray key = new JSONArray();
             for (HexCoordinate coord : collision.getCollisionLayer(b).getCoord()) {
-                key.add(coord.getAsOffset().toString());
+                key.add(coord.toOffset().toString());
             }
             layer.put("key", key);
             collisionList.add(layer);

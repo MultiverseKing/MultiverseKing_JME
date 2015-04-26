@@ -5,6 +5,7 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import org.hexgridapi.core.RTSCamera;
+import org.hexgridapi.core.appstate.HexGridDefaultApp;
 import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.render.RenderComponent;
@@ -15,19 +16,16 @@ import org.multiversekingesapi.render.RenderSystem;
  * @author roah
  */
 public class CameraControlSystem extends EntitySystemAppState implements SubSystem {
-    private final RTSCamera camera;
+    private RTSCamera camera;
     private EntityId trackedEntity;
     private Spatial trackedSpatial;
     private RenderSystem renderSystem;
-
-    public CameraControlSystem(RTSCamera camera) {
-        this.camera = camera;
-    }
     
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
+        camera = ((HexGridDefaultApp)app).getRtsCam();
         return entityData.getEntities(RenderComponent.class, CameraTrackComponent.class);
     }
 

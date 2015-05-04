@@ -1,8 +1,6 @@
 package core;
 
 import core.entitysystem.JESPropertiesPanel;
-import hexmapeditor.gui.JPropertiesPanelHolder;
-import java.awt.Component;
 import org.multiversekingesapi.EntityDataAppState;
 import org.multiversekingesapi.IMultiverCoreGUI;
 import org.multiversekingesapi.field.AreaEventSystem;
@@ -25,6 +23,10 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
             }
         });
     }
+
+    public Editor() {
+        super("King Of Multiverse Editor");
+    }
     Screen screen;
 
     @Override
@@ -33,8 +35,8 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
     }
 
     @Override
-    public void startAreaEditor() {
-        super.startAreaEditor();
+    public void startHexGridEditor() {
+        super.startHexGridEditor();
 
         screen = new Screen(this);
         getStateManager().attachAll(
@@ -43,14 +45,8 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
                 new HexPositionSystem(),
                 new AreaEventSystem(),
                 new AreaEventRenderDebugSystem());
-        
+
         rootWindow.getJMenuBar().add(new JPlayEditorMenu(this));
-        
-        for (Component c : rootWindow.getContentPane().getComponents()) {
-            if (c instanceof JPropertiesPanelHolder) {
-                ((JPropertiesPanelHolder) c).add(new JESPropertiesPanel(this));
-                break;
-            }
-        }
+        addPropertiesPanel(new JESPropertiesPanel(this));
     }
 }

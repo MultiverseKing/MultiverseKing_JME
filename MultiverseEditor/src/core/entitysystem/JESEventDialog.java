@@ -41,8 +41,8 @@ public class JESEventDialog extends JDialog {
                 switch ((AreaEventComponent.Event) ((JComboBox) e.getSource()).getSelectedItem()) {
                     case Start:
                         break;
-                    case Trigger:
-                        buildTriggerMenu();
+                    case Event:
+                        buildEventMenu();
                         break;
                     default:
                         throw new UnsupportedOperationException(
@@ -71,7 +71,10 @@ public class JESEventDialog extends JDialog {
         addComp(cancelBtn, 3, 3, 1, 1, GridBagConstraints.EAST, GridBagConstraints.BOTH);
     }
 
-    private void buildTriggerMenu() {
+    private void buildEventMenu() {
+        System.err.println("TODO : Set Trigger Menu");
+        JPanel innerPan = new JPanel();
+        
     }
 
     // Sets the rules for a component destined for a GridBagLayout

@@ -76,11 +76,15 @@ public class JESPropertiesPanel extends JPropertiesPanel {
 
                 final AreaEventComponent.Event event = dial.getValidatedEvent();
                 if (event != null) {
+                    if (event.equals(AreaEventComponent.Event.Start)
+                            && system.getStartPosition() != null
+                            && system.getStartPosition().equals(cursorPan.getPosition())) {
+                        return;
+                    }
                     editorMain.enqueue(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            editorMain.getStateManager().getState(AreaEventSystem.class)
-                                    .updateEvent(cursorPan.getPosition(), event, true);
+                            system.updateEvent(cursorPan.getPosition(), event, true);
                             return null;
                         }
                     });
@@ -135,6 +139,8 @@ public class JESPropertiesPanel extends JPropertiesPanel {
                         return null;
                     }
                 });
+                eventPan.remove(((Component) e.getSource()).getParent());
+                eventPan.revalidate();
             }
         });
         result.setAlignmentX(0);

@@ -73,6 +73,9 @@ public class AreaEventSystem extends EntitySystemAppState {
         }
         if (add) {
             if (event.equals(Event.Start) && startPosition != null) {
+                if(startPosition.equals(inspectedTilePos)){
+                    return;
+                }
                 for(Entity e : entities){
                     if(e.get(AreaEventComponent.class).getPosition().equals(startPosition)){
                         AreaEventComponent comp = e.get(AreaEventComponent.class)

@@ -58,6 +58,6 @@ public class AreaEventComponent implements PersistentComponent {
 
     public enum Event {
         Start,
-        Trigger,
+        Event,
     }
 }

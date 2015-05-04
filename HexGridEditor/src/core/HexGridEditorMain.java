@@ -1,11 +1,14 @@
 package core;
 
+import com.jme3.app.Application;
+import hexmapeditor.gui.database.JDataBaseMenu;
 import hexmapeditor.gui.hexmap.JHexEditorMenu;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.RenderManager;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
+import gui.JPropertiesPanel;
 import hexmapeditor.HexMapSystem;
 import hexmapeditor.gui.JPropertiesPanelHolder;
 import hexmapeditor.gui.hexmap.JHexEditorMenu.HexMenuAction;
@@ -14,6 +17,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import javax.swing.JFrame;
@@ -30,18 +35,19 @@ import org.hexgridapi.core.appstate.MouseControlSystem;
 public class HexGridEditorMain extends HexGridDefaultApp {
 
     protected final JFrame rootWindow;
-    protected boolean isStart = false;
+    private final JPropertiesPanelHolder holder = new JPropertiesPanelHolder();
+    private boolean isStart = false;
 
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                HexGridEditorMain editorMain = new HexGridEditorMain();
+                HexGridEditorMain editorMain = new HexGridEditorMain("Hex Grid Editor");
             }
         });
     }
 
-    public HexGridEditorMain() {
+    public HexGridEditorMain(String windowName) {
         AppSettings initSettings = new AppSettings(true);
         Dimension dim = new Dimension(1024, 768);
         initSettings.setWidth(dim.width);
@@ -49,8 +55,14 @@ public class HexGridEditorMain extends HexGridDefaultApp {
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 
 
-        rootWindow = new JFrame("Hex Grid Editor");
-        rootWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        rootWindow = new JFrame(windowName);
+        rootWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        rootWindow.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosed(WindowEvent e) {
+                stop();
+            }
+        });
         rootWindow.getContentPane().setLayout(new BorderLayout());
 
         rootWindow.addComponentListener(new ComponentAdapter() {
@@ -79,6 +91,9 @@ public class HexGridEditorMain extends HexGridDefaultApp {
         editorMenu.setAction(HexMenuAction.Load);
         menuBar.add(editorMenu);
 
+        JDataBaseMenu dataMenu = new JDataBaseMenu(this);
+        menuBar.add(dataMenu);
+
         rootWindow.setJMenuBar(menuBar);
         //-------------
 
@@ -98,7 +113,7 @@ public class HexGridEditorMain extends HexGridDefaultApp {
         return rootWindow;
     }
 
-    public void startAreaEditor() {
+    public void startHexGridEditor() {
         inputManager.addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
@@ -110,7 +125,6 @@ public class HexGridEditorMain extends HexGridDefaultApp {
 
         rootWindow.getContentPane().add(((JmeCanvasContext) this.getContext()).getCanvas(), BorderLayout.CENTER);
 
-        JPropertiesPanelHolder holder = new JPropertiesPanelHolder();
         rootWindow.getContentPane().add(holder, BorderLayout.EAST);
         holder.add(new JHexPropertiesPanel(this));
         rootWindow.revalidate();
@@ -126,5 +140,9 @@ public class HexGridEditorMain extends HexGridDefaultApp {
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
+    }
+
+    public void addPropertiesPanel(JPropertiesPanel propertiesPanel) {
+        holder.add(propertiesPanel);
     }
 }

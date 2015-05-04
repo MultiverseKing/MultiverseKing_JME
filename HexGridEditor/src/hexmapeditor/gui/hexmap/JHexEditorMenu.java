@@ -37,7 +37,7 @@ public final class JHexEditorMenu extends JMenu {
                     main.enqueue(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
-                            main.startAreaEditor();
+                            main.startHexGridEditor();
                             return null;
                         }
                     });

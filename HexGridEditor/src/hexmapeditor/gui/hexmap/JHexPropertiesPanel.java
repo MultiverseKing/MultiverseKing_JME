@@ -41,7 +41,7 @@ import hexmapeditor.gui.JCursorPositionPanel;
  * visual since there is no replacement for it.
  * @author roah
  */
-public class JHexPropertiesPanel extends JPropertiesPanel {
+public final class JHexPropertiesPanel extends JPropertiesPanel {
 
     private final HexGridEditorMain editorMain;
     private HexMapSystem editorSystem;

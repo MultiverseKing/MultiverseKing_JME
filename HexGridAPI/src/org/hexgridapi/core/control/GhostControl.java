@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.MapData;
-import org.hexgridapi.core.mesh.MeshParameter;
+import org.hexgridapi.core.mesh.GreddyMeshingParameter;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
@@ -31,15 +31,15 @@ import org.hexgridapi.utility.Vector2Int;
 public class GhostControl extends ChunkControl {
 
     private final Node collisionNode = new Node("GhostCollision");
-    private final int radius = 2;
+    private final int radius = 1;
     private final HexGrid system;
     private final Camera cam;
     private GridRayCastControl rayControl;
     private Vector3f oldCamPosition = new Vector3f();
 
-    public GhostControl(Application app, MeshParameter meshParam,
+    public GhostControl(Application app, GreddyMeshingParameter meshParam, Material hexMat,
             MapData.GhostMode mode, Vector2Int pos, HexGrid system) {
-        super(meshParam, app.getAssetManager(), mode, pos, false);
+        super(meshParam, app.getAssetManager(), hexMat, mode, pos, false);
         if (mode.equals(MapData.GhostMode.NONE)) {
             throw new UnsupportedOperationException(mode + " isn't allowed for Ghost Control");
         }
@@ -87,7 +87,7 @@ public class GhostControl extends ChunkControl {
             if (mode.equals(MapData.GhostMode.GHOST)) {
                 genGhost();
             }
-            updatePosition();
+            updatePosition(true);
         } else if (spatial == null) {
             // cleanup
         } else {
@@ -153,20 +153,22 @@ public class GhostControl extends ChunkControl {
                 HexCoordinate pos = event.getPosition();
                 if (pos != null && !isInRange(pos.getCorrespondingChunk())) {
                     this.chunkPosition = pos.getCorrespondingChunk();
-                    updatePosition();
+                    updatePosition(false);
                 }
                 oldCamPosition = cam.getLocation().clone();
             }
         }
     }
 
-    private void updatePosition() {
+    private void updatePosition(boolean initialise) {
         Vector3f pos = HexGrid.getChunkWorldPosition(chunkPosition);
         spatial.setLocalTranslation(pos);
         collisionNode.setLocalTranslation(pos);
         if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)
                 || mode.equals(MapData.GhostMode.PROCEDURAL)) {
-            update();
+            if (!initialise) {
+                update();
+            }
             genGhost();
         }
         updateCulling();
@@ -209,7 +211,7 @@ public class GhostControl extends ChunkControl {
     }
 
     public void hideGhostTile(boolean hide) {
-        if(mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)){
+        if (mode.equals(MapData.GhostMode.GHOST_PROCEDURAL)) {
             for (int x = -radius; x <= radius; x++) {
                 for (int y = -radius; y <= radius; y++) {
                     Spatial geo = ((Node) ((Node) spatial).getChild("TILES." + x + "|" + y)).getChild("NO_TILE");

@@ -7,7 +7,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
-import com.jme3.scene.Node;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +20,7 @@ import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.events.MouseRayListener;
 
 /**
- * take care of all input hapening on the room grid.
+ * Take care of all mouse input happening on the grid.
  *
  * @author Eike Foede, roah
  */
@@ -108,7 +107,7 @@ public class MouseControlSystem extends AbstractAppState {
             } else {
                 inputListeners.get(listenerPulseIndex).onMouseAction(
                         new MouseInputEvent(MouseInputEventType.PULSE, tileSelectionControl.getSelectedPos(), 
-                        mapData.getTile(tileSelectionControl.getSelectedPos()).getHeight(),//new HexCoordinate(cursor.getLocalTranslation()),
+                        mapData.getTile(tileSelectionControl.getSelectedPos()).getHeight(),
                         rayCastControl.get3DRay(GridRayCastControl.CastFrom.MOUSE), null));
             }
         }

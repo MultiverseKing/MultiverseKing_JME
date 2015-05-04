@@ -12,7 +12,7 @@ import com.jme3.math.FastMath;
  * @author roah
  */
 public final class HexSetting {
-
+    
     /**
      * Radius to use when generating hex.
      */
@@ -24,7 +24,7 @@ public final class HexSetting {
     /**
      * Number of hex contain in a chunk.
      */
-    public final static int CHUNK_SIZE = 16; //must be multiple of two
+    public final static int CHUNK_SIZE = 8; //must be multiple of two
     /**
      * The initial depth given to any generated chunk.
      */
@@ -39,4 +39,9 @@ public final class HexSetting {
      * @deprecated 
      */
     public final static int CHUNK_DATA_LIMIT = 4;
+    
+    /**
+     * Path used to load the texture.
+     */
+    public final static String TEXTURE_PATH = "Textures/HexField/";
 }

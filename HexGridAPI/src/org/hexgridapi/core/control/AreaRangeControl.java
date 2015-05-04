@@ -15,23 +15,26 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.texture.Texture;
 import java.util.HashMap;
 import org.hexgridapi.core.MapData;
-import org.hexgridapi.core.mesh.MeshParameter;
+import org.hexgridapi.core.mesh.GreddyMeshingParameter;
 import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *
  * @author roah
+ * @deprecated use {@link TileSelectionControl} instead.
+ * @deprecated too much computation for any noticeable improvement.
+ * @deprecated does not handle the MeshGenerator. (from 3.0.0)
  */
 public class AreaRangeControl extends AbstractControl {
 
     private final AssetManager assetManager;
-    private final MeshParameter meshParam;
+    private final GreddyMeshingParameter meshParam;
     private final MapData.GhostMode mode;
     private int radius = 0;
     private HexCoordinate centerPosition;
     private ColorRGBA color;
 
-    public AreaRangeControl(MeshParameter meshParam, AssetManager assetManager, MapData.GhostMode mode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
+    public AreaRangeControl(GreddyMeshingParameter meshParam, AssetManager assetManager, MapData.GhostMode mode, HexCoordinate centerPosition, int radius, ColorRGBA color) {
         this.meshParam = meshParam;
         this.assetManager = assetManager;
         this.mode = mode;

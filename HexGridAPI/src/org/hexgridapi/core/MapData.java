@@ -13,9 +13,13 @@ import org.hexgridapi.utility.Vector2Int;
 
 /**
  * This class holds the hex data of the map.
+ * When setting textureKey avoid using "NO_TILES" && "SELECTION_TEXTURE" && "EMPTY_TEXTURE_KEY" 
+ * these are used internaly as the Key index is :
+ * -2 = and below used for non existant tile or ghost tile. StringKey == "NO_TILES"
+ * -1 = used for areaTexture. StringKey == "SELECTION_TEXTURE"
+ * 00 = default tecture used when specifiating no texture. StringKey == "EMPTY_TEXTURE_KEY"
+ * 01 = inclusive and above used for user added texture (ordered the way the get added).
  *
- * @todo: refresh method, when the mapElement is change but the chunk isn't on
- * memory, the chunk when loaded should be refreshed to get the right element.
  * @author Eike Foede, Roah
  */
 public final class MapData {
@@ -26,39 +30,42 @@ public final class MapData {
     private final HexGridMapLoader hexGridMapLoader;
     private GhostMode mode;
     private ProceduralGenerator generator;
-    private String mapName = "Undefined";// = "Reset";
-    /**
-     * Key index :
-     * -2 = and below used for non existant tile or ghost tile
-     * -1 = used for areaTexture
-     * 00 = used for EMPTY_TEXTURE_KEY (when specifiating no texture)
-     * 01 = and above user for added texture (ordered the way the get added).
-     */
+    private String mapName = "Undefined";
     private ArrayList<String> textureKeys = new ArrayList<String>();
 
     public MapData(AssetManager assetManager) {
         this(null, assetManager, GhostMode.PROCEDURAL);
     }
-    
-    public MapData(Object[] textureKeys, AssetManager assetManager, GhostMode mode){
+
+    public MapData(Object[] textureKeys, AssetManager assetManager, GhostMode mode) {
         this.assetManager = assetManager;
         hexGridMapLoader = new HexGridMapLoader(assetManager);
         genTextureKeys(textureKeys);
-        if(!mode.equals(GhostMode.NONE)){
+        if (!mode.equals(GhostMode.NONE)) {
             generator = new ProceduralGenerator(ProceduralGenerator.generateSeed(), this.textureKeys.size());
         }
         this.mode = mode;
     }
 
     private void genTextureKeys(Object[] userKey) {
-        this.textureKeys.add("EMPTY_TEXTURE_KEY");
         if (userKey != null) {
-            for (int i = 0; i < userKey.length; i++) {
-                textureKeys.add(userKey[i].toString());
+            for (int i = -1; i < userKey.length; i++) {
+                if(i == -1) {
+                    textureKeys.add("EMPTY_TEXTURE_KEY");
+                } else {
+                    if (userKey[i].toString().equals("NO_TILES")
+                            || userKey[i].toString().equals("EMPTY_TEXTURE_KEY")
+                            || userKey[i].toString().equals("SELECTION_TEXTURE")) {
+                        throw new IllegalArgumentException(userKey[i] + " is not allowed.");
+                    }
+                    textureKeys.add(userKey[i].toString());
+                }
             }
+        } else {
+            textureKeys.add("EMPTY_TEXTURE_KEY");
         }
     }
-    
+
     /**
      * Register a listener to respond to Tile Event.
      *
@@ -94,29 +101,27 @@ public final class MapData {
     public GhostMode getMode() {
         return mode;
     }
-    
-    public ProceduralGenerator getGenerator(){
+
+    public ProceduralGenerator getGenerator() {
         return generator;
     }
-    
+
     public int getSeed() {
         return generator.getSeed();
     }
-    
+
     /**
      * Check if there is any data currently stored.
-     * 
+     *
      * @return true if there is data.
      */
     public boolean containTilesData() {
         return !chunkData.isEmpty();
     }
-    
 
-    
     /**
      * Check if the specifiate chunk got any tile data stored.
-     * 
+     *
      * @param chunkPos inspected chunk.
      * @return true the specifiate chunk got any tile stored.
      */
@@ -132,9 +137,9 @@ public final class MapData {
      */
     public HexTile getTile(HexCoordinate tilePos) {
         HexTile t = chunkData.getTile(tilePos);
-        if(t == null && !chunkData.contain(tilePos)
+        if (t == null && !chunkData.contain(tilePos)
                 && (mode.equals(GhostMode.GHOST_PROCEDURAL)
-                    || mode.equals(GhostMode.PROCEDURAL))){
+                || mode.equals(GhostMode.PROCEDURAL))) {
             t = generator.getTileValue(tilePos);
         }
         return t;
@@ -150,8 +155,8 @@ public final class MapData {
         HexTile[] result = new HexTile[tilePos.length];
         for (int i = 0; i < tilePos.length; i++) {
             result[i] = chunkData.getTile(tilePos[i]);
-            if(result[i] == null && mode.equals(GhostMode.GHOST_PROCEDURAL)
-                    || mode.equals(GhostMode.PROCEDURAL)){
+            if (result[i] == null && mode.equals(GhostMode.GHOST_PROCEDURAL)
+                    || mode.equals(GhostMode.PROCEDURAL)) {
                 result[i] = generator.getTileValue(tilePos[i]);
             }
         }
@@ -167,6 +172,7 @@ public final class MapData {
     public void setTile(HexCoordinate tilePos, HexTile tile) {
         setTile(new HexCoordinate[]{tilePos}, new HexTile[]{tile});
     }
+
     /**
      * Change the designed tile(s) properties.
      * if tile array size is == 1 the given properties will be apply on all
@@ -215,20 +221,19 @@ public final class MapData {
 //        }
 //        updateTileListeners(tceList);
 //    }
-    
     private TileChangeEvent updateTileData(HexCoordinate tilePos, HexTile tile) {
         HexTile oldTile;
         if (tile != null) {
             oldTile = chunkData.add(tilePos, tile);
         } else {
             oldTile = chunkData.remove(tilePos);
-            if(oldTile == null && mode.equals(GhostMode.GHOST_PROCEDURAL)){
+            if (oldTile == null && mode.equals(GhostMode.GHOST_PROCEDURAL)) {
                 chunkData.add(tilePos, null);
             }
         }
         return new TileChangeEvent(tilePos, oldTile, tile);
     }
-    
+
     public boolean saveArea(String mapName) {
         this.mapName = mapName;
         return hexGridMapLoader.saveArea(mapName);
@@ -242,7 +247,7 @@ public final class MapData {
      * The texture used when adding a tile with no texture.
      *
      * @param Key texture to use as default
-     * @todo 
+     * @todo
      */
 //    public void setDefaultTexture(String Key) {
 //        for (Vector2Int coord : tileData.keySet()) {
@@ -250,7 +255,6 @@ public final class MapData {
 //        }
 //        updateTileListeners(new TileChangeEvent(null, new HexTile(Integer.MIN_VALUE, getTextureKey(Key)), new HexTile(Integer.MIN_VALUE, Integer.MIN_VALUE)));
 //    }
-
     /**
      * Get all tile around the defined position, return null for tile who
      * doesn't exist.
@@ -283,7 +287,7 @@ public final class MapData {
             l.onTileChange(tce);
         }
     }
-    
+
     /**
      * Cleanup the current map.
      */
@@ -299,14 +303,12 @@ public final class MapData {
      * @return EMPTY_TEXTURE_KEY if not found
      */
     public String getTextureValue(int textureKey) {
-        if (textureKey == -1) {
-            return "SELECTION_TEXTURE";
-        } else if (textureKey < -1) {
+        if (textureKey <= -1) {
             return "NO_TILE";
         } else {
             try {
                 return textureKeys.get(textureKey);
-            } catch (IndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException e) {                
                 return "EMPTY_TEXTURE_KEY";
             }
         }
@@ -320,9 +322,7 @@ public final class MapData {
      * @throws NoSuchFieldError if no mapping
      */
     public int getTextureKey(String value) throws NoSuchFieldError {
-        if(value == null || value.equals("NO_TILE")){
-            return -2;
-        } else if (value.equals("SELECTION_TEXTURE")) {
+        if (value == null || value.equals("NO_TILE")) {
             return -1;
         }
         int result = textureKeys.indexOf(value);
@@ -340,14 +340,14 @@ public final class MapData {
     public List<String> getTextureKeys() {
         return Collections.unmodifiableList(textureKeys);
     }
-    
+
     /**
      * Used to define how the chunk will handle tiles if they does not exist.
      */
     public enum GhostMode {
 
         /**
-         * null chunk will be ignored, 
+         * null chunk will be ignored,
          * null tiles will be ignored.
          */
         NONE,
@@ -362,7 +362,7 @@ public final class MapData {
          */
         PROCEDURAL,
         /**
-         * null chunk will be generated proceduraly, 
+         * null chunk will be generated proceduraly,
          * null tile will be generated as ghost.
          */
         GHOST_PROCEDURAL;

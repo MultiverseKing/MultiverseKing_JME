@@ -8,7 +8,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
 import org.hexgridapi.core.HexSetting;
-import org.hexgridapi.core.mesh.MeshParameter.CullingData;
+import org.hexgridapi.core.mesh.GreddyMeshingParameter.CullingData;
 import org.hexgridapi.utility.Vector2Int;
 
 /**
@@ -64,12 +64,12 @@ public final class MeshGenerator {
     }
 
     /**
-     * Generate a mesh accordingly to meshParam.
+     * Generate a mesh accordingly to param.
      *
-     * @param meshParam parameter to use.
+     * @param greddyMeshParam parameter to use.
      * @return newly generated Mesh.
      */
-    public Mesh getMesh(MeshParameter meshParam) {
+    public Mesh getMesh(GreddyMeshingParameter greddyMeshParam) {
         ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
         ArrayList<Vector2f[]> texCoord = new ArrayList<Vector2f[]>();
         ArrayList<int[]> index = new ArrayList<int[]>();
@@ -78,14 +78,14 @@ public final class MeshGenerator {
         int mergedtextCoordCount = 0;
         int mergedIndexCount = 0;
 
-        while (meshParam.hasNext()) {
-            Vector3f[] groundTriVert = getTriVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
-            Vector2f[] groundTriTex = getTriTexCoord(meshParam.getSizeParam());
-            int[] groundTriIndice = getTriIndex(meshParam.getSizeParam(), mergedVerticeCount);
+        while (greddyMeshParam.hasNext()) {
+            Vector3f[] groundTriVert = getTriVerticesPosition(greddyMeshParam.getCurrentPositionParam(), greddyMeshParam.getCurrentSizeParam(), greddyMeshParam.getCurrentHeightParam());
+            Vector2f[] groundTriTex = getTriTexCoord(greddyMeshParam.getCurrentSizeParam());
+            int[] groundTriIndice = getTriIndex(greddyMeshParam.getCurrentSizeParam(), mergedVerticeCount);
 
-            Vector3f[] groundQuadVert = getQuadVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
-            Vector2f[] groundQuadTex = getQuadTexCoord(meshParam.getPositionParam(), meshParam.getSizeParam());
-            int[] groundQuadIndice = getQuadIndex(meshParam.getSizeParam(), mergedVerticeCount + groundTriVert.length);
+            Vector3f[] groundQuadVert = getQuadVerticesPosition(greddyMeshParam.getCurrentPositionParam(), greddyMeshParam.getCurrentSizeParam(), greddyMeshParam.getCurrentHeightParam());
+            Vector2f[] groundQuadTex = getQuadTexCoord(greddyMeshParam.getCurrentPositionParam(), greddyMeshParam.getCurrentSizeParam());
+            int[] groundQuadIndice = getQuadIndex(greddyMeshParam.getCurrentSizeParam(), mergedVerticeCount + groundTriVert.length);
 
             Vector3f[] groundVert = new Vector3f[groundTriVert.length + groundQuadVert.length];
             Vector2f[] groundTex = new Vector2f[groundTriTex.length + groundQuadTex.length];
@@ -102,23 +102,22 @@ public final class MeshGenerator {
             mergedVerticeCount += groundVert.length;
             mergedIndexCount += groundIndice.length;
 
-            if (!meshParam.onlyGround()) {
-//                Vector3f[] sideVert = getSideVerticesPosition(meshParam.getPositionParam(), meshParam.getSizeParam(), meshParam.getHeightParam());
-                Vector3f[] sideVert = getSideVerticesPosition(groundVert, meshParam.getGroundHeight());
+            if (!greddyMeshParam.onlyGround()) {
+                Vector3f[] sideVert = getSideVerticesPosition(groundVert, greddyMeshParam.getGroundHeight());
                 Vector3f[] vertCombi = new Vector3f[sideVert.length + groundVert.length];
                 System.arraycopy(groundVert, 0, vertCombi, 0, groundVert.length);
                 System.arraycopy(sideVert, 0, vertCombi, groundVert.length, sideVert.length);
                 vertices.add(vertCombi);
 
-                Vector2f[] sideTex = getSideVerticesTextCoord(meshParam.getSizeParam(), meshParam.getHeightParam(), meshParam.getGroundHeight());
-//                Vector2f[] sideTex = getSideVerticestexCoord(meshParam.getSizeParam(), meshParam.getHeightParam());
+                Vector2f[] sideTex = getSideVerticesTextCoord(greddyMeshParam.getCurrentSizeParam(), greddyMeshParam.getCurrentHeightParam(), greddyMeshParam.getGroundHeight());
+//                Vector2f[] sideTex = getSideVerticestexCoord(meshParam.getCurrentSizeParam(), meshParam.getCurrentHeightParam());
                 Vector2f[] texCombi = new Vector2f[sideTex.length + groundTex.length];
                 System.arraycopy(groundTex, 0, texCombi, 0, groundTex.length);
                 System.arraycopy(sideTex, 0, texCombi, groundTex.length, sideTex.length);
                 texCoord.add(texCombi);
 
-                int[] sideIndice = getSideIndex(meshParam.getSizeParam(), mergedVerticeCount, groundVert.length, meshParam.getCullingData());
-//                int[] sideIndice = getSideIndex(meshParam.getSizeParam().x, mergedVerticeCount, meshParam.getCulling());
+                int[] sideIndice = getSideIndex(greddyMeshParam.getCurrentSizeParam(), mergedVerticeCount, groundVert.length, greddyMeshParam.getCullingData());
+//                int[] sideIndice = getSideIndex(meshParam.getCurrentSizeParam().x, mergedVerticeCount, meshParam.getCulling());
                 int[] indiceCombi = new int[sideIndice.length + groundIndice.length];
                 System.arraycopy(groundIndice, 0, indiceCombi, 0, groundIndice.length);
                 System.arraycopy(sideIndice, 0, indiceCombi, groundIndice.length, sideIndice.length);
@@ -135,6 +134,97 @@ public final class MeshGenerator {
         }
         Vector3f[] mergedVertices = new Vector3f[mergedVerticeCount];
         Vector2f[] mergedtextCoord = new Vector2f[mergedtextCoordCount];
+        int[] mergedIndex = new int[mergedIndexCount];
+
+        mergedVerticeCount = 0;
+        mergedtextCoordCount = 0;
+        mergedIndexCount = 0;
+        for (int i = 0; i < greddyMeshParam.getElementMeshCount(); i++) {
+            System.arraycopy(vertices.get(i), 0, mergedVertices, mergedVerticeCount, vertices.get(i).length);
+            System.arraycopy(texCoord.get(i), 0, mergedtextCoord, mergedtextCoordCount, texCoord.get(i).length);
+            System.arraycopy(index.get(i), 0, mergedIndex, mergedIndexCount, index.get(i).length);
+
+            mergedVerticeCount += vertices.get(i).length;
+            mergedtextCoordCount += texCoord.get(i).length;
+            mergedIndexCount += index.get(i).length;
+        }
+        return setCollisionBound(setAllBuffer(mergedVertices, mergedtextCoord, mergedIndex));
+    }
+
+    /**
+     * Generate a mesh accordingly to meshParam.
+     *
+     * @param meshParam parameter to use.
+     * @return newly generated Mesh.
+     */
+    public Mesh getArrayTextureMesh(GreddyMeshingParameter meshParam) {
+        ArrayList<Vector3f[]> vertices = new ArrayList<Vector3f[]>();
+        ArrayList<Vector3f[]> texCoord = new ArrayList<Vector3f[]>();
+        ArrayList<int[]> index = new ArrayList<int[]>();
+
+        int mergedVerticeCount = 0;
+        int mergedtextCoordCount = 0;
+        int mergedIndexCount = 0;
+
+        while (meshParam.hasNext()) {
+            Vector3f[] groundTriVert = getTriVerticesPosition(meshParam.getCurrentPositionParam(),
+                    meshParam.getCurrentSizeParam(), meshParam.getCurrentHeightParam());
+            Vector3f[] groundTriTex = getArrayTriTexCoord(meshParam.getCurrentSizeParam(),
+                    meshParam.getCurrentTextureIDParam());
+            int[] groundTriIndice = getTriIndex(meshParam.getCurrentSizeParam(), mergedVerticeCount);
+
+            Vector3f[] groundQuadVert = getQuadVerticesPosition(meshParam.getCurrentPositionParam(),
+                    meshParam.getCurrentSizeParam(), meshParam.getCurrentHeightParam());
+            Vector3f[] groundQuadTex = getArrayQuadTexCoord(meshParam.getCurrentPositionParam(),
+                    meshParam.getCurrentSizeParam(), meshParam.getCurrentTextureIDParam());
+            int[] groundQuadIndice = getQuadIndex(meshParam.getCurrentSizeParam(), mergedVerticeCount + groundTriVert.length);
+
+            Vector3f[] groundVert = new Vector3f[groundTriVert.length + groundQuadVert.length];
+            Vector3f[] groundTex = new Vector3f[groundTriTex.length + groundQuadTex.length];
+            int[] groundIndice = new int[groundTriIndice.length + groundQuadIndice.length];
+
+            System.arraycopy(groundTriVert, 0, groundVert, 0, groundTriVert.length);
+            System.arraycopy(groundQuadVert, 0, groundVert, groundTriVert.length, groundQuadVert.length);
+            System.arraycopy(groundTriTex, 0, groundTex, 0, groundTriTex.length);
+            System.arraycopy(groundQuadTex, 0, groundTex, groundTriTex.length, groundQuadTex.length);
+            System.arraycopy(groundTriIndice, 0, groundIndice, 0, groundTriIndice.length);
+            System.arraycopy(groundQuadIndice, 0, groundIndice, groundTriIndice.length, groundQuadIndice.length);
+
+            mergedtextCoordCount += groundTex.length;
+            mergedVerticeCount += groundVert.length;
+            mergedIndexCount += groundIndice.length;
+
+            if (!meshParam.onlyGround()) {
+                Vector3f[] sideVert = getSideVerticesPosition(groundVert, meshParam.getGroundHeight());
+                Vector3f[] vertCombi = new Vector3f[sideVert.length + groundVert.length];
+                System.arraycopy(groundVert, 0, vertCombi, 0, groundVert.length);
+                System.arraycopy(sideVert, 0, vertCombi, groundVert.length, sideVert.length);
+                vertices.add(vertCombi);
+
+                Vector3f[] sideTex = getSideArrayVerticesTextCoord(meshParam.getCurrentSizeParam(),
+                        meshParam.getCurrentHeightParam(), meshParam.getGroundHeight(), meshParam.getCurrentTextureIDParam());
+                Vector3f[] texCombi = new Vector3f[sideTex.length + groundTex.length];
+                System.arraycopy(groundTex, 0, texCombi, 0, groundTex.length);
+                System.arraycopy(sideTex, 0, texCombi, groundTex.length, sideTex.length);
+                texCoord.add(texCombi);
+
+                int[] sideIndice = getSideIndex(meshParam.getCurrentSizeParam(), mergedVerticeCount, groundVert.length, meshParam.getCullingData());
+                int[] indiceCombi = new int[sideIndice.length + groundIndice.length];
+                System.arraycopy(groundIndice, 0, indiceCombi, 0, groundIndice.length);
+                System.arraycopy(sideIndice, 0, indiceCombi, groundIndice.length, sideIndice.length);
+                index.add(indiceCombi);
+
+                mergedIndexCount += sideIndice.length;
+                mergedtextCoordCount += sideTex.length;
+                mergedVerticeCount += sideVert.length;
+            } else {
+                vertices.add(groundVert);
+                texCoord.add(groundTex);
+                index.add(groundIndice);
+            }
+        }
+        Vector3f[] mergedVertices = new Vector3f[mergedVerticeCount];
+        Vector3f[] mergedtextCoord = new Vector3f[mergedtextCoordCount];
         int[] mergedIndex = new int[mergedIndexCount];
 
         mergedVerticeCount = 0;
@@ -217,6 +307,21 @@ public final class MeshGenerator {
         }
         texCoord[size.x * 4] = new Vector2f(j, 0.25f);
         texCoord[size.x * 4 + 1] = new Vector2f(j + 0.5f, 0f);
+        return texCoord;
+    }
+
+    private static Vector3f[] getArrayTriTexCoord(Vector2Int size, int textureID) {
+        Vector3f[] texCoord = new Vector3f[size.x * 4 + 2];
+        int j = 0;
+        for (int i = 0; i < size.x * 4; i += 4) {
+            texCoord[i] = new Vector3f(j, 0.25f, textureID);
+            texCoord[i + 1] = new Vector3f(j + 0.5f, 0f, textureID);
+            texCoord[i + 2] = new Vector3f(j + 1f, 0.25f, textureID);
+            texCoord[i + 3] = new Vector3f(j + 0.5f, 0f, textureID);//Y+
+            j++;
+        }
+        texCoord[size.x * 4] = new Vector3f(j, 0.25f, textureID);
+        texCoord[size.x * 4 + 1] = new Vector3f(j + 0.5f, 0f, textureID);
         return texCoord;
     }
 
@@ -334,6 +439,38 @@ public final class MeshGenerator {
         return texCoord;
     }
 
+    private static Vector3f[] getArrayQuadTexCoord(Vector2Int position, Vector2Int size, int textureID) {
+        Vector3f[] texCoord = new Vector3f[(4 * size.y) + ((size.y - 1) * 2)];
+
+        texCoord[0] = new Vector3f(0f, 0.25f, textureID);
+        texCoord[1] = new Vector3f(size.x, 0.25f, textureID);
+        texCoord[2] = new Vector3f(0f, 0.75f, textureID);
+        texCoord[3] = new Vector3f(size.x, 0.75f, textureID);
+
+        int index = 4;
+        for (int i = 1 + position.y; i < size.y + position.y; i++) {
+
+            if ((i & 1) == 0) {
+                texCoord[index] = new Vector3f(0.5f, 0f, textureID);
+                texCoord[index + 1] = new Vector3f(size.x + 0.5f, 0f, textureID);
+                texCoord[index + 2] = new Vector3f(0f, 0.25f, textureID);
+                texCoord[index + 3] = new Vector3f(size.x, 0.25f, textureID);
+                texCoord[index + 4] = new Vector3f(0f, 0.75f, textureID);
+                texCoord[index + 5] = new Vector3f(size.x, 0.75f, textureID);
+            } else {
+                texCoord[index] = new Vector3f(-0.5f, 0f, textureID);
+                texCoord[index + 1] = new Vector3f(size.x - 0.5f, 0f, textureID);
+                texCoord[index + 2] = new Vector3f(0f, 0.25f, textureID);
+                texCoord[index + 3] = new Vector3f(size.x, 0.25f, textureID);
+                texCoord[index + 4] = new Vector3f(0f, 0.75f, textureID);
+                texCoord[index + 5] = new Vector3f(size.x, 0.75f, textureID);
+            }
+            index += 6;
+        }
+
+        return texCoord;
+    }
+
     private static int[] getQuadIndex(Vector2Int size, int offset) {
         int[] index = new int[(size.y * 2 * 3) + ((size.y - 1) * 2 * 3)];
 
@@ -373,8 +510,8 @@ public final class MeshGenerator {
         Vector3f[] sideVert = new Vector3f[groundVert.length * 2];
         System.arraycopy(groundVert, 0, sideVert, 0, groundVert.length);
         for (int i = 0; i < groundVert.length; i++) {
-            sideVert[i + groundVert.length] = new Vector3f(groundVert[i].x, 
-                    groundHeight*HexSetting.FLOOR_OFFSET, groundVert[i].z);
+            sideVert[i + groundVert.length] = new Vector3f(groundVert[i].x,
+                    groundHeight * HexSetting.FLOOR_OFFSET, groundVert[i].z);
         }
         return sideVert;
     }
@@ -425,6 +562,52 @@ public final class MeshGenerator {
         return texCoord;
     }
 
+    private Vector3f[] getSideArrayVerticesTextCoord(Vector2Int size, int height, int groundHeight, int textureID) {
+        Vector3f[] texCoord = new Vector3f[((size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2)) * 2];
+        int offset = (size.x * 4 + 2) + (4 * size.y) + ((size.y - 1) * 2);
+        float texHeight = (int) (FastMath.abs(groundHeight) + height) * 0.5f;
+        /**
+         * Side-tri coord.
+         * K define if top or bottom vertices. (vertice on Y+ or Y-)
+         */
+        for (int k = 0; k < 2; k++) {
+            for (int i = 0; i < size.x * 4; i += 4) {
+                texCoord[i + (k == 1 ? offset : 0)] = new Vector3f((k == 1 ? texHeight : 0f), 1f, textureID);
+                texCoord[i + (k == 1 ? offset : 0) + 1] = new Vector3f((k == 1 ? texHeight : 0f), 0.75f, textureID);
+                texCoord[i + (k == 1 ? offset : 0) + 2] = new Vector3f((k == 1 ? texHeight : 0f), 0.75f, textureID);
+                texCoord[i + (k == 1 ? offset : 0) + 3] = new Vector3f((k == 1 ? texHeight : 0f), 1f, textureID);
+            }
+            texCoord[size.x * 4 + (k == 1 ? offset : 0)] = new Vector3f((k == 1 ? texHeight : 0f), 1, textureID);
+            texCoord[size.x * 4 + (k == 1 ? offset : 0) + 1] = new Vector3f((k == 1 ? texHeight : 0f), 1, textureID);
+        }
+        /**
+         * Side-quad coord.
+         * k define if top or bottom vertices
+         * quad on the first row are calculated outside the loop.
+         */
+        int index = size.x * 4 + 2;
+        for (int k = 0; k < 2; k++) {
+            texCoord[index + (k == 1 ? offset : 0)] = new Vector3f((k == 1 ? texHeight : 0f), 1f, textureID);
+            texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector3f((k == 1 ? texHeight : 0f), 1f, textureID);
+            texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector3f((k == 1 ? texHeight : 0f), 0.75f, textureID);
+            texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector3f((k == 1 ? texHeight : 0f), 0.75f, textureID);
+        }
+
+        for (int k = 0; k < 2; k++) {
+            index = (size.x * 4 + 2) + 4;
+            for (int i = 0; i < size.y - 1; i++) {
+                texCoord[index + (k == 1 ? offset : 0)] = new Vector3f((k == 1 ? texHeight : 0), 0.75f, textureID);
+                texCoord[index + (k == 1 ? offset : 0) + 1] = new Vector3f((k == 1 ? texHeight : 0), 0.75f, textureID);
+                texCoord[index + (k == 1 ? offset : 0) + 2] = new Vector3f((k == 1 ? texHeight : 0), 1f, textureID);
+                texCoord[index + (k == 1 ? offset : 0) + 3] = new Vector3f((k == 1 ? texHeight : 0), 1f, textureID);
+                texCoord[index + (k == 1 ? offset : 0) + 4] = new Vector3f((k == 1 ? texHeight : 0), 0.75f, textureID);
+                texCoord[index + (k == 1 ? offset : 0) + 5] = new Vector3f((k == 1 ? texHeight : 0), 0.75f, textureID);
+                index += 6;
+            }
+        }
+        return texCoord;
+    }
+    
     private static int[] getSideIndex(Vector2Int size, int arrayOffset, int groundOffset, CullingData culling) {
         if (arrayOffset < 0) {
             arrayOffset = 0;
@@ -438,7 +621,7 @@ public final class MeshGenerator {
          */
         for (int x = 0; x < size.x; x++) {
             int vert = x * 4 + arrayOffset;
-            if (!culling.getCulling(MeshParameter.Position.TOP, x, MeshParameter.Position.TOP_LEFT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.TOP, x, GreddyMeshingParameter.Position.TOP_LEFT)) {
                 index[i] = vert;
                 index[i + 1] = vert + 1;
                 index[i + 2] = vert + groundOffset;
@@ -447,7 +630,7 @@ public final class MeshGenerator {
                 index[i + 4] = vert + 1;
                 index[i + 5] = vert + 1 + groundOffset;
             }
-            if (!culling.getCulling(MeshParameter.Position.TOP, x, MeshParameter.Position.TOP_RIGHT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.TOP, x, GreddyMeshingParameter.Position.TOP_RIGHT)) {
                 index[i + 6] = (x + 1) * 4 + arrayOffset;
                 index[i + 7] = (x + 1) * 4 + arrayOffset + groundOffset;
                 index[i + 8] = vert + 1;
@@ -456,7 +639,7 @@ public final class MeshGenerator {
                 index[i + 10] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + groundOffset : size.x * 4 + arrayOffset + groundOffset;
                 index[i + 11] = vert + 1 + groundOffset;
             }
-            if (!culling.getCulling(MeshParameter.Position.BOTTOM, x, MeshParameter.Position.BOT_LEFT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.BOTTOM, x, GreddyMeshingParameter.Position.BOT_LEFT)) {
                 index[i + 12] = vert + 2;
                 index[i + 13] = vert + 1 + 2;
                 index[i + 14] = vert + groundOffset + 2;
@@ -465,7 +648,7 @@ public final class MeshGenerator {
                 index[i + 16] = vert + 1 + 2;
                 index[i + 17] = vert + 1 + groundOffset + 2;
             }
-            if (!culling.getCulling(MeshParameter.Position.BOTTOM, x, MeshParameter.Position.BOT_RIGHT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.BOTTOM, x, GreddyMeshingParameter.Position.BOT_RIGHT)) {
                 index[i + 18] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + groundOffset + 2 + 1 : size.x * 4 + arrayOffset + 1 + groundOffset;
                 index[i + 19] = x != size.x - 1 ? (x + 1) * 4 + arrayOffset + 2 + 1 : size.x * 4 + arrayOffset + 1;
                 index[i + 20] = vert + 2;
@@ -480,7 +663,7 @@ public final class MeshGenerator {
          * generate left/right face.
          */
         int offsetB = size.x * 4 + 2 + arrayOffset;
-        if (!culling.getCulling(MeshParameter.Position.LEFT, 0, MeshParameter.Position.LEFT)) {
+        if (!culling.getCulling(GreddyMeshingParameter.Position.LEFT, 0, GreddyMeshingParameter.Position.LEFT)) {
             index[i] = offsetB;
             index[i + 1] = offsetB + groundOffset;
             index[i + 2] = offsetB + 2;
@@ -490,7 +673,7 @@ public final class MeshGenerator {
             index[i + 5] = offsetB + groundOffset + 2;
         }
 
-        if (!culling.getCulling(MeshParameter.Position.RIGHT, 0, MeshParameter.Position.RIGHT)) {
+        if (!culling.getCulling(GreddyMeshingParameter.Position.RIGHT, 0, GreddyMeshingParameter.Position.RIGHT)) {
             index[i + 6] = offsetB + 1;
             index[i + 7] = offsetB + 3;
             index[i + 8] = offsetB + groundOffset + 1;
@@ -503,7 +686,7 @@ public final class MeshGenerator {
         i += 12;
         for (int y = 1; y < size.y; y++) {
             int vert = (y - 1) * 6;
-            if (!culling.getCulling(MeshParameter.Position.LEFT, y, MeshParameter.Position.LEFT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.LEFT, y, GreddyMeshingParameter.Position.LEFT)) {
                 index[i] = offsetB + vert + 4;
                 index[i + 1] = offsetB + vert + 2;
                 index[i + 2] = offsetB + groundOffset + vert + 2;
@@ -513,8 +696,8 @@ public final class MeshGenerator {
                 index[i + 5] = offsetB + groundOffset + vert + 4;
             }
 
-            if (!culling.getCulling(MeshParameter.Position.LEFT, y, MeshParameter.Position.TOP_LEFT)
-                    || !culling.getCulling(MeshParameter.Position.LEFT, y - 1, MeshParameter.Position.BOT_LEFT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.LEFT, y, GreddyMeshingParameter.Position.TOP_LEFT)
+                    || !culling.getCulling(GreddyMeshingParameter.Position.LEFT, y - 1, GreddyMeshingParameter.Position.BOT_LEFT)) {
                 index[i + 6] = offsetB + vert;
                 index[i + 7] = offsetB + groundOffset + vert;
                 index[i + 8] = offsetB + vert + 2;
@@ -524,7 +707,7 @@ public final class MeshGenerator {
                 index[i + 11] = offsetB + groundOffset + vert + 2;
             }
 
-            if (!culling.getCulling(MeshParameter.Position.RIGHT, y, MeshParameter.Position.RIGHT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.RIGHT, y, GreddyMeshingParameter.Position.RIGHT)) {
                 index[i + 12] = offsetB + vert + 3;
                 index[i + 13] = offsetB + vert + 5;
                 index[i + 14] = offsetB + groundOffset + vert + 3;
@@ -534,8 +717,8 @@ public final class MeshGenerator {
                 index[i + 17] = offsetB + groundOffset + vert + 3;
             }
 
-            if (!culling.getCulling(MeshParameter.Position.RIGHT, y, MeshParameter.Position.TOP_RIGHT)
-                    || !culling.getCulling(MeshParameter.Position.RIGHT, y - 1, MeshParameter.Position.BOT_RIGHT)) {
+            if (!culling.getCulling(GreddyMeshingParameter.Position.RIGHT, y, GreddyMeshingParameter.Position.TOP_RIGHT)
+                    || !culling.getCulling(GreddyMeshingParameter.Position.RIGHT, y - 1, GreddyMeshingParameter.Position.BOT_RIGHT)) {
                 index[i + 18] = offsetB + vert + 1;
                 index[i + 19] = offsetB + vert + 3;
                 index[i + 20] = offsetB + groundOffset + vert + 1;
@@ -565,6 +748,13 @@ public final class MeshGenerator {
         Mesh result = new Mesh();
         result.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
         result.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoord));
+        result.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(index));
+        return result;
+    }
+    private static Mesh setAllBuffer(Vector3f[] vertices, Vector3f[] texCoord, int[] index) {
+        Mesh result = new Mesh();
+        result.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+        result.setBuffer(VertexBuffer.Type.TexCoord, 3, BufferUtils.createFloatBuffer(texCoord));
         result.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(index));
         return result;
     }

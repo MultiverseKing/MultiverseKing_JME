@@ -1,9 +1,8 @@
 package org.hexgridapi.core.mesh;
 
 import com.jme3.scene.Mesh;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Iterator;
 import org.hexgridapi.core.HexGrid;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.HexTile;
@@ -16,42 +15,27 @@ import org.hexgridapi.utility.Vector2Int;
  * Used to generate the needed data used by the MeshManager to generate all
  * mesh contained in the chunk, mesh are split by used texture.
  * 1 texture can have mutilple mesh since it's split by height.
- * 
+ *
  * @author roah
  */
-public final class MeshParameter {
+public final class GreddyMeshingParameter {
 
-    /**
-     * Reference used to generate the parameter.
-     */
     private final MapData mapData;
-    /**
-     * Mesh parameter needed to generate the mesh.
-     */
-    private ArrayList<Vector2Int> position = new ArrayList<Vector2Int>();
-    private ArrayList<Vector2Int> size = new ArrayList<Vector2Int>();
-    private ArrayList<Integer> height = new ArrayList<Integer>();
     /**
      * Contain all list of parameter for a specifate element.
      */
-    private HashMap<String, ArrayList<Integer>> elementTypeRef = new HashMap<String, ArrayList<Integer>>(2, 1.0f);
-    /**
-     * Used to define which algorithm to use with meshmanager.
-     */
-    private boolean onlyGround;
-    private Shape shapeType;
-    private String inspectedTexture;
-    private int inspectedMesh;
+    private HashMap<String, GreddyMeshingElementMeshData> elementMeshData = new HashMap<String, GreddyMeshingElementMeshData>();
     private int groundHeight = 0;
     private Vector2Int inspectedChunk;
+    private boolean onlyGround;
+    private Shape shapeType; //Used for culling.
+    private String inspectedTexture;
+    private final boolean useArrayTexture;
+    private Iterator<String> meshIterator;
 
-    /**
-     * Generate all parameter needed to create a grid from defined value.
-     *
-     * @param mapData Reference used to get the data from.
-     */
-    public MeshParameter(MapData mapData) {
+    public GreddyMeshingParameter(MapData mapData, boolean useArrayTexture) {
         this.mapData = mapData;
+        this.useArrayTexture = useArrayTexture;
     }
 
     private void initialize(HexCoordinate centerPosition, int radius, boolean onlyGround, Shape shapeType) {
@@ -63,7 +47,6 @@ public final class MeshParameter {
         /**
          * x && y == coord local
          */
-        int elementID = 0;
         for (int y = 0; y < isVisited.length; y++) {
             for (int x = 0; x < isVisited.length; x++) {
                 if (!isVisited[x][y]) {
@@ -75,93 +58,66 @@ public final class MeshParameter {
                         currentTileMapCoord = getNextTileCoord(centerPosition, radius, null, x, y, chunkInitTile);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = getIsInRange(radius, null, x, y);
-//                    } else if (mode.equals(GhostMode.FULL)) {
-//                        currentTile = null;
-//                        currentIsInRange = false;
                     } else {
                         currentTileMapCoord = new HexCoordinate(Coordinate.OFFSET, x + chunkInitTile.x, y + chunkInitTile.y);
                         currentTile = mapData.getTile(currentTileMapCoord);
                         currentIsInRange = false;
                     }
                     if (currentTile == null || centerPosition != null && !currentIsInRange) {
-                        textValue = mapData.getTextureValue(-2); //Value used to not generate mesh on that position.
-                    } else if (centerPosition != null) {
-                        textValue = mapData.getTextureValue(-1);  //Value used to use the selection texture.
+                        textValue = mapData.getTextureValue(-1); //Value used to not generate mesh on that position.
                     } else {
                         textValue = mapData.getTextureValue(currentTile.getTextureKey());
                     }
-                    if (elementTypeRef.isEmpty() || !elementTypeRef.containsKey(textValue)) {
-                        ArrayList<Integer> list = new ArrayList<Integer>();
-                        elementTypeRef.put(textValue, list);
-                    }
-                    elementTypeRef.get(textValue).add(elementID);
-
                     Integer tileHeight = currentTile == null ? null : currentTile.getHeight();
+
+                    if (elementMeshData.isEmpty() || !elementMeshData.containsKey(textValue)) {
+                        elementMeshData.put(textValue, new GreddyMeshingElementMeshData(new Vector2Int(x, y), tileHeight));
+                    } else {
+                        elementMeshData.get(textValue).add(new Vector2Int(x, y), tileHeight);
+                    }
+
                     if (tileHeight != null && tileHeight < groundHeight + HexSetting.CHUNK_DEPTH) {
                         groundHeight = tileHeight;
                     }
-//                    if(!mode.equals(GhostMode.FULL)){
-//                        tileHeight = currentTile == null ? null : currentTile.getHeight();
-//                    } else {
-//                        tileHeight = HexSetting.GROUND_HEIGHT;
-//                    }
-//                    Integer tileHeight = !mode.equals(GhostMode.FULL) ? currentTile == null ? null : currentTile.getHeight() : HexSetting.GROUND_HEIGHT;
 
-                    this.add(new Vector2Int(x, y), tileHeight);
-                    setSize(centerPosition, radius, elementID, isVisited, currentTile, currentIsInRange, chunkInitTile);
-                    elementID++;
+                    setSize(centerPosition, radius, isVisited, elementMeshData.get(textValue),
+                            currentTile, currentIsInRange, chunkInitTile);
                 }
             }
         }
     }
 
-    private void setSize(HexCoordinate centerPos, int radius, int inspectedID, 
-            boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
-        
+    private void setSize(HexCoordinate centerPos, int radius, boolean[][] isVisited, GreddyMeshingElementMeshData currentGreddyData,
+            HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
+
         // Define the size on X.
-        for (int x = 1; x < isVisited.length - position.get(inspectedID).x; x++) {
-            boolean alreadyVisited = isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y];
-            HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, inspectedID, x, 0, chunkOffset));
-//            if (mode.equals(GhostMode.FULL)) {
-//                nextTile = null;
-//            } else {
-//                nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, 0));
-//            }
+        for (int x = 1; x < isVisited.length - currentGreddyData.getLastAddedPosition().x; x++) {
+            boolean alreadyVisited = isVisited[currentGreddyData.getLastAddedPosition().x + x][currentGreddyData.getLastAddedPosition().y];
+            HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, currentGreddyData.getLastAddedPosition(), x, 0, chunkOffset));
             if (!alreadyVisited && currentTile == null && nextTile == null
                     || !alreadyVisited && centerPos == null && currentTile != null && nextTile != null
                     && currentTile.getTextureKey() == nextTile.getTextureKey() && currentTile.getHeight() == nextTile.getHeight()
                     || !alreadyVisited && centerPos != null && currentTile != null && nextTile != null
-                    && getIsInRange(radius, inspectedID, x, 0) == currentIsInRange
+                    && getIsInRange(radius, currentGreddyData.getLastAddedPosition(), x, 0) == currentIsInRange
                     && currentTile.getHeight() == nextTile.getHeight()) {
-                this.size.get(inspectedID).x++;
-                isVisited[x + position.get(inspectedID).x][position.get(inspectedID).y] = true;
+                currentGreddyData.expandSizeX();
+                isVisited[currentGreddyData.getLastAddedPosition().x + x][currentGreddyData.getLastAddedPosition().y] = true;
             } else {
                 break;
-//                setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
-//                return;
             }
         }
-//        setSizeY(centerPos, radius, inspectedID, isVisited, currentTile, currentIsInRange, chunkOffset);
-//    }
-//
-//    private void setSizeY(HexCoordinate centerPos, int radius, int inspectedID, boolean[][] isVisited, HexTile currentTile, boolean currentIsInRange, Vector2Int chunkOffset) {
         // Define the size on Y.
-        for (int y = 1; y < isVisited.length - position.get(inspectedID).y; y++) {
+        for (int y = 1; y < isVisited.length - currentGreddyData.getLastAddedPosition().y; y++) {
             //We check if the next Y line got the same properties
-            for (int x = 0; x < size.get(inspectedID).x; x++) {
-                boolean alreadyVisited = isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y + y];
-                HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, inspectedID, x, y, chunkOffset));
-//                if (mode.equals(GhostMode.FULL)) {
-//                    nextTile = null;
-//                } else {
-//                    nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, posInList, x, y));
-//                }
+            for (int x = 0; x < currentGreddyData.getLastAddedSize().x; x++) {
+                boolean alreadyVisited = isVisited[currentGreddyData.getLastAddedPosition().x + x][currentGreddyData.getLastAddedPosition().y + y];
+                HexTile nextTile = mapData.getTile(getNextTileCoord(centerPos, radius, currentGreddyData.getLastAddedPosition(), x, y, chunkOffset));
                 if (alreadyVisited || currentTile == null && nextTile != null || currentTile != null && nextTile == null
                         || centerPos == null && currentTile != null && nextTile != null
                         && !mapData.getTextureValue(nextTile.getTextureKey()).equals(mapData.getTextureValue(currentTile.getTextureKey()))
                         || centerPos == null && currentTile != null && nextTile != null && nextTile.getHeight() != currentTile.getHeight()
                         || centerPos != null && currentTile != null && nextTile != null
-                        && getIsInRange(radius, inspectedID, x, y) != currentIsInRange
+                        && getIsInRange(radius, currentGreddyData.getLastAddedPosition(), x, y) != currentIsInRange
                         || centerPos != null && currentTile != null && nextTile != null
                         && nextTile.getHeight() != currentTile.getHeight()) {
                     //if one tile didn't match the requirement we stop the search
@@ -169,22 +125,27 @@ public final class MeshParameter {
                 }
             }
             //all tile meet the requirement we increase the size Y
-            size.get(inspectedID).y++;
+            currentGreddyData.expandSizeY();
             //we set that line as visited so we don't do any operation later for them
-            for (int x = 0; x < size.get(inspectedID).x; x++) {
-                isVisited[position.get(inspectedID).x + x][position.get(inspectedID).y + y] = true;
+            Vector2Int lastAddedPosition = currentGreddyData.getLastAddedPosition();
+            for (int x = 0; x < currentGreddyData.getLastAddedSize().x; x++) {
+                isVisited[lastAddedPosition.x + x][lastAddedPosition.y + y] = true;
             }
         }
     }
 
-    private boolean getIsInRange(int radius, Integer inspectedID, int x, int y) {
-        return new HexCoordinate(Coordinate.OFFSET, radius, radius).hasInRange(
-                new HexCoordinate(Coordinate.OFFSET, (inspectedID != null ? position.get(inspectedID).x : 0) + x, (inspectedID != null ? position.get(inspectedID).y : 0) + y), radius);
+    private boolean getIsInRange(int radius, Vector2Int position, int x, int y) {
+        return new HexCoordinate(Coordinate.OFFSET, radius, radius)
+                .hasInRange(new HexCoordinate(Coordinate.OFFSET,
+                (position != null ? position.x : 0) + x,
+                (position != null ? position.y : 0) + y), radius);
     }
 
-    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Integer inspectedID, int x, int y, Vector2Int chunkOffset) {
+    private HexCoordinate getNextTileCoord(HexCoordinate centerPos, int radius, Vector2Int position, int x, int y, Vector2Int chunkOffset) {
         if (centerPos != null) {
-            Vector2Int coord = new Vector2Int(x + (inspectedID != null ? position.get(inspectedID).x : 0) - radius, y + (inspectedID != null ? position.get(inspectedID).y : 0) - radius);
+            Vector2Int coord = new Vector2Int(
+                    x + (position != null ? position.x : 0) - radius,
+                    y + (position != null ? position.y : 0) - radius);
             if ((radius & 1) == 0) {
                 if ((centerPos.toOffset().y & 1) == 0) {
                     return centerPos.add(coord);
@@ -207,26 +168,16 @@ public final class MeshParameter {
                 }
             }
         } else {
-            return new HexCoordinate(Coordinate.OFFSET, x + position.get(inspectedID).x + chunkOffset.x, y + position.get(inspectedID).y + chunkOffset.y);
+            return new HexCoordinate(Coordinate.OFFSET,
+                    x + position.x + chunkOffset.x,
+                    y + position.y + chunkOffset.y);
         }
     }
 
     private boolean[][] getVisitedList(int radius) {
         int chunkSize = radius < 1 ? HexSetting.CHUNK_SIZE : (radius * 2) + 1;
         boolean[][] isVisited = new boolean[chunkSize][chunkSize];
-        //todo remove
-        for (int y = 0; y < chunkSize; y++) {
-            for (int x = 0; x < chunkSize; x++) {
-                isVisited[x][y] = false;
-            }
-        }
         return isVisited;
-    }
-
-    private void add(Vector2Int position, Integer height) {
-        this.position.add(position);
-        this.size.add(new Vector2Int(1,1));
-        this.height.add(height == null ? 0 : height);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getters">
@@ -262,13 +213,21 @@ public final class MeshParameter {
     }
 
     private HashMap<String, Mesh> getMesh() {
-        HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementTypeRef.size());
-        for (String value : elementTypeRef.keySet()) {
-            if (!value.equals("NO_TILE") || value.equals("NO_TILE") 
-                    && (mapData.getMode().equals(MapData.GhostMode.GHOST)
-                    || mapData.getMode().equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
-                inspectedTexture = value;
-                inspectedMesh = -1;
+        if (!(mapData.getMode().equals(MapData.GhostMode.GHOST)
+                || mapData.getMode().equals(MapData.GhostMode.GHOST_PROCEDURAL))) {
+            elementMeshData.remove(mapData.getTextureValue(-1));
+        }
+        HashMap<String, Mesh> mesh = new HashMap<String, Mesh>(elementMeshData.size());
+        meshIterator = elementMeshData.keySet().iterator();
+
+        if (useArrayTexture) {
+            String value = meshIterator.next();
+            inspectedTexture = value; //Send this to the generator
+            mesh.put("mesh", MeshGenerator.getInstance().getMesh(this));
+        } else {
+            while (meshIterator.hasNext()) {
+                String value = meshIterator.next();
+                inspectedTexture = value; //Send this to the generator
                 mesh.put(value, MeshGenerator.getInstance().getMesh(this));
             }
         }
@@ -276,38 +235,35 @@ public final class MeshParameter {
     }
 
     /**
-     * @return index list of all mesh of the current element.
-     */
-    public ArrayList<Integer> getElementMeshIndex() {
-        return this.elementTypeRef.get(inspectedTexture);
-    }
-
-    /**
-     * @return a list of all element.
-     */
-    public Set<String> getAllElementInList() {
-        return this.elementTypeRef.keySet();
-    }
-
-    /**
      * @return position in chunk of the current element mesh visited.
      */
-    public Vector2Int getPositionParam() {
-        return position.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
+    public Vector2Int getCurrentPositionParam() {
+        return elementMeshData.get(inspectedTexture).getPosition();
     }
 
     /**
      * @return the size of the current element mesh visited.
      */
-    public Vector2Int getSizeParam() {
-        return size.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
+    public Vector2Int getCurrentSizeParam() {
+        return elementMeshData.get(inspectedTexture).getSize();
     }
 
     /**
      * @return height of the current element mesh visited.
      */
-    public int getHeightParam() {
-        return height.get(elementTypeRef.get(inspectedTexture).get(inspectedMesh));
+    public int getCurrentHeightParam() {
+        return elementMeshData.get(inspectedTexture).getHeight();
+    }
+
+    /**
+     * @return height of the current element mesh visited.
+     */
+    public int getCurrentTextureIDParam() {
+        if (inspectedTexture.equals("NO_TILES")
+                || inspectedTexture.equals("EMPTY_TEXTURE_KEY")) {
+            return 0;
+        }
+        return mapData.getTextureKey(inspectedTexture);
     }
 
     /**
@@ -329,7 +285,7 @@ public final class MeshParameter {
      * @return
      */
     public int getElementMeshCount() {
-        return elementTypeRef.get(inspectedTexture).size();
+        return elementMeshData.get(inspectedTexture).size();
     }
 
     /**
@@ -338,12 +294,14 @@ public final class MeshParameter {
      * @return
      */
     public boolean hasNext() {
-        inspectedMesh++;
-        if (elementTypeRef.get(inspectedTexture).size() > inspectedMesh) {
-            return true;
-        } else {
-            return false;
+        boolean hasNext = elementMeshData.get(inspectedTexture).hasNext();
+        if (useArrayTexture) {
+            if (!hasNext && meshIterator.hasNext()) {
+                inspectedTexture = meshIterator.next();
+                return elementMeshData.get(inspectedTexture).hasNext();
+            }
         }
+        return hasNext;
     }
     // </editor-fold>
 
@@ -358,12 +316,12 @@ public final class MeshParameter {
 
     /**
      * Internal use.
-     * 
-     * @todo Since HexGridAPI_v.1.1.9.preAlpha the culling on chunk edge is 
-     * always set to false, this only serve to avoid calculation when editing 
-     * the grid once generated, there is no use of it if the grid isn't mean 
+     *
+     * @todo Since HexGridAPI_v.1.1.9.preAlpha the culling on chunk edge is
+     * always set to false, this only serve to avoid calculation when editing
+     * the grid once generated, there is no use of it if the grid isn't mean
      * to be edited once generated. An improvement is needed to let the user
-     * chose if it will edit or not the grid once generated so we know if this 
+     * chose if it will edit or not the grid once generated so we know if this
      * have to be enabled or not.
      */
     public class CullingData {
@@ -373,72 +331,72 @@ public final class MeshParameter {
         boolean[][][] culling = new boolean[4][][];
 
         private CullingData() {
-            int inspectedID = elementTypeRef.get(inspectedTexture).get(inspectedMesh);
-            boolean isOddStart = (position.get(inspectedID).y & 1) == 0;
+            GreddyMeshingElementMeshData inspectedMesh = elementMeshData.get(inspectedTexture);
+            boolean isOddStart = (inspectedMesh.getPosition().y & 1) == 0;
 
             Vector2Int chunkInitTile = HexGrid.getInitialChunkTile(inspectedChunk).toOffset();
             HexCoordinate coord = new HexCoordinate(Coordinate.OFFSET,
-                    position.get(inspectedID).x + chunkInitTile.x, position.get(inspectedID).y + chunkInitTile.y);
+                    inspectedMesh.getPosition().x + chunkInitTile.x, inspectedMesh.getPosition().y + chunkInitTile.y);
             for (int i = 0; i < 4; i++) {
-                int currentSize = (i == 0 || i == 1 ? size.get(inspectedID).x : size.get(inspectedID).y);
+                int currentSize = (i == 0 || i == 1 ? inspectedMesh.getSize().x : inspectedMesh.getSize().y);
                 culling[i] = new boolean[currentSize][3];
                 for (int j = 0; j < currentSize; j++) {
 
                     if (i == 0) { // top chunk = -(Z)
-                        if (shapeType.equals(Shape.SQUARE) && position.get(inspectedID).y == 0) {
+                        if (shapeType.equals(Shape.SQUARE) && inspectedMesh.getPosition().y == 0) {
                             culling[i][j][0] = false; // top left
                             culling[i][j][1] = false; // top right
                             culling[i][j][2] = false;
                         } else {
                             HexTile[] neightbors = mapData.getNeightbors(coord.add(j, 0));
-                            culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
-                            culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
+                            culling[i][j][0] = neightbors[2] == null || neightbors[2].getHeight() < inspectedMesh.getHeight() ? false : true; // top left
+                            culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < inspectedMesh.getHeight() ? false : true; // top right
                             culling[i][j][2] = false;
                         }
                     } else if (i == 1) { //bot chunk = (Z)
-                        if (shapeType.equals(Shape.SQUARE) && position.get(inspectedID).y == HexSetting.CHUNK_SIZE - 1) {
+                        if (shapeType.equals(Shape.SQUARE) && inspectedMesh.getPosition().y == HexSetting.CHUNK_SIZE - 1) {
                             culling[i][j][0] = false; // top left
                             culling[i][j][1] = false; // top right
                             culling[i][j][2] = false;
                         } else {
-                            HexTile[] neightbors = mapData.getNeightbors(coord.add(j, size.get(inspectedID).y - 1));
-                            culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
-                            culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
+                            HexTile[] neightbors = mapData.getNeightbors(coord.add(j, inspectedMesh.getSize().y - 1));
+                            culling[i][j][0] = neightbors[4] == null || neightbors[4].getHeight() < inspectedMesh.getHeight() ? false : true; // bot left
+                            culling[i][j][1] = neightbors[5] == null || neightbors[5].getHeight() < inspectedMesh.getHeight() ? false : true; // bot right
                             culling[i][j][2] = false;
                         }
                     } else if (i == 2) { // left chunk = -(X)
-                        if (shapeType.equals(Shape.SQUARE) && position.get(inspectedID).x == 0) {
+                        if (shapeType.equals(Shape.SQUARE) && inspectedMesh.getPosition().x == 0) {
                             culling[i][j][0] = false; // top left
                             culling[i][j][1] = false; // top right
                             culling[i][j][2] = false;
                         } else {
                             HexTile[] neightbors = mapData.getNeightbors(coord.add(0, j));
-                            culling[i][j][0] = neightbors[3] == null || neightbors[3].getHeight() < height.get(inspectedID) ? false : true; // left
+                            culling[i][j][0] = neightbors[3] == null || neightbors[3].getHeight() < inspectedMesh.getHeight() ? false : true; // left
                             if (isOddStart && (j & 1) == 0) {
-                                culling[i][j][1] = j != 0 && neightbors[2] == null || j != 0 && neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
-                                culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
+                                culling[i][j][1] = j != 0 && neightbors[2] == null || j != 0 && neightbors[2].getHeight() < inspectedMesh.getHeight() ? false : true; // top left
+                                culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < inspectedMesh.getHeight() ? false : true; // bot left
                             } else if (!isOddStart && (j & 1) != 0) {
-                                culling[i][j][1] = neightbors[2] == null || neightbors[2].getHeight() < height.get(inspectedID) ? false : true; // top left
-                                culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < height.get(inspectedID) ? false : true; // bot left
+                                culling[i][j][1] = neightbors[2] == null || neightbors[2].getHeight() < inspectedMesh.getHeight() ? false : true; // top left
+                                culling[i][j][2] = j != currentSize - 1 && neightbors[4] == null || j != currentSize - 1 && neightbors[4].getHeight() < inspectedMesh.getHeight() ? false : true; // bot left
                             } else {
                                 culling[i][j][1] = false; // top left ignored
                                 culling[i][j][2] = false; // bot left ignored
                             }
                         }
                     } else { // right chunk = (X)
-                        if (shapeType.equals(Shape.SQUARE) && position.get(inspectedID).x == HexSetting.CHUNK_SIZE - 1) {
+                        if (shapeType.equals(Shape.SQUARE) && inspectedMesh.getPosition().x == HexSetting.CHUNK_SIZE - 1) {
                             culling[i][j][0] = false; // top left
                             culling[i][j][1] = false; // top right
                             culling[i][j][2] = false;
                         } else {
-                            HexTile[] neightbors = mapData.getNeightbors(coord.add(size.get(inspectedID).x - 1, j));
-                            culling[i][j][0] = neightbors[0] == null || neightbors[0].getHeight() < height.get(inspectedID) ? false : true; // right
+                            HexTile[] neightbors = mapData.getNeightbors(coord.add(inspectedMesh.getSize().x - 1, j));
+                            culling[i][j][0] = neightbors[0] == null || neightbors[0].getHeight() < inspectedMesh.getHeight() ? false : true; // right
                             if (!isOddStart && (j & 1) == 0) {
-                                culling[i][j][1] = j != 0 && neightbors[1] == null || j != 0 && neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
-                                culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
+                                culling[i][j][1] = j != 0 && neightbors[1] == null || j != 0 && neightbors[1].getHeight() < inspectedMesh.getHeight() ? false : true; // top right
+                                culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < inspectedMesh.getHeight() ? false : true; // bot right
                             } else if (isOddStart && (j & 1) != 0) {
-                                culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < height.get(inspectedID) ? false : true; // top right
-                                culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < height.get(inspectedID) ? false : true; // bot right
+                                culling[i][j][1] = neightbors[1] == null || neightbors[1].getHeight() < inspectedMesh.getHeight() ? false : true; // top right
+                                culling[i][j][2] = j != currentSize - 1 && neightbors[5] == null || j != currentSize - 1 && neightbors[5].getHeight() < inspectedMesh.getHeight() ? false : true; // bot right
                             } else {
                                 culling[i][j][1] = false; // top right ignored
                                 culling[i][j][2] = false; // bot right ignored
@@ -517,10 +475,7 @@ public final class MeshParameter {
     }
 
     private void clear() {
-        elementTypeRef.clear();
-        height.clear();
-        position.clear();
-        size.clear();
+        elementMeshData.clear();
         groundHeight = 0;
     }
 

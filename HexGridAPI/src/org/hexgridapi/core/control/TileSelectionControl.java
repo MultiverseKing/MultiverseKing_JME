@@ -14,6 +14,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.core.mesh.MeshGenerator;
@@ -25,7 +26,9 @@ import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.utility.HexCoordinate;
 
 /**
- *
+ * Generate tile on the field to be used as selection control. <br>
+ * Used by {@link MouseControlSystem} by default.
+ * 
  * @author roah
  */
 public class TileSelectionControl implements TileInputListener {
@@ -42,9 +45,9 @@ public class TileSelectionControl implements TileInputListener {
     public void initialise(Application app) {
         if (mat == null) {
             mat = app.getAssetManager().loadMaterial("Materials/hexMat.j3m");
-//            mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
-//            mat.setColor("Color", new ColorRGBA(1, 0, 0, 0.3f));
-            mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
+//            mat.setTexture("DiffuseMap", app.getAssetManager().loadTexture(new TextureKey("Textures/EMPTY_TEXTURE_KEY.png", false)));
+//            mat.setColor("Diffuse", new ColorRGBA(1, 0, 0, 0.3f));
+            mat.setTexture("ColorMap", app.getAssetManager().loadTexture(new TextureKey(HexSetting.TEXTURE_PATH+"EMPTY_TEXTURE_KEY.png", false)));
             mat.setColor("Color", new ColorRGBA(1, 0, 0, 0.3f));
             mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Additive);
         }

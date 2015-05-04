@@ -1,0 +1,27 @@
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
+    MaterialParameters {
+        Minnaert : false
+        Specular : 0.8 0.8 0.8 1.0
+        Diffuse : 0.8 0.8 0.8 1.0
+        UseMaterialColors : true
+        ParallaxHeight : 0.05
+        Ambient : 0.8 0.8 0.8 1.0
+        Shininess : 20.0
+        WardIso : false
+        NormalMap : Flip Models/Units/Berserk/bakenormal.png
+        DiffuseMap : Flip Models/Units/Berserk/diffuse2.png
+        SpecularMap : Flip Models/Units/Berserk/spec.png
+        ShadowIntensity : 0.0
+    }
+    AdditionalRenderState {
+      FaceCull Back
+      Wireframe Off
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      AlphaTestFalloff 0.0
+      Blend Off
+      PointSprite Off
+      ColorWrite On
+      DepthTest On
+    }
+}

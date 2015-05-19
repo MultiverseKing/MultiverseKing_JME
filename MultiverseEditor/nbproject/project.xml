@@ -11,8 +11,8 @@
             <name>MultiverseEditor</name>
             <source-roots>
                 <root id="src.assets2.dir"/>
-                <root id="src.assets.dir"/>
                 <root id="src.dir"/>
+                <root id="src.assets.dir"/>
             </source-roots>
             <test-roots/>
         </data>

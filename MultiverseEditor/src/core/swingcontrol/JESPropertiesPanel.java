@@ -1,4 +1,4 @@
-package core.entitysystem;
+package core.swingcontrol;
 
 import gui.JPropertiesPanel;
 import java.awt.Dimension;
@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.utility.HexCoordinate;
-import org.multiversekingesapi.field.AreaEventSystem;
+import core.escontrol.DebugSystem;
 import org.multiversekingesapi.field.component.AreaEventComponent;
 
 /**
@@ -34,7 +34,7 @@ public class JESPropertiesPanel extends JPropertiesPanel {
     private final HexGridEditorMain editorMain;
     private JCursorPositionPanel cursorPan;
     private HashMap<String, Component> comps = new HashMap<>();
-    private final AreaEventSystem system;
+    private final DebugSystem system;
     private JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
@@ -52,7 +52,7 @@ public class JESPropertiesPanel extends JPropertiesPanel {
         cursorPan = new JCursorPositionPanel(editorMain.getStateManager().getState(MouseControlSystem.class));
         add(cursorPan);
         editorMain.getStateManager().getState(MouseControlSystem.class).getSelectionControl().registerTileListener(selectionListener);
-        system = editorMain.getStateManager().getState(AreaEventSystem.class);
+        system = editorMain.getStateManager().getState(DebugSystem.class);
     }
     private TileSelectionListener selectionListener = new TileSelectionListener() {
         @Override
@@ -134,7 +134,7 @@ public class JESPropertiesPanel extends JPropertiesPanel {
                 editorMain.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        editorMain.getStateManager().getState(AreaEventSystem.class)
+                        editorMain.getStateManager().getState(DebugSystem.class)
                                 .updateEvent(cursorPan.getPosition(), passEvent, false);
                         return null;
                     }

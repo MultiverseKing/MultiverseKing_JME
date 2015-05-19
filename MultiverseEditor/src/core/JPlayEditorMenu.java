@@ -9,7 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
-import org.multiversekingesapi.field.AreaEventSystem;
+import core.escontrol.DebugSystem;
+import core.escontrol.RenderDebugSystem;
 import org.multiversekingesapi.field.exploration.ExplorationSystem;
 
 /**
@@ -30,10 +31,7 @@ public class JPlayEditorMenu extends JMenu {
                 main.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        main.getStateManager().detach(main.getStateManager().getState(ExplorationSystem.class));
-                        main.getRootWindow().getJMenuBar().remove(stopBtn);
-                        main.getRootWindow().revalidate();
-                        main.getRootWindow().repaint();
+                        stopExploration();
                         return null;
                     }
                 });
@@ -64,8 +62,15 @@ public class JPlayEditorMenu extends JMenu {
                 main.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        if (main.getStateManager().getState(AreaEventSystem.class).getStartPosition() != null) {
-                            main.getStateManager().attach(new ExplorationSystem());
+                        if (main.getStateManager().getState(ExplorationSystem.class) != null) {
+                            int result = JOptionPane.showConfirmDialog(main.getRootWindow(), "Exploration mode already running, "
+                                    + "want to shut it off ?", "Exploration", JOptionPane.OK_CANCEL_OPTION);
+                            if (result == 0) {
+                                stopExploration();
+                            }
+                        } else if (main.getStateManager().getState(DebugSystem.class).getStartPosition() != null) {
+                            main.getStateManager().attach(new ExplorationSystem(main.getStateManager().getState(DebugSystem.class).getStartPosition()));
+                            main.getStateManager().getState(RenderDebugSystem.class).setEnabled(false);
                             main.getRootWindow().getJMenuBar().add(stopBtn);
                             main.getRootWindow().revalidate();
                             main.getRootWindow().repaint();
@@ -77,5 +82,13 @@ public class JPlayEditorMenu extends JMenu {
                 });
                 break;
         }
+    }
+
+    private void stopExploration() {
+        main.getStateManager().detach(main.getStateManager().getState(ExplorationSystem.class));
+        main.getStateManager().getState(RenderDebugSystem.class).setEnabled(true);
+        main.getRootWindow().getJMenuBar().remove(stopBtn);
+        main.getRootWindow().revalidate();
+        main.getRootWindow().repaint();
     }
 }

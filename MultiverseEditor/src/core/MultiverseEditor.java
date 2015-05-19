@@ -1,11 +1,11 @@
 package core;
 
-import core.entitysystem.JESPropertiesPanel;
+import core.swingcontrol.JESPropertiesPanel;
 import org.multiversekingesapi.EntityDataAppState;
-import org.multiversekingesapi.IMultiverCoreGUI;
-import org.multiversekingesapi.field.AreaEventSystem;
+import org.multiversekingesapi.MultiverCoreGUI;
+import core.escontrol.DebugSystem;
 import org.multiversekingesapi.field.position.HexPositionSystem;
-import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
+import core.escontrol.RenderDebugSystem;
 import org.multiversekingesapi.render.RenderSystem;
 import tonegod.gui.core.Screen;
 
@@ -13,18 +13,18 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
+public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreGUI {
 
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Editor app = new Editor();
+                MultiverseEditor app = new MultiverseEditor();
             }
         });
     }
 
-    public Editor() {
+    public MultiverseEditor() {
         super("King Of Multiverse Editor");
     }
     Screen screen;
@@ -43,8 +43,9 @@ public class Editor extends HexGridEditorMain implements IMultiverCoreGUI {
                 new EntityDataAppState(),
                 new RenderSystem(),
                 new HexPositionSystem(),
-                new AreaEventSystem(),
-                new AreaEventRenderDebugSystem());
+                new DebugSystem(),
+                new RenderDebugSystem()
+                );
 
         rootWindow.getJMenuBar().add(new JPlayEditorMenu(this));
         addPropertiesPanel(new JESPropertiesPanel(this));

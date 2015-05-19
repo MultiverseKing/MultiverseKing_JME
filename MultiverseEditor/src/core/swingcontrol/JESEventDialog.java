@@ -1,4 +1,4 @@
-package core.entitysystem;
+package core.swingcontrol;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;

@@ -23,6 +23,7 @@ import org.multiversekingesapi.utility.ElementalAttribut;
  * Master to load Entity from file.
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class EntityLoader {
 

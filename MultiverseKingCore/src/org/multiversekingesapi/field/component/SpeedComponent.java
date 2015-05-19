@@ -1,12 +1,12 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class SpeedComponent implements PersistentComponent {
+public class SpeedComponent implements EntityComponent {
 
     private final float speed;
 

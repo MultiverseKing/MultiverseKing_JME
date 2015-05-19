@@ -1,12 +1,12 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class InfluenceComponent implements PersistentComponent {
+public class InfluenceComponent implements EntityComponent {
 
     private final byte range;
 

@@ -1,6 +1,6 @@
 package org.multiversekingesapi.render.animation;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  * Contain the currently played animation for the entity or the animation who
@@ -8,7 +8,7 @@ import com.simsilica.es.PersistentComponent;
  *
  * @author roah
  */
-public class AnimationComponent implements PersistentComponent {
+public class AnimationComponent implements EntityComponent {
 
     private Animation animation;
 

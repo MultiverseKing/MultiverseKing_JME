@@ -1,6 +1,6 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.HexCoordinate.Coordinate;
@@ -11,7 +11,7 @@ import org.multiversekingesapi.field.Collision;
  *
  * @author roah
  */
-public class CollisionComponent implements PersistentComponent {
+public class CollisionComponent implements EntityComponent {
 
     /**
      * Collision layer of the entity and collision size.

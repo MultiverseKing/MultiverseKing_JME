@@ -1,13 +1,13 @@
 package org.multiversekingesapi.render;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import org.multiversekingesapi.SubSystem;
 
 /**
  *
  * @author Eike Foede, roah
  */
-public class RenderComponent extends AbstractRender implements PersistentComponent {
+public class RenderComponent extends AbstractRender implements EntityComponent {
 
     private final SubSystem subSystem;
 

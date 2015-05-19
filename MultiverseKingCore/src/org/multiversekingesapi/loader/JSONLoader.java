@@ -1,4 +1,4 @@
-package org.multiversekingesapi.utility;
+package org.multiversekingesapi.loader;
 
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
@@ -12,7 +12,7 @@ import org.json.simple.parser.ParseException;
 import sun.misc.IOUtils;
 
 /**
- *
+ * @todo Use for game configuration
  * @author roah
  */
 public class JSONLoader implements AssetLoader {

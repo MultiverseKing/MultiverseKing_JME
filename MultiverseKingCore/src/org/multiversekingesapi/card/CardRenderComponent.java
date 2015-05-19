@@ -1,6 +1,6 @@
 package org.multiversekingesapi.card;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import org.multiversekingesapi.card.attribut.CardRenderPosition;
 import org.multiversekingesapi.render.AbstractRender;
 
@@ -10,7 +10,7 @@ import org.multiversekingesapi.render.AbstractRender;
  *
  * @author roah
  */
-public class CardRenderComponent extends AbstractRender implements PersistentComponent {
+public class CardRenderComponent extends AbstractRender implements EntityComponent {
 
     private final CardRenderPosition renderPosition;
 

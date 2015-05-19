@@ -1,11 +1,11 @@
 package org.multiversekingesapi.render.camera;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class CameraTrackComponent implements PersistentComponent {
+public class CameraTrackComponent implements EntityComponent {
     
 }

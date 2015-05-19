@@ -17,6 +17,7 @@ import org.json.simple.JSONObject;
  * avoids any use of it outside of the loading.
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class UnitLoader {
 

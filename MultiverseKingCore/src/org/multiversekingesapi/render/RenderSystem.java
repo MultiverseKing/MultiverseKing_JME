@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.HexSetting;
-import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
@@ -62,7 +62,7 @@ public class RenderSystem extends EntitySystemAppState {
         app.getRootNode().attachChild(renderSystemNode);
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
         mapData.registerTileChangeListener(tileChangeListeners);
-        renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow.
+        renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow. -50%fps...
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
 
         return entityData.getEntities(RenderComponent.class);

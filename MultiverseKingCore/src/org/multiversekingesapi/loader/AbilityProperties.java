@@ -10,6 +10,7 @@ import org.multiversekingesapi.field.Collision;
 /**
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class AbilityProperties extends CardProperties {
 

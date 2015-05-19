@@ -9,6 +9,7 @@ import org.multiversekingesapi.field.component.WeaponSlotsComponent;
 /**
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class TitanLoader extends UnitLoader {
 

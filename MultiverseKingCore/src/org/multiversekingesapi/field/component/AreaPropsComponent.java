@@ -1,12 +1,12 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  * Component used for object on the Room field.
  * @author roah
  */
-public class AreaPropsComponent implements PersistentComponent {
+public class AreaPropsComponent implements EntityComponent {
 
     private final boolean isTrigger;
     private final boolean isImmune;

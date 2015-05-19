@@ -7,7 +7,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
 import org.hexgridapi.core.HexSetting;
-import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;

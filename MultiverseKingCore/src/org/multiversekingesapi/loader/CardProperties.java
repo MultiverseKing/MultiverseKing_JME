@@ -10,6 +10,7 @@ import org.multiversekingesapi.utility.ElementalAttribut;
  * CardRendersystem,
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class CardProperties {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">

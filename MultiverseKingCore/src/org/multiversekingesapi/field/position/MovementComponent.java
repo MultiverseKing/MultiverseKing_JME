@@ -1,13 +1,13 @@
 package org.multiversekingesapi.field.position;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  * Entity movement stats.
  *
  * @author roah
  */
-public class MovementComponent implements PersistentComponent {
+public class MovementComponent implements EntityComponent {
 
     private final byte movePoint;
     private final float moveSpeed;

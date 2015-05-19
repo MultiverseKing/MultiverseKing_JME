@@ -1,12 +1,12 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class HealthComponent implements PersistentComponent {
+public class HealthComponent implements EntityComponent {
 
     private final int max;
     private final int current;

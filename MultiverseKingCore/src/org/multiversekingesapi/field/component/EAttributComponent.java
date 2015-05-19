@@ -1,6 +1,6 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**
@@ -8,7 +8,7 @@ import org.multiversekingesapi.utility.ElementalAttribut;
  *
  * @author roah
  */
-public class EAttributComponent implements PersistentComponent {
+public class EAttributComponent implements EntityComponent {
 
     private final ElementalAttribut eAttribut;
 

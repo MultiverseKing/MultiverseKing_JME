@@ -4,7 +4,7 @@
  */
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.hexgridapi.utility.HexCoordinate;
  *
  * @author roah
  */
-public class AreaEventComponent implements PersistentComponent {
+public class AreaEventComponent implements EntityComponent {
 
     private final ArrayList<Event> events;
     private final HexCoordinate position;

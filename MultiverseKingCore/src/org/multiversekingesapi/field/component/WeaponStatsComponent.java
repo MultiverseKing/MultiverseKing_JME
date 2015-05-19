@@ -1,6 +1,6 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
 import org.hexgridapi.utility.HexCoordinate;
 import org.multiversekingesapi.utility.ElementalAttribut;
@@ -9,7 +9,7 @@ import org.multiversekingesapi.utility.ElementalAttribut;
  * @todo rework
  * @author roah
  */
-public class WeaponStatsComponent implements PersistentComponent {
+public class WeaponStatsComponent implements EntityComponent {
 
     /**
      * Area where the weapon is activated if it can be activated.

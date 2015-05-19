@@ -2,24 +2,27 @@ package org.multiversekingesapi.loader;
 
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
+import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author roah
+ * @deprecated using j3o
  */
-public class PlayerProperties {
+public class PlayerLoader {
 
-    private PlayerProperties() {
+    private PlayerLoader() {
     }
 
 
     private static class Holder {
 
-        private final static PlayerProperties instance = new PlayerProperties();
+        private final static PlayerLoader instance = new PlayerLoader();
     }
 
-    public static PlayerProperties getInstance(AssetManager manager) {
+    public static PlayerLoader getInstance(AssetManager manager) {
         if (!initialized) {
             initialize(manager);
         }
@@ -30,11 +33,14 @@ public class PlayerProperties {
     private static boolean initialized = false;
     private static int level;
     private static String blessedTitan;
+    private static HexCoordinate lastSavedPosition;
 
     private static void initialize(AssetManager manager) {
         JSONObject data = (JSONObject) manager.loadAsset(new AssetKey<>("Data/PlayerProperties.json"));
         level = ((Number) data.get("Level")).intValue();
         blessedTitan = (String) data.get("BlessedTitan");
+        lastSavedPosition = new HexCoordinate(HexCoordinate.Coordinate.OFFSET, ((Number) data.get("SavedPosX")).intValue(), 
+                ((Number) data.get("SavedPosY")).intValue());
     }
 
     public int getLevel() {
@@ -43,5 +49,9 @@ public class PlayerProperties {
     
     public String getBlessedTitan() {
         return blessedTitan;
+    }
+
+    public HexCoordinate getLastSavedPosition() {
+        return lastSavedPosition;
     }
 }

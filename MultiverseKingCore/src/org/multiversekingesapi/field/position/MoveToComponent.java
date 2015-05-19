@@ -1,13 +1,13 @@
 package org.multiversekingesapi.field.position;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import org.hexgridapi.utility.HexCoordinate;
 
 /**
  *
  * @author Eike Foede, roah
  */
-public class MoveToComponent implements PersistentComponent {
+public class MoveToComponent implements EntityComponent {
 
     private final HexCoordinate position;
 

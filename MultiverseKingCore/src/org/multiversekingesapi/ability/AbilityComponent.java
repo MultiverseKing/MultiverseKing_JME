@@ -1,6 +1,6 @@
 package org.multiversekingesapi.ability;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiversekingesapi.field.Collision;
 import org.multiversekingesapi.utility.ElementalAttribut;
@@ -9,7 +9,7 @@ import org.multiversekingesapi.utility.ElementalAttribut;
  *
  * @author roah
  */
-public class AbilityComponent implements PersistentComponent {
+public class AbilityComponent implements EntityComponent {
 
     private final String name;
     private final int power;

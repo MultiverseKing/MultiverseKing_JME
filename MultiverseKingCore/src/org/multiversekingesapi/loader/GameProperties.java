@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 /**
  *
  * @author roah
+ * @deprecated use j3o
  */
 public class GameProperties {
 

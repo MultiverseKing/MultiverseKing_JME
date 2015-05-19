@@ -1,6 +1,5 @@
 package org.multiversekingesapi.field.exploration;
 
-import com.jme3.animation.LoopMode;
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.MotionPathListener;
 import com.jme3.cinematic.events.MotionEvent;
@@ -18,7 +17,7 @@ import org.hexgridapi.pathfinding.Pathfinder;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;

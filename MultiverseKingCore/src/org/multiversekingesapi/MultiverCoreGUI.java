@@ -6,6 +6,6 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public interface IMultiverCoreGUI {
+public interface MultiverCoreGUI {
     Screen getScreen();
 }

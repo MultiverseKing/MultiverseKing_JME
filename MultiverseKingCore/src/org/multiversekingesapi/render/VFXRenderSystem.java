@@ -1,7 +1,7 @@
 package org.multiversekingesapi.render;
 
 import com.jme3.scene.Node;
-import org.hexgridapi.core.MapData;
+import org.hexgridapi.core.data.MapData;
 
 /**
  * System used to show all FX on the screen, work with other system, The

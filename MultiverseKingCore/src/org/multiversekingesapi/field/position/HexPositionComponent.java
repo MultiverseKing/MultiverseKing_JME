@@ -1,7 +1,6 @@
 package org.multiversekingesapi.field.position;
 
 import com.simsilica.es.EntityComponent;
-import com.simsilica.es.PersistentComponent;
 import org.hexgridapi.utility.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiversekingesapi.SubSystem;
@@ -10,7 +9,7 @@ import org.multiversekingesapi.SubSystem;
  *
  * @author Eike Foede, roah
  */
-public class HexPositionComponent implements PersistentComponent {
+public class HexPositionComponent implements EntityComponent {
 
     private final SubSystem system;
     private final HexCoordinate position;

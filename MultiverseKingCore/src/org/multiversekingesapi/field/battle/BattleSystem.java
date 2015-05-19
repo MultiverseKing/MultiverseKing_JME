@@ -7,19 +7,17 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
+import com.simsilica.es.EntityComponent;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import org.hexgridapi.core.appstate.MouseControlSystem;
-import org.hexgridapi.core.MapData;
-import org.hexgridapi.core.appstate.AbstractHexGridAppState;
+import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
@@ -30,7 +28,6 @@ import org.multiversekingesapi.EntityDataAppState;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.card.CardRenderComponent;
 import org.multiversekingesapi.card.attribut.CardRenderPosition;
-import org.multiversekingesapi.field.AreaEventSystem;
 import org.multiversekingesapi.field.CollisionSystem;
 import org.multiversekingesapi.field.component.HealthComponent;
 import org.multiversekingesapi.field.component.InfluenceComponent;
@@ -38,16 +35,14 @@ import org.multiversekingesapi.field.position.HexPositionComponent;
 import org.multiversekingesapi.field.position.MoveToComponent;
 import org.multiversekingesapi.field.exploration.HexMovementSystem;
 import org.multiversekingesapi.loader.EntityLoader;
-import org.multiversekingesapi.loader.PlayerProperties;
+import org.multiversekingesapi.loader.PlayerLoader;
 import org.multiversekingesapi.loader.TitanLoader;
-import org.multiversekingesapi.render.AreaEventRenderDebugSystem;
 import org.multiversekingesapi.render.AbstractRender.RenderType;
 import org.multiversekingesapi.render.RenderComponent;
 import org.multiversekingesapi.render.RenderSystem;
 import org.multiversekingesapi.render.animation.Animation;
 import org.multiversekingesapi.render.animation.AnimationComponent;
 import org.multiversekingesapi.render.animation.AnimationSystem;
-import tonegod.gui.core.Screen;
 
 /**
  * TODO: This do too much work should be split on multiple part as :
@@ -58,6 +53,7 @@ import tonegod.gui.core.Screen;
  */
 public class BattleSystem extends AbstractAppState implements MouseRayListener, SubSystem {
 
+    private final HexCoordinate startPosition;
     private SimpleApplication app;
     private EntityData entityData;
     private MapData mapData;
@@ -65,20 +61,18 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     private MouseControlSystem mouseSystem;
     private Action currentAction = null;
     private EntityId inspectedId = null;
-    private BattleGUI battleGUI;
-    private AreaEventRenderDebugSystem debugSystem;
     private EntityId playerCore;
 
-    public BattleSystem(Screen screen) {
-        battleGUI = new BattleGUI(screen);
+    public BattleSystem(HexCoordinate startPosition) {
+        this.startPosition = startPosition;
     }
-
+    
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         this.app = (SimpleApplication) app;
         entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
         mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
-        debugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
+//        debugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
 //        if (mapData.getAllChunkPos().isEmpty()) {
 //            mapData.addChunk(new Vector2Int(), null);
 //        }
@@ -115,12 +109,12 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     }
 
     private void initialisePlayerCore() {
-        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-        if (debugSystem != null) {
-            debugSystem.showDebug(false, startPosition, this);
-        }
+//        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+//        if (debugSystem != null) {
+//            debugSystem.showDebug(false, startPosition, this);
+//        }
 
-        PlayerProperties properties = PlayerProperties.getInstance(app.getAssetManager());
+        PlayerLoader properties = PlayerLoader.getInstance(app.getAssetManager());
         playerCore = entityData.createEntity();
         entityData.setComponents(playerCore,
                 new RenderComponent("Well", RenderType.Core),
@@ -131,10 +125,10 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     }
 
     private void removePlayerCore() {
-        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-        if (debugSystem != null) {
-            debugSystem.showDebug(true, startPosition, this);
-        }
+//        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+//        if (debugSystem != null) {
+//            debugSystem.showDebug(true, startPosition, this);
+//        }
         entityData.removeEntity(playerCore);
     }
     
@@ -230,7 +224,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
 
     private void openEntityPropertiesMenu(Entity e) {
         if (inspectedId == null || !inspectedId.equals(e.getId())) {
-            ArrayList<PersistentComponent> comps = new ArrayList<>();
+            ArrayList<EntityComponent> comps = new ArrayList<>();
             RenderType renderType = e.get(RenderComponent.class).getRenderType();
             switch (renderType) {
                 case Ability:
@@ -238,8 +232,8 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
                 case Core:
                     comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
                     comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
-                    app.getStateManager().getState(AbstractHexGridAppState.class).showAreaRange(
-                            e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
+//                    app.getStateManager().getState(AbstractHexGridAppState.class).showAreaRange(
+//                            e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
                     break;
                 case Debug:
                     break;

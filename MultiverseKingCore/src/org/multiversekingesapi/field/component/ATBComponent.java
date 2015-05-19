@@ -1,12 +1,12 @@
 package org.multiversekingesapi.field.component;
 
-import com.simsilica.es.PersistentComponent;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class ATBComponent implements PersistentComponent {
+public class ATBComponent implements EntityComponent {
 
     private final byte current;
     private final byte max;

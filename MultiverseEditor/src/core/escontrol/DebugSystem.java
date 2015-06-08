@@ -6,7 +6,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.field.component.AreaEventComponent.Event;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 
 /**
  * Handle all event in the area, as teleportation, starting point etc...
@@ -23,7 +23,7 @@ public class DebugSystem extends EntitySystemAppState {
     }
 
     public HexCoordinate getStartPosition() {
-        return startPosition != null ? startPosition.duplicate() : null;
+        return startPosition != null ? startPosition.clone() : null;
     }
 
     @Override

@@ -1,13 +1,12 @@
 package core.escontrol;
 
-import com.jme3.scene.Node;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.SubSystem;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.field.component.AreaEventComponent;
 import org.multiversekingesapi.field.component.AreaEventComponent.Event;
 import org.multiversekingesapi.field.position.HexPositionComponent;

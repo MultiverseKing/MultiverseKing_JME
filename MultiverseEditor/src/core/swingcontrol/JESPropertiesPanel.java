@@ -1,13 +1,13 @@
 package core.swingcontrol;
 
-import gui.JPropertiesPanel;
+import gui.JPanelTab;
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import core.HexGridEditorMain;
-import hexmapeditor.gui.JCursorPositionPanel;
+import hexmap.gui.JCursorPositionPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -21,7 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.hexgridapi.events.TileSelectionListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import core.escontrol.DebugSystem;
 import org.multiversekingesapi.field.component.AreaEventComponent;
 
@@ -29,7 +29,7 @@ import org.multiversekingesapi.field.component.AreaEventComponent;
  *
  * @author roah
  */
-public class JESPropertiesPanel extends JPropertiesPanel {
+public class JESPropertiesPanel extends JPanelTab {
 
     private final HexGridEditorMain editorMain;
     private JCursorPositionPanel cursorPan;
@@ -38,20 +38,14 @@ public class JESPropertiesPanel extends JPropertiesPanel {
     private JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
-    public JESPropertiesPanel(HexGridEditorMain editorMain) {
+    public JESPropertiesPanel(HexGridEditorMain editorMain, MouseControlSystem mouseSystem) {
         super(editorMain.getAssetManager().loadTexture(
-                "Textures/Icons/Buttons/closeChest.png").getImage(), "EntityEditor");
+                "Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
         this.editorMain = editorMain;
 
-        setBorder(BorderFactory.createTitledBorder("Entity Editor"));
-        setPreferredSize(new Dimension(170, 300));
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
-        addComp(separator);
-
-        cursorPan = new JCursorPositionPanel(editorMain.getStateManager().getState(MouseControlSystem.class));
+        cursorPan = new JCursorPositionPanel(mouseSystem);
         add(cursorPan);
-        editorMain.getStateManager().getState(MouseControlSystem.class).getSelectionControl().registerTileListener(selectionListener);
+        mouseSystem.getSelectionControl().registerTileListener(selectionListener);
         system = editorMain.getStateManager().getState(DebugSystem.class);
     }
     private TileSelectionListener selectionListener = new TileSelectionListener() {
@@ -70,8 +64,8 @@ public class JESPropertiesPanel extends JPropertiesPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //open event menu
-                JESEventDialog dial = new JESEventDialog(editorMain.getRootWindow(), "Add Event");
-                dial.setLocationRelativeTo(editorMain.getRootWindow());
+                JESEventDialog dial = new JESEventDialog(editorMain.getRootFrame(), "Add Event");
+                dial.setLocationRelativeTo(editorMain.getRootFrame());
                 dial.setVisible(true);
 
                 final AreaEventComponent.Event event = dial.getValidatedEvent();

@@ -19,13 +19,13 @@ public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreG
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MultiverseEditor app = new MultiverseEditor();
+                MultiverseEditor app = new MultiverseEditor("King Of Multiverse Editor");
             }
         });
     }
 
-    public MultiverseEditor() {
-        super("King Of Multiverse Editor");
+    public MultiverseEditor(String str) {
+        super(str);
     }
     Screen screen;
 
@@ -35,19 +35,16 @@ public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreG
     }
 
     @Override
-    public void startHexGridEditor() {
-        super.startHexGridEditor();
-
+    public void initApplication() {
         screen = new Screen(this);
         getStateManager().attachAll(
                 new EntityDataAppState(),
                 new RenderSystem(),
                 new HexPositionSystem(),
                 new DebugSystem(),
-                new RenderDebugSystem()
-                );
+                new RenderDebugSystem());
 
-        rootWindow.getJMenuBar().add(new JPlayEditorMenu(this));
-        addPropertiesPanel(new JESPropertiesPanel(this));
+        getRootFrame().getJMenuBar().add(new JPlayEditorMenu(this));
+        getHexMapModule().addPropertiesTab(new JESPropertiesPanel(this, getHexMapModule().getMouseSystem()));
     }
 }

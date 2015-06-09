@@ -1,0 +1,28 @@
+{
+   "visual": "Undefined",
+   "rarity":"MULTIVERSE",
+   "eAttribut":"VOLT",
+   "description":"Testing Unit used on the editor",
+   "UnitStats":{
+      "healthPoint":50000,
+      "atb":10,
+      "loadSpeed":10,
+      "moveRange":5,
+      "moveSpeed":1.5,
+      "Ability":[
+         "null"
+      ],
+      "collision":[
+         {
+            "layer":0,
+            "areaRadius": 2,
+            "key":["0|0"]
+         }
+      ]
+   },
+    "TitanStats":{
+        "atbBurst":5,
+        "influenceRange":5,
+        "weaponSlots":4
+    }
+}

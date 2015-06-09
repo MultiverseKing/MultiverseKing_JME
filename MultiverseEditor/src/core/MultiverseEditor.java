@@ -3,9 +3,9 @@ package core;
 import core.swingcontrol.JESPropertiesPanel;
 import org.multiversekingesapi.EntityDataAppState;
 import org.multiversekingesapi.MultiverCoreGUI;
-import core.escontrol.DebugSystem;
+import core.debug.DebugSystemState;
 import org.multiversekingesapi.field.position.HexPositionSystem;
-import core.escontrol.RenderDebugSystem;
+import core.debug.RenderDebugSystem;
 import org.multiversekingesapi.render.RenderSystem;
 import tonegod.gui.core.Screen;
 
@@ -41,7 +41,7 @@ public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreG
                 new EntityDataAppState(),
                 new RenderSystem(),
                 new HexPositionSystem(),
-                new DebugSystem(),
+                new DebugSystemState(),
                 new RenderDebugSystem());
 
         getRootFrame().getJMenuBar().add(new JPlayEditorMenu(this));

@@ -9,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
-import core.escontrol.DebugSystem;
-import core.escontrol.RenderDebugSystem;
+import core.debug.DebugSystemState;
+import core.debug.RenderDebugSystem;
 import org.multiversekingesapi.field.exploration.ExplorationSystem;
 
 /**
@@ -68,8 +68,8 @@ public class JPlayEditorMenu extends JMenu {
                             if (result == 0) {
                                 stopExploration();
                             }
-                        } else if (main.getStateManager().getState(DebugSystem.class).getStartPosition() != null) {
-                            main.getStateManager().attach(new ExplorationSystem(main.getStateManager().getState(DebugSystem.class).getStartPosition()));
+                        } else if (main.getStateManager().getState(DebugSystemState.class).getStartPosition() != null) {
+                            main.getStateManager().attach(new ExplorationSystem());
                             main.getStateManager().getState(RenderDebugSystem.class).setEnabled(false);
                             main.getRootFrame().getJMenuBar().add(stopBtn);
                             main.getRootFrame().revalidate();

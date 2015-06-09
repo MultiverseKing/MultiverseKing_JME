@@ -22,7 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.hexgridapi.events.TileSelectionListener;
 import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
-import core.escontrol.DebugSystem;
+import core.debug.DebugSystemState;
 import org.multiversekingesapi.field.component.AreaEventComponent;
 
 /**
@@ -34,7 +34,7 @@ public class JESPropertiesPanel extends JPanelTab {
     private final HexGridEditorMain editorMain;
     private JCursorPositionPanel cursorPan;
     private HashMap<String, Component> comps = new HashMap<>();
-    private final DebugSystem system;
+    private final DebugSystemState system;
     private JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
@@ -46,7 +46,7 @@ public class JESPropertiesPanel extends JPanelTab {
         cursorPan = new JCursorPositionPanel(mouseSystem);
         add(cursorPan);
         mouseSystem.getSelectionControl().registerTileListener(selectionListener);
-        system = editorMain.getStateManager().getState(DebugSystem.class);
+        system = editorMain.getStateManager().getState(DebugSystemState.class);
     }
     private TileSelectionListener selectionListener = new TileSelectionListener() {
         @Override
@@ -128,7 +128,7 @@ public class JESPropertiesPanel extends JPanelTab {
                 editorMain.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        editorMain.getStateManager().getState(DebugSystem.class)
+                        editorMain.getStateManager().getState(DebugSystemState.class)
                                 .updateEvent(cursorPan.getPosition(), passEvent, false);
                         return null;
                     }

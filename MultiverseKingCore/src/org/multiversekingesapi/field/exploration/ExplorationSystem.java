@@ -9,16 +9,16 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
+import core.debug.DebugSystemState;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.RTSCamera;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.appstate.HexGridDefaultApp;
+import org.hexgridapi.core.appstate.HexGridDefaultApplication;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiversekingesapi.EntityDataAppState;
 import org.multiversekingesapi.SubSystem;
@@ -45,32 +45,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
     private MouseControlSystem mouseSystem;
     private EntityId playerId;
 //    private AreaEventRenderDebugSystem renderDebugSystem;
-    private final HexCoordinate startPosition;
-
-    public ExplorationSystem() {
-        this.startPosition = loadStart();
-    }
-
-    public ExplorationSystem(HexCoordinate startPosition) {
-        if (startPosition != null) {
-            this.startPosition = startPosition;
-        } else {
-            this.startPosition = loadStart();
-        }
-    }
-
-    private HexCoordinate loadStart() {
-        Spatial playerData = app.getAssetManager().loadModel("Data/playerData.j3o");
-        if (playerData.getUserData("savedPosition") != null) {
-            return new HexCoordinate(HexCoordinate.Coordinate.OFFSET,
-                    new Vector2Int((String) playerData.getUserData("savedPosition")));
-        } else {
-            Logger.getLogger(ExplorationSystem.class.getName())
-                    .log(Level.WARNING, "There is no Starting position to load, "
-                    + "setting the position at the Hearth World.");
-            return new HexCoordinate();
-        }
-    }
+    private HexCoordinate startPosition;
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -85,15 +60,20 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
         /**
          * Initialise all other system needed.
          */
-        setUsedState(true);
-
+        loadDependence(true);
         /**
          * Define the starting position from the AreaEventSystem.
          */
-//        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-//        if (renderDebugSystem != null) {
-//            renderDebugSystem.showDebug(false, startPosition, this);
-//        }
+        //        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
+        //        if (renderDebugSystem != null) {
+        //            renderDebugSystem.showDebug(false, startPosition, this);
+        //        }
+        DebugSystemState debug = app.getStateManager().getState(DebugSystemState.class);
+        if (debug != null) {
+            startPosition = debug.getStartPosition();
+        } else {
+            startPosition = loadStart();
+        }
         /**
          * Load the titan controlled by the player outside of battle to move
          * arround.
@@ -105,6 +85,19 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
                 new HexPositionComponent(startPosition),
                 new AnimationComponent(Animation.IDLE),
                 new CameraTrackComponent());
+    }
+
+    private HexCoordinate loadStart() {
+        Spatial playerData = app.getAssetManager().loadModel("Data/playerData.j3o");
+        if (playerData.getUserData("savedPosition") != null) {
+            return new HexCoordinate(HexCoordinate.Coordinate.OFFSET,
+                    Vector2Int.fromString((String) playerData.getUserData("savedPosition")));
+        } else {
+            Logger.getLogger(ExplorationSystem.class.getName())
+                    .log(Level.WARNING, "There is no Starting position to load, "
+                    + "setting the position at the Hearth World.");
+            return new HexCoordinate();
+        }
     }
 
     @Override
@@ -123,33 +116,33 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
     public void cleanup() {
         super.cleanup();
 
-        setUsedState(false);
+        loadDependence(false);
 
         entityData.removeEntity(playerId);
 //        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
 //        if (renderDebugSystem != null) {
 //            renderDebugSystem.showDebug(true, startPosition, this);
 //        }
-        ((HexGridDefaultApp) app).getRtsCam().setCenter(
+        ((HexGridDefaultApplication) app).getRtsCam().setCenter(
                 startPosition.toWorldPosition(
                 mapData.getTile(startPosition) != null
                 ? mapData.getTile(startPosition).getHeight() : 0));
     }
 
-    private void setUsedState(boolean enable) {
+    private void loadDependence(boolean isLoad) {
         AppState state;
         Class<? extends AppState>[] states = new Class[]{
             CollisionSystem.class,
             AnimationSystem.class,
             HexMovementSystem.class,
-            MonsterNest.class,
+            //            MonsterNest.class,
             CameraControlSystem.class
         };
         for (Class c : states) {
-            state = getState(enable, c);
-            if (enable && state != null) {
+            state = getState(isLoad, c);
+            if (isLoad && state != null) {
                 app.getStateManager().attach(state);
-            } else if (!enable && state != null) {
+            } else if (!isLoad && state != null) {
                 app.getStateManager().detach(state);
             }
         }

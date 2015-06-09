@@ -2,7 +2,7 @@ package org.multiversekingesapi.loader;
 
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONObject;
 

@@ -21,7 +21,7 @@ import org.hexgridapi.core.appstate.MouseControlSystem;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.TileInputListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.card.gui.Card;
 import org.multiversekingesapi.card.gui.Hover;
 import org.multiversekingesapi.field.CollisionSystem;

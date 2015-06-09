@@ -1,7 +1,7 @@
 package org.multiversekingesapi.render.utility;
 
 import java.util.List;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 
 /**
  *

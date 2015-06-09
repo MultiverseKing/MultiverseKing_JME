@@ -19,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.field.position.HexPositionComponent;

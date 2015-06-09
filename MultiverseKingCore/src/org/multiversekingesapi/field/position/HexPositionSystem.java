@@ -11,7 +11,7 @@ import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.SubSystem;
 import org.multiversekingesapi.render.RenderComponent;
@@ -42,6 +42,11 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
                     }
                 }
             }
+        }
+        
+        @Override
+        public void onGridReload(){
+            
         }
     };
 
@@ -122,7 +127,7 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
                         .toWorldPosition(mapData.getTile(
                         e.get(HexPositionComponent.class).getPosition()).getHeight());
             }
-    //            pos.y += 0.1f;
+            pos.y += 0.01f;
             s.setLocalTranslation(pos);
             s.setLocalRotation(e.get(HexPositionComponent.class).getRotation().toQuaternion());
         }

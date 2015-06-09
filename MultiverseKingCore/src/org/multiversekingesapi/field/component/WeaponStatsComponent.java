@@ -2,7 +2,7 @@ package org.multiversekingesapi.field.component;
 
 import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.utility.ElementalAttribut;
 
 /**

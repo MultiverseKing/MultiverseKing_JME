@@ -5,11 +5,10 @@ import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
 import org.hexgridapi.core.HexSetting;
 import org.hexgridapi.core.appstate.AbstractHexGridAppState;
-import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.control.GhostControl;
+import org.hexgridapi.core.control.buffercontrol.ChunkBufferControl;
 import org.hexgridapi.core.data.procedural.ProceduralChunkData;
-import org.hexgridapi.core.data.procedural.ProceduralHexGrid;
-import org.hexgridapi.events.GhostListener;
+import org.hexgridapi.core.geometry.builder.ChunkCoordinate;
+import org.hexgridapi.events.BufferListener;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.procedural.ProceduralContent;
@@ -22,12 +21,13 @@ public class MonsterNest extends EntitySystemAppState {
 
     private ArrayList<Vector2Int> instancedNest = new ArrayList<>();
     private ProceduralContent generator;
-    private Vector2Int currentPos;
-    private GhostListener listener = new GhostListener() {
+    private ChunkCoordinate currentPos;
+    private BufferListener listener = new BufferListener() {
+
         @Override
-        public void positionUpdate(Vector2Int ghostPosition) {
-            if (!currentPos.equals(ghostPosition)) {
-                currentPos = ghostPosition;
+        public void positionUpdate(ChunkCoordinate newBufferPosition) {
+            if (!currentPos.equals(newBufferPosition)) {
+                currentPos = newBufferPosition;
                 updateNest();
             }
         }
@@ -36,9 +36,9 @@ public class MonsterNest extends EntitySystemAppState {
     @Override
     protected EntitySet initialiseSystem() {
         
-        ProceduralHexGrid mdGen = app.getStateManager().getState(MapDataAppState.class).getMapData().getGenerator();
-        generator = new ProceduralContent(mdGen, 1, 1.0, 0.00);
-        GhostControl control = app.getStateManager().getState(AbstractHexGridAppState.class).getGhostControl();
+//        ProceduralHexGrid mdGen = app.getStateManager().getState(MapDataAppState.class).getMapData().getGenerator();
+//        generator = new ProceduralContent(mdGen, 1, 1.0, 0.00);
+        ChunkBufferControl control = app.getStateManager().getState(AbstractHexGridAppState.class).getBufferControl();
         control.registerListener(listener);
         currentPos = control.getChunkPosition();
 //        populatesNest();

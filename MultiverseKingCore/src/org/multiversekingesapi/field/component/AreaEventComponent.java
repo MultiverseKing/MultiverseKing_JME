@@ -8,7 +8,7 @@ import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 
 /**
  *

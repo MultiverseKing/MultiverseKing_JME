@@ -21,7 +21,7 @@ import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.TileChangeListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.field.position.HexPositionComponent;
 
 /**
@@ -53,6 +53,10 @@ public class RenderSystem extends EntitySystemAppState {
                     }
                 }
             }
+        }
+        
+        @Override
+        public void onGridReload(){
         }
     };
 

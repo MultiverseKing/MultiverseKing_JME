@@ -8,7 +8,7 @@ import org.multiversekingesapi.EntitySystemAppState;
 import org.multiversekingesapi.render.AbstractRender.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.multiversekingesapi.field.position.HexPositionComponent;
 
 /**

@@ -24,7 +24,7 @@ public class AbilityProperties extends CardProperties {
         JSONObject data = (JSONObject) obj.get("ability");
         power = ((Number) data.get("power")).intValue();
         segmentCost = ((Number) data.get("segmentCost")).intValue();
-        range = new Vector2Int(data.get("activationRange").toString());
+        range = Vector2Int.fromString(data.get("activationRange").toString());
 
         EntityLoader eLoader = new EntityLoader(app);
         collision = eLoader.importCollision((JSONArray) data.get("hitCollision"));

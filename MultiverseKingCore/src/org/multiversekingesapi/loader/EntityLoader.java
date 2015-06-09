@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.utility.HexCoordinate;
-import org.hexgridapi.utility.HexCoordinate.Coordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -119,7 +119,7 @@ public class EntityLoader {
             Number segment = (Number) abilityData.get("segmentCost");
             Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
 
-            return new AbilityComponent(name, new Vector2Int(abilityData.get("castRange").toString()), eAttribut,
+            return new AbilityComponent(name, Vector2Int.fromString(abilityData.get("castRange").toString()), eAttribut,
                     segment.byteValue(), power.intValue(), hitCollision, description);
         }
         return null;
@@ -150,7 +150,7 @@ public class EntityLoader {
             JSONArray key = (JSONArray) value.get("key");
             ArrayList<HexCoordinate> collisionCoord = new ArrayList<>();
             for (int j = 0; j < key.size(); j++) {
-                collisionCoord.add(new HexCoordinate(Coordinate.OFFSET, new Vector2Int((String) key.get(j))));
+                collisionCoord.add(new HexCoordinate(Coordinate.OFFSET, Vector2Int.fromString((String) key.get(j))));
             }
             collision.addLayer(layer.byteValue(), collision.new CollisionData(areaRange.byteValue(), collisionCoord));
         }

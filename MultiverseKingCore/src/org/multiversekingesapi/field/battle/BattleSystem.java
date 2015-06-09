@@ -22,7 +22,7 @@ import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
-import org.hexgridapi.utility.HexCoordinate;
+import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiversekingesapi.EntityDataAppState;
 import org.multiversekingesapi.SubSystem;

@@ -1,0 +1,1 @@
+{"visual":"PulseVoltage","description":"High voltage shock energy pulse around the unit... Internet is you friends... xD","playCost":3,"rarity":"COMMON","Ability":{"segmentCost":1,"power":15,"collision":[{"layer":0,"areaRadius":2,"key":["-2|0","-1|-2","1|-2","1|-1","2|0","-2|-1"]}],"castRange":"0|0"},"eAttribut":"VOLT"}

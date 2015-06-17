@@ -1,0 +1,14 @@
+Material My Material : MatDefs/shaderBlowCopy.j3md {
+     MaterialParameters {
+        AniTexMap : Flip Repeat Textures/animation/hex_void_anim.png
+        numTilesU : 8
+        numTilesV : 1
+        Speed : 20
+        Distance : 0.0
+     }
+    AdditionalRenderState {
+      Blend Alpha
+      Wireframe Off
+      AlphaTestFalloff 0.3
+    }
+}

@@ -16,7 +16,7 @@ import static org.multiverseking.card.attribut.CardRenderPosition.OUTERWORLD;
 import org.multiverseking.render.animation.AnimationComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.appstate.GridMouseControlAppState;
 import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
@@ -314,7 +314,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
             screen.removeElement(card);
 
             //Register the input for the card system
-            app.getStateManager().getState(MouseControlSystem.class).registerTileInputListener(this);
+            app.getStateManager().getState(GridMouseControlAppState.class).registerTileInputListener(this);
             app.getInputManager().addListener(cardInputListener, "Cancel");
         }
     }
@@ -324,7 +324,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(MouseControlSystem.class).removeTileInputListener(this);
+        app.getStateManager().getState(GridMouseControlAppState.class).removeTileInputListener(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -388,7 +388,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
                  * We activate the pulse Mode, if not activated the cast is
                  * canceled.
                  */
-                if (!app.getStateManager().getState(MouseControlSystem.class).setCursorPulseMode(this)) {
+                if (!app.getStateManager().getState(GridMouseControlAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
             } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.Titan)) {

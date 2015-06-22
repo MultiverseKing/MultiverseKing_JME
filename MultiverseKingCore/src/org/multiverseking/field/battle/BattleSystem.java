@@ -17,7 +17,7 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.appstate.GridMouseControlAppState;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.events.MouseInputEvent;
@@ -58,7 +58,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     private EntityData entityData;
     private MapData mapData;
     private RenderSystem renderSystem;
-    private MouseControlSystem mouseSystem;
+    private GridMouseControlAppState mouseSystem;
     private Action currentAction = null;
     private EntityId inspectedId = null;
     private EntityId playerCore;
@@ -94,7 +94,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         renderSystem = app.getStateManager().getState(RenderSystem.class);
 //        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this, true);
-        mouseSystem = app.getStateManager().getState(MouseControlSystem.class);
+        mouseSystem = app.getStateManager().getState(GridMouseControlAppState.class);
         mouseSystem.registerRayInputListener(this);
 
         initialisePlayerCore();

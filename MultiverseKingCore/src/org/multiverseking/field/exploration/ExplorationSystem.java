@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.appstate.HexGridDefaultApplication;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.appstate.GridMouseControlAppState;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.events.MouseInputEvent;
@@ -42,7 +42,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
     private SimpleApplication app;
     private EntityData entityData;
     private MapData mapData;
-    private MouseControlSystem mouseSystem;
+    private GridMouseControlAppState mouseSystem;
     private EntityId playerId;
 //    private AreaEventRenderDebugSystem renderDebugSystem;
     private HexCoordinate startPosition;
@@ -53,7 +53,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
         this.app = (SimpleApplication) app;
         this.entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
         this.mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
-        this.mouseSystem = app.getStateManager().getState(MouseControlSystem.class);
+        this.mouseSystem = app.getStateManager().getState(GridMouseControlAppState.class);
         mouseSystem.registerTileInputListener(tileInputListener);
 //        this.renderDebugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
 

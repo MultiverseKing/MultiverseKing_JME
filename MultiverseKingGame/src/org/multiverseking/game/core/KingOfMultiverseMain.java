@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.appstate.HexGridDefaultApplication;
 import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.appstate.GridMouseControlAppState;
 import org.hexgridapi.core.geometry.builder.GridParam;
 import org.hexgridapi.core.geometry.builder.coordinate.SquareCoordinate;
 import org.multiverseking.EntityDataAppState;
@@ -53,7 +53,7 @@ public class KingOfMultiverseMain extends HexGridDefaultApplication implements M
                  * HexGrid State
                  */
                 new MapDataAppState(mapData),
-                new MouseControlSystem(),
+                new GridMouseControlAppState(),
                 new HexGridSystem(mapData),
                 /**
                  * Entity system State

@@ -1,6 +1,6 @@
 package org.multiverseking.editor.core.swingcontrol;
 
-import org.hexgridapi.editor.gui.JPanelTab;
+import org.hexgridapi.editor.utility.gui.JPanelTab;
 import java.awt.Dimension;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -18,7 +18,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.hexgridapi.core.appstate.MouseControlSystem;
+import org.hexgridapi.core.appstate.GridMouseControlAppState;
 import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
 import org.hexgridapi.events.TileSelectionListener;
 import org.multiverseking.debug.DebugSystemState;
@@ -37,7 +37,7 @@ public class JESPropertiesPanel extends JPanelTab {
     private JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
-    public JESPropertiesPanel(HexGridEditorMain editorMain, MouseControlSystem mouseSystem) {
+    public JESPropertiesPanel(HexGridEditorMain editorMain, GridMouseControlAppState mouseSystem) {
         super(editorMain.getAssetManager().loadTexture(
                 "org/multiverseking/assets/Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
         this.editorMain = editorMain;

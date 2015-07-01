@@ -15,9 +15,9 @@ import org.multiverseking.render.animation.AnimationComponent;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.pathfinding.Astar;
 import org.hexgridapi.pathfinding.Pathfinder;
 import org.hexgridapi.utility.Rotation;
@@ -47,7 +47,7 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
 
     @Override
     protected EntitySet initialiseSystem() {
-        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
+        mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
         pathfinder.setMapData(mapData);
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this, true);

@@ -2,8 +2,8 @@ package org.multiverseking.field.component;
 
 import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate.Coordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiverseking.field.Collision;
 

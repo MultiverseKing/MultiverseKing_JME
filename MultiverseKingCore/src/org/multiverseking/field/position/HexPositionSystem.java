@@ -6,12 +6,13 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
-import org.hexgridapi.core.HexSetting;
-import org.hexgridapi.core.appstate.MapDataAppState;
+import org.hexgridapi.core.geometry.HexSetting;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.data.procedural.Generator;
+import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.events.TileChangeEvent;
-import org.hexgridapi.events.TileChangeListener;
+import org.hexgridapi.events.MapDataListener;
 import org.multiverseking.EntitySystemAppState;
 import org.multiverseking.SubSystem;
 import org.multiverseking.render.RenderComponent;
@@ -27,7 +28,7 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
     private MapData mapData;
     private RenderSystem renderSystem;
     private ArrayList<EntityId> subSystems = new ArrayList<>();
-    private TileChangeListener tileChangeListener = new TileChangeListener() {
+    private MapDataListener tileChangeListener = new MapDataListener() {
         @Override
         public void onTileChange(TileChangeEvent[] events) {
             for (Entity e : entities) {
@@ -43,19 +44,14 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
                 }
             }
         }
-        
-        @Override
-        public void onGridReload(){
-            
-        }
     };
 
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
-        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
-        mapData.registerTileChangeListener(tileChangeListener);
+        mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
+        mapData.register(tileChangeListener);
         app.getStateManager().getState(RenderSystem.class).registerSubSystem(this);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
@@ -85,7 +81,7 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
     @Override
     protected void cleanupSystem() {
         app.getStateManager().getState(RenderSystem.class).removeSubSystem(this, false);
-        mapData.removeTileChangeListener(tileChangeListener);
+        mapData.unregister(tileChangeListener);
     }
     
     /**

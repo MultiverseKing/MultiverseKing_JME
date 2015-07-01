@@ -1,61 +1,78 @@
 package org.multiverseking.render.camera;
 
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.hexgridapi.core.RTSCamera;
-import org.hexgridapi.core.appstate.HexGridDefaultApplication;
+import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.camera.RTSCamera;
+import org.hexgridapi.core.geometry.buffer.BufferPositionProvider;
+import org.hexgridapi.core.geometry.buffer.HexGridBuffer;
 import org.multiverseking.EntitySystemAppState;
 import org.multiverseking.SubSystem;
-import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
 
 /**
+ * Used to bound the camera, or {@link HexGridBuffer} to the player.
  *
  * @author roah
  */
-public class CameraControlSystem extends EntitySystemAppState implements SubSystem {
+public class CameraControlSystem extends EntitySystemAppState implements SubSystem, BufferPositionProvider {
+
     private RTSCamera camera;
     private EntityId trackedEntity;
     private Spatial trackedSpatial;
     private RenderSystem renderSystem;
-    
+    private boolean boundToCamera;
+
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
-        camera = ((HexGridDefaultApplication)app).getRtsCam();
-        return entityData.getEntities(RenderComponent.class, CameraTrackComponent.class);
+        camera = app.getStateManager().getState(RTSCamera.class);
+        app.getStateManager().getState(AbstractHexGridAppState.class).setBufferPositionProvider(this);
+        return entityData.getEntities(CameraTrackComponent.class);
     }
 
     @Override
     protected void updateSystem(float tpf) {
-        if(trackedSpatial == null && !entities.isEmpty()) {
+        if (trackedSpatial == null && !entities.isEmpty()) {
             trackedSpatial = renderSystem.getSpatial(trackedEntity);
         }
-        if(trackedSpatial != null){
+        if (boundToCamera && trackedSpatial != null) {
             camera.setCenter(trackedSpatial.getLocalTranslation());
         }
     }
 
     @Override
     protected void addEntity(Entity e) {
-        trackedEntity = e.getId();
-        trackedSpatial = renderSystem.getSpatial(e.getId());
+        setTrackingTo(e.getId());
     }
 
     @Override
     protected void updateEntity(Entity e) {
+        setTrackingTo(e.getId());
     }
 
     @Override
     protected void removeEntity(Entity e) {
-        if(e.get(CameraTrackComponent.class) != null){
-            entityData.removeComponent(e.getId(), CameraTrackComponent.class);
+        setTrackingTo(null);
+    }
+
+    private void setTrackingTo(EntityId id) {
+        if (id != null) {
+            if (trackedEntity != null && !trackedEntity.equals(id)) {
+                entityData.removeComponent(trackedEntity, CameraTrackComponent.class);
+            } else if (trackedEntity != null) {
+                return;
+            }
+            trackedEntity = id;
+            trackedSpatial = renderSystem.getSpatial(id);
+        } else {
+            trackedEntity = null;
+            trackedSpatial = null;
         }
-        trackedEntity = null;
-        trackedSpatial = null;
     }
 
     @Override
@@ -67,5 +84,17 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
     public void rootSystemIsRemoved() {
         app.getStateManager().detach(this);
     }
-    
+
+    @Override
+    public Vector3f getBufferPosition() {
+        return trackedSpatial.getLocalTranslation();
+    }
+
+    @Override
+    public void resetToOriginPosition(Vector3f pos) {
+    }
+
+    public void setBoundToCamera(boolean boundToCamera) {
+        this.boundToCamera = boundToCamera;
+    }
 }

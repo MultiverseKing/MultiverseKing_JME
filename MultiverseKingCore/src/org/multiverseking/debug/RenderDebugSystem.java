@@ -6,7 +6,7 @@ import org.multiverseking.EntitySystemAppState;
 import org.multiverseking.SubSystem;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.multiverseking.field.component.AreaEventComponent;
 import org.multiverseking.field.component.AreaEventComponent.Event;
 import org.multiverseking.field.position.HexPositionComponent;

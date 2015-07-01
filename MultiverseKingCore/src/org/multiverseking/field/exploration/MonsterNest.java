@@ -3,7 +3,7 @@ package org.multiverseking.field.exploration;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
-import org.hexgridapi.core.geometry.builder.ChunkCoordinate;
+import org.hexgridapi.core.ChunkCoordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiverseking.EntitySystemAppState;
 import org.multiverseking.procedural.ProceduralContent;

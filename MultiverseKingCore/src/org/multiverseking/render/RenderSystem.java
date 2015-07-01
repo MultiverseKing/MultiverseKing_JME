@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.appstate.MapDataAppState;
 import org.hexgridapi.core.data.MapData;
+import org.hexgridapi.core.AbstractHexGridAppState;
 
 /**
  * Handle the render of all entities, spatial loading parenting etc...
@@ -38,7 +38,7 @@ public class RenderSystem extends EntitySystemAppState {
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
-        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
+        mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow. -50%fps...
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
 
@@ -177,7 +177,7 @@ public class RenderSystem extends EntitySystemAppState {
     }
 
     /**
-     * @deprecated
+     * @deprecated use {@link #getSubSystemNode(org.multiverseking.SubSystem) }
      */
     public CollisionResults subSystemCollideWith(SubSystem subSystem, Ray ray) {
         if (subSystems.contains(subSystem)) {

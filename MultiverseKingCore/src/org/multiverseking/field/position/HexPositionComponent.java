@@ -1,7 +1,7 @@
 package org.multiverseking.field.position;
 
 import com.simsilica.es.EntityComponent;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.utility.Rotation;
 import org.multiverseking.SubSystem;
 

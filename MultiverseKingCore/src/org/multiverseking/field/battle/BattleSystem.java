@@ -16,10 +16,10 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
-import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.appstate.GridMouseControlAppState;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
@@ -71,7 +71,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     public void initialize(AppStateManager stateManager, Application app) {
         this.app = (SimpleApplication) app;
         entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-        mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
+        mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
 //        debugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
 //        if (mapData.getAllChunkPos().isEmpty()) {
 //            mapData.addChunk(new Vector2Int(), null);
@@ -95,7 +95,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
 //        iNode = renderSystem.addSubSystemNode("InteractiveNode");
         renderSystem.registerSubSystem(this, true);
         mouseSystem = app.getStateManager().getState(GridMouseControlAppState.class);
-        mouseSystem.registerRayInputListener(this);
+        mouseSystem.register(this);
 
         initialisePlayerCore();
 

@@ -12,11 +12,11 @@ import com.simsilica.es.EntityId;
 import org.multiverseking.debug.DebugSystemState;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.appstate.HexGridDefaultApplication;
-import org.hexgridapi.core.appstate.MapDataAppState;
-import org.hexgridapi.core.appstate.GridMouseControlAppState;
+import org.hexgridapi.core.camera.RTSCamera;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.utility.Vector2Int;
@@ -52,22 +52,19 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
         this.entityData = app.getStateManager().getState(EntityDataAppState.class).getEntityData();
-        this.mapData = app.getStateManager().getState(MapDataAppState.class).getMapData();
+        this.mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
         this.mouseSystem = app.getStateManager().getState(GridMouseControlAppState.class);
-        mouseSystem.registerTileInputListener(tileInputListener);
+        mouseSystem.register(tileInputListener);
 //        this.renderDebugSystem = app.getStateManager().getState(AreaEventRenderDebugSystem.class);
 
         /**
          * Initialise all other system needed.
          */
-        loadDependence(true);
+        loadDependency(true);
+        app.getStateManager().getState(CameraControlSystem.class).setBoundToCamera(true);
         /**
          * Define the starting position from the AreaEventSystem.
          */
-        //        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-        //        if (renderDebugSystem != null) {
-        //            renderDebugSystem.showDebug(false, startPosition, this);
-        //        }
         DebugSystemState debug = app.getStateManager().getState(DebugSystemState.class);
         if (debug != null) {
             startPosition = debug.getStartPosition();
@@ -115,21 +112,15 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
     @Override
     public void cleanup() {
         super.cleanup();
-
-        loadDependence(false);
-
+        loadDependency(false);
         entityData.removeEntity(playerId);
-//        HexCoordinate startPosition = app.getStateManager().getState(AreaEventSystem.class).getStartPosition();
-//        if (renderDebugSystem != null) {
-//            renderDebugSystem.showDebug(true, startPosition, this);
-//        }
-        ((HexGridDefaultApplication) app).getRtsCam().setCenter(
+        app.getStateManager().getState(RTSCamera.class).setCenter(
                 startPosition.toWorldPosition(
                 mapData.getTile(startPosition) != null
                 ? mapData.getTile(startPosition).getHeight() : 0));
     }
 
-    private void loadDependence(boolean isLoad) {
+    private void loadDependency(boolean isLoad) {
         AppState state;
         Class<? extends AppState>[] states = new Class[]{
             CollisionSystem.class,

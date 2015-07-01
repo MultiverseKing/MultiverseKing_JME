@@ -2,7 +2,7 @@ package org.multiverseking.field;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.coordinate.HexCoordinate;
 
 /**
  *

@@ -16,8 +16,8 @@ import static org.multiverseking.card.attribut.CardRenderPosition.OUTERWORLD;
 import org.multiverseking.render.animation.AnimationComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.hexgridapi.core.appstate.GridMouseControlAppState;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
+import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.TileInputListener;
@@ -35,7 +35,8 @@ import tonegod.gui.core.Screen;
  * System used to render all card on the screen.
  *
  * @todo AbstractRender card on a better way.
- * @todo AbstractRender the opponent hand, show how many card the opponent got in
+ * @todo AbstractRender the opponent hand, show how many card the opponent got
+ * in
  * hand(opposite side).
  * @author roah
  */
@@ -314,7 +315,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
             screen.removeElement(card);
 
             //Register the input for the card system
-            app.getStateManager().getState(GridMouseControlAppState.class).registerTileInputListener(this);
+            app.getStateManager().getState(GridMouseControlAppState.class).register(this);
             app.getInputManager().addListener(cardInputListener, "Cancel");
         }
     }
@@ -324,7 +325,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
         cardPreviewCast = null;
         screen.removeElement(screen.getElementById(castDebug.getUID()));
         //Remove the input for the card system
-        app.getStateManager().getState(GridMouseControlAppState.class).removeTileInputListener(this);
+        app.getStateManager().getState(GridMouseControlAppState.class).register(this);
         app.getInputManager().removeListener(cardInputListener);
     }
 
@@ -355,7 +356,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
                 if (unitLoader != null) {
                     /* @todo How this is suppose to work without render Comp !? */
                     entityData.setComponents(cardPreviewCast.getCardEntityUID(),
-//                            new HexPositionComponent(castCoord, Rotation.A),
+                            //                            new HexPositionComponent(castCoord, Rotation.A),
                             cardRender.clone(CardRenderPosition.FIELD),
                             new AnimationComponent(Animation.SUMMON),
                             new EAttributComponent(cardPreviewCast.getProperties().getElement()),
@@ -424,7 +425,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
 
     @Override
     public void onMouseAction(MouseInputEvent event) {
-        if(event.getType().equals(MouseInputEventType.LMB)){
+        if (event.getType().equals(MouseInputEventType.LMB)) {
             activateCard(event);
         }
     }

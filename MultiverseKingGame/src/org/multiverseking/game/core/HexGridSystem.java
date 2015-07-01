@@ -4,7 +4,8 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.appstate.AbstractHexGridAppState;
+import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.geometry.buffer.BufferPositionProvider;
 
 /**
  *
@@ -12,8 +13,8 @@ import org.hexgridapi.core.appstate.AbstractHexGridAppState;
  */
 public class HexGridSystem extends AbstractHexGridAppState {
 
-    public HexGridSystem(MapData mapData) {
-        super(mapData);
+    public HexGridSystem(MapData mapData, BufferPositionProvider provider, String path) {
+        super(mapData, provider, path);
     }
 
     @Override

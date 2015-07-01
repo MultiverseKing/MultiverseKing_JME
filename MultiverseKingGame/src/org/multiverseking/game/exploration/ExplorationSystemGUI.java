@@ -4,8 +4,8 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector2f;
+import org.hexgridapi.core.AbstractHexGridAppState;
 import org.multiverseking.game.core.KingOfMultiverseMain;
-import org.hexgridapi.core.appstate.MapDataAppState;
 import tonegod.gui.controls.text.Label;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
@@ -32,7 +32,8 @@ public class ExplorationSystemGUI extends AbstractAppState {
     private void initialiseDebug() {
         debug = new Window(screen, Vector2f.ZERO);
         Label label = new Label(screen, Vector2f.ZERO, new Vector2f(225, 35));
-        label.setText(Integer.toString(app.getStateManager().getState(MapDataAppState.class).getMapData().getSeed()));
+        label.setText(Integer.toString(app.getStateManager()
+                .getState(AbstractHexGridAppState.class).getMapData().getGenerator().getSeed()));
         debug.addWindowContent(label);
         screen.addElement(debug);
     }

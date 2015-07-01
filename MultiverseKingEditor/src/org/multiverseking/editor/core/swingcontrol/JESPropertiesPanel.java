@@ -1,6 +1,6 @@
 package org.multiverseking.editor.core.swingcontrol;
 
-import org.hexgridapi.editor.utility.gui.JPanelTab;
+import com.jme3.texture.Image;
 import java.awt.Dimension;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -8,6 +8,7 @@ import org.hexgridapi.editor.core.HexGridEditorMain;
 import org.hexgridapi.editor.hexmap.gui.JCursorPositionPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,22 +19,26 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.hexgridapi.core.appstate.GridMouseControlAppState;
-import org.hexgridapi.core.geometry.builder.coordinate.HexCoordinate;
+import org.hexgridapi.core.camera.RTSCamera;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.editor.hexmap.gui.HexGridPropertiesPan;
+import org.hexgridapi.editor.utility.ImageConverter;
 import org.hexgridapi.events.TileSelectionListener;
 import org.multiverseking.debug.DebugSystemState;
+import org.multiverseking.editor.core.JPlayEditorMenu;
 import org.multiverseking.field.component.AreaEventComponent;
 
 /**
  *
  * @author roah
  */
-public class JESPropertiesPanel extends JPanelTab {
+public class JESPropertiesPanel extends HexGridPropertiesPan {
 
     private final HexGridEditorMain editorMain;
-    private JCursorPositionPanel cursorPan;
-    private HashMap<String, Component> comps = new HashMap<>();
     private final DebugSystemState system;
+    private final JPlayEditorMenu playEditorMenu;
+    private JCursorPositionPanel cursorPan;
     private JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
@@ -42,9 +47,12 @@ public class JESPropertiesPanel extends JPanelTab {
                 "org/multiverseking/assets/Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
         this.editorMain = editorMain;
 
+        playEditorMenu = new JPlayEditorMenu(editorMain);
+        editorMain.getRootFrame().getJMenuBar().add(playEditorMenu);
+
         cursorPan = new JCursorPositionPanel(mouseSystem);
         add(cursorPan);
-        mouseSystem.getSelectionControl().registerTileListener(selectionListener);
+        mouseSystem.getSelectionControl().register(selectionListener);
         system = editorMain.getStateManager().getState(DebugSystemState.class);
     }
     private TileSelectionListener selectionListener = new TileSelectionListener() {
@@ -59,6 +67,10 @@ public class JESPropertiesPanel extends JPanelTab {
     };
 
     private void initialize() {
+        JPanel holder = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        holder.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
+        holder.setAlignmentX(0);
+        
         JButton addEvent = new JButton(new AbstractAction("Add Event") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,17 +98,34 @@ public class JESPropertiesPanel extends JPanelTab {
                 }
             }
         });
-        addEvent.setPreferredSize(new Dimension(Integer.MAX_VALUE, 30));
-        addEvent.setAlignmentX(0);
-        add(addEvent);
+        addEvent.setPreferredSize(new Dimension(120, 26));
+        holder.add(addEvent);
+        //------- Center to Start Position ------
+        Image img = editorMain.getAssetManager().loadTexture(
+                      "org/multiverseking/assets/Textures/Icons/Buttons/centerToStart.png").getImage();
+        JButton center = new JButton(new AbstractAction("", ImageConverter.convertToIcon(img, 20, 20)) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(system.getStartPosition() != null) {
+                    editorMain.getStateManager().getState(RTSCamera.class)
+                            .setCenter(system.getStartPosition().toWorldPosition());
+                }
+            }
+        });
+        center.setPreferredSize(new Dimension(30, 26));
+        holder.add(center);
+        add(holder);
+        
         JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
-        addComp(separator);
+        addWithSpace(separator);
 
         eventPan.setLayout(new BoxLayout(eventPan, BoxLayout.PAGE_AXIS));
         add(eventPan);
 
         inspectedPos = cursorPan.getPosition();
+        editorMain.getRootFrame().pack();
+        editorMain.getRootFrame().revalidate();
     }
 
     private void updateMenu() {
@@ -148,5 +177,26 @@ public class JESPropertiesPanel extends JPanelTab {
 
     @Override
     public void isHidden() {
+    }
+
+    @Override
+    public void onMapLoaded() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onMapRemoved() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onMapReset() {
+//        editorMain.enqueue(new Callable<Void>() {
+//            @Override
+//            public Void call() throws Exception {
+//                editorMain.getStateManager().getState(DebugSystemState.class).cleanup();
+//                return null;
+//            }
+//        });
     }
 }

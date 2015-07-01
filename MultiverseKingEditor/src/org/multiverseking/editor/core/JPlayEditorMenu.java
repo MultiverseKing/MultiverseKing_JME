@@ -9,6 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.border.BevelBorder;
+import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.camera.RTSCamera;
 import org.multiverseking.debug.DebugSystemState;
 import org.multiverseking.debug.RenderDebugSystem;
 import org.multiverseking.field.exploration.ExplorationSystem;
@@ -85,6 +87,8 @@ public class JPlayEditorMenu extends JMenu {
     }
 
     private void stopExploration() {
+        main.getStateManager().getState(AbstractHexGridAppState.class)
+                .setBufferPositionProvider(main.getStateManager().getState(RTSCamera.class));
         main.getStateManager().detach(main.getStateManager().getState(ExplorationSystem.class));
         main.getStateManager().getState(RenderDebugSystem.class).setEnabled(true);
         main.getRootFrame().getJMenuBar().remove(stopBtn);

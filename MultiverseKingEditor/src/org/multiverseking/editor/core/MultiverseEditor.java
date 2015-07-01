@@ -1,5 +1,6 @@
 package org.multiverseking.editor.core;
 
+import java.util.logging.Level;
 import org.hexgridapi.editor.core.HexGridEditorMain;
 import org.multiverseking.editor.core.swingcontrol.JESPropertiesPanel;
 import org.multiverseking.EntityDataAppState;
@@ -17,6 +18,7 @@ import tonegod.gui.core.Screen;
 public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreGUI {
 
     public static void main(String[] args) {
+        java.util.logging.Logger.getLogger("com.jme3").setLevel(Level.WARNING);
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -45,7 +47,6 @@ public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreG
                 new DebugSystemState(),
                 new RenderDebugSystem());
 
-        getRootFrame().getJMenuBar().add(new JPlayEditorMenu(this));
         getHexMapModule().addPropertiesTab(new JESPropertiesPanel(this, getHexMapModule().getMouseSystem()));
     }
 }

@@ -2,8 +2,8 @@ package org.multiverseking.debug;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.EntitySystemAppState;
-import org.multiverseking.SubSystem;
+import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.utility.system.SubSystem;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.coordinate.HexCoordinate;

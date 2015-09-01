@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import org.hexgridapi.core.geometry.HexSetting;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.hexgridapi.core.data.procedural.Generator;
 import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.events.TileChangeEvent;
 import org.hexgridapi.events.MapDataListener;
-import org.multiverseking.EntitySystemAppState;
-import org.multiverseking.SubSystem;
+import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
 

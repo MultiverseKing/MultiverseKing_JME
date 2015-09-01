@@ -1,4 +1,4 @@
-package org.multiverseking;
+package org.multiverseking.utility.system;
 
 import tonegod.gui.core.Screen;
 
@@ -6,6 +6,6 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public interface MultiverCoreGUI {
+public interface MultiverseCoreGUI {
     Screen getScreen();
 }

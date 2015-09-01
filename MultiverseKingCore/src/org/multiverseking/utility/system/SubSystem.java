@@ -1,4 +1,4 @@
-package org.multiverseking;
+package org.multiverseking.utility.system;
 
 /**
  * Allow a system specifie to another system that it is dependend on it.

@@ -1,6 +1,6 @@
 package org.multiverseking.render;
 
-import org.multiverseking.SubSystem;
+import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.render.utility.SpatialInitializer;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
@@ -11,13 +11,11 @@ import com.jme3.scene.control.Control;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.EntitySystemAppState;
+import org.multiverseking.utility.system.EntitySystemAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.AbstractHexGridAppState;
 
 /**
  * Handle the render of all entities, spatial loading parenting etc...
@@ -29,7 +27,6 @@ import org.hexgridapi.core.AbstractHexGridAppState;
 public class RenderSystem extends EntitySystemAppState {
 
     private final Node renderSystemNode = new Node("RenderSystemNode");
-    private MapData mapData;
     private HashMap<EntityId, Spatial> spatials = new HashMap<>();
     private ArrayList<SubSystem> subSystems = new ArrayList<>(3);
     private SpatialInitializer spatialInitializer;
@@ -38,10 +35,9 @@ public class RenderSystem extends EntitySystemAppState {
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
-        mapData = app.getStateManager().getState(AbstractHexGridAppState.class).getMapData();
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow. -50%fps...
         spatialInitializer = new SpatialInitializer(app.getAssetManager());
-
+        
         return entityData.getEntities(RenderComponent.class);
     }
 

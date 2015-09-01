@@ -2,7 +2,7 @@ package org.multiverseking.loader;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetKey;
-import org.multiverseking.ability.AbilityComponent;
+import battleSystem.ability.AbilityComponent;
 import org.multiverseking.field.Collision;
 import org.multiverseking.field.Collision.CollisionData;
 import org.multiverseking.render.AbstractRender.RenderType;

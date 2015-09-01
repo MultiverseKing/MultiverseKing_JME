@@ -4,7 +4,7 @@ import org.multiverseking.field.component.CollisionComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.EntitySystemAppState;
+import org.multiverseking.utility.system.EntitySystemAppState;
 import org.multiverseking.render.AbstractRender.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;

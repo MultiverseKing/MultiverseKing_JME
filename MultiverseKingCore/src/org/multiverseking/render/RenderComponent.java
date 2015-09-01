@@ -1,7 +1,7 @@
 package org.multiverseking.render;
 
 import com.simsilica.es.EntityComponent;
-import org.multiverseking.SubSystem;
+import org.multiverseking.utility.system.SubSystem;
 
 /**
  *

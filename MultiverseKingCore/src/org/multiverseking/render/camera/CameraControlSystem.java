@@ -9,12 +9,12 @@ import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.geometry.buffer.BufferPositionProvider;
 import org.hexgridapi.core.geometry.buffer.HexGridBuffer;
-import org.multiverseking.EntitySystemAppState;
-import org.multiverseking.SubSystem;
+import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.render.RenderSystem;
 
 /**
- * Used to bound the camera, or {@link HexGridBuffer} to the player.
+ * Used to bound the camera, or {@link HexGridBuffer} to the player. (merge with exploration system)
  *
  * @author roah
  */
@@ -32,6 +32,7 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
         renderSystem.registerSubSystem(this);
         camera = app.getStateManager().getState(RTSCamera.class);
         app.getStateManager().getState(AbstractHexGridAppState.class).setBufferPositionProvider(this);
+        System.err.println("init camera system");
         return entityData.getEntities(CameraTrackComponent.class);
     }
 
@@ -96,5 +97,7 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
 
     public void setBoundToCamera(boolean boundToCamera) {
         this.boundToCamera = boundToCamera;
+        app.getStateManager().getState(AbstractHexGridAppState.class)
+                .setBufferPositionProvider(app.getStateManager().getState(RTSCamera.class));
     }
 }

@@ -2,7 +2,7 @@ package org.multiverseking.loader;
 
 import com.jme3.app.SimpleApplication;
 import com.simsilica.es.PersistentComponent;
-import org.multiverseking.ability.AbilityComponent;
+import battleSystem.ability.AbilityComponent;
 import org.multiverseking.field.component.ATBComponent;
 import org.multiverseking.field.component.HealthComponent;
 import org.multiverseking.field.position.MovementComponent;

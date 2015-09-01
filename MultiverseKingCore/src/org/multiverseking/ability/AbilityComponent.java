@@ -1,4 +1,4 @@
-package org.multiverseking.ability;
+package battleSystem.ability;
 
 import com.simsilica.es.EntityComponent;
 import org.hexgridapi.utility.Vector2Int;

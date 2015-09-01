@@ -11,7 +11,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -22,6 +21,7 @@ import javax.swing.JPanel;
 import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.editor.hexmap.HexGridModule;
 import org.hexgridapi.editor.hexmap.gui.HexGridPropertiesPan;
 import org.hexgridapi.editor.utility.ImageConverter;
 import org.hexgridapi.events.TileSelectionListener;
@@ -34,7 +34,7 @@ import org.multiverseking.field.component.AreaEventComponent;
  * @author roah
  */
 public class JESPropertiesPanel extends HexGridPropertiesPan {
-
+    
     private final HexGridEditorMain editorMain;
     private final DebugSystemState system;
     private final JPlayEditorMenu playEditorMenu;

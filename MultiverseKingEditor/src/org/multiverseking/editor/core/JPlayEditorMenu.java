@@ -21,16 +21,16 @@ import org.multiverseking.field.exploration.ExplorationSystem;
  */
 public class JPlayEditorMenu extends JMenu {
 
-    private final HexGridEditorMain main;
+    private final HexGridEditorMain editorMain;
     private JButton stopBtn;
 
-    public JPlayEditorMenu(final HexGridEditorMain main) {
+    public JPlayEditorMenu(final HexGridEditorMain editorMain) {
         super("Play");
-        this.main = main;
+        this.editorMain = editorMain;
         stopBtn = new JButton(new AbstractAction(" Stop") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                main.enqueue(new Callable<Void>() {
+                editorMain.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
                         stopExploration();
@@ -58,26 +58,27 @@ public class JPlayEditorMenu extends JMenu {
     public void onAction(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Play Battle":
-                JOptionPane.showMessageDialog(main.getRootFrame(), "TODO...");
+                JOptionPane.showMessageDialog(editorMain.getRootFrame(), "TODO...");
                 break;
             case "Play Exploration":
-                main.enqueue(new Callable<Void>() {
+                editorMain.enqueue(new Callable<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        if (main.getStateManager().getState(ExplorationSystem.class) != null) {
-                            int result = JOptionPane.showConfirmDialog(main.getRootFrame(), "Exploration mode already running, "
+                        if (editorMain.getStateManager().getState(ExplorationSystem.class) != null) {
+                            int result = JOptionPane.showConfirmDialog(editorMain.getRootFrame(), "Exploration mode already running, "
                                     + "want to shut it off ?", "Exploration", JOptionPane.OK_CANCEL_OPTION);
                             if (result == 0) {
                                 stopExploration();
                             }
-                        } else if (main.getStateManager().getState(DebugSystemState.class).getStartPosition() != null) {
-                            main.getStateManager().attach(new ExplorationSystem());
-                            main.getStateManager().getState(RenderDebugSystem.class).setEnabled(false);
-                            main.getRootFrame().getJMenuBar().add(stopBtn);
-                            main.getRootFrame().revalidate();
-                            main.getRootFrame().repaint();
+                        } else if (editorMain.getStateManager().getState(DebugSystemState.class).getStartPosition() != null) {
+                            editorMain.getStateManager().attach(new ExplorationSystem());
+                            editorMain.getStateManager().getState(RenderDebugSystem.class).setEnabled(false);
+                            editorMain.getRootFrame().getJMenuBar().add(stopBtn);
+                            editorMain.getHexGridModule().collapseProperties(true);
+                            editorMain.getRootFrame().revalidate();
+                            editorMain.getRootFrame().repaint();
                         } else {
-                            JOptionPane.showMessageDialog(main.getRootFrame(), "A start position need to be set.");
+                            JOptionPane.showMessageDialog(editorMain.getRootFrame(), "A start position need to be set.");
                         }
                         return null;
                     }
@@ -87,12 +88,13 @@ public class JPlayEditorMenu extends JMenu {
     }
 
     private void stopExploration() {
-        main.getStateManager().getState(AbstractHexGridAppState.class)
-                .setBufferPositionProvider(main.getStateManager().getState(RTSCamera.class));
-        main.getStateManager().detach(main.getStateManager().getState(ExplorationSystem.class));
-        main.getStateManager().getState(RenderDebugSystem.class).setEnabled(true);
-        main.getRootFrame().getJMenuBar().remove(stopBtn);
-        main.getRootFrame().revalidate();
-        main.getRootFrame().repaint();
+        editorMain.getStateManager().getState(AbstractHexGridAppState.class)
+                .setBufferPositionProvider(editorMain.getStateManager().getState(RTSCamera.class));
+        editorMain.getStateManager().detach(editorMain.getStateManager().getState(ExplorationSystem.class));
+        editorMain.getStateManager().getState(RenderDebugSystem.class).setEnabled(true);
+        editorMain.getRootFrame().getJMenuBar().remove(stopBtn);
+        editorMain.getHexGridModule().collapseProperties(false);
+        editorMain.getRootFrame().revalidate();
+        editorMain.getRootFrame().repaint();
     }
 }

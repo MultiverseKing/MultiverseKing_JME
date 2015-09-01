@@ -3,8 +3,8 @@ package org.multiverseking.editor.core;
 import java.util.logging.Level;
 import org.hexgridapi.editor.core.HexGridEditorMain;
 import org.multiverseking.editor.core.swingcontrol.JESPropertiesPanel;
-import org.multiverseking.EntityDataAppState;
-import org.multiverseking.MultiverCoreGUI;
+import org.multiverseking.utility.system.EntityDataAppState;
+import org.multiverseking.utility.system.MultiverseCoreGUI;
 import org.multiverseking.debug.DebugSystemState;
 import org.multiverseking.field.position.HexPositionSystem;
 import org.multiverseking.debug.RenderDebugSystem;
@@ -15,7 +15,7 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreGUI {
+public class MultiverseEditor extends HexGridEditorMain implements MultiverseCoreGUI {
 
     public static void main(String[] args) {
         java.util.logging.Logger.getLogger("com.jme3").setLevel(Level.WARNING);
@@ -47,6 +47,6 @@ public class MultiverseEditor extends HexGridEditorMain implements MultiverCoreG
                 new DebugSystemState(),
                 new RenderDebugSystem());
 
-        getHexMapModule().addPropertiesTab(new JESPropertiesPanel(this, getHexMapModule().getMouseSystem()));
+        getHexGridModule().addPropertiesTab(new JESPropertiesPanel(this, getHexGridModule().getMouseSystem()));
     }
 }

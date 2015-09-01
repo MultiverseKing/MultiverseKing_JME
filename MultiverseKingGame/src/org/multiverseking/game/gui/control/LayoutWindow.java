@@ -76,7 +76,8 @@ public abstract class LayoutWindow {
      * @param windowElementAlignement Alignement used to place each element.
      * @param elementAlignMaxCount element count on selected alignement.
      */
-    public LayoutWindow(Screen screen, String UID, Element parent, String name, Vector2f layoutGridSize, Align windowElementAlignement, int elementAlignMaxCount) {
+    public LayoutWindow(Screen screen, String UID, Element parent, String name, 
+            Vector2f layoutGridSize, Align windowElementAlignement, int elementAlignMaxCount) {
         this.screen = screen;
         this.UID = UID != null ? UID : generateUID(name);
         this.name = name;

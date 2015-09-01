@@ -13,8 +13,8 @@ import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.coordinate.SquareCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.EntityDataAppState;
-import org.multiverseking.MultiverCoreGUI;
+import org.multiverseking.utility.system.EntityDataAppState;
+import org.multiverseking.utility.system.MultiverseCoreGUI;
 import org.multiverseking.field.exploration.ExplorationSystem;
 import org.multiverseking.field.position.HexPositionSystem;
 import org.multiverseking.render.RenderSystem;
@@ -24,7 +24,7 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class KingOfMultiverseMain extends AbstractHexGridApplication implements MultiverCoreGUI {
+public class KingOfMultiverseMain extends AbstractHexGridApplication implements MultiverseCoreGUI {
 
     public static void main(String[] args) {
         KingOfMultiverseMain app = new KingOfMultiverseMain();
@@ -68,7 +68,7 @@ public class KingOfMultiverseMain extends AbstractHexGridApplication implements 
                 new ExplorationSystem(),
                 new ExplorationSystemGUI());
 
-        MapParam param = new MapParam(SquareCoordinate.class, Vector2Int.ZERO, 12, 1, false, false, true, null);
+        MapParam param = new MapParam(SquareCoordinate.class, Vector2Int.ZERO, 12, 1, false, false, 0, null);
         hexGrid.setParam(param);
     }
 }

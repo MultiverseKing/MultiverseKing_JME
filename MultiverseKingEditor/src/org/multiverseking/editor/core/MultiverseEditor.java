@@ -2,12 +2,12 @@ package org.multiverseking.editor.core;
 
 import java.util.logging.Level;
 import org.hexgridapi.editor.core.HexGridEditorMain;
+import org.multiverseking.debug.DebugSystemState;
+import org.multiverseking.debug.RenderDebugSystem;
 import org.multiverseking.editor.core.swingcontrol.JESPropertiesPanel;
 import org.multiverseking.utility.system.EntityDataAppState;
 import org.multiverseking.utility.system.MultiverseCoreGUI;
-import org.multiverseking.debug.DebugSystemState;
 import org.multiverseking.field.position.HexPositionSystem;
-import org.multiverseking.debug.RenderDebugSystem;
 import org.multiverseking.render.RenderSystem;
 import tonegod.gui.core.Screen;
 

@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.hexgridapi.editor.hexmap.HexGridModule;
 import org.hexgridapi.editor.hexmap.gui.HexGridPropertiesPan;
 import org.hexgridapi.editor.utility.ImageConverter;
 import org.hexgridapi.events.TileSelectionListener;

@@ -3,7 +3,7 @@ Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
         ColorMap : org/multiverseking/assets/Textures/testDebugCursor.png
      }
     AdditionalRenderState {
-      Blend Off
+      Blend Alpha
       Wireframe Off
       AlphaTestFalloff 0.4
       PointSprite Off
@@ -11,5 +11,6 @@ Material My Material : Common/MatDefs/Misc/Unshaded.j3md {
       DepthTest Off
       DepthWrite Off
       PolyOffset 0.0 0.0
+      FaceCull Off
     }
 }

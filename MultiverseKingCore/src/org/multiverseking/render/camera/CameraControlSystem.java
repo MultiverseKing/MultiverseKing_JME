@@ -14,7 +14,9 @@ import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.render.RenderSystem;
 
 /**
- * Used to bound the camera, or {@link HexGridBuffer} to the player. (merge with exploration system)
+ * Used to bound the camera, or {@link HexGridBuffer} to the player position.
+ * Make the grid being generated around the tracked character.
+ * Make the camera being lock to the tracked character.
  *
  * @author roah
  */
@@ -24,15 +26,15 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
     private EntityId trackedEntity;
     private Spatial trackedSpatial;
     private RenderSystem renderSystem;
-    private boolean boundToCamera;
+    // Set this to false to free the camera from the tracked character
+    private boolean lockCamera = true; 
 
     @Override
     protected EntitySet initialiseSystem() {
         renderSystem = app.getStateManager().getState(RenderSystem.class);
         renderSystem.registerSubSystem(this);
         camera = app.getStateManager().getState(RTSCamera.class);
-        app.getStateManager().getState(AbstractHexGridAppState.class).setBufferPositionProvider(this);
-        System.err.println("init camera system");
+        updateProvider(true);
         return entityData.getEntities(CameraTrackComponent.class);
     }
 
@@ -41,7 +43,8 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
         if (trackedSpatial == null && !entities.isEmpty()) {
             trackedSpatial = renderSystem.getSpatial(trackedEntity);
         }
-        if (boundToCamera && trackedSpatial != null) {
+        // this part bound the camera position to the character position
+        if (lockCamera && trackedSpatial != null) {
             camera.setCenter(trackedSpatial.getLocalTranslation());
         }
     }
@@ -95,9 +98,19 @@ public class CameraControlSystem extends EntitySystemAppState implements SubSyst
     public void resetToOriginPosition(Vector3f pos) {
     }
 
-    public void setBoundToCamera(boolean boundToCamera) {
-        this.boundToCamera = boundToCamera;
-        app.getStateManager().getState(AbstractHexGridAppState.class)
-                .setBufferPositionProvider(app.getStateManager().getState(RTSCamera.class));
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        updateProvider(enabled);
+    }
+    
+    private void updateProvider(boolean enable) {
+        if(!enable) {
+            app.getStateManager().getState(AbstractHexGridAppState.class)
+                    .setBufferPositionProvider(app.getStateManager().getState(RTSCamera.class));
+        } else {
+            app.getStateManager().getState(AbstractHexGridAppState.class)
+                    .setBufferPositionProvider(this);
+        }
     }
 }

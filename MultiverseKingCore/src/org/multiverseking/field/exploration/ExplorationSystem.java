@@ -5,23 +5,20 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
-import org.multiverseking.debug.DebugSystemState;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.camera.RTSCamera;
-import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
-import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.camera.RTSCamera;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.data.MapData;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.utility.system.EntityDataAppState;
-import org.multiverseking.utility.system.SubSystem;
+import org.multiverseking.debug.DebugSystemState;
 import org.multiverseking.field.CollisionSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.field.position.MoveToComponent;
@@ -32,6 +29,8 @@ import org.multiverseking.render.animation.AnimationComponent;
 import org.multiverseking.render.animation.AnimationSystem;
 import org.multiverseking.render.camera.CameraControlSystem;
 import org.multiverseking.render.camera.CameraTrackComponent;
+import org.multiverseking.utility.system.EntityDataAppState;
+import org.multiverseking.utility.system.SubSystem;
 
 /**
  *
@@ -61,7 +60,6 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
          * Initialise all other system needed.
          */
         loadDependency(true);
-        app.getStateManager().getState(CameraControlSystem.class).setBoundToCamera(true);
         /**
          * Define the starting position from the AreaEventSystem.
          */
@@ -76,7 +74,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
          * arround.
          */
         playerId = entityData.createEntity();
-        String name = (String) ((Node) app.getAssetManager().loadModel("org/multiverseking/assets/Data/playerData.j3o")).getUserData("blessedTitan");
+        String name = "Gilga";
         entityData.setComponents(playerId, new RenderComponent(
                 name, AbstractRender.RenderType.Titan),
                 new HexPositionComponent(startPosition),

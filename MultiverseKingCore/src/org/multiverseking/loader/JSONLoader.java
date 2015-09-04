@@ -2,14 +2,15 @@ package org.multiverseking.loader;
 
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import sun.misc.IOUtils;
 
 /**
  * @todo Use for game configuration
@@ -17,7 +18,7 @@ import sun.misc.IOUtils;
  */
 public class JSONLoader implements AssetLoader {
 
-    private static JSONParser parser = new JSONParser();
+    private final static JSONParser parser = new JSONParser();
 
     /**
      * Load the file using the binary importer.
@@ -29,13 +30,27 @@ public class JSONLoader implements AssetLoader {
     @Override
     public Object load(AssetInfo assetInfo) throws IOException {
         InputStream is = assetInfo.openStream();
-        String s = new String(IOUtils.readFully(is, -1, true));
         JSONObject data = null;
+        BufferedReader bufferedReader = null;
+        StringBuilder stringBuilder = new StringBuilder();
         try {
-            data = (JSONObject) parser.parse(s);
-            is.close();
+            bufferedReader = new BufferedReader(new InputStreamReader(is));
+            String s;
+            while ((s = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(s);
+            }
+            data = (JSONObject) parser.parse(stringBuilder.toString());
         } catch (ParseException ex) {
             Logger.getLogger(JSONLoader.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (bufferedReader != null) {
+                    try {
+                            bufferedReader.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(JSONLoader.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+            }
+            is.close();
         }
 
         if (data != null) {

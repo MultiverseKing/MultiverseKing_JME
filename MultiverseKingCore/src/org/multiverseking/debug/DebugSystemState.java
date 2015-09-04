@@ -1,12 +1,12 @@
 package org.multiverseking.debug;
 
-import org.multiverseking.field.component.AreaEventComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.field.component.AreaEventComponent;
 import org.multiverseking.field.component.AreaEventComponent.Event;
+import org.multiverseking.utility.system.EntitySystemAppState;
 
 /**
  * Handle all event in the area, as teleportation, starting point etc...

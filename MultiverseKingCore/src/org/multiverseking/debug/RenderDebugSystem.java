@@ -2,8 +2,6 @@ package org.multiverseking.debug;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.utility.system.SubSystem;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.coordinate.HexCoordinate;
@@ -13,6 +11,8 @@ import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
+import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.utility.system.SubSystem;
 
 /**
  *

@@ -1,25 +1,23 @@
 package org.multiverseking.battle.battleSystem;
 
-import org.multiverseking.battle.battleSystem.ability.AbilitySystem;
+import com.jme3.app.state.AppStateManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import java.util.ArrayList;
-import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
-import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.camera.RTSCamera;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.field.CollisionSystem;
+import org.multiverseking.battle.battleSystem.ability.AbilitySystem;
 import org.multiverseking.battle.battleSystem.component.FocusComponent;
-import com.jme3.app.state.AppStateManager;
-import com.simsilica.es.EntityData;
-import org.multiverseking.utility.system.DependendAppState;
-import org.multiverseking.utility.system.EntityDataAppState;
+import org.multiverseking.field.CollisionSystem;
 import org.multiverseking.field.exploration.HexMovementSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.field.position.MoveToComponent;
@@ -29,7 +27,8 @@ import org.multiverseking.render.RenderSystem;
 import org.multiverseking.render.animation.Animation;
 import org.multiverseking.render.animation.AnimationComponent;
 import org.multiverseking.render.animation.AnimationSystem;
-import org.multiverseking.utility.system.MultiverseCoreGUI;
+import org.multiverseking.utility.system.DependendAppState;
+import org.multiverseking.utility.system.EntityDataAppState;
 
 /**
  *
@@ -49,8 +48,8 @@ public class BattleSystemTest extends DependendAppState {
     public BattleSystemTest() {
         super(new Class[]{
             CollisionSystem.class, AnimationSystem.class,
-            HexMovementSystem.class, AbilitySystem.class,
-            BattleGUIRender.class});
+            HexMovementSystem.class, AbilitySystem.class});
+//            BattleGUIRender.class});
     }
 
     @Override

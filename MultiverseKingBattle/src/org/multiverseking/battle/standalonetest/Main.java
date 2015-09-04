@@ -1,6 +1,5 @@
 package org.multiverseking.battle.standalonetest;
 
-import org.multiverseking.battle.battleSystem.BattleSystemTest;
 import com.jme3.renderer.RenderManager;
 import java.util.logging.Level;
 import org.hexgridapi.core.AbstractHexGridApplication;
@@ -9,11 +8,12 @@ import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.coordinate.SquareCoordinate;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.utility.system.EntityDataAppState;
-import org.multiverseking.utility.system.MultiverseCoreGUI;
+import org.multiverseking.battle.battleSystem.BattleSystemTest;
 import org.multiverseking.debug.RenderDebugSystem;
 import org.multiverseking.field.position.HexPositionSystem;
 import org.multiverseking.render.RenderSystem;
+import org.multiverseking.utility.system.EntityDataAppState;
+import org.multiverseking.utility.system.MultiverseCoreGUI;
 import tonegod.gui.core.Screen;
 
 /**
@@ -62,8 +62,8 @@ public class Main extends AbstractHexGridApplication implements MultiverseCoreGU
                 new RenderSystem(), new HexPositionSystem(), 
                 new RenderDebugSystem(), new BattleSystemTest());
 
-        setDisplayFps(false);
-        setDisplayStatView(false);
+//        setDisplayFps(false);
+//        setDisplayStatView(false);
     }
 
     @Override

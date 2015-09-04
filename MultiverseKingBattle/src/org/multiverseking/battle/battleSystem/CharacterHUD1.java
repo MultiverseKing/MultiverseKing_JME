@@ -104,7 +104,7 @@ public class CharacterHUD1 {
     }
 
     private Indicator initIndicator(String param) {
-        String[] params = param.split("//.");
+        String[] params = param.split("\\.");
         Indicator ind = new Indicator(screen, Vector2f.ZERO, new Vector2f(708, 139).mult(.75f), Element.Orientation.valueOf(params[2]), false) {
             @Override
             public void onChange(float currentValue, float currentPercentage) {

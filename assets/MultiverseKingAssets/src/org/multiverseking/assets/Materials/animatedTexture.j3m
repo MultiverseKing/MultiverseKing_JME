@@ -1,14 +1,20 @@
-Material My Material : MatDefs/shaderBlowCopy.j3md {
+Material My Material : ShaderBlow/MatDefs/SimpleSprite/SimpleSprite.j3md {
      MaterialParameters {
-        AniTexMap : Flip Repeat Textures/animation/hex_void_anim.png
-        numTilesU : 8
-        numTilesV : 1
-        Speed : 20
-        Distance : 0.0
+        numTilesU : 1
+        numTilesV : 8
+        Speed : 16
+        AniTexMap : org/multiverseking/assets/Textures/animation/hex_void_anim.png
+        Multiply_Color : 1.0 1.0 1.0 0.0
+        FogColor : 1.0 1.0 1.0 0.0
      }
     AdditionalRenderState {
       Blend Alpha
-      Wireframe Off
+      Wireframe On
       AlphaTestFalloff 0.3
+      DepthWrite On
+      PolyOffset 0.0 0.0
+      FaceCull Back
+      ColorWrite On
+      DepthTest On
     }
 }

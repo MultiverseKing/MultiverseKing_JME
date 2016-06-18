@@ -1,33 +1,33 @@
 package org.multiverseking.card;
 
-import org.multiverseking.card.attribut.CardRenderPosition;
-import org.multiverseking.loader.CardProperties;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.render.animation.Animation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
+import org.hexgridapi.events.MouseInputEvent;
+import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
+import org.hexgridapi.events.TileInputListener;
+import org.multiverseking.card.attribut.CardRenderPosition;
 import static org.multiverseking.card.attribut.CardRenderPosition.DECK;
 import static org.multiverseking.card.attribut.CardRenderPosition.FIELD;
 import static org.multiverseking.card.attribut.CardRenderPosition.HAND;
 import static org.multiverseking.card.attribut.CardRenderPosition.OUTERWORLD;
-import org.multiverseking.render.animation.AnimationComponent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
-import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.hexgridapi.events.MouseInputEvent;
-import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
-import org.hexgridapi.events.TileInputListener;
 import org.multiverseking.card.gui.Card;
 import org.multiverseking.card.gui.Hover;
+import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.field.CollisionSystem;
 import org.multiverseking.field.component.EAttributComponent;
+import org.multiverseking.loader.CardProperties;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.loader.UnitLoader;
 import org.multiverseking.render.AbstractRender.RenderType;
+import org.multiverseking.render.animation.Animation;
+import org.multiverseking.render.animation.AnimationComponent;
 import tonegod.gui.controls.windows.Window;
 import tonegod.gui.core.Screen;
 
@@ -147,7 +147,8 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
         if (cardPos == CardRenderPosition.HAND) {
             String cardName = e.get(CardRenderComponent.class).getName();
             Card card;
-            CardProperties properties = new EntityLoader(app).loadCardProperties(cardName, e.get(CardRenderComponent.class).getRenderType());
+            CardProperties properties = new EntityLoader(app).loadCardProperties(cardName, 
+                    e.get(CardRenderComponent.class).getRenderType());
             if (properties != null) {
                 card = new Card(screen, true, cardName, handCards.size() - 1, e.getId(),
                         properties);
@@ -316,7 +317,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
 
             //Register the input for the card system
             app.getStateManager().getState(GridMouseControlAppState.class).register(this);
-            app.getInputManager().addListener(cardInputListener, "Cancel");
+            app.getInputManager().addListener(cardInputListener, MouseInputEventType.RMB.toString());
         }
     }
 
@@ -337,15 +338,11 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
 
     private void activateCard(HexCoordinate castCoord, RenderType type) {
         switch (type) {
-            case Ability:
-                break;
             case Core:
                 break;
             case Debug:
                 break;
             case Environment:
-                break;
-            case Equipement:
                 break;
             case Titan:
                 break;
@@ -417,7 +414,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
     private ActionListener cardInputListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("Cancel") && !keyPressed) {
+            if (name.equals(MouseInputEventType.RMB.toString()) && !keyPressed) {
                 castCanceled();
             }
         }

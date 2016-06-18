@@ -1,5 +1,6 @@
-package org.multiverseking.utility.system;
+package org.multiverseking.core.utility;
 
+import org.multiverseking.core.EntityDataAppState;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;

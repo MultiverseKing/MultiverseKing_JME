@@ -1,4 +1,4 @@
-package org.multiverseking.utility.system;
+package org.multiverseking.core.utility;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -17,7 +17,7 @@ public abstract class DependendAppState extends AbstractAppState {
     private final Class<? extends AppState>[] states;
     protected SimpleApplication app;
     
-    public DependendAppState(Class<? extends AppState>[] states) {
+    public DependendAppState(Class<? extends AppState>... states) {
         this.states = states;
     }
     
@@ -28,18 +28,18 @@ public abstract class DependendAppState extends AbstractAppState {
          * Initialise all other system needed.
          */
         loadDependency(true);
-        initialiseSystem(stateManager);
+        initializeSystem(stateManager);
     }
     
-    public abstract void initialiseSystem(AppStateManager stateManager);
+    public abstract void initializeSystem(AppStateManager stateManager);
 
-    private void loadDependency(boolean isLoad) {
+    private void loadDependency(boolean isLoading) {
         AppState state;
         for (Class c : states) {
-            state = getState(isLoad, c);
-            if (isLoad && state != null) {
+            state = getState(isLoading, c);
+            if (isLoading && state != null) {
                 app.getStateManager().attach(state);
-            } else if (!isLoad && state != null) {
+            } else if (!isLoading && state != null) {
                 app.getStateManager().detach(state);
             }
         }

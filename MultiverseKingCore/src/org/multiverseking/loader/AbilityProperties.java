@@ -2,15 +2,15 @@ package org.multiverseking.loader;
 
 import com.jme3.app.SimpleApplication;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.render.RenderComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.multiverseking.field.Collision;
+import org.multiverseking.render.RenderComponent;
 
 /**
  *
  * @author roah
- * @deprecated use j3o
+ * @deprecated handled by the vfx system
  */
 public class AbilityProperties extends CardProperties {
 
@@ -19,8 +19,9 @@ public class AbilityProperties extends CardProperties {
     private final Vector2Int range;
     private final Collision collision;
 
+    //@todo
     public AbilityProperties(JSONObject obj, String name, SimpleApplication app) {
-        super(obj, name, RenderComponent.RenderType.Ability);
+//        super(obj, name, RenderComponent.RenderType.Ability);
         JSONObject data = (JSONObject) obj.get("ability");
         power = ((Number) data.get("power")).intValue();
         segmentCost = ((Number) data.get("segmentCost")).intValue();

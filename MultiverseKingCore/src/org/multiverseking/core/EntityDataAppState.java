@@ -1,11 +1,10 @@
-package org.multiverseking.utility.system;
+package org.multiverseking.core;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.base.DefaultEntityData;
-import org.multiverseking.loader.JSONLoader;
 
 /**
  * The EntityData of the game is stored in this AppState to allow
@@ -24,8 +23,6 @@ public class EntityDataAppState extends AbstractAppState {
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
-        //@deprecated
-        app.getAssetManager().registerLoader(JSONLoader.class, "json", "card");
     }
 
     public EntityData getEntityData() {

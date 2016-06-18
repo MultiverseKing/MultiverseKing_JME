@@ -29,8 +29,8 @@ import org.multiverseking.render.animation.AnimationComponent;
 import org.multiverseking.render.animation.AnimationSystem;
 import org.multiverseking.render.camera.CameraControlSystem;
 import org.multiverseking.render.camera.CameraTrackComponent;
-import org.multiverseking.utility.system.EntityDataAppState;
-import org.multiverseking.utility.system.SubSystem;
+import org.multiverseking.core.EntityDataAppState;
+import org.multiverseking.core.utility.SubSystem;
 
 /**
  *

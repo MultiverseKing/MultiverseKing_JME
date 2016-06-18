@@ -5,7 +5,7 @@ import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
 import org.hexgridapi.core.ChunkCoordinate;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.procedural.ProceduralContent;
 
 /**

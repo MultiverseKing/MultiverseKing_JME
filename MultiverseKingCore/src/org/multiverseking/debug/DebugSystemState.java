@@ -6,7 +6,7 @@ import com.simsilica.es.EntitySet;
 import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.multiverseking.field.component.AreaEventComponent;
 import org.multiverseking.field.component.AreaEventComponent.Event;
-import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.core.utility.EntitySystemAppState;
 
 /**
  * Handle all event in the area, as teleportation, starting point etc...

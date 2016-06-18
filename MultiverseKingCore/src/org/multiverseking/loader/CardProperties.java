@@ -1,8 +1,8 @@
 package org.multiverseking.loader;
 
-import org.multiverseking.render.AbstractRender.RenderType;
 import org.json.simple.JSONObject;
 import org.multiverseking.card.attribut.Rarity;
+import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.utility.ElementalAttribut;
 
 /**
@@ -10,7 +10,6 @@ import org.multiverseking.utility.ElementalAttribut;
  * CardRendersystem,
  *
  * @author roah
- * @deprecated use j3o
  */
 public class CardProperties {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
@@ -49,15 +48,13 @@ public class CardProperties {
     /**
      * Create a new card type component.
      *
-     * @param playCost level needed to use the card.
-     * @param faction constraint use.
-     * @param cardType constraint use.
-     * @param rarity balance...
+     * @param obj
+     * @param name
      */
     public CardProperties(JSONObject obj, String name, RenderType renderType) {
         this.name = name;
         this.renderType = renderType;
-        if(renderType == RenderType.Titan){
+        if (renderType == RenderType.Titan) {
             playCost = 0;
         } else {
             Number tmpValue = (Number) obj.get("playCost");
@@ -73,7 +70,7 @@ public class CardProperties {
      * Constructor used for the editor mode.
      */
     public CardProperties(String name, String visual, int playCost, RenderType renderType, Rarity rarity, ElementalAttribut element, String description) {
-        if(renderType == RenderType.Titan){
+        if (renderType == RenderType.Titan) {
             this.playCost = 0;
         } else {
             this.playCost = playCost;
@@ -85,7 +82,7 @@ public class CardProperties {
         this.description = description;
         this.visual = visual;
     }
-    
+
     /**
      * Internal use.
      */
@@ -155,6 +152,7 @@ public class CardProperties {
     public String getName() {
         return name;
     }
+
     /**
      * The card img texture to use for this card.
      *

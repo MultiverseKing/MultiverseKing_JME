@@ -1,4 +1,4 @@
-package org.multiverseking.utility.system;
+package org.multiverseking.core.utility;
 
 import tonegod.gui.core.Screen;
 

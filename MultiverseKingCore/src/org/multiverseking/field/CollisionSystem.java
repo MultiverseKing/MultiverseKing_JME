@@ -1,15 +1,15 @@
 package org.multiverseking.field;
 
-import org.multiverseking.field.component.CollisionComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.render.AbstractRender.RenderType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.field.component.CollisionComponent;
 import org.multiverseking.field.position.HexPositionComponent;
+import org.multiverseking.render.AbstractRender.RenderType;
 
 /**
  * Handle interaction on the field.
@@ -66,15 +66,11 @@ public class CollisionSystem extends EntitySystemAppState {
      */
     public boolean isValidPosition(HexCoordinate castPosition, RenderType renderType) {
         switch (renderType) {
-            case Ability:
-                return true;
             case Core:
                 return false;
             case Debug:
                 return true;
             case Environment:
-                return false;
-            case Equipement:
                 return false;
             case Titan:
                 return false;

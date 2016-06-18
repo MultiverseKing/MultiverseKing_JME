@@ -1,15 +1,14 @@
 package org.multiverseking.loader;
 
-import org.multiverseking.render.AbstractRender.RenderType;
 import org.json.simple.JSONObject;
 import org.multiverseking.field.component.ATBBurstComponent;
 import org.multiverseking.field.component.InfluenceComponent;
 import org.multiverseking.field.component.WeaponSlotsComponent;
+import org.multiverseking.render.AbstractRender.RenderType;
 
 /**
  *
  * @author roah
- * @deprecated use j3o
  */
 public class TitanLoader extends UnitLoader {
 

@@ -9,8 +9,8 @@ import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.geometry.buffer.BufferPositionProvider;
 import org.hexgridapi.core.geometry.buffer.HexGridBuffer;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.utility.system.SubSystem;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.render.RenderSystem;
 
 /**

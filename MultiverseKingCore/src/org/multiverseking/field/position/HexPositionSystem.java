@@ -6,14 +6,14 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
-import org.hexgridapi.core.geometry.HexSetting;
-import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.AbstractHexGridAppState;
-import org.hexgridapi.events.TileChangeEvent;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.data.MapData;
+import org.hexgridapi.core.geometry.HexSetting;
 import org.hexgridapi.events.MapDataListener;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.utility.system.SubSystem;
+import org.hexgridapi.events.TileChangeEvent;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
 
@@ -79,7 +79,9 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
 
     @Override
     protected void cleanupSystem() {
-        app.getStateManager().getState(RenderSystem.class).removeSubSystem(this, false);
+        if(renderSystem != null) {
+            renderSystem.removeSubSystem(this, false);
+        }
         mapData.unregister(tileChangeListener);
     }
     

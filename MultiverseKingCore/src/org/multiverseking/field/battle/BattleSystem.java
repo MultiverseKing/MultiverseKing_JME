@@ -16,24 +16,24 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
-import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
-import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.data.MapData;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.utility.Rotation;
-import org.multiverseking.utility.system.EntityDataAppState;
-import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.card.CardRenderComponent;
 import org.multiverseking.card.attribut.CardRenderPosition;
+import org.multiverseking.core.EntityDataAppState;
+import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.field.CollisionSystem;
 import org.multiverseking.field.component.HealthComponent;
 import org.multiverseking.field.component.InfluenceComponent;
+import org.multiverseking.field.exploration.HexMovementSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.field.position.MoveToComponent;
-import org.multiverseking.field.exploration.HexMovementSystem;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.loader.PlayerLoader;
 import org.multiverseking.loader.TitanLoader;
@@ -227,8 +227,6 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
             ArrayList<EntityComponent> comps = new ArrayList<>();
             RenderType renderType = e.get(RenderComponent.class).getRenderType();
             switch (renderType) {
-                case Ability:
-                    break;
                 case Core:
                     comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
                     comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
@@ -238,8 +236,6 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
                 case Debug:
                     break;
                 case Environment:
-                    break;
-                case Equipement:
                     break;
                 case Titan:
                     break;
@@ -262,7 +258,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
                 inspectedId = id;
                 currentAction = action;
                 //Register the input for this system
-                app.getInputManager().addListener(fieldInputListener, "Cancel");
+                app.getInputManager().addListener(fieldInputListener, MouseInputEventType.RMB.toString());
                 break;
             case ABILITY:
                 break;
@@ -300,7 +296,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     private ActionListener fieldInputListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("Cancel") && !keyPressed) {
+            if (name.equals(MouseInputEventType.RMB.toString()) && !keyPressed) {
                 actionCancel();
             }
         }

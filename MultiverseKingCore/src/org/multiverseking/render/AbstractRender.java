@@ -32,8 +32,6 @@ public abstract class AbstractRender {
         Titan,
         Core,
         Environment,
-        Ability,
-        Equipement,
         Debug;
     }
 }

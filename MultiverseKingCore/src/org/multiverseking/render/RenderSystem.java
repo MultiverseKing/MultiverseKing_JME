@@ -1,7 +1,5 @@
 package org.multiverseking.render;
 
-import org.multiverseking.utility.system.SubSystem;
-import org.multiverseking.render.utility.SpatialInitializer;
 import com.jme3.collision.CollisionResults;
 import com.jme3.math.Ray;
 import com.jme3.renderer.queue.RenderQueue;
@@ -11,20 +9,22 @@ import com.jme3.scene.control.Control;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.core.utility.RootSystem;
+import org.multiverseking.core.utility.SubSystem;
+import org.multiverseking.render.utility.SpatialInitializer;
 
 /**
- * Handle the render of all entities, spatial loading parenting etc...
- * /!\ Does not handle the positioning of entity.
- * HexGrid got his own render system.
+ * Handle the render of all entities, spatial loading parenting etc... /!\ Does
+ * not handle the positioning of entity. HexGrid got his own render system.
  *
  * @author Eike Foede, roah
  */
-public class RenderSystem extends EntitySystemAppState {
+public class RenderSystem extends EntitySystemAppState implements RootSystem {
 
     private final Node renderSystemNode = new Node("RenderSystemNode");
     private HashMap<EntityId, Spatial> spatials = new HashMap<>();
@@ -36,8 +36,8 @@ public class RenderSystem extends EntitySystemAppState {
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow. -50%fps...
-        spatialInitializer = new SpatialInitializer(app.getAssetManager());
-        
+        spatialInitializer = new SpatialInitializer(app.getAssetManager(), "/Models");
+
         return entityData.getEntities(RenderComponent.class);
     }
 
@@ -86,10 +86,15 @@ public class RenderSystem extends EntitySystemAppState {
     }
 
     @Override
-    protected void cleanupSystem() {
+    public void cleanupSubSystem() {
         for (SubSystem s : subSystems) {
             s.rootSystemIsRemoved();
         }
+    }
+
+    @Override
+    protected void cleanupSystem() {
+        cleanupSubSystem();
         spatials.clear();
         renderSystemNode.removeFromParent();
     }
@@ -97,8 +102,10 @@ public class RenderSystem extends EntitySystemAppState {
 
     // <editor-fold defaultstate="collapsed" desc="SubSystem Method">
     /**
-     * Register a System to work with entity Spatial.
+     * Register a System to work with entity Spatial. (No node is added for that
+     * system)
      */
+    @Override
     public void registerSubSystem(SubSystem system) {
         registerSubSystem(system, false);
     }
@@ -106,7 +113,7 @@ public class RenderSystem extends EntitySystemAppState {
     /**
      * Register a system to work with spatial having his own node settup.
      */
-    public void registerSubSystem(SubSystem subSystem, boolean addNode) {
+    public Node registerSubSystem(SubSystem subSystem, boolean addNode) {
         Node n = null;
         if (subSystems.contains(subSystem)) {
             n = (Node) renderSystemNode.getChild(subSystem.getClass().getName());
@@ -127,13 +134,26 @@ public class RenderSystem extends EntitySystemAppState {
         } else if (!addNode && n != null) {
             renderSystemNode.detachChild(n);
         }
+        return n;
+    }
+
+    /**
+     * Remove a subSystem ratached to this system. Clearing all spatial that
+     * belong to that subSystem.
+     *
+     * @param subSystem the subSystem to remove.
+     */
+    @Override
+    public void removeSubSystem(SubSystem subSystem) {
+        removeSubSystem(subSystem, true);
     }
 
     /**
      * Remove a subSystem ratached to this system.
      *
      * @param subSystem the subSystem to remove.
-     * @param clear does all spatial belong to that subSystem have to be purge ?
+     * @param clear does all spatial belong to that subSystem have to be deleted
+     * ?
      */
     public void removeSubSystem(SubSystem subSystem, boolean clear) {
         if (subSystems.remove(subSystem)) {
@@ -198,8 +218,8 @@ public class RenderSystem extends EntitySystemAppState {
     }
 
     /**
-     * @return true if the spatial is added to the render Node.
-     * (aka : is visible)
+     * @return true if the spatial is added to the render Node. (aka : is
+     * visible)
      */
     private boolean addSpatial(Entity e) {
         Spatial s = initialiseSpatial(e);
@@ -237,35 +257,51 @@ public class RenderSystem extends EntitySystemAppState {
     }
 
     /**
-     * Return the Animation Spatial control of an entity, if any.
+     * Return the Spatial control of an entity, if any.
      *
      * @param id of the entity.
-     * @return null if no anim control.
+     * @param control the control to add.
+     * @return false if there is no spatial for that entity.
+     */
+    public boolean setControl(EntityId id, Control control) {
+        if (spatials.containsKey(id)) {
+            spatials.get(id).addControl(control);
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Return the control of the define entity spatial if any.
+     *
+     * @param id of the entity.
+     * @return null if no control is found.
      */
     public <T extends Control> T getControl(EntityId id, Class<T> controlType) {
         if (spatials.containsKey(id)) {
             Spatial s = spatials.get(id);
-            T ctrl = s.getControl(controlType);
-            if (ctrl == null && s instanceof Node && !((Node) s).getChildren().isEmpty()) {
-                for (Spatial child : ((Node) s).getChildren()) {
-                    ctrl = child.getControl(controlType);
-                    if (ctrl != null) {
-                        return ctrl;
-                    }
-                }
-            }
-            return ctrl;
+            return searchControl(s, controlType);
         }
         return null;
+    }
+
+    private <T extends Control> T searchControl(Spatial s, Class<T> controlType) {
+        T ctrl = s.getControl(controlType);
+        if (ctrl == null && s instanceof Node && !((Node) s).getChildren().isEmpty()) {
+            for (Spatial child : ((Node) s).getChildren()) {
+                ctrl = searchControl(child, controlType);
+//                ctrl = child.getControl(controlType);
+                if (ctrl != null) {
+                    return ctrl;
+                }
+            }
+        }
+        return ctrl;
     }
 
     public String getRenderNodeName() {
         return renderSystemNode.getName();
     }
 
-//    public Node getRenderNode() {
-//        return renderSystemNode;
-//    }
     public String getSpatialName(EntityId id) {
         return spatials.get(id).getName();
     }

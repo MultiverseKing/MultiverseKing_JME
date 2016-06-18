@@ -2,14 +2,13 @@ package org.multiverseking.loader;
 
 import com.jme3.asset.AssetKey;
 import com.jme3.asset.AssetManager;
-import org.multiverseking.render.RenderComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.multiverseking.render.RenderComponent;
 
 /**
  *
  * @author roah
- * @deprecated use j3o
  */
 public class GameProperties {
 
@@ -42,8 +41,9 @@ public class GameProperties {
         JSONObject data = (JSONObject) assetManager.loadAsset(new AssetKey<>("Data/GameProperties.json"));
         JSONObject card = (JSONObject) data.get("Card");
 
-        updateList((byte) 0, (JSONArray) card.get(RenderComponent.RenderType.Ability.toString()));
-        updateList((byte) 1, (JSONArray) card.get(RenderComponent.RenderType.Equipement.toString()));
+        // @todo
+//        updateList((byte) 0, (JSONArray) card.get(RenderComponent.RenderType.Ability.toString()));
+//        updateList((byte) 1, (JSONArray) card.get(RenderComponent.RenderType.Equipement.toString()));
         updateList((byte) 2, (JSONArray) card.get(RenderComponent.RenderType.Unit.toString()));
         updateList((byte) 3, (JSONArray) card.get(RenderComponent.RenderType.Titan.toString()));
         updateList((byte) 4, (JSONArray) data.get("Map"));

@@ -2,7 +2,7 @@ package org.multiverseking.render.utility;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.scene.Spatial;
-import org.multiverseking.render.AbstractRender.RenderType;
+import org.multiverseking.render.AbstractRender;
 
 /**
  *
@@ -10,18 +10,27 @@ import org.multiverseking.render.AbstractRender.RenderType;
  */
 public class SpatialInitializer {
 
+    public static final String rootAssetPath = "org/multiverseking/assets";
     private final AssetManager assetManager;
+    private final String folderPath;
 
-    public SpatialInitializer(AssetManager am) {
-        this.assetManager = am;
+    public SpatialInitializer(AssetManager manager, String folderPath) {
+        this.assetManager = manager;
+        this.folderPath = rootAssetPath + folderPath + "/";
     }
 
-    public Spatial initialize(String name, RenderType type) {
+    public Spatial initialize(String name) {
+        return initialize(name, null);
+    }
+    
+    public Spatial initialize(String name, AbstractRender.RenderType type) {
         Spatial model;
-        if(type.equals(RenderType.Debug)){
-            model = assetManager.loadModel("org/multiverseking/assets/Models/"+type.toString()+"/" + name + ".j3o");
+        if (type != null && type.equals(AbstractRender.RenderType.Debug)) {
+            model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + ".j3o");
+        } else if (type != null) {
+            model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + "/" + name + ".j3o");
         } else {
-            model = assetManager.loadModel("org/multiverseking/assets/Models/"+type.toString()+"/" + name + "/" + name + ".j3o");
+            model = (Spatial) assetManager.loadModel(folderPath + "/" + name + "/" + name + ".j3o");
         }
         return model;
     }

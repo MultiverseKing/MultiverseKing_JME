@@ -9,25 +9,25 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.HashMap;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.render.animation.Animation;
-import org.multiverseking.render.animation.AnimationComponent;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hexgridapi.core.data.MapData;
-import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.AbstractHexGridAppState;
+import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.pathfinding.Astar;
 import org.hexgridapi.pathfinding.Pathfinder;
 import org.hexgridapi.utility.Rotation;
-import org.multiverseking.utility.system.SubSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.field.position.HexPositionSystem;
 import org.multiverseking.field.position.MoveToComponent;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
+import org.multiverseking.render.animation.Animation;
+import org.multiverseking.render.animation.AnimationComponent;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.core.utility.SubSystem;
 
 /**
  * Todo : behavior when unit got an obstacle appearing when moving (stop it and
@@ -41,7 +41,7 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
     private MapData mapData;
     private RenderSystem renderSystem;
     private HexPositionSystem hexPositionsystem;
-    private Pathfinder pathfinder = new Astar();
+    private final Pathfinder pathfinder = new Astar();
     private HashMap<EntityId, HexCoordinate> movementUpdateGoal = new HashMap<>();
     private HashMap<EntityId, HexCoordinate> movementGoal = new HashMap<>();
 

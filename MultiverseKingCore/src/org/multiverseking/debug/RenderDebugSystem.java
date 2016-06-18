@@ -5,14 +5,14 @@ import com.simsilica.es.EntitySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.coordinate.HexCoordinate;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.field.component.AreaEventComponent;
 import org.multiverseking.field.component.AreaEventComponent.Event;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.utility.system.SubSystem;
 
 /**
  *

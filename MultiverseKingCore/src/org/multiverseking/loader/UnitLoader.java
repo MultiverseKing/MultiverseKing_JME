@@ -1,23 +1,21 @@
 package org.multiverseking.loader;
 
+import battleSystem.ability.AbilityComponent;
 import com.jme3.app.SimpleApplication;
 import com.simsilica.es.PersistentComponent;
-import battleSystem.ability.AbilityComponent;
-import org.multiverseking.field.component.ATBComponent;
-import org.multiverseking.field.component.HealthComponent;
-import org.multiverseking.field.position.MovementComponent;
-import org.multiverseking.field.component.CollisionComponent;
-import org.multiverseking.field.component.SpeedComponent;
-import org.multiverseking.render.AbstractRender.RenderType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.multiverseking.field.component.ATBComponent;
+import org.multiverseking.field.component.CollisionComponent;
+import org.multiverseking.field.component.HealthComponent;
+import org.multiverseking.field.component.SpeedComponent;
+import org.multiverseking.field.position.MovementComponent;
 
 /**
  * loader to load entity units from file, Contain InitialUnitStatsComponent to
  * avoids any use of it outside of the loading.
  *
  * @author roah
- * @deprecated use j3o
  */
 public class UnitLoader {
 
@@ -33,7 +31,7 @@ public class UnitLoader {
         Number moveRange = (Number) data.get("moveRange");
         Number moveSpeed = (Number) data.get("moveSpeed");
 
-        JSONArray ability = (JSONArray) data.get(RenderType.Ability.toString());
+        JSONArray ability = (JSONArray) data.get("Ability");
         String[] abilityList = new String[ability.size()];
         for (int i = 0; i < ability.size(); i++) {
             abilityList[i] = ability.get(i).toString();

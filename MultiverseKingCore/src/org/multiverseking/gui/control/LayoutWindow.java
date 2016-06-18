@@ -21,7 +21,7 @@ public abstract class LayoutWindow {
     protected final Vector2f layoutGridSize;// = new Vector2f(230, 20);//min value X == 230
     protected final String name;
     protected Element parent;
-    protected ExtWindow window = null;
+    protected Window window = null;
     protected final LinkedHashMap<String, Element> elementList = new LinkedHashMap<>();
     /**
      * Max element count on the selected alignment.
@@ -109,7 +109,7 @@ public abstract class LayoutWindow {
      */
     protected final void show(Vector2f position) {
         Vector2f size = getWindowSize();
-        window = new ExtWindow(screen, getUID(), position, size) {
+        window = new Window(screen, getUID(), position, size) {
             @Override
             public void hideWindow() {
                 super.hideWindow();
@@ -133,7 +133,6 @@ public abstract class LayoutWindow {
         populate();
         /**
          * this resolve a weird issue with button not showing properly
-         *
          * @todo : resolve.
          */
         window.hide();

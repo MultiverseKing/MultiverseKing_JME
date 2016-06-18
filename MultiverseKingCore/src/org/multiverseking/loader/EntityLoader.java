@@ -1,11 +1,8 @@
 package org.multiverseking.loader;
 
+import battleSystem.ability.AbilityComponent;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetKey;
-import battleSystem.ability.AbilityComponent;
-import org.multiverseking.field.Collision;
-import org.multiverseking.field.Collision.CollisionData;
-import org.multiverseking.render.AbstractRender.RenderType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,6 +14,9 @@ import org.hexgridapi.core.coordinate.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.multiverseking.field.Collision;
+import org.multiverseking.field.Collision.CollisionData;
+import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.utility.ElementalAttribut;
 
 /**
@@ -46,7 +46,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        return new UnitLoader((JSONObject) getData(name, RenderType.Unit).get(RenderType.Unit.toString()+"Stats"), this);
+        return new UnitLoader((JSONObject) getData(name, RenderType.Unit.toString()).get(RenderType.Unit.toString()+"Stats"), this);
     }
 
     /**
@@ -55,7 +55,7 @@ public class EntityLoader {
      * @return return null if not found.
      */
     public TitanLoader loadTitanStats(String name) {
-        return new TitanLoader(getData(name, RenderType.Titan), this);
+        return new TitanLoader(getData(name, RenderType.Titan.toString()), this);
     }
 
     /**
@@ -64,7 +64,7 @@ public class EntityLoader {
      * @param cardName to save.
      * @return false if file not correctly saved.
      */
-    public boolean saveCardProperties(RenderType type, JSONObject typeData, CardProperties card, boolean override) {
+    public boolean saveCardProperties(String type, JSONObject typeData, CardProperties card, boolean override) {
         File file;
         String folder = "/" + card.getRenderType().toString() + "/";
         file = new File(path + folder + card.getName() + ".card");
@@ -92,7 +92,7 @@ public class EntityLoader {
         typeData.put("segmentCost", abilityProperties.getSegmentCost());
         typeData.put("collision", exportCollision(abilityProperties.getCollision()));
 
-        return saveCardProperties(RenderType.Ability, typeData, abilityProperties, override);
+        return saveCardProperties("Ability", typeData, abilityProperties, override);
     }
 
     /**
@@ -102,19 +102,19 @@ public class EntityLoader {
      * @return null if file not found.
      */
     public CardProperties loadCardProperties(String cardName, RenderType type) {
-        return new CardProperties(getData(cardName, type), cardName, type);
+        return new CardProperties(getData(cardName, type.toString()), cardName, type);
     }
 
     public AbilityComponent loadAbility(String name) {
         if (name.equals("None")) {
             return null;
         }
-        JSONObject obj = getData(name, RenderType.Ability);
+        JSONObject obj = getData(name, "Ability");
         if (obj != null) {
             ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
             String description = obj.get("description").toString();
 
-            JSONObject abilityData = (JSONObject) obj.get(RenderType.Ability.toString());
+            JSONObject abilityData = (JSONObject) obj.get("Ability");
             Number power = (Number) abilityData.get("power");
             Number segment = (Number) abilityData.get("segmentCost");
             Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
@@ -176,11 +176,11 @@ public class EntityLoader {
         }
     }
 
-    private JSONObject getData(String name, RenderType type) {
+    private JSONObject getData(String name, String type) {
         return (JSONObject) app.getAssetManager().loadAsset(new AssetKey<>(getFolder(type) + name + ".card"));
     }
 
-    private String getFolder(RenderType type) {
+    private String getFolder(String type) {
         return "org/multiverseking/assets/Data/CardData/" + type.toString() + "/";
     }
 }

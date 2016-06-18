@@ -1,6 +1,6 @@
 package org.multiverseking.render.animation;
 
-import org.multiverseking.utility.system.SubSystem;
+import org.multiverseking.core.utility.SubSystem;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.AnimEventListener;
@@ -8,7 +8,7 @@ import com.jme3.animation.LoopMode;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
+import org.multiverseking.core.utility.EntitySystemAppState;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -8,6 +8,7 @@ import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.core.geometry.buffer.BufferPositionProvider;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
+import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
 
 /**
  *
@@ -21,8 +22,10 @@ public class HexGridAppState extends AbstractHexGridAppState {
 
     @Override
     public void initializeSystem(AppStateManager stateManager, Application app) {
-        app.getInputManager().addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        app.getInputManager().addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        app.getInputManager().addMapping(MouseInputEventType.LMB.toString(), new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        app.getInputManager().addMapping(MouseInputEventType.RMB.toString(), new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+//        app.getInputManager().addMapping("Confirm", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+//        app.getInputManager().addMapping("Cancel", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 
         app.getStateManager().attach(new GridMouseControlAppState());
     }

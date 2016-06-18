@@ -4,8 +4,8 @@ import battleSystem.ability.AbilityComponent;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.utility.system.EntitySystemAppState;
-import org.multiverseking.battle.battleSystem.component.FocusComponent;
+import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.battle.battleSystem.focus.MainFocusComponent;
 import org.multiverseking.field.component.SpeedComponent;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;
@@ -28,7 +28,7 @@ public class AbilitySystemGUI extends EntitySystemAppState {
     @Override
     protected EntitySet initialiseSystem() {
         genCharacterMenu();
-        return entityData.getEntities(FocusComponent.class, SpeedComponent.class, AbilityComponent.class);
+        return entityData.getEntities(MainFocusComponent.class, SpeedComponent.class, AbilityComponent.class);
     }
 
     @Override

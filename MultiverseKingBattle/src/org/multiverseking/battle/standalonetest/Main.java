@@ -9,11 +9,8 @@ import org.hexgridapi.core.coordinate.SquareCoordinate;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiverseking.battle.battleSystem.BattleSystemTest;
-import org.multiverseking.debug.RenderDebugSystem;
-import org.multiverseking.field.position.HexPositionSystem;
-import org.multiverseking.render.RenderSystem;
-import org.multiverseking.utility.system.EntityDataAppState;
-import org.multiverseking.utility.system.MultiverseCoreGUI;
+import org.multiverseking.core.MultiverseCoreState;
+import org.multiverseking.core.utility.MultiverseCoreGUI;
 import tonegod.gui.core.Screen;
 
 /**
@@ -46,24 +43,27 @@ public class Main extends AbstractHexGridApplication implements MultiverseCoreGU
     @Override
     public void initApp() {
         // initialise hexgrid
+        RTSCamera.KeyMapping keyMapping = RTSCamera.KeyMapping.col;
         screen = new Screen(this);
         getGuiNode().addControl(screen);
-        rtsCam = new RTSCamera(RTSCamera.KeyMapping.col);
+        rtsCam = new RTSCamera(keyMapping);
         MapData mapData = new MapData(assetManager, new String[]{"EARTH", "ICE", "NATURE", "VOLT"});
         hexGridState = new HexGridAppState(mapData, rtsCam, "org/hexgridapi/assets/Textures/HexField/");
         rootNode.attachChild(hexGridState.getGridNode());
         
-        MapParam param = new MapParam(SquareCoordinate.class, new Vector2Int(5, 10),
-                8, 1, false, false, 702093121, null);
+        MapParam param = new MapParam(SquareCoordinate.class, new Vector2Int(3, 4),
+                7, 1, false, false, 722093121, null);
         hexGridState.setParam(param);
         
-        EntityDataAppState entityDataAppState = new EntityDataAppState();
-        stateManager.attachAll(rtsCam, hexGridState, entityDataAppState,
-                new RenderSystem(), new HexPositionSystem(), 
-                new RenderDebugSystem(), new BattleSystemTest());
+//        EntityDataAppState entityDataAppState = new EntityDataAppState();
+//        stateManager.attachAll(rtsCam, hexGridState, entityDataAppState,
+//                new RenderSystem(), new HexPositionSystem(), 
+//                new RenderDebugSystem(), new BattleSystemTest());
+        stateManager.attachAll(rtsCam, hexGridState, 
+                new MultiverseCoreState(keyMapping, BattleSystemTest.class));
 
-//        setDisplayFps(false);
-//        setDisplayStatView(false);
+        setDisplayFps(false);
+        setDisplayStatView(false);
     }
 
     @Override

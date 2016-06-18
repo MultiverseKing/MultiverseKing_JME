@@ -1,13 +1,9 @@
 package org.multiverseking.editor.core.swingcontrol;
 
 import com.jme3.texture.Image;
-import java.awt.Dimension;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import org.hexgridapi.editor.core.HexGridEditorMain;
-import org.hexgridapi.editor.hexmap.gui.JCursorPositionPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -18,10 +14,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import org.hexgridapi.core.camera.RTSCamera;
-import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.hexgridapi.editor.hexmap.gui.HexGridPropertiesPan;
+import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
+import org.hexgridapi.editor.core.EditorMain;
+import org.hexgridapi.editor.hexgrid.gui.HexGridPropertiesPan;
+import org.hexgridapi.editor.hexgrid.gui.JCursorPositionPanel;
 import org.hexgridapi.editor.utility.ImageConverter;
 import org.hexgridapi.events.TileSelectionListener;
 import org.multiverseking.debug.DebugSystemState;
@@ -32,16 +32,16 @@ import org.multiverseking.field.component.AreaEventComponent;
  *
  * @author roah
  */
-public class JESPropertiesPanel extends HexGridPropertiesPan {
+public class JESPropertiesTab extends HexGridPropertiesPan {
     
-    private final HexGridEditorMain editorMain;
+    private final EditorMain editorMain;
     private final DebugSystemState system;
     private final JPlayEditorMenu playEditorMenu;
-    private JCursorPositionPanel cursorPan;
-    private JPanel eventPan = new JPanel();
+    private final JCursorPositionPanel cursorPan;
+    private final JPanel eventPan = new JPanel();
     private HexCoordinate inspectedPos;
 
-    public JESPropertiesPanel(HexGridEditorMain editorMain, GridMouseControlAppState mouseSystem) {
+    public JESPropertiesTab(EditorMain editorMain, GridMouseControlAppState mouseSystem) {
         super(editorMain.getAssetManager().loadTexture(
                 "org/multiverseking/assets/Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
         this.editorMain = editorMain;
@@ -54,7 +54,7 @@ public class JESPropertiesPanel extends HexGridPropertiesPan {
         mouseSystem.getSelectionControl().register(selectionListener);
         system = editorMain.getStateManager().getState(DebugSystemState.class);
     }
-    private TileSelectionListener selectionListener = new TileSelectionListener() {
+    private final TileSelectionListener selectionListener = new TileSelectionListener() {
         @Override
         public void onTileSelectionUpdate(HexCoordinate currentSelection, ArrayList<HexCoordinate> selectedList) {
             if (inspectedPos == null) {
@@ -180,12 +180,12 @@ public class JESPropertiesPanel extends HexGridPropertiesPan {
 
     @Override
     public void onMapLoaded() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void onMapRemoved() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

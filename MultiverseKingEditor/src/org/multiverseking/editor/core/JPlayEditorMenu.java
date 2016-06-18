@@ -1,6 +1,6 @@
 package org.multiverseking.editor.core;
 
-import org.hexgridapi.editor.core.HexGridEditorMain;
+import org.hexgridapi.editor.core.EditorMain;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Callable;
 import javax.swing.AbstractAction;
@@ -21,10 +21,10 @@ import org.multiverseking.field.exploration.ExplorationSystem;
  */
 public class JPlayEditorMenu extends JMenu {
 
-    private final HexGridEditorMain editorMain;
+    private final EditorMain editorMain;
     private JButton stopBtn;
 
-    public JPlayEditorMenu(final HexGridEditorMain editorMain) {
+    public JPlayEditorMenu(final EditorMain editorMain) {
         super("Play");
         this.editorMain = editorMain;
         stopBtn = new JButton(new AbstractAction(" Stop") {

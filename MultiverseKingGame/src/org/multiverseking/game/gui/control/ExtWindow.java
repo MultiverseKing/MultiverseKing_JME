@@ -44,6 +44,6 @@ public class ExtWindow extends Window {
     }
     
     public void setIsCollapse(){
-        collapse.onButtonMouseLeftUp(null, isEnabled);
+        collapseBtn.onButtonMouseLeftUp(null, isEnabled);
     }
 }

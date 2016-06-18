@@ -1,4 +1,4 @@
-package org.multiverseking.battle.battleSystem.ability;
+package org.multiverseking.battle.core.ability;
 
 import java.util.ArrayList;
 import java.util.HashMap;

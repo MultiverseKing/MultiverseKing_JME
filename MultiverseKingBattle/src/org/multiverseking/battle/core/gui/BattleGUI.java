@@ -1,10 +1,10 @@
-package org.multiverseking.battle.battleSystem.gui;
+package org.multiverseking.battle.core.gui;
 
 import com.jme3.input.controls.ActionListener;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
-import org.multiverseking.battle.battleSystem.BattleSystemTest;
-import org.multiverseking.battle.battleSystem.focus.FocusComponent;
+import org.multiverseking.battle.core.BattleSystemTest;
+import org.multiverseking.battle.core.focus.FocusComponent;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.MultiverseCoreGUI;
 import org.multiverseking.core.utility.SubSystem;

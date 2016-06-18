@@ -1,4 +1,4 @@
-package org.multiverseking.battle.battleSystem;
+package org.multiverseking.battle.core;
 
 import org.multiverseking.core.MultiverseGameState;
 import com.jme3.app.state.AppStateManager;
@@ -9,11 +9,11 @@ import com.simsilica.es.EntityId;
 import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.battle.battleSystem.ability.AbilitySystem;
-import org.multiverseking.battle.battleSystem.focus.FocusComponent;
-import org.multiverseking.battle.battleSystem.focus.FocusSystem;
-import org.multiverseking.battle.battleSystem.focus.MainFocusComponent;
-import org.multiverseking.battle.battleSystem.gui.BattleGUI;
+import org.multiverseking.battle.core.ability.AbilitySystem;
+import org.multiverseking.battle.core.focus.FocusComponent;
+import org.multiverseking.battle.core.focus.FocusSystem;
+import org.multiverseking.battle.core.focus.MainFocusComponent;
+import org.multiverseking.battle.core.gui.BattleGUI;
 import org.multiverseking.core.EntityDataAppState;
 import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.field.CollisionSystem;

@@ -8,7 +8,7 @@ import org.hexgridapi.core.camera.RTSCamera;
 import org.hexgridapi.core.coordinate.SquareCoordinate;
 import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.battle.battleSystem.BattleSystemTest;
+import org.multiverseking.battle.core.BattleSystemTest;
 import org.multiverseking.core.MultiverseCoreState;
 import org.multiverseking.core.utility.MultiverseCoreGUI;
 import tonegod.gui.core.Screen;

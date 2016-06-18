@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.battleSystem.gui.atbGauge;
+package org.multiverseking.battle.core.gui.gauge;
 
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.ArrayList;
-import org.multiverseking.battle.battleSystem.gui.CharacterHUD;
+import org.multiverseking.battle.core.gui.CharacterHUD;
 import tonegod.gui.controls.extras.Indicator;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;

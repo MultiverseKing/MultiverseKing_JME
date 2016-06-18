@@ -1,4 +1,4 @@
-package org.multiverseking.battle.battleSystem.ability;
+package org.multiverseking.battle.core.ability;
 
 import com.jme3.input.controls.ActionListener;
 import com.simsilica.es.Entity;
@@ -9,9 +9,11 @@ import java.util.HashMap;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
-import org.multiverseking.battle.battleSystem.focus.FocusSystem;
-import org.multiverseking.battle.battleSystem.focus.MainFocusComponent;
+import org.multiverseking.battle.core.focus.FocusSystem;
+import org.multiverseking.battle.core.focus.MainFocusComponent;
 import org.multiverseking.core.utility.EntitySystemAppState;
+import org.multiverseking.ability.AbilityComponent;
+import org.multiverseking.field.component.SpeedComponent;
 import org.multiverseking.field.position.MoveToComponent;
 import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.render.RenderComponent;

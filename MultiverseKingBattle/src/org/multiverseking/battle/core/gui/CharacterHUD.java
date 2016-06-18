@@ -1,4 +1,4 @@
-package org.multiverseking.battle.battleSystem.gui;
+package org.multiverseking.battle.core.gui;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -6,8 +6,8 @@ import com.jme3.math.Vector4f;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.multiverseking.battle.battleSystem.gui.atbGauge.ActionGauge;
-import org.multiverseking.battle.battleSystem.gui.atbGauge.AtbGauge;
+import org.multiverseking.battle.core.gui.gauge.ActionGauge;
+import org.multiverseking.battle.core.gui.gauge.AtbGauge;
 import tonegod.gui.controls.extras.Indicator;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
@@ -43,7 +43,6 @@ public class CharacterHUD {
         mainHolder.setAsContainerOnly();
 
         initMainBlock();
-//        initAtb();
         gauges.add(new ActionGauge(this, screen, filePath, 6));
         gauges.stream().forEach((g) -> {
             mainHolder.addChild(g.getGauge());
@@ -70,9 +69,7 @@ public class CharacterHUD {
         mainHolder.addChild(lifeStaminaWeapon);
 
         String[] val = new String[]{
-            "stamina.Blue.HORIZONTAL",
-            "mainWeapon.Blue.VERTICAL",
-            "secondaryWeapon.Blue.VERTICAL"};
+            "stamina.Red.HORIZONTAL"};
         Vector2f size = new Vector2f(708, 139).mult(.75f);
         for (int i = val.length - 1; i >= 0; i--) {
             gauges_d.add(initIndicator(val[i], null, size, false));

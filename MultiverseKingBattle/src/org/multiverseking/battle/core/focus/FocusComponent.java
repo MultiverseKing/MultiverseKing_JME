@@ -1,4 +1,4 @@
-package org.multiverseking.battle.battleSystem.focus;
+package org.multiverseking.battle.core.focus;
 
 import com.simsilica.es.EntityComponent;
 

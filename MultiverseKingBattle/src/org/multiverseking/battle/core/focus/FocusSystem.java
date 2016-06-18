@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.battleSystem.focus;
+package org.multiverseking.battle.core.focus;
 
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.ActionListener;
@@ -32,7 +32,7 @@ import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.events.TileInputListener;
-import org.multiverseking.battle.battleSystem.BattleSystemTest;
+import org.multiverseking.battle.core.BattleSystemTest;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.render.AbstractRender;

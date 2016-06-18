@@ -1,11 +1,11 @@
-package org.multiverseking.battle.battleSystem.ability;
+package org.multiverseking.battle.core.ability;
 
-import battleSystem.ability.AbilityComponent;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
+import org.multiverseking.ability.AbilityComponent;
 import org.multiverseking.core.utility.EntitySystemAppState;
-import org.multiverseking.battle.battleSystem.focus.MainFocusComponent;
+import org.multiverseking.battle.core.focus.MainFocusComponent;
 import org.multiverseking.field.component.SpeedComponent;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.core.Element;

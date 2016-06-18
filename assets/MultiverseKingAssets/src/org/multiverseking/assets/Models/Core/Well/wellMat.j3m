@@ -1,6 +1,6 @@
-Material MyMaterial : Common/MatDefs/Misc/ColoredTextured.j3md {
+Material MyMaterial : Common/MatDefs/Light/Lighting.j3md {
     MaterialParameters {
-        ColorMap : org/multiverseking/assets/Models/Core/Well/DifuseGroup.png
+        DiffuseMap : org/multiverseking/assets/Models/Core/Well/DifuseGroup.png
     }
     AdditionalRenderState {
       FaceCull Back

@@ -41,21 +41,25 @@ import org.multiverseking.render.RenderSystem;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handle the focus system during battle.
+ * Handle the Character selection during battle.
+ *
  * @author roah
  */
-public class FocusSystem extends EntitySystemAppState implements MouseRayListener {
+public class MainSelectionSystem extends EntitySystemAppState implements MouseRayListener {
+
     private RenderSystem renderSystem;
     private MapData mapData;
     private BattleSystemTest battleSystem;
-    private Entity selectedEntity = null; // currently selected object/unit using the mouse
-    private EntityId currentFocus = null; // can be a summoned unit
-    private EntityId[] mainUnitsID;
-    private Integer selectedMainUnit = 0; // always a titan or the core
-    private boolean countDown = false;
     private RTSCamera camera;
-    private float currentTimerCountDown = 0;
     private TileInputListener mouseFocusLocker;
+    private EntityId[] mainUnitsID;         // ID of all Main unit
+    private Integer selectedMainUnit = 0;   // internal ordering for titan and core
+    private EntityId selectedEntity = null; // Selection using the mouse
+    /**
+     * Unit Selection when double taping.
+     */
+    private boolean countDown = false;
+    private float currentTimerCountDown = 0;
 
     @Override
     protected EntitySet initialiseSystem() {
@@ -65,14 +69,14 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
         app.getStateManager().getState(GridMouseControlAppState.class).register(this);
         battleSystem = app.getStateManager().getState(BattleSystemTest.class);
         mainUnitsID = battleSystem.getMainUnitsID();
-        
+
         // Register input Listeners
         app.getInputManager().addListener(keyListeners,
                 new String[]{"char_0", "char_1", "char_2", "char_3"});
 //        cursor = new CharacterFocusCursor(app, systemNode);
         return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
     }
-    
+
     private final ActionListener keyListeners = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -86,14 +90,14 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
                     selectedMainUnit = tmp;
                     countDownReset();
                 }
-                setFocusTo(mainUnitsID[selectedMainUnit]);
+                entityData.setComponent(mainUnitsID[selectedMainUnit], new MainFocusComponent());
             }
         }
     };
 
     /**
-     * Countdown is used for doubleTap input
-     * (pressing the key twice center the view on the character).
+     * Countdown is used for doubleTap input (pressing the key twice center the
+     * view on the character).
      */
     @Override
     protected void updateSystem(float tpf) {
@@ -115,15 +119,6 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
         countDown = false;
     }
     
-    private void setFocusTo(EntityId id) {
-        // @todo
-//        Spatial model = app.getAssetManager().loadModel("org/multiverseking/assets/Interface/Battle/cursor/FX_cursor.j3o");
-//        renderSystem.getSubSystemNode(battleSystem).attachChild(model);
-//        model.setLocalTranslation(entityData.getComponent(id, HexPositionComponent.class).getPosition().toWorldPosition());
-        entityData.setComponent(id, new MainFocusComponent());
-        currentFocus = id;
-    }
-
     @Override
     protected void addEntity(Entity e) {
     }
@@ -135,10 +130,10 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
     @Override
     protected void removeEntity(Entity e) {
     }
+
     /**
-     * Implements the Ray listeners to get the collision on character 
-     * before the collision on the grid is process.
-     * {@inheritDoc}
+     * Implements the Ray listeners to get the collision on character before the
+     * collision on the grid is process. {@inheritDoc}
      */
     @Override
     public MouseInputEvent MouseRayInputAction(MouseInputEvent.MouseInputEventType mouseInputType, Ray ray) {
@@ -152,11 +147,14 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
                 for (Entity e : entities) {
                     Spatial s = results.getClosestCollision().getGeometry().getParent();
                     do {
-                        if(s != null) {
+                        if (s != null) {
                             if (s.getName().equals(renderSystem.getSpatialName(e.getId()))) {
                                 HexCoordinate pos = entityData.getComponent(e.getId(), HexPositionComponent.class).getPosition();
-                                selectedEntity = e;
-                                return new MouseInputEvent(MouseInputEvent.MouseInputEventType.LMB, pos, 
+                                if (selectedEntity != e.getId()) {
+                                    countDownStop();
+                                }
+                                selectedEntity = e.getId();
+                                return new MouseInputEvent(MouseInputEvent.MouseInputEventType.LMB, pos,
                                         mapData.getTile(pos).getHeight(), ray, results.getClosestCollision());
                             } else {
                                 s = s.getParent();
@@ -173,12 +171,19 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
 
     @Override
     public void onMouseAction(MouseInputEvent event) {
-        if (mouseFocusLocker == null 
+        if (mouseFocusLocker == null
                 || event.getType().equals(MouseInputEvent.MouseInputEventType.LMB)) {
             // Used when the spatial is not selected directly.
-            Entity e = selectedEntity == null ? getEntity(event.getPosition()) : selectedEntity;
-            if (e != null) {
-                setFocusTo(e.getId());
+            Entity e = getEntity(event.getPosition());
+            if(e != null) {
+                if (selectedEntity == null) {
+                    selectedEntity = e.getId();
+                    countDownReset();
+                } else if (selectedEntity == e.getId() && countDown) {
+                    entityData.setComponent(e.getId(), new MainFocusComponent());
+                } else {
+                    countDownReset();
+                }
             }
         }
     }
@@ -194,9 +199,16 @@ public class FocusSystem extends EntitySystemAppState implements MouseRayListene
         }
         return null;
     }
-    
+
+    /**
+     * Used to lock the character selection using the mouse when doing 
+     * specific action which can conflict as : chosing a movement position.
+     * @param listeners
+     * @param isLock
+     * @return 
+     */
     public boolean lockMouseFocus(TileInputListener listeners, boolean isLock) {
-        if(mouseFocusLocker != null && !mouseFocusLocker.equals(listeners)) {
+        if (mouseFocusLocker != null && !mouseFocusLocker.equals(listeners)) {
             LoggerFactory.getLogger(this.getClass()).info("Ray Listeners already locked by {}", mouseFocusLocker);
             return false;
         } else if (mouseFocusLocker != null && !isLock) {

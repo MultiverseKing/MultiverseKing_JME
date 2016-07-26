@@ -14,24 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.core.gui.gauge;
+package org.multiverseking.battle.core.movement;
 
-import tonegod.gui.core.Element;
+import com.simsilica.es.EntityComponent;
 
 /**
  *
  * @author roah
  */
-public class StaminaGauge implements AtbGauge {
+public class StaminaComponent implements EntityComponent {
 
-    @Override
-    public void update(float tpf) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private final float value;
+
+    public StaminaComponent() {
+        value = 0;
     }
 
-    @Override
-    public Element getGauge() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public StaminaComponent(float value) {
+        this.value = value;
     }
-    
+
+    public float getValue() {
+        return value;
+    }
+
+    /**
+     * Clone component with modifiate rotation.
+     *
+     * @param value new value.
+     * @return the cloned component.
+     */
+    public StaminaComponent clone(float value) {
+        return new StaminaComponent(value);
+    }
 }

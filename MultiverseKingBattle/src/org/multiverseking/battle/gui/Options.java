@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.core.gui;
+package org.multiverseking.battle.gui;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import org.multiverseking.battle.core.gui.utils.Layout;
+import org.multiverseking.battle.gui.utils.Layout;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Panel;
 import tonegod.gui.core.Screen;
@@ -43,7 +43,6 @@ public class Options extends AbstractAppState {
     }
 
     private void populateWindow() {
-        Options option = this;
         Layout.dim.set(100, 100);
         optionWin = new Panel(screen, Vector2f.ZERO);
 
@@ -75,6 +74,7 @@ public class Options extends AbstractAppState {
 
         optionWin.setIsResizable(false);
         optionWin.setIsMovable(false);
+                battleGUI.enableHelper();
     }
 
     @Override

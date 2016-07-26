@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.core.gui.gauge;
+package org.multiverseking.battle.gui.gauge;
 
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector4f;
 import java.util.ArrayList;
-import org.multiverseking.battle.core.gui.CharacterHUD;
+import org.multiverseking.battle.gui.CharacterHUD;
 import tonegod.gui.controls.extras.Indicator;
 import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
@@ -28,19 +28,16 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-public class ActionGauge implements AtbGauge {
+public class ActionGauge extends ATBGauge {
 
-    private final CharacterHUD characterHUD_d;
-    private final Screen screen;
-    private final String filePath;
+    private final CharacterHUD characterHUD;
     private final ArrayList<Indicator> segmentsList = new ArrayList<>();
     private int gaugeSize;
     private Element holder;
 
-    public ActionGauge(CharacterHUD characterHUD_d, Screen screen, String filePath, int gaugeSize) {
-        this.characterHUD_d = characterHUD_d;
-        this.screen = screen;
-        this.filePath = filePath;
+    public ActionGauge(Screen screen, CharacterHUD characterHUD, String filePath, int gaugeSize) {
+        super(screen, filePath);
+        this.characterHUD = characterHUD;
         this.gaugeSize = gaugeSize;
         initAtb();
     }
@@ -64,7 +61,7 @@ public class ActionGauge implements AtbGauge {
         holder.addChild(atbHolderC);
 
         for (int i = 0; i < gaugeSize; i++) {
-            Indicator ind = characterHUD_d.initIndicator("atbSegment.Blue.HORIZONTAL",
+            Indicator ind = ATBGauge.initIndicator(screen, "atbSegment.Blue.HORIZONTAL."+filePath,
                     new Vector2f(58 + ((100 + 10) * i), 10), new Vector2f(110, 15), true);
             ind.setOverlayImage(filePath + "atbSegmentOverlay.png");
             ind.setBaseImage(filePath + "atbSegment.png");
@@ -84,7 +81,7 @@ public class ActionGauge implements AtbGauge {
     @Override
     public void update(float tpf) {
         if (currentSegment != -1) { // if the gauge is not fill
-            timer += tpf * 15;
+            timer += tpf * speed;
             if (timer <= 100) {
                 segmentsList.get(currentSegment).setCurrentValue((int) timer);
             } else if (timer > 100) {

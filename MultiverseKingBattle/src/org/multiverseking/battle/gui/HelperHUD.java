@@ -14,18 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.core.gui;
+package org.multiverseking.battle.gui;
 
-import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.multiverseking.battle.core.gui.utils.Layout;
+import org.multiverseking.battle.gui.utils.Layout;
 import org.multiverseking.core.MultiverseCoreState;
-import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.text.LabelElement;
 import tonegod.gui.controls.windows.Panel;
-import tonegod.gui.core.Element;
 import tonegod.gui.core.Screen;
 
 /**

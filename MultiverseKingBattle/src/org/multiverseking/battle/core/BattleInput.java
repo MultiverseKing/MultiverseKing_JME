@@ -38,14 +38,6 @@ public class BattleInput extends AbstractAppState {
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
         registerCharacterInput();
-        switch (app.getStateManager().getState(MultiverseCoreState.class).getMapping()) {
-            case col:
-                break;
-            case fr:
-                break;
-            default:
-                // Use US input by default.
-        }
     }
 
     /**

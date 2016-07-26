@@ -10,14 +10,17 @@ import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiverseking.battle.core.ability.AbilitySystem;
-import org.multiverseking.battle.core.focus.FocusComponent;
-import org.multiverseking.battle.core.focus.FocusSystem;
+import org.multiverseking.battle.core.movement.StaminaComponent;
+import org.multiverseking.battle.core.focus.MainSelectionSystem;
 import org.multiverseking.battle.core.focus.MainFocusComponent;
-import org.multiverseking.battle.core.gui.BattleGUI;
+import org.multiverseking.battle.core.focus.MainFocusSystem;
+import org.multiverseking.battle.core.movement.BattleMovement;
+import org.multiverseking.battle.gui.BattleGUI;
+import org.multiverseking.battle.gui.CharacterHUD;
 import org.multiverseking.core.EntityDataAppState;
 import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.field.CollisionSystem;
-import org.multiverseking.field.exploration.HexMovementSystem;
+import org.multiverseking.field.position.HexMovementSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.render.AbstractRender;
 import org.multiverseking.render.RenderComponent;
@@ -38,9 +41,10 @@ public class BattleSystemTest extends MultiverseGameState implements SubSystem {
     private EntityData entityData;
 
     public BattleSystemTest() {
-        super(CollisionSystem.class, AnimationSystem.class,
-                HexMovementSystem.class, AbilitySystem.class,
-                BattleGUI.class, BattleInput.class, FocusSystem.class);
+        super(CollisionSystem.class, AnimationSystem.class, HexMovementSystem.class, 
+                AbilitySystem.class, BattleGUI.class, CharacterHUD.class,
+                BattleMovement.class, MainFocusSystem.class, BattleInput.class, 
+                MainSelectionSystem.class);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class BattleSystemTest extends MultiverseGameState implements SubSystem {
 
     private void loadPlayerData() {
         Node playerData = (Node) app.getAssetManager().loadModel(
-                "org/multiverseking/assets/Data/playerData.j3o");
+                "Data/playerData.j3o");
         playerMainUnitsID[0] = entityData.createEntity();
         entityData.setComponents(playerMainUnitsID[0],
                 new RenderComponent((String) playerData.getUserData("coreName"),
@@ -81,7 +85,8 @@ public class BattleSystemTest extends MultiverseGameState implements SubSystem {
                     AbstractRender.RenderType.Titan, this),
                     new HexPositionComponent(pos.add(Vector2Int.fromString(
                                             (String) data.getUserData("corePosition")))),
-                    new AnimationComponent(Animation.SUMMON));
+                    new AnimationComponent(Animation.SUMMON), 
+                    new StaminaComponent());
         }
     }
     

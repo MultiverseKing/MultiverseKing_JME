@@ -1,6 +1,5 @@
 package org.multiverseking.loader;
 
-import battleSystem.ability.AbilityComponent;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetKey;
 import java.io.File;
@@ -14,6 +13,7 @@ import org.hexgridapi.core.coordinate.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.multiverseking.ability.AbilityComponent;
 import org.multiverseking.field.Collision;
 import org.multiverseking.field.Collision.CollisionData;
 import org.multiverseking.render.AbstractRender.RenderType;
@@ -28,7 +28,7 @@ import org.multiverseking.utility.ElementalAttribut;
 public class EntityLoader {
 
 //    private final String path = System.getProperty("user.dir") + "/assets/Data/CardData";
-    private final String path = "/assets/Data/CardData";
+    private final String path = "Data/CardData";
     private final SimpleApplication app;
 
     public EntityLoader(SimpleApplication app) {
@@ -181,6 +181,6 @@ public class EntityLoader {
     }
 
     private String getFolder(String type) {
-        return "org/multiverseking/assets/Data/CardData/" + type.toString() + "/";
+        return "Data/CardData/" + type.toString() + "/";
     }
 }

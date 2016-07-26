@@ -39,32 +39,32 @@ public abstract class EntitySystemAppState extends AbstractAppState {
         this.entityData = tmp.getEntityData();
 
         entities = initialiseSystem();
-        for (Entity e : entities) {
+        entities.stream().forEach((e) -> {
             addEntity(e);
-        }
+        });
     }
 
     @Override
     public final void update(float tpf) {
         if (entities.applyChanges()) {
-            for (Entity e : entities.getChangedEntities()) {
+            entities.getChangedEntities().stream().forEach((e) -> {
                 updateEntity(e);
-            }
-            for (Entity e : entities.getAddedEntities()) {
+            });
+            entities.getAddedEntities().stream().forEach((e) -> {
                 addEntity(e);
-            }
-            for (Entity e : entities.getRemovedEntities()) {
+            });
+            entities.getRemovedEntities().stream().forEach((e) -> {
                 removeEntity(e);
-            }
+            });
         }
         this.updateSystem(tpf);
     }
 
     @Override
     public final void cleanup() {
-        for (Entity e : entities) {
+        entities.stream().forEach((e) -> {
             removeEntity(e);
-        }
+        });
         this.cleanupSystem();
         entities.release();
         super.cleanup();

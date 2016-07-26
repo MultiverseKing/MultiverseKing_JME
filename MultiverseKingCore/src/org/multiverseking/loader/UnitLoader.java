@@ -1,10 +1,10 @@
 package org.multiverseking.loader;
 
-import battleSystem.ability.AbilityComponent;
 import com.jme3.app.SimpleApplication;
 import com.simsilica.es.PersistentComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.multiverseking.ability.AbilityComponent;
 import org.multiverseking.field.component.ATBComponent;
 import org.multiverseking.field.component.CollisionComponent;
 import org.multiverseking.field.component.HealthComponent;

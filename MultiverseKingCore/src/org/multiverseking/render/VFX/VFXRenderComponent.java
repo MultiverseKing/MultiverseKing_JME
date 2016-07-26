@@ -9,8 +9,8 @@ import org.multiverseking.core.utility.SubSystem;
  */
 public class VFXRenderComponent implements EntityComponent {
 
-    private final SubSystem subSystem;
     private final String name;
+    private final SubSystem subSystem;
     private final boolean isVisible;
 
     /**
@@ -41,8 +41,21 @@ public class VFXRenderComponent implements EntityComponent {
      * @param isVisible does is to be visible.
      */
     public VFXRenderComponent(String name, SubSystem system, boolean isVisible) {
-        this.subSystem = system;
         this.name = name;
+        this.subSystem = system;
+        this.isVisible = isVisible;
+    }
+    /**
+     * component used for the rendering.
+     *
+     * @param name Object name to render.
+     * @param system is this object belong to another system.
+     * @param mode does is to be visible.
+     * @param isVisible does is to be visible.
+     */
+    public VFXRenderComponent(String name, SubSystem system, EmitterMode mode, boolean isVisible) {
+        this.name = name;
+        this.subSystem = system;
         this.isVisible = isVisible;
     }
 
@@ -64,5 +77,10 @@ public class VFXRenderComponent implements EntityComponent {
 
     public VFXRenderComponent cloneAndShow() {
         return new VFXRenderComponent(getName(), subSystem, true);
+    }
+    
+    public enum EmitterMode {
+        pulse,
+        instance
     }
 }

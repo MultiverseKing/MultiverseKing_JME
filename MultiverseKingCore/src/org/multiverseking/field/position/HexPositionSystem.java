@@ -19,14 +19,14 @@ import org.multiverseking.render.RenderSystem;
 
 /**
  * Handle the HEX position rendering of all entity.
- *
+ * @TODO Spatial parenting may cause issue with positionning
  * @author roah
  */
 public class HexPositionSystem extends EntitySystemAppState implements SubSystem {
 
     private MapData mapData;
     private RenderSystem renderSystem;
-    private ArrayList<EntityId> subSystems = new ArrayList<>();
+    private ArrayList<EntityId> positionCulling = new ArrayList<>(); // Used for spatials position handled by subsustem (aka position culling?)
     private MapDataListener tileChangeListener = new MapDataListener() {
         @Override
         public void onTileChange(TileChangeEvent[] events) {
@@ -61,12 +61,25 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
 
     @Override
     protected void addEntity(Entity e) {
-        updateSpatialTransform(e);
+        RenderComponent render = entityData.getComponent(e.getId(), RenderComponent.class);
+        if (render != null && render.getParent() != null) {
+            entityData.removeComponent(e.getId(), HexPositionComponent.class);
+//            updateSpatialTransform(e); // todo update the position to the parent
+        } else {
+            updateSpatialTransform(e);
+        }
     }
 
     @Override
     protected void updateEntity(Entity e) {
-        updateSpatialTransform(e);
+        RenderComponent render = entityData.getComponent(e.getId(), RenderComponent.class);
+        if (render != null && render.getParent() != null) {
+            entityData.removeComponent(e.getId(), HexPositionComponent.class);
+//            updateSpatialTransform(e); // todo update the position to the parent
+        } else {
+            updateSpatialTransform(e);
+        }
+        updateSpatialTransform(e); // todo parenting handling
     }
 
     @Override
@@ -74,7 +87,7 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
         if(e.get(HexPositionComponent.class) != null){
             entityData.removeComponent(e.getId(), HexPositionComponent.class);
         }
-        subSystems.remove(e.getId());
+        positionCulling.remove(e.getId());
     }
 
     @Override
@@ -89,16 +102,16 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
      * @todo better implementation in case of multiple system wanting 
      * to get the control of the position of an entity at the same moment.
      */
-    public void registerEntityToSubSystem(EntityId id) {
-        subSystems.add(id);
+    public void registerEntityForCulling(EntityId id) {
+        positionCulling.add(id);
     }
     
     /**
      * @todo better implementation in case of multiple system wanting 
      * to get the control of the position of an entity at the same moment.
      */
-    public void removeEntityFromSubSystem(EntityId id) {
-        subSystems.remove(id);
+    public void removeEntityFromCulling(EntityId id) {
+        positionCulling.remove(id);
         Entity e = entities.getEntity(id);
         if(e != null){
             updateSpatialTransform(e);
@@ -111,7 +124,7 @@ public class HexPositionSystem extends EntitySystemAppState implements SubSystem
     }
 
     private void updateSpatialTransform(Entity e) {
-        if(subSystems.contains(e.getId())){
+        if(positionCulling.contains(e.getId())){
             return;
         }
         Spatial s = renderSystem.getSpatial(e.getId());

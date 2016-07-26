@@ -11,12 +11,11 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.RootSystem;
 import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.render.utility.SpatialInitializer;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handle the render of all entities, spatial loading parenting etc... /!\ Does
@@ -31,12 +30,12 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
     private ArrayList<SubSystem> subSystems = new ArrayList<>(3);
     private SpatialInitializer spatialInitializer;
 
-    // <editor-fold defaultstate="collapsed" desc="Overrided Method">
+    // <editor-fold defaultstate="collapsed" desc="Entity System">
     @Override
     protected EntitySet initialiseSystem() {
         app.getRootNode().attachChild(renderSystemNode);
         renderSystemNode.setShadowMode(RenderQueue.ShadowMode.Cast); //<< diseable this to remove the shadow. -50%fps...
-        spatialInitializer = new SpatialInitializer(app.getAssetManager(), "/Models");
+        spatialInitializer = new SpatialInitializer(app.getAssetManager(), "Models");
 
         return entityData.getEntities(RenderComponent.class);
     }
@@ -46,37 +45,107 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
     }
 
     @Override
-    public void addEntity(Entity e) {
-        if (addSpatial(e)) {
-            if (e.get(RenderComponent.class).getSubSystem() != null) {
-                addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSubSystem());
+    public void addEntity(Entity e) {        
+        spatials.put(e.getId(), initialiseSpatial(e));
+        Spatial parent = spatials.get(e.get(RenderComponent.class).getParent());
+        if (parent != null) {
+            ((Node) parent).attachChild(spatials.get(e.getId()));
+        } else if (getSubSystemNode(e.get(RenderComponent.class).getSubSystem()) != null) {
+            addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSubSystem());
+        } else {
+            renderSystemNode.attachChild(spatials.get(e.getId()));
+        }
+
+        Control[] control = e.get(RenderComponent.class).getControl();
+        if (control != null) {
+            Spatial s = spatials.get(e.getId());
+            for (Control c : control) {
+                s.addControl(c);
             }
         }
+
+        if (!e.get(RenderComponent.class).isVisible()) {
+            spatials.get(e.getId()).setCullHint(Spatial.CullHint.Always);
+        }
+
     }
 
     @Override
     protected void updateEntity(Entity e) {
-        /**
-         * Update the spatial if it need to.
-         */
         Spatial s = spatials.get(e.getId());
-        String eName = e.get(RenderComponent.class).getName() + e.get(RenderComponent.class).getRenderType() + e.getId().toString();
-        if (s == null) {
-            addSpatial(e);
-        } else if (!eName.equals(s.getName())) {
+        System.err.println(s.getName());
+
+        /**
+         * Update the spatial geometry if it need to.
+         */
+        String eName = computeSpatialName(e);
+        if (!eName.equals(s.getName())) {
             switchSpatial(e);
         }
-        if (spatials.get(e.getId()).getParent() == null
-                && e.get(RenderComponent.class).isVisible()) {
-            if (e.get(RenderComponent.class).getSubSystem() != null) {
-                addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSubSystem());
+
+        /**
+         * Update the spatial parenting
+         */
+        RenderComponent renderComp = e.get(RenderComponent.class);
+        Spatial renderCompParent = spatials.get(renderComp.getParent());
+        System.err.println(renderComp.getParent());
+        if (renderCompParent != null && !s.getParent().getName().equals(renderCompParent.getName())) {
+            ((Node) renderCompParent).attachChild(spatials.get(e.getId()));
+            System.err.println("Entity : " + renderComp.getName() + " attached to : " + renderCompParent.getName() );
+        } else if (renderCompParent != null && s.getParent().getName().equals(renderCompParent.getName())) {
+            // If the parent hasn't change do nothing
+            System.err.println("Error 01");
+        } else if (e.get(RenderComponent.class).getSubSystem() != null
+                && getSubSystemNode(e.get(RenderComponent.class).getSubSystem()) != null) {
+            // If the subSystem Node is currently processed.
+            System.err.println("Error 02");
+            if (getSubSystemNode(e.get(RenderComponent.class)
+                    .getSubSystem()).getName().equals(s.getParent().getName())) {
+                // If the SubSystem is the same than the parent do nothing
             } else {
-                addSpatialToRenderNode(e.getId());
+                // If the spatial parent is not the subSystem node
+                addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSubSystem());
             }
-        } else if (spatials.get(e.getId()).getParent() != null
-                && !e.get(RenderComponent.class).isVisible()) {
-            spatials.get(e.getId()).removeFromParent();
+        } else {
+            System.err.println("Error 03");
+            renderSystemNode.attachChild(spatials.get(e.getId()));
         }
+
+//        if (s.getParent() == null && entityRender.getParent() != null
+//                && !spatials.containsKey(entityRender.getParent())) {
+//            // We attach the spatial to his parent if currently processed
+//            ((Node) spatials.get(entityRender.getParent())).attachChild(s);
+//        } else if ((s.getParent() == null
+//                // If the spatial is not attach to the scene  
+//                // We attach the Spatial to his corresponding system
+//                // Else it is added to the render Node
+//                || (entityRender.getParent() != null
+//                && !spatials.containsKey(entityRender.getParent())))
+//                && !addSpatialToSubSystem(e.getId(), entityRender.getSubSystem())) {
+//            // If the spatial is attach to the scene but the parenting has been change
+//            // and the new parent is not currently processed we add it to the 
+//            // corresponding System else on his the render Node
+//            addSpatialToRenderNode(e.getId());
+//        } else if () {
+//            // we check if the parent id is not currently processed
+//        } else if ( && !computeSpatialName((Entity) entityData.getEntity(
+//                entityRender.getParent(), RenderComponent.class))
+//                .equals(s.getParent().getName())) {
+//            // if the current parent Spatial Id is not the same than render component Parent Spatial ID
+//        } else {
+//        }
+        /**
+         * Update the spatial visibility if it need to.
+         */
+        if (renderComp.isVisible()) {
+            s.setCullHint(Spatial.CullHint.Inherit);
+        } else {
+            s.setCullHint(Spatial.CullHint.Always);
+        }
+    }
+
+    private String computeSpatialName(Entity e) {
+        return e.get(RenderComponent.class).getName() + e.get(RenderComponent.class).getRenderType() + e.getId().toString();
     }
 
     @Override
@@ -112,6 +181,12 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
 
     /**
      * Register a system to work with spatial having his own node settup.
+     *
+     * @param subSystem The system to register.
+     * @param addNode Set it to true if the system require to do some operation
+     * on his own.
+     * @return A generated node for the system to work with if requested else
+     * null.
      */
     public Node registerSubSystem(SubSystem subSystem, boolean addNode) {
         Node n = null;
@@ -168,8 +243,8 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
                 renderSystemNode.detachChild(n);
             }
         } else {
-            Logger.getLogger(getClass().getName()).log(Level.WARNING,
-                    "Trying to remove a subSystem not referenced : {1} ",
+            LoggerFactory.getLogger(this.getClass()).warn(
+                    "Trying to remove a subSystem not referenced : {} ",
                     new Object[]{subSystem.getClass().getName()});
         }
     }
@@ -180,13 +255,13 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
             if (n != null) {
                 return n;
             } else {
-                Logger.getLogger(getClass().getName()).log(Level.INFO,
-                        "No Node referenced for : {1} ",
+                LoggerFactory.getLogger(this.getClass()).info(
+                        "No Node referenced for : {} ",
                         new Object[]{subSystem.getClass().getName()});
             }
         } else {
-            Logger.getLogger(getClass().getName()).log(Level.WARNING,
-                    "Trying to get a Node for a subSystem not referenced : {1} ",
+                LoggerFactory.getLogger(this.getClass()).warn(
+                        "Trying to get a Node for a subSystem not referenced : {1} ",
                     new Object[]{subSystem.getClass().getName()});
         }
         return null;
@@ -208,7 +283,7 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
     private Spatial initialiseSpatial(Entity e) {
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getRenderType());
-        s.setName(renderComp.getName() + renderComp.getRenderType() + e.getId().toString());
+        s.setName(computeSpatialName(e));
         if (renderComp.getRenderType().equals(RenderComponent.RenderType.Debug)) {
             s.setShadowMode(RenderQueue.ShadowMode.Cast);
         } else {
@@ -217,37 +292,23 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
         return s;
     }
 
-    /**
-     * @return true if the spatial is added to the render Node. (aka : is
-     * visible)
-     */
-    private boolean addSpatial(Entity e) {
-        Spatial s = initialiseSpatial(e);
-        spatials.put(e.getId(), s);
-        if (e.get(RenderComponent.class).isVisible()) {
-            renderSystemNode.attachChild(s);
-            return true;
-        }
-        return false;
-    }
-
     private void switchSpatial(Entity e) {
         Spatial newSpatial = initialiseSpatial(e);
-        if (e.get(RenderComponent.class).isVisible()) {
-            Node parent = spatials.get(e.getId()).getParent();
-            parent.attachChild(newSpatial);
+        spatials.get(e.getId()).getParent().attachChild(newSpatial);
+        if (!e.get(RenderComponent.class).isVisible()) {
+
         }
         spatials.get(e.getId()).removeFromParent();
         spatials.put(e.getId(), newSpatial);
     }
 
-    private void addSpatialToSubSystem(EntityId id, SubSystem system) {
-        if (spatials.get(id) != null) {
-            Node subSystemNode = (Node) renderSystemNode.getChild(system.getClass().getName());
-            if (!subSystemNode.hasChild(spatials.get(id))) {
-                subSystemNode.attachChild(spatials.get(id));
-            }
+    private boolean addSpatialToSubSystem(EntityId id, SubSystem system) {
+        if (system == null) {
+            return false;
         }
+        Node subSystemNode = (Node) renderSystemNode.getChild(system.getClass().getName());
+        subSystemNode.attachChild(spatials.get(id));
+        return true;
     }
 
     private void addSpatialToRenderNode(EntityId id) {
@@ -270,6 +331,7 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
         }
         return false;
     }
+
     /**
      * Return the control of the define entity spatial if any.
      *

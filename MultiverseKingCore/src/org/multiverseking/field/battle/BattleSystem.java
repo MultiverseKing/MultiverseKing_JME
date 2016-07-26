@@ -31,7 +31,7 @@ import org.multiverseking.core.utility.SubSystem;
 import org.multiverseking.field.CollisionSystem;
 import org.multiverseking.field.component.HealthComponent;
 import org.multiverseking.field.component.InfluenceComponent;
-import org.multiverseking.field.exploration.HexMovementSystem;
+import org.multiverseking.field.position.HexMovementSystem;
 import org.multiverseking.field.position.HexPositionComponent;
 import org.multiverseking.field.position.MoveToComponent;
 import org.multiverseking.loader.EntityLoader;

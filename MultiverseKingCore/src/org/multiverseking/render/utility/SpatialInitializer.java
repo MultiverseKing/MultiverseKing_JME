@@ -10,13 +10,13 @@ import org.multiverseking.render.AbstractRender;
  */
 public class SpatialInitializer {
 
-    public static final String rootAssetPath = "org/multiverseking/assets";
+//    public static final String rootAssetPath = "org/multiverseking/assets";
     private final AssetManager assetManager;
     private final String folderPath;
 
     public SpatialInitializer(AssetManager manager, String folderPath) {
         this.assetManager = manager;
-        this.folderPath = rootAssetPath + folderPath + "/";
+        this.folderPath = folderPath + "/";
     }
 
     public Spatial initialize(String name) {
@@ -25,7 +25,9 @@ public class SpatialInitializer {
     
     public Spatial initialize(String name, AbstractRender.RenderType type) {
         Spatial model;
-        if (type != null && type.equals(AbstractRender.RenderType.Debug)) {
+        if (type != null && 
+                (type.equals(AbstractRender.RenderType.Debug) 
+                || type.equals(AbstractRender.RenderType.Utility))) {
             model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + ".j3o");
         } else if (type != null) {
             model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + "/" + name + ".j3o");

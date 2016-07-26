@@ -1,4 +1,4 @@
-package battleSystem.ability;
+package org.multiverseking.ability;
 
 import com.simsilica.es.EntityComponent;
 import org.hexgridapi.utility.Vector2Int;
@@ -21,11 +21,6 @@ public class AbilityComponent implements EntityComponent {
 
     /**
      * Create a new ability for an entity unit.
-     *
-     * @param activationRange ability trigger.
-     * @param effectSize when activated.
-     * @param eAttribut of the effect.
-     * @param loadTime between activation.
      */
     public AbilityComponent(String name, Vector2Int castRange, ElementalAttribut eAttribut,
             byte activationCost, int power, Collision collision, String description) {

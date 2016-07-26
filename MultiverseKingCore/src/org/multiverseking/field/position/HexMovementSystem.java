@@ -1,4 +1,4 @@
-package org.multiverseking.field.exploration;
+package org.multiverseking.field.position;
 
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.MotionPathListener;
@@ -18,9 +18,6 @@ import org.hexgridapi.core.data.MapData;
 import org.hexgridapi.pathfinding.Astar;
 import org.hexgridapi.pathfinding.Pathfinder;
 import org.hexgridapi.utility.Rotation;
-import org.multiverseking.field.position.HexPositionComponent;
-import org.multiverseking.field.position.HexPositionSystem;
-import org.multiverseking.field.position.MoveToComponent;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
@@ -30,10 +27,10 @@ import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.SubSystem;
 
 /**
- * Todo : behavior when unit got an obstacle appearing when moving (stop it and
+ * @todo : behavior when unit got an obstacle appearing when moving (stop it and
  * remove the component).
- * todo : behavior when unit is moving and a tile change.
- *
+ * @todo : behavior when unit is moving and a tile change.
+ * @TODO replace the current system by a lighter one
  * @author Eike Foede, roah
  */
 public class HexMovementSystem extends EntitySystemAppState implements SubSystem {
@@ -67,7 +64,7 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
                 entityData.removeComponent(e.getId(), MoveToComponent.class);
             } else {
                 movementGoal.put(e.getId(), e.get(MoveToComponent.class).getPosition());
-                hexPositionsystem.registerEntityToSubSystem(e.getId());
+                hexPositionsystem.registerEntityForCulling(e.getId());
             }
         }
     }
@@ -147,7 +144,7 @@ public class HexMovementSystem extends EntitySystemAppState implements SubSystem
 //            entityData.setComponent(e.getId(), new MoveToComponent(movementUpdateGoal.get(e.getId())));
 //            return;
 //        }
-        hexPositionsystem.removeEntityFromSubSystem(e.getId());
+        hexPositionsystem.removeEntityFromCulling(e.getId());
         entityData.setComponent(e.getId(), new AnimationComponent(Animation.IDLE));
     }
 

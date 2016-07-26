@@ -1,0 +1,7 @@
+Material My Material : tonegod/gui/shaders/Unshaded.j3md {
+     MaterialParameters {
+        GlobalAlpha : 0.0
+     }
+    AdditionalRenderState {
+    }
+}

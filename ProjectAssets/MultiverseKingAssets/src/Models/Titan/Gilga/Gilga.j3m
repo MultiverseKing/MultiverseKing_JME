@@ -1,0 +1,11 @@
+Material My Material : Common/MatDefs/Light/Lighting.j3md {
+     MaterialParameters {
+        UseVertexColor : true
+        Specular : 1.0 0.0 0.2 1.0
+        Shininess : 1.0
+        GlowMap : org/multiverseking/assets/Models/Titan/Gilga/emit_05.png
+     }
+    AdditionalRenderState {
+      FaceCull Back
+    }
+}

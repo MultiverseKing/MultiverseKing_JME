@@ -1,7 +1,0 @@
-Material My Material : Common/MatDefs/Light/Lighting.j3md {
-     MaterialParameters {
-        DiffuseMap : org/multiverseking/assets/Models/Unit/colorBake.png
-     }
-    AdditionalRenderState {
-    }
-}

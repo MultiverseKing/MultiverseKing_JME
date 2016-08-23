@@ -12,7 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.multiverseking.field.component.AreaEventComponent;
+import org.multiverseking.field.exploration.component.AreaEventComponent;
 
 /**
  *

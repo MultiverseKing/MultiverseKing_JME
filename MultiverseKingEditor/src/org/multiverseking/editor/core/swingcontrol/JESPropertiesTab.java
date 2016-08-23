@@ -26,7 +26,7 @@ import org.hexgridapi.editor.utility.ImageConverter;
 import org.hexgridapi.events.TileSelectionListener;
 import org.multiverseking.debug.DebugSystemState;
 import org.multiverseking.editor.core.JPlayEditorMenu;
-import org.multiverseking.field.component.AreaEventComponent;
+import org.multiverseking.field.exploration.component.AreaEventComponent;
 
 /**
  *

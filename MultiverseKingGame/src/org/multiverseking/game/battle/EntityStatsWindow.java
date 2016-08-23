@@ -4,8 +4,8 @@ import com.simsilica.es.EntityId;
 import com.simsilica.es.PersistentComponent;
 import java.util.ArrayList;
 import org.hexgridapi.utility.Vector2Int;
-import org.multiverseking.field.component.HealthComponent;
-import org.multiverseking.field.component.InfluenceComponent;
+import org.multiverseking.utility.component.HealthComponent;
+import org.multiverseking.utility.component.InfluenceComponent;
 import org.multiverseking.game.gui.control.EditorWindow;
 import org.multiverseking.game.gui.control.LayoutWindow.HAlign;
 import org.multiverseking.game.gui.control.LayoutWindow.VAlign;
@@ -36,23 +36,23 @@ public class EntityStatsWindow extends EditorWindow {
     
     private void populate(RenderType renderType, ArrayList<PersistentComponent> comps) {
         switch (renderType) {
-            case Ability:
+            case ABILITY:
                 break;
-            case Core:
+            case CORE:
                 HealthComponent hp = (HealthComponent) comps.get(0);
                 addLabelPropertieField("Health Point", new Vector2Int(hp.getCurrent(), hp.getMax()), HAlign.left);
                 InfluenceComponent inf = (InfluenceComponent) comps.get(1);
                 addLabelPropertieField("Influence range", inf.getRange(), HAlign.left);
                 break;
-            case Debug:
+            case DEBUG:
                 break;
-            case Environment:
+            case ENVIRONMENT:
                 break;
-            case Equipement:
+            case TITAN:
                 break;
-            case Titan:
+            case UNIT:
                 break;
-            case Unit:
+            case UTILITY:
                 break;
         }
     }

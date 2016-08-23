@@ -23,14 +23,14 @@ import com.simsilica.es.EntitySet;
 import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.SubSystem;
-import org.multiverseking.field.position.HexPositionComponent;
+import org.multiverseking.field.position.component.HexPositionComponent;
 import org.multiverseking.render.AbstractRender;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
 import org.multiverseking.utility.MoveOnYControl;
 
 /**
- * Ensure that only one character can be selected on the same time.
+ * Ensure that only one titan can be selected on the same time.
  * @author roah
  */
 public class MainFocusSystem extends EntitySystemAppState implements SubSystem {
@@ -43,9 +43,9 @@ public class MainFocusSystem extends EntitySystemAppState implements SubSystem {
         app.getStateManager().getState(RenderSystem.class).registerSubSystem(this);
         cursor = entityData.createEntity();
         entityData.setComponents(cursor, new RenderComponent("cursor", 
-                AbstractRender.RenderType.Utility, this, false, new MoveOnYControl()),
+                AbstractRender.RenderType.UTILITY, this, false, new MoveOnYControl()),
                 new HexPositionComponent(new HexCoordinate()));
-        return entityData.getEntities(MainFocusComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(MainFocusComponent.class, MainTitanComponent.class);
     }
 
     @Override

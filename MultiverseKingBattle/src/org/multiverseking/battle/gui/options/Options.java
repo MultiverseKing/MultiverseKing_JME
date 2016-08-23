@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.gui;
+package org.multiverseking.battle.gui.options;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.math.Vector2f;
-import org.multiverseking.battle.gui.utils.Layout;
+import org.multiverseking.battle.gui.BattleGUI;
 import tonegod.gui.controls.buttons.ButtonAdapter;
 import tonegod.gui.controls.windows.Panel;
 import tonegod.gui.core.Screen;
 
 /**
- *
+ * @todo make it a persistant menu though exploration and battle
  * @author roah
  */
 public class Options extends AbstractAppState {
 
     private final BattleGUI battleGUI;
-    private Screen screen;
+    private final Screen screen;
     private Panel optionWin;
 
     public Options(Screen screen, BattleGUI battleGUI) {

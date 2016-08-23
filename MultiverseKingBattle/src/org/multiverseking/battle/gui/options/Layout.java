@@ -1,4 +1,4 @@
-package org.multiverseking.battle.gui.utils;
+package org.multiverseking.battle.gui.options;
 
 import com.jme3.font.BitmapFont;
 import com.jme3.math.Vector2f;

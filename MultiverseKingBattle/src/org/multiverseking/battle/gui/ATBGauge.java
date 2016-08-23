@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.gui.gauge;
+package org.multiverseking.battle.gui;
 
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
@@ -28,18 +28,10 @@ import tonegod.gui.core.Screen;
  * @author roah
  */
 public abstract class ATBGauge {
-
-    protected final Screen screen;
-    protected final String filePath;;
-
-    public abstract void update(float tpf);
-
+    
+    protected Element gauge;
+    
     public abstract Element getGauge();
-
-    public ATBGauge(Screen screen, String filePath) {
-        this.screen = screen;
-        this.filePath = filePath;
-    }
     
     /**
      * The {@param param} value work as : name.color.fillingdirection.filepath.
@@ -52,7 +44,7 @@ public abstract class ATBGauge {
      * @param overlay Alpha image to put over the jauge.
      * @return A newly generated jauge on the desired position.
      */
-    public static Indicator initIndicator(Screen screen, String param, Vector2f pos, Vector2f size, boolean overlay) {
+    protected static Indicator initIndicator(Screen screen, String param, Vector2f pos, Vector2f size, boolean overlay) {
         String[] params = param.split("\\.");
         Indicator ind = new Indicator(screen, pos, size,
                 Element.Orientation.valueOf(params[2]), overlay) {

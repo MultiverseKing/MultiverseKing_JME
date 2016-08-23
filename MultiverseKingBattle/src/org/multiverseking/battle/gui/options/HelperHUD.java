@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.multiverseking.battle.gui;
+package org.multiverseking.battle.gui.options;
 
 import com.jme3.math.Vector2f;
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.multiverseking.battle.gui.utils.Layout;
 import org.multiverseking.core.MultiverseCoreState;
 import tonegod.gui.controls.text.LabelElement;
 import tonegod.gui.controls.windows.Panel;
@@ -29,7 +28,7 @@ import tonegod.gui.core.Screen;
  *
  * @author roah
  */
-class HelperHUD {
+public class HelperHUD {
 
     private final Screen screen;
     private Panel helperMain;
@@ -100,11 +99,11 @@ class HelperHUD {
         return list;
     }
 
-    boolean isVisible() {
+    public boolean isVisible() {
         return helperMain.getIsVisible();
     }
 
-    void show(boolean b) {
+    public void show(boolean b) {
         helperMain.setIsVisible(b);
     }
 }

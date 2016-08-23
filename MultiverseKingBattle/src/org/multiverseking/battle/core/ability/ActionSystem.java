@@ -9,38 +9,38 @@ import java.util.HashMap;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
+import org.multiverseking.ability.ActionAbilityComponent;
 import org.multiverseking.battle.core.focus.MainSelectionSystem;
-import org.multiverseking.battle.core.focus.MainFocusComponent;
 import org.multiverseking.core.utility.EntitySystemAppState;
-import org.multiverseking.render.AbstractRender.RenderType;
-import org.multiverseking.render.RenderComponent;
+import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Handle all action outside the bullet zone.
  * @author roah
  */
-public class AbilitySystem extends EntitySystemAppState {
+public class ActionSystem extends EntitySystemAppState {
     
     private HashMap<EntityId, AbilityManager> abilityManager = new HashMap<>();
     private EntityId currentFocus;
     private MainSelectionSystem focusSystem;
-    private boolean isCore;
+    private boolean abilityConfig = false;
 
     @Override
     protected EntitySet initialiseSystem() {
+        app.getStateManager().attach(new ActionSystemGUI());
         focusSystem = app.getStateManager().getState(MainSelectionSystem.class);
         app.getStateManager().getState(GridMouseControlAppState.class).register(tileInputListener);
         registerCharacterKey();
-        return entityData.getEntities(MainFocusComponent.class, RenderComponent.class);
+        return entityData.getEntities(ActionAbilityComponent.class);
     }
     
     @Override
     protected void addEntity(Entity e) {
-        RenderType renderType = e.get(RenderComponent.class).getRenderType();
-        if (renderType.equals(RenderType.Titan) || renderType.equals(RenderType.Core)) {
-            isCore = renderType.equals(RenderType.Core);
-            currentFocus = e.getId();
-        }
+//        RenderType renderType = e.get(RenderComponent.class).getRenderType();
+//        if (renderType.equals(RenderType.Titan) || renderType.equals(RenderType.Core)) {
+//            isCore = renderType.equals(RenderType.Core);
+//            currentFocus = e.getId();
+//        }
 //        AbilityManager aManager = new AbilityManager(e.get(AbilityComponent.class).getName(),
 //                e.get(AbilityComponent.class).getSegment(), e.get(SpeedComponent.class).getSpeed());
 //        abilityManager.put(e.getId(), aManager);
@@ -68,27 +68,39 @@ public class AbilitySystem extends EntitySystemAppState {
     protected void cleanupSystem() {
         app.getInputManager().removeListener(keyListeners);
         app.getStateManager().getState(GridMouseControlAppState.class).unregister(tileInputListener);
-        focusSystem.lockMouseFocus(tileInputListener, false);
     }
 
     private void registerCharacterKey() {
         app.getInputManager().addListener(keyListeners, new String[]{
-            "attack", "defends", "skill_0", "skill_1", "skill_2",
-            "skill_3", MouseInputEvent.MouseInputEventType.RMB.toString()});
+            "skill_weapon", "skill_0", "skill_1", "skill_2", "skill_3", 
+            MouseInputEvent.MouseInputEventType.RMB.toString()});
     }
 
-    private final ActionListener keyListeners = new ActionListener() {
-        @Override
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (!isPressed) {
-                if (name.contains("skill_")) {
-                    System.out.println("use - " + name);
-                } else if (!isCore && name.equals("attack")) {
-                    System.out.println("use - " + name);
-                } else if (!isCore && name.equals("defends")) {
-                    System.out.println("use - " + name);
-                }
+    private final ActionListener keyListeners = (String name, boolean isPressed, float tpf) -> {
+        if (!isPressed && name.contains("skill_")) {
+            name = name.substring(6);
+            LoggerFactory.getLogger(ActionSystem.class).debug("Try to cast skill_{}", name);
+            switch(name){
+                case "weapon":
+                    break;
+                case "0":
+                    break;
+                case "1":
+                    break;
+                case "2":
+                    break;
+                case "3":
+                    break;
+                default:
+                    LoggerFactory.getLogger(ActionSystem.class)
+                            .error("{} does not exit in is current state.", name);
+                    return;
             }
+            abilityConfig = true;
+        } else if (!isPressed && abilityConfig
+                && name.equals(MouseInputEvent.MouseInputEventType.RMB.toString())) {
+                    LoggerFactory.getLogger(ActionSystem.class).debug("Cancel current ability.");
+                abilityConfig = false;
         }
     };
 

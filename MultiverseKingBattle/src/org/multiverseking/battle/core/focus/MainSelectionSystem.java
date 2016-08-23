@@ -34,11 +34,10 @@ import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.events.TileInputListener;
 import org.multiverseking.battle.core.BattleSystemTest;
 import org.multiverseking.core.utility.EntitySystemAppState;
-import org.multiverseking.field.position.HexPositionComponent;
+import org.multiverseking.field.position.component.HexPositionComponent;
 import org.multiverseking.render.AbstractRender;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
-import org.slf4j.LoggerFactory;
 
 /**
  * Handle the Character selection during battle.
@@ -51,9 +50,9 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
     private MapData mapData;
     private BattleSystemTest battleSystem;
     private RTSCamera camera;
-    private TileInputListener mouseFocusLocker;
+//    private TileInputListener mouseFocusLocker;
     private EntityId[] mainUnitsID;         // ID of all Main unit
-    private Integer selectedMainUnit = 0;   // internal ordering for titan and core
+    private Integer selectedMainUnit = 1;   // internal ordering for titan and core
     private EntityId selectedEntity = null; // Selection using the mouse
     /**
      * Unit Selection when double taping.
@@ -72,16 +71,16 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
 
         // Register input Listeners
         app.getInputManager().addListener(keyListeners,
-                new String[]{"char_0", "char_1", "char_2", "char_3"});
+                new String[]{"char_0", "char_1", "char_2"});
 //        cursor = new CharacterFocusCursor(app, systemNode);
-        return entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
+        return entityData.getEntities(MainTitanComponent.class);
     }
 
     private final ActionListener keyListeners = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (!isPressed) {
-                Integer tmp = Integer.valueOf(name.split("_")[1]);
+                Integer tmp = Integer.valueOf(name.split("_")[1]) + 1;
                 if (countDown && selectedMainUnit.equals(tmp)) {
                     camera.setCenter(renderSystem.getSpatial(
                             mainUnitsID[selectedMainUnit]).getLocalTranslation());
@@ -137,7 +136,7 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
      */
     @Override
     public MouseInputEvent MouseRayInputAction(MouseInputEvent.MouseInputEventType mouseInputType, Ray ray) {
-        if (entities.isEmpty() || mouseFocusLocker != null) {
+        if (entities.isEmpty()) {
             return null;
         }
         if (mouseInputType.equals(MouseInputEvent.MouseInputEventType.LMB)) {
@@ -171,8 +170,7 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
 
     @Override
     public void onMouseAction(MouseInputEvent event) {
-        if (mouseFocusLocker == null
-                || event.getType().equals(MouseInputEvent.MouseInputEventType.LMB)) {
+        if (event.getType().equals(MouseInputEvent.MouseInputEventType.LMB)) {
             // Used when the spatial is not selected directly.
             Entity e = getEntity(event.getPosition());
             if(e != null) {
@@ -190,12 +188,12 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
 
     private Entity getEntity(HexCoordinate coord) {
         for (Entity e : entities) {
-            if (!e.get(RenderComponent.class).getRenderType().equals(AbstractRender.RenderType.Debug)) {
+//            if (!e.get(RenderComponent.class).getRenderType().equals(AbstractRender.RenderType.DEBUG)) {
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
                 if (posComp != null && posComp.getPosition().equals(coord)) {
                     return e;
                 }
-            }
+//            }
         }
         return null;
     }
@@ -203,22 +201,23 @@ public class MainSelectionSystem extends EntitySystemAppState implements MouseRa
     /**
      * Used to lock the character selection using the mouse when doing 
      * specific action which can conflict as : chosing a movement position.
+     * @todo use the GridMouseControlAppState pulse mode to show the user where he is aiming
      * @param listeners
      * @param isLock
      * @return 
      */
-    public boolean lockMouseFocus(TileInputListener listeners, boolean isLock) {
-        if (mouseFocusLocker != null && !mouseFocusLocker.equals(listeners)) {
-            LoggerFactory.getLogger(this.getClass()).info("Ray Listeners already locked by {}", mouseFocusLocker);
-            return false;
-        } else if (mouseFocusLocker != null && !isLock) {
-            mouseFocusLocker = null;
-            return true;
-        } else {
-            mouseFocusLocker = listeners;
-            return true;
-        }
-    }
+//    public boolean lockMouseFocus(TileInputListener listeners, boolean isLock) {
+//        if (mouseFocusLocker != null && !mouseFocusLocker.equals(listeners)) {
+//            LoggerFactory.getLogger(this.getClass()).info("Ray Listeners already locked by {}", mouseFocusLocker);
+//            return false;
+//        } else if (mouseFocusLocker != null && !isLock) {
+//            mouseFocusLocker = null;
+//            return true;
+//        } else {
+//            mouseFocusLocker = listeners;
+//            return true;
+//        }
+//    }
 
     @Override
     protected void cleanupSystem() {

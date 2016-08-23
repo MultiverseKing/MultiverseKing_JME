@@ -49,7 +49,7 @@ public class BattleInput extends AbstractAppState {
         inputManager.addMapping("char_0", new KeyTrigger(KeyInput.KEY_F1));
         inputManager.addMapping("char_1", new KeyTrigger(KeyInput.KEY_F2));
         inputManager.addMapping("char_2", new KeyTrigger(KeyInput.KEY_F3));
-        inputManager.addMapping("char_3", new KeyTrigger(KeyInput.KEY_F4));
+//        inputManager.addMapping("char_3", new KeyTrigger(KeyInput.KEY_F4));
         
         // Character movement
         switch (app.getStateManager().getState(MultiverseCoreState.class).getMapping()) {
@@ -66,14 +66,14 @@ public class BattleInput extends AbstractAppState {
         // Character Normal Attack
         switch (app.getStateManager().getState(MultiverseCoreState.class).getMapping()) {
             case col:
-                inputManager.addMapping("attack", new KeyTrigger(KeyInput.KEY_Q));
+                inputManager.addMapping("skill_weapon", new KeyTrigger(KeyInput.KEY_Q));
                 break;
             case fr:
-                inputManager.addMapping("attack", new KeyTrigger(KeyInput.KEY_A));
+                inputManager.addMapping("skill_weapon", new KeyTrigger(KeyInput.KEY_A));
                 break;
             default:
                 // Use US input by default.
-                inputManager.addMapping("attack", new KeyTrigger(KeyInput.KEY_Q));
+                inputManager.addMapping("skill_weapon", new KeyTrigger(KeyInput.KEY_Q));
         }
         
         // Character Normal Defence

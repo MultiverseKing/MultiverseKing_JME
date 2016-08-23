@@ -1,0 +1,21 @@
+{
+   "visual":"PulseVoltage",
+   "rarity":"COMMON",
+   "eAttribut":"VOLT",
+   "description":"High voltage shock energy pulse around the unit... Internet is you friends... xD",
+   "Ability":{
+        "power":15,
+        "cost":1,
+        "animation": "ABILITY_1",
+        "castRange": {
+            "layer": 0,
+            "type": "SELF"
+        },
+        "effectRange": {
+            "layer": -1,
+            "type": "CIRCLE", 
+            "minRange": 0,
+            "maxRange": 1
+        }
+   }
+}

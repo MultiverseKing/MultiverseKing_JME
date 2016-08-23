@@ -3,7 +3,7 @@
    "rarity":"MULTIVERSE",
    "eAttribut":"VOLT",
    "description":"Testing Unit used on the editor",
-   "UnitStats":{
+   "UNIT_STATS":{
       "healthPoint":50000,
       "atb":10,
       "loadSpeed":10,
@@ -11,16 +11,13 @@
       "moveSpeed":1.5,
       "Ability":[
          "null"
-      ],
-      "collision":[
-         {
-            "layer":0,
-            "areaRadius": 2,
-            "key":["0|0"]
-         }
-      ]
+        ],
+      "collision": {
+            "layer": 0,
+            "type": "SELF"
+        }
    },
-    "TitanStats":{
+    "TITAN_STATS":{
         "atbBurst":5,
         "influenceRange":5,
         "weaponSlots":4

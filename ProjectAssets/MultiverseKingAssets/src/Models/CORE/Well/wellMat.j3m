@@ -1,6 +1,6 @@
 Material MyMaterial : ShaderBlow/MatDefs/Dissolve/Lighting.j3md {
     MaterialParameters {
-        DiffuseMap : Models/Core/Well/DifuseGroup.png
+        DiffuseMap : Models/CORE/Well/DifuseGroup.png
     }
     AdditionalRenderState {
       FaceCull Back

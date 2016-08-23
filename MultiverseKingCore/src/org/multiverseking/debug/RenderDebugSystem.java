@@ -7,9 +7,9 @@ import java.util.logging.Logger;
 import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.SubSystem;
-import org.multiverseking.field.component.AreaEventComponent;
-import org.multiverseking.field.component.AreaEventComponent.Event;
-import org.multiverseking.field.position.HexPositionComponent;
+import org.multiverseking.field.exploration.component.AreaEventComponent;
+import org.multiverseking.field.exploration.component.AreaEventComponent.Event;
+import org.multiverseking.field.position.component.HexPositionComponent;
 import org.multiverseking.render.AbstractRender.RenderType;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
@@ -62,9 +62,9 @@ public class RenderDebugSystem extends EntitySystemAppState implements SubSystem
         RenderComponent render;
         if (e.get(AreaEventComponent.class).getEvents().contains(Event.Start)) {
 //            render = new RenderComponent("S_Shape", RenderType.Debug, this, isVisible);
-            render = new RenderComponent("S_Shape", RenderType.Debug, this, isVisible);
+            render = new RenderComponent("S_Shape", RenderType.DEBUG, this, isVisible);
         } else {
-            render = new RenderComponent("T_Shape", RenderType.Debug, this, isVisible);
+            render = new RenderComponent("T_Shape", RenderType.DEBUG, this, isVisible);
         }
         e.set(render);
         e.set(new HexPositionComponent(e.get(AreaEventComponent.class).getPosition()));

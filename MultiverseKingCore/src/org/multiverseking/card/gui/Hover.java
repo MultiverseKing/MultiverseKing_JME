@@ -154,15 +154,15 @@ public class Hover extends Window {
         icon.setPosition(new Vector2f(getDimensions().x * 0.075f, getDimensions().y * 0.8f));
         icon.setDimensions(getDimensions().x * 0.22f, getDimensions().y * 0.15f);
         switch (type) {
-            case Core:
+            case CORE:
                 break;
-            case Debug:
+            case DEBUG:
                 break;
-            case Environment:
+            case ENVIRONMENT:
                 break;
-            case Titan:
+            case TITAN:
                 break;
-            case Unit:
+            case UNIT:
                 icon.setPosition(new Vector2f(getDimensions().x * 0.079f, getDimensions().y * 0.8f));
                 icon.setDimensions(getDimensions().x * 0.21f, getDimensions().y * 0.15f);
                 break;

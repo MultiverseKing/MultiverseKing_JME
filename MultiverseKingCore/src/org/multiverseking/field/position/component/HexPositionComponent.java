@@ -1,4 +1,4 @@
-package org.multiverseking.field.position;
+package org.multiverseking.field.position.component;
 
 import com.simsilica.es.EntityComponent;
 import org.hexgridapi.core.coordinate.HexCoordinate;

@@ -1,5 +1,6 @@
 package org.multiverseking.field.position;
 
+import org.multiverseking.field.position.component.HexPositionComponent;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;

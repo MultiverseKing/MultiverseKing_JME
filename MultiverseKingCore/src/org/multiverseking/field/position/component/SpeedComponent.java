@@ -1,4 +1,4 @@
-package org.multiverseking.field.component;
+package org.multiverseking.field.position.component;
 
 import com.simsilica.es.EntityComponent;
 
@@ -16,8 +16,6 @@ public class SpeedComponent implements EntityComponent {
 
     /**
      * Base load speed for all action.
-     *
-     * @return
      */
     public float getSpeed() {
         return speed;

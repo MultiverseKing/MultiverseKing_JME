@@ -4,17 +4,18 @@ import com.jme3.app.SimpleApplication;
 import com.simsilica.es.PersistentComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.multiverseking.ability.AbilityComponent;
-import org.multiverseking.field.component.ATBComponent;
-import org.multiverseking.field.component.CollisionComponent;
-import org.multiverseking.field.component.HealthComponent;
-import org.multiverseking.field.component.SpeedComponent;
-import org.multiverseking.field.position.MovementComponent;
+import org.multiverseking.ability.ActionAbility;
+import org.multiverseking.ability.ActionAbilityComponent;
+import org.multiverseking.field.collision.CollisionComponent;
+import org.multiverseking.utility.component.HealthComponent;
+import org.multiverseking.field.position.component.SpeedComponent;
+import org.multiverseking.field.position.component.MovementComponent;
 
 /**
  * loader to load entity units from file, Contain InitialUnitStatsComponent to
  * avoids any use of it outside of the loading.
  *
+ * @todo refactor
  * @author roah
  */
 public class UnitLoader {
@@ -45,7 +46,7 @@ public class UnitLoader {
                 moveSpeed.floatValue(),
                 abilityList);
 
-        collisionComponent = new CollisionComponent(eLoader.importCollision((JSONArray) data.get("collision")));
+        collisionComponent = new CollisionComponent(eLoader.importCollision((JSONObject) data.get("collision")));
     }
 
     public CollisionComponent getCollisionComponent() {
@@ -90,7 +91,8 @@ public class UnitLoader {
             this.abilityList = stats.getAbilityList();
         }
 
-        private InitialUnitStatsComponent(int healthPoint, byte maxAtb, float speed, byte moveRange, float moveSpeed, String[] abilityList) {
+        private InitialUnitStatsComponent(int healthPoint, byte maxAtb, float speed, 
+                byte moveRange, float moveSpeed, String[] abilityList) {
             super(healthPoint);
             this.atbSize = maxAtb;
             this.loadSpeed = speed;
@@ -100,18 +102,14 @@ public class UnitLoader {
         }
 
         /**
-         * Size of the Atb.Action gauge.
+         * @return Size of the Atb.Action gauge.
          */
         public byte getAtbSize() {
             return atbSize;
         }
 
-        public ATBComponent getATBComponent() {
-            return new ATBComponent(atbSize);
-        }
-        
         /**
-         * Speed of the unit to load the gauge.
+         * @return Speed of the unit to load the gauge.
          */
         public float getLoadSpeed() {
             return loadSpeed;
@@ -120,16 +118,16 @@ public class UnitLoader {
         public SpeedComponent getSpeedComponent() {
             return new SpeedComponent(loadSpeed);
         }
-        
+
         /**
-         * How far the unit can move (Movament gauge Size).
+         * @return How far the unit can move (Movament gauge Size).
          */
         public byte getMoveRange() {
             return moveRange;
         }
 
         /**
-         * How fast the unit can move from one tile to another.
+         * @return How fast the unit can move from one tile to another.
          */
         public float getMoveSpeed() {
             return moveSpeed;
@@ -140,24 +138,19 @@ public class UnitLoader {
         }
 
         /**
-         * All ability binded to this unit.
+         * @return All ability binded to this unit.
          */
         public String[] getAbilityList() {
             return abilityList;
         }
 
-        public AbilityComponent[] getAbilityComponent() {
+        public ActionAbilityComponent getActionAbilityComponent() {
             EntityLoader loader = new EntityLoader(app);
-            AbilityComponent[] list = new AbilityComponent[abilityList.length];
-            int i = 0;
-            for (String s : abilityList) {
-                if (s.equals("null")) {
-                    return null;
-                }
-                list[i] = loader.loadAbility(s);
-                i++;
+            ActionAbility[] list = new ActionAbility[abilityList.length];
+            for (int i = 0; i < abilityList.length; i++) {
+                list[i] = loader.loadActionAbility(abilityList[i]);
             }
-            return list;
+            return new ActionAbilityComponent(list);
         }
     }
 }

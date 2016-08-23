@@ -20,9 +20,9 @@ import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.TileInputListener;
 import org.hexgridapi.utility.Vector2Int;
 import org.multiverseking.debug.DebugSystemState;
-import org.multiverseking.field.CollisionSystem;
-import org.multiverseking.field.position.HexPositionComponent;
-import org.multiverseking.field.position.MoveToComponent;
+import org.multiverseking.field.collision.CollisionSystem;
+import org.multiverseking.field.position.component.HexPositionComponent;
+import org.multiverseking.field.position.component.MoveToComponent;
 import org.multiverseking.render.AbstractRender;
 import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.animation.Animation;
@@ -77,7 +77,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
         playerId = entityData.createEntity();
         String name = "Gilga";
         entityData.setComponents(playerId, new RenderComponent(
-                name, AbstractRender.RenderType.Titan),
+                name, AbstractRender.RenderType.TITAN),
                 new HexPositionComponent(startPosition),
                 new AnimationComponent(Animation.IDLE),
                 new CameraTrackComponent());

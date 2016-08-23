@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.multiverseking.field.component;
+package org.multiverseking.field.exploration.component;
 
 import com.simsilica.es.EntityComponent;
 import java.util.ArrayList;

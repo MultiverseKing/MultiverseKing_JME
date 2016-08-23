@@ -1,5 +1,6 @@
 package org.multiverseking.field.exploration;
 
+import org.multiverseking.field.exploration.component.NestLordComponent;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntitySet;
 import java.util.ArrayList;

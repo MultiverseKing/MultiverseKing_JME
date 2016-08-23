@@ -1,5 +1,7 @@
 package org.multiverseking.field.position;
 
+import org.multiverseking.field.position.component.HexPositionComponent;
+import org.multiverseking.field.position.component.MoveToComponent;
 import com.jme3.cinematic.MotionPath;
 import com.jme3.cinematic.MotionPathListener;
 import com.jme3.cinematic.events.MotionEvent;

@@ -1,4 +1,4 @@
-package org.multiverseking.field.position;
+package org.multiverseking.field.position.component;
 
 /**
  *

@@ -4,8 +4,8 @@ import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 import org.hexgridapi.core.coordinate.HexCoordinate;
-import org.multiverseking.field.component.AreaEventComponent;
-import org.multiverseking.field.component.AreaEventComponent.Event;
+import org.multiverseking.field.exploration.component.AreaEventComponent;
+import org.multiverseking.field.exploration.component.AreaEventComponent.Event;
 import org.multiverseking.core.utility.EntitySystemAppState;
 
 /**

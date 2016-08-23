@@ -1,9 +1,8 @@
 package org.multiverseking.loader;
 
 import org.json.simple.JSONObject;
-import org.multiverseking.field.component.ATBBurstComponent;
-import org.multiverseking.field.component.InfluenceComponent;
-import org.multiverseking.field.component.WeaponSlotsComponent;
+import org.multiverseking.utility.component.InfluenceComponent;
+import org.multiverseking.utility.component.WeaponSlotsComponent;
 import org.multiverseking.render.AbstractRender.RenderType;
 
 /**
@@ -15,8 +14,8 @@ public class TitanLoader extends UnitLoader {
     private final InitialTitanStatsComponent initialStatsComponent;
 
     TitanLoader(JSONObject data, EntityLoader eLoader) {
-        super((JSONObject) data.get(RenderType.Unit.toString() + "Stats"), eLoader);
-        JSONObject titanData = (JSONObject) data.get(RenderType.Titan.toString() + "Stats");
+        super((JSONObject) data.get(RenderType.UNIT.toString() + "_STATS"), eLoader);
+        JSONObject titanData = (JSONObject) data.get(RenderType.TITAN.toString() + "_STATS");
 
         Number influenceRange = (Number) titanData.get("influenceRange");
         Number atbBurst = (Number) titanData.get("atbBurst");
@@ -63,10 +62,6 @@ public class TitanLoader extends UnitLoader {
          */
         public byte getMaxAtbBurst() {
             return maxAtbBurst;
-        }
-
-        public ATBBurstComponent getATBBurstComponent() {
-            return new ATBBurstComponent(maxAtbBurst);
         }
 
         /**

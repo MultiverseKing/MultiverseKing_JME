@@ -13,11 +13,6 @@ import org.multiverseking.utility.ElementalAttribut;
  */
 public class CardProperties {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
-
-    /**
-     * Used to know how much ressource is needed to play the card.
-     */
-    private final int playCost;
     /**
      * Used to know where the card can be played etc, mainly used stats.
      */
@@ -50,16 +45,11 @@ public class CardProperties {
      *
      * @param obj
      * @param name
+     * @param renderType
      */
     public CardProperties(JSONObject obj, String name, RenderType renderType) {
         this.name = name;
         this.renderType = renderType;
-        if (renderType == RenderType.Titan) {
-            playCost = 0;
-        } else {
-            Number tmpValue = (Number) obj.get("playCost");
-            playCost = tmpValue.intValue();
-        }
         visual = (String) obj.get("visual");
         rarity = Rarity.valueOf(obj.get("rarity").toString());
         element = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
@@ -69,12 +59,8 @@ public class CardProperties {
     /**
      * Constructor used for the editor mode.
      */
-    public CardProperties(String name, String visual, int playCost, RenderType renderType, Rarity rarity, ElementalAttribut element, String description) {
-        if (renderType == RenderType.Titan) {
-            this.playCost = 0;
-        } else {
-            this.playCost = playCost;
-        }
+    public CardProperties(String name, String visual, RenderType renderType,
+            Rarity rarity, ElementalAttribut element, String description) {
         this.name = name;
         this.renderType = renderType;
         this.rarity = rarity;
@@ -87,7 +73,6 @@ public class CardProperties {
      * Internal use.
      */
     public CardProperties() {
-        this.playCost = 0;
         this.renderType = null;
         this.rarity = null;
         this.element = null;
@@ -97,14 +82,6 @@ public class CardProperties {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Getter">
-    /**
-     * Play Cost to use the card.
-     *
-     * @return playCost needed for this card.
-     */
-    public int getPlayCost() {
-        return playCost;
-    }
 
     /**
      * Card subType properties.

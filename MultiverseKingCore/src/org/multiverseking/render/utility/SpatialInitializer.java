@@ -26,8 +26,8 @@ public class SpatialInitializer {
     public Spatial initialize(String name, AbstractRender.RenderType type) {
         Spatial model;
         if (type != null && 
-                (type.equals(AbstractRender.RenderType.Debug) 
-                || type.equals(AbstractRender.RenderType.Utility))) {
+                (type.equals(AbstractRender.RenderType.DEBUG) 
+                || type.equals(AbstractRender.RenderType.UTILITY))) {
             model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + ".j3o");
         } else if (type != null) {
             model = (Spatial) assetManager.loadModel(folderPath + type.toString() + "/" + name + "/" + name + ".j3o");

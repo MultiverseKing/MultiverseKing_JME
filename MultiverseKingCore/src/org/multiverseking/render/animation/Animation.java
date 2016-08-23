@@ -15,6 +15,14 @@ public enum Animation {
      */
     SUMMON,
     /**
+     * Used for normal attack.
+     */
+    ATTACK,
+    /**
+     * Used for normal attack.
+     */
+    ABILITY_1,
+    /**
      * When moving on the field at average speed.
      */
     WALK

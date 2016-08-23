@@ -28,11 +28,12 @@ public abstract class AbstractRender {
     }
     
     public enum RenderType{
-        Unit,
-        Titan,
-        Core,
-        Environment,
-        Debug,
-        Utility;
+        UNIT,
+        TITAN,
+        CORE,
+        ENVIRONMENT,
+        ABILITY,
+        DEBUG,
+        UTILITY
     }
 }

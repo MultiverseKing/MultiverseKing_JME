@@ -28,12 +28,12 @@ import org.multiverseking.card.CardRenderComponent;
 import org.multiverseking.card.attribut.CardRenderPosition;
 import org.multiverseking.core.EntityDataAppState;
 import org.multiverseking.core.utility.SubSystem;
-import org.multiverseking.field.CollisionSystem;
-import org.multiverseking.field.component.HealthComponent;
-import org.multiverseking.field.component.InfluenceComponent;
+import org.multiverseking.field.collision.CollisionSystem;
+import org.multiverseking.utility.component.HealthComponent;
+import org.multiverseking.utility.component.InfluenceComponent;
 import org.multiverseking.field.position.HexMovementSystem;
-import org.multiverseking.field.position.HexPositionComponent;
-import org.multiverseking.field.position.MoveToComponent;
+import org.multiverseking.field.position.component.HexPositionComponent;
+import org.multiverseking.field.position.component.MoveToComponent;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.loader.PlayerLoader;
 import org.multiverseking.loader.TitanLoader;
@@ -117,7 +117,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         PlayerLoader properties = PlayerLoader.getInstance(app.getAssetManager());
         playerCore = entityData.createEntity();
         entityData.setComponents(playerCore,
-                new RenderComponent("Well", RenderType.Core),
+                new RenderComponent("Well", RenderType.CORE),
                 new HexPositionComponent(startPosition, Rotation.A, this),
                 new AnimationComponent(Animation.SUMMON),
                 new HealthComponent(properties.getLevel() * 10),
@@ -148,8 +148,8 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         TitanLoader load = loader.loadTitanStats(name);
 //        HexCoordinate position = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
         entityData.setComponents(entityData.createEntity(),
-                new CardRenderComponent(name, CardRenderPosition.FIELD, RenderType.Titan),
-                new RenderComponent(name, RenderType.Titan),
+                new CardRenderComponent(name, CardRenderPosition.FIELD, RenderType.TITAN),
+                new RenderComponent(name, RenderType.TITAN),
                 new HexPositionComponent(position, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 load.getInitialStatsComponent(),
@@ -207,7 +207,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     private Entity checkEntities(HexCoordinate coord) {
         EntitySet entities = entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
         for (Entity e : entities) {
-            if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)) {
+            if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.DEBUG)) {
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
                 if (posComp != null && posComp.getPosition().equals(coord)) {
                     return e;
@@ -227,19 +227,19 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
             ArrayList<EntityComponent> comps = new ArrayList<>();
             RenderType renderType = e.get(RenderComponent.class).getRenderType();
             switch (renderType) {
-                case Core:
+                case CORE:
                     comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
                     comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
 //                    app.getStateManager().getState(AbstractHexGridAppState.class).showAreaRange(
 //                            e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
                     break;
-                case Debug:
+                case DEBUG:
                     break;
-                case Environment:
+                case ENVIRONMENT:
                     break;
-                case Titan:
+                case TITAN:
                     break;
-                case Unit:
+                case UNIT:
                     break;
                 default:
                     throw new UnsupportedOperationException(e.get(RenderComponent.class).getRenderType() + " is not currently supported.");

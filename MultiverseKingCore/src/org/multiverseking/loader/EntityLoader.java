@@ -5,7 +5,7 @@ import com.jme3.asset.AssetKey;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hexgridapi.core.coordinate.HexCoordinate;
@@ -13,17 +13,16 @@ import org.hexgridapi.core.coordinate.HexCoordinate.Coordinate;
 import org.hexgridapi.utility.Vector2Int;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.multiverseking.ability.AbilityComponent;
-import org.multiverseking.field.Collision;
-import org.multiverseking.field.Collision.CollisionData;
+import org.multiverseking.ability.ActionAbility;
+import org.multiverseking.field.collision.CollisionData;
 import org.multiverseking.render.AbstractRender.RenderType;
+import org.multiverseking.render.animation.Animation;
 import org.multiverseking.utility.ElementalAttribut;
 
 /**
  * Master to load Entity from file.
- *
+ * @todo need refactor
  * @author roah
- * @deprecated use j3o
  */
 public class EntityLoader {
 
@@ -46,7 +45,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        return new UnitLoader((JSONObject) getData(name, RenderType.Unit.toString()).get(RenderType.Unit.toString()+"Stats"), this);
+        return new UnitLoader((JSONObject) getData(name, RenderType.UNIT.toString()).get(RenderType.UNIT.toString()+"Stats"), this);
     }
 
     /**
@@ -55,7 +54,7 @@ public class EntityLoader {
      * @return return null if not found.
      */
     public TitanLoader loadTitanStats(String name) {
-        return new TitanLoader(getData(name, RenderType.Titan.toString()), this);
+        return new TitanLoader(getData(name, RenderType.TITAN.toString()), this);
     }
 
     /**
@@ -66,7 +65,7 @@ public class EntityLoader {
      */
     public boolean saveCardProperties(String type, JSONObject typeData, CardProperties card, boolean override) {
         File file;
-        String folder = "/" + card.getRenderType().toString() + "/";
+        String folder = "/" + type + "/";
         file = new File(path + folder + card.getName() + ".card");
         if (file.exists() && !file.isDirectory() && !override) {
             return false;
@@ -78,83 +77,95 @@ public class EntityLoader {
         obj.put("visual", card.getVisual());
         obj.put("rarity", card.getRarity().toString());
         obj.put("eAttribut", card.getElement().toString());
-        obj.put("playCost", card.getPlayCost());
         obj.put("description", card.getDescription());
 
-        obj.put(type.toString(), typeData);
+        obj.put(type, typeData);
         return setData(file, obj);
     }
 
-    public boolean saveAbility(AbilityProperties abilityProperties, boolean override) {
-        JSONObject typeData = new JSONObject();
-        typeData.put("power", abilityProperties.getPower());
-        typeData.put("castRange", abilityProperties.getCastRange().toString());
-        typeData.put("segmentCost", abilityProperties.getSegmentCost());
-        typeData.put("collision", exportCollision(abilityProperties.getCollision()));
+    public boolean saveActionAbility(AbilityProperties abilityProperties, boolean override) {
+        JSONObject data = new JSONObject();
+        data.put("power", abilityProperties.getPower());
+        data.put("castRange", abilityProperties.getCastRange().toString());
+        data.put("cost", abilityProperties.getCost());
+        data.put("animation", abilityProperties.getAnimation());
+        data.put("castRange", exportCollision(abilityProperties.getCastRange()));
+        data.put("effectRange", exportCollision(abilityProperties.getEffectRange()));
 
-        return saveCardProperties("Ability", typeData, abilityProperties, override);
+        return saveCardProperties("Ability", data, abilityProperties, override);
     }
 
     /**
      * Load a card from his Name, and return all of his properties parsed.
      *
      * @param cardName
+     * @param type
      * @return null if file not found.
      */
     public CardProperties loadCardProperties(String cardName, RenderType type) {
         return new CardProperties(getData(cardName, type.toString()), cardName, type);
     }
 
-    public AbilityComponent loadAbility(String name) {
-        if (name.equals("None")) {
+    public ActionAbility loadActionAbility(String name) {
+        if (name == null || name.equals("None")) {
             return null;
         }
         JSONObject obj = getData(name, "Ability");
         if (obj != null) {
             ElementalAttribut eAttribut = ElementalAttribut.valueOf(obj.get("eAttribut").toString());
             String description = obj.get("description").toString();
+            
+            JSONObject data = (JSONObject) obj.get("ability");
+            int power = ((Number) data.get("power")).intValue();
+            int cost = ((Number) data.get("cost")).intValue();
+            Animation animation = Animation.valueOf((String) data.get("animation"));
+            int collisionLayer = ((Number) ((JSONObject) data.get("castRange")).get("layer")).intValue();
+            CollisionData castRange = importCollision((JSONObject) data.get("castRange"));
+            CollisionData effectRange = importCollision((JSONObject) data.get("effectRange"));
 
-            JSONObject abilityData = (JSONObject) obj.get("Ability");
-            Number power = (Number) abilityData.get("power");
-            Number segment = (Number) abilityData.get("segmentCost");
-            Collision hitCollision = importCollision((JSONArray) abilityData.get("collision"));
-
-            return new AbilityComponent(name, Vector2Int.fromString(abilityData.get("castRange").toString()), eAttribut,
-                    segment.byteValue(), power.intValue(), hitCollision, description);
+            return new ActionAbility(name, animation, power, cost, eAttribut, description, castRange, effectRange);
         }
         return null;
     }
 
-    public JSONArray exportCollision(Collision collision) {
-        JSONArray collisionList = new JSONArray();
-        for (byte b : collision.getLayers()) {
-            JSONObject layer = new JSONObject();
-            layer.put("layer", b);
-            layer.put("areaRadius", collision.getCollisionLayer(b).getAreaRadius());
-            JSONArray key = new JSONArray();
-            for (HexCoordinate coord : collision.getCollisionLayer(b).getCoord()) {
-                key.add(coord.toOffset().toString());
-            }
-            layer.put("key", key);
-            collisionList.add(layer);
+    //@todo
+    public JSONObject exportCollision(CollisionData collisionData) {
+        JSONObject exportData = new JSONObject();
+        exportData.put("layer", collisionData.getLayer());
+        exportData.put("type", collisionData.getType());
+        switch(collisionData.getType()) {
+            case SELF:
+                return exportData;
+            case CUSTOM:
+                JSONArray position = new JSONArray();
+                position.addAll(Arrays.asList(collisionData.getPosition()));
+                exportData.put("position", position);
+                return exportData;
+            default:
+                exportData.put("min", collisionData.getMin());
+                exportData.put("max", collisionData.getMax());
+                return exportData;
         }
-        return collisionList;
     }
 
-    public Collision importCollision(JSONArray collisionData) {
-        Collision collision = new Collision();
-        for (int i = 0; i < collisionData.size(); i++) {
-            JSONObject value = (JSONObject) collisionData.get(i);
-            Number layer = (Number) value.get("layer");
-            Number areaRange = (Number) value.get("areaRadius");
-            JSONArray key = (JSONArray) value.get("key");
-            ArrayList<HexCoordinate> collisionCoord = new ArrayList<>();
-            for (int j = 0; j < key.size(); j++) {
-                collisionCoord.add(new HexCoordinate(Coordinate.OFFSET, Vector2Int.fromString((String) key.get(j))));
-            }
-            collision.addLayer(layer.byteValue(), collision.new CollisionData(areaRange.byteValue(), collisionCoord));
+    public CollisionData importCollision(JSONObject collisionData) {
+        CollisionData.Type type = CollisionData.Type.valueOf((String)collisionData.get("type"));
+        int layer = ((Number)collisionData.get("layer")).intValue();
+        switch(type) {
+            case SELF:
+                return new CollisionData(layer);
+            case CUSTOM:
+                JSONArray key = (JSONArray) collisionData.get("key");
+                HexCoordinate[] collisionCoord = new HexCoordinate[key.size()];
+                for (int j = 0; j < key.size(); j++) {
+                    collisionCoord[j] = new HexCoordinate(Coordinate.OFFSET, Vector2Int.fromString((String) key.get(j)));
+                }
+                return new CollisionData(layer, collisionCoord);
+            default:
+                return new CollisionData(layer, type, 
+                        ((Number)collisionData.get("minRange")).intValue(), 
+                        ((Number)collisionData.get("maxRange")).intValue());
         }
-        return collision;
     }
 
     private boolean setData(File f, JSONObject obj) {

@@ -73,7 +73,6 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
     @Override
     protected void updateEntity(Entity e) {
         Spatial s = spatials.get(e.getId());
-        System.err.println(s.getName());
 
         /**
          * Update the spatial geometry if it need to.
@@ -88,17 +87,13 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
          */
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial renderCompParent = spatials.get(renderComp.getParent());
-        System.err.println(renderComp.getParent());
         if (renderCompParent != null && !s.getParent().getName().equals(renderCompParent.getName())) {
             ((Node) renderCompParent).attachChild(spatials.get(e.getId()));
-            System.err.println("Entity : " + renderComp.getName() + " attached to : " + renderCompParent.getName() );
         } else if (renderCompParent != null && s.getParent().getName().equals(renderCompParent.getName())) {
             // If the parent hasn't change do nothing
-            System.err.println("Error 01");
         } else if (e.get(RenderComponent.class).getSubSystem() != null
                 && getSubSystemNode(e.get(RenderComponent.class).getSubSystem()) != null) {
             // If the subSystem Node is currently processed.
-            System.err.println("Error 02");
             if (getSubSystemNode(e.get(RenderComponent.class)
                     .getSubSystem()).getName().equals(s.getParent().getName())) {
                 // If the SubSystem is the same than the parent do nothing
@@ -107,7 +102,6 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
                 addSpatialToSubSystem(e.getId(), e.get(RenderComponent.class).getSubSystem());
             }
         } else {
-            System.err.println("Error 03");
             renderSystemNode.attachChild(spatials.get(e.getId()));
         }
 
@@ -284,7 +278,7 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getRenderType());
         s.setName(computeSpatialName(e));
-        if (renderComp.getRenderType().equals(RenderComponent.RenderType.Debug)) {
+        if (renderComp.getRenderType().equals(RenderComponent.RenderType.DEBUG)) {
             s.setShadowMode(RenderQueue.ShadowMode.Cast);
         } else {
             s.setShadowMode(RenderQueue.ShadowMode.Inherit);

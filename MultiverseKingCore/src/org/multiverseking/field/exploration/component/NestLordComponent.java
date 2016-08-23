@@ -1,4 +1,4 @@
-package org.multiverseking.field.exploration;
+package org.multiverseking.field.exploration.component;
 
 import com.simsilica.es.EntityComponent;
 

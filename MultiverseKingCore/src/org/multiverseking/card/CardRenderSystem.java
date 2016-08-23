@@ -1,6 +1,7 @@
 package org.multiverseking.card;
 
 import com.jme3.input.controls.ActionListener;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityId;
@@ -11,6 +12,7 @@ import org.hexgridapi.core.coordinate.HexCoordinate;
 import org.hexgridapi.core.mousepicking.GridMouseControlAppState;
 import org.hexgridapi.events.MouseInputEvent;
 import org.hexgridapi.events.MouseInputEvent.MouseInputEventType;
+import org.hexgridapi.events.MouseRayListener;
 import org.hexgridapi.events.TileInputListener;
 import org.multiverseking.card.attribut.CardRenderPosition;
 import static org.multiverseking.card.attribut.CardRenderPosition.DECK;
@@ -20,8 +22,8 @@ import static org.multiverseking.card.attribut.CardRenderPosition.OUTERWORLD;
 import org.multiverseking.card.gui.Card;
 import org.multiverseking.card.gui.Hover;
 import org.multiverseking.core.utility.EntitySystemAppState;
-import org.multiverseking.field.CollisionSystem;
-import org.multiverseking.field.component.EAttributComponent;
+import org.multiverseking.field.collision.CollisionSystem;
+import org.multiverseking.utility.component.EAttributComponent;
 import org.multiverseking.loader.CardProperties;
 import org.multiverseking.loader.EntityLoader;
 import org.multiverseking.loader.UnitLoader;
@@ -40,7 +42,7 @@ import tonegod.gui.core.Screen;
  * hand(opposite side).
  * @author roah
  */
-public class CardRenderSystem extends EntitySystemAppState implements TileInputListener {
+public class CardRenderSystem extends EntitySystemAppState implements MouseRayListener {
     // <editor-fold defaultstate="collapsed" desc="Used Variable">
 
     /**
@@ -338,15 +340,15 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
 
     private void activateCard(HexCoordinate castCoord, RenderType type) {
         switch (type) {
-            case Core:
+            case CORE:
                 break;
-            case Debug:
+            case DEBUG:
                 break;
-            case Environment:
+            case ENVIRONMENT:
                 break;
-            case Titan:
+            case TITAN:
                 break;
-            case Unit:
+            case UNIT:
                 CardRenderComponent cardRender = entities.getEntity(cardPreviewCast.getCardEntityUID()).get(CardRenderComponent.class);
                 String name = cardRender.getName();
                 UnitLoader unitLoader = new EntityLoader(app).loadUnitStats(name);
@@ -389,7 +391,7 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
                 if (!app.getStateManager().getState(GridMouseControlAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
-            } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.Titan)) {
+            } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.TITAN)) {
                 /**
                  * We check if the collision system is currently running, if
                  * it's not the card will be directly casted.
@@ -419,6 +421,11 @@ public class CardRenderSystem extends EntitySystemAppState implements TileInputL
             }
         }
     };
+    
+    @Override
+    public MouseInputEvent MouseRayInputAction(MouseInputEvent.MouseInputEventType mouseInputType, Ray ray) {
+        return null;
+    }
 
     @Override
     public void onMouseAction(MouseInputEvent event) {

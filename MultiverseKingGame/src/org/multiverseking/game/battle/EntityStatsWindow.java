@@ -36,23 +36,23 @@ public class EntityStatsWindow extends EditorWindow {
     
     private void populate(RenderType renderType, ArrayList<PersistentComponent> comps) {
         switch (renderType) {
-            case ABILITY:
+            case Ability:
                 break;
-            case CORE:
+            case Core:
                 HealthComponent hp = (HealthComponent) comps.get(0);
                 addLabelPropertieField("Health Point", new Vector2Int(hp.getCurrent(), hp.getMax()), HAlign.left);
                 InfluenceComponent inf = (InfluenceComponent) comps.get(1);
                 addLabelPropertieField("Influence range", inf.getRange(), HAlign.left);
                 break;
-            case DEBUG:
+            case Debug:
                 break;
-            case ENVIRONMENT:
+            case Environment:
                 break;
-            case TITAN:
+            case Titan:
                 break;
-            case UNIT:
+            case Unit:
                 break;
-            case UTILITY:
+            case Utility:
                 break;
         }
     }

@@ -1,7 +1,6 @@
 package org.multiverseking.editor.core;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.plugins.FileLocator;
 import com.jme3.input.ChaseCamera;
 import com.jme3.scene.Node;
 import emitterbuilder.builder.EmitterBuilder;
@@ -31,7 +30,7 @@ public class EmitterModule extends Base3DModuleTab {
                 "Emitter Module", null, false);
         this.app = app;
         //@todo need to be cleanned
-        app.getAssetManager().registerLocator("/home/roah/Documents/jmonkey/3.1/tonegodProjects/EmitterBuilder/assets", FileLocator.class);
+//        app.getAssetManager().registerLocator("/home/roah/Documents/jmonkey/3.1/tonegodProjects/EmitterBuilder/assets", FileLocator.class);
         screen = new Screen(app, "tonegod/gui/style/atlasdef/style_map.gui.xml");
         screen.setUseTextureAtlas(true, "tonegod/gui/style/atlasdef/atlas.png");
 //        screen.setUseCustomCursors(true);

@@ -43,7 +43,7 @@ public class JESPropertiesTab extends HexGridPropertiesPan {
 
     public JESPropertiesTab(EditorMain editorMain, GridMouseControlAppState mouseSystem) {
         super(editorMain.getAssetManager().loadTexture(
-                "org/multiverseking/assets/Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
+                "/Textures/Icons/Buttons/closeChest.png").getImage(), "Entity System");
         this.editorMain = editorMain;
 
         playEditorMenu = new JPlayEditorMenu(editorMain);
@@ -85,12 +85,9 @@ public class JESPropertiesTab extends HexGridPropertiesPan {
                             && system.getStartPosition().equals(cursorPan.getPosition())) {
                         return;
                     }
-                    editorMain.enqueue(new Callable<Void>() {
-                        @Override
-                        public Void call() throws Exception {
-                            system.updateEvent(cursorPan.getPosition(), event, true);
-                            return null;
-                        }
+                    editorMain.enqueue(() -> {
+                        system.updateEvent(cursorPan.getPosition(), event, true);
+                        return null;
                     });
                     eventPan.add(getButtonEvent(event));
                     revalidate();
@@ -101,7 +98,7 @@ public class JESPropertiesTab extends HexGridPropertiesPan {
         holder.add(addEvent);
         //------- Center to Start Position ------
         Image img = editorMain.getAssetManager().loadTexture(
-                      "org/multiverseking/assets/Textures/Icons/Buttons/centerToStart.png").getImage();
+                      "/Textures/Icons/Buttons/centerToStart.png").getImage();
         JButton center = new JButton(new AbstractAction("", ImageConverter.convertToIcon(img, 20, 20)) {
             @Override
             public void actionPerformed(ActionEvent e) {

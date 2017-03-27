@@ -17,11 +17,8 @@ public class MultiverseEditor extends EditorMain implements MultiverseCoreGUI {
 
     public static void main(String[] args) {
         java.util.logging.Logger.getLogger("com.jme3").setLevel(Level.WARNING);
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MultiverseEditor app = new MultiverseEditor("King Of Multiverse Editor");
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            MultiverseEditor app = new MultiverseEditor("King Of Multiverse Editor");
         });
     }
 

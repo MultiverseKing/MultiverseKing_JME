@@ -45,7 +45,7 @@ public class EntityLoader {
      * @return loaded data or null if the unit not found.
      */
     public UnitLoader loadUnitStats(String name) {
-        return new UnitLoader((JSONObject) getData(name, RenderType.UNIT.toString()).get(RenderType.UNIT.toString()+"Stats"), this);
+        return new UnitLoader((JSONObject) getData(name, RenderType.Unit.toString()).get(RenderType.Unit.toString()+"Stats"), this);
     }
 
     /**
@@ -54,7 +54,7 @@ public class EntityLoader {
      * @return return null if not found.
      */
     public TitanLoader loadTitanStats(String name) {
-        return new TitanLoader(getData(name, RenderType.TITAN.toString()), this);
+        return new TitanLoader(getData(name, RenderType.Titan.toString()), this);
     }
 
     /**

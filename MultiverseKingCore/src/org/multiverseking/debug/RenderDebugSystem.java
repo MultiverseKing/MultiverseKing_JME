@@ -62,9 +62,9 @@ public class RenderDebugSystem extends EntitySystemAppState implements SubSystem
         RenderComponent render;
         if (e.get(AreaEventComponent.class).getEvents().contains(Event.Start)) {
 //            render = new RenderComponent("S_Shape", RenderType.Debug, this, isVisible);
-            render = new RenderComponent("S_Shape", RenderType.DEBUG, this, isVisible);
+            render = new RenderComponent("S_Shape", RenderType.Debug, this, isVisible);
         } else {
-            render = new RenderComponent("T_Shape", RenderType.DEBUG, this, isVisible);
+            render = new RenderComponent("T_Shape", RenderType.Debug, this, isVisible);
         }
         e.set(render);
         e.set(new HexPositionComponent(e.get(AreaEventComponent.class).getPosition()));

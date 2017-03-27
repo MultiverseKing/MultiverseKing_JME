@@ -21,7 +21,7 @@ public class AbilityProperties extends CardProperties {
     private final CollisionData effectRange;
     
     public AbilityProperties(JSONObject obj, String name, SimpleApplication app) {
-        super(obj, name, AbstractRender.RenderType.ABILITY);
+        super(obj, name, AbstractRender.RenderType.Ability);
         JSONObject data = (JSONObject) obj.get("ability");
         power = ((Number) data.get("power")).intValue();
         cost = ((Number) data.get("cost")).intValue();

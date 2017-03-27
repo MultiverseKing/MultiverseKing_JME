@@ -44,8 +44,8 @@ public class GameProperties {
         // @todo
 //        updateList((byte) 0, (JSONArray) card.get(RenderComponent.RenderType.Ability.toString()));
 //        updateList((byte) 1, (JSONArray) card.get(RenderComponent.RenderType.Equipement.toString()));
-        updateList((byte) 2, (JSONArray) card.get(RenderComponent.RenderType.UNIT.toString()));
-        updateList((byte) 3, (JSONArray) card.get(RenderComponent.RenderType.TITAN.toString()));
+        updateList((byte) 2, (JSONArray) card.get(RenderComponent.RenderType.Unit.toString()));
+        updateList((byte) 3, (JSONArray) card.get(RenderComponent.RenderType.Titan.toString()));
         updateList((byte) 4, (JSONArray) data.get("Map"));
     }
 

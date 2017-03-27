@@ -117,7 +117,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         PlayerLoader properties = PlayerLoader.getInstance(app.getAssetManager());
         playerCore = entityData.createEntity();
         entityData.setComponents(playerCore,
-                new RenderComponent("Well", RenderType.CORE),
+                new RenderComponent("Well", RenderType.Core),
                 new HexPositionComponent(startPosition, Rotation.A, this),
                 new AnimationComponent(Animation.SUMMON),
                 new HealthComponent(properties.getLevel() * 10),
@@ -148,8 +148,8 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
         TitanLoader load = loader.loadTitanStats(name);
 //        HexCoordinate position = new HexCoordinate(HexCoordinate.OFFSET,HexSetting.CHUNK_SIZE / 2, HexSetting.CHUNK_SIZE / 2);
         entityData.setComponents(entityData.createEntity(),
-                new CardRenderComponent(name, CardRenderPosition.FIELD, RenderType.TITAN),
-                new RenderComponent(name, RenderType.TITAN),
+                new CardRenderComponent(name, CardRenderPosition.FIELD, RenderType.Titan),
+                new RenderComponent(name, RenderType.Titan),
                 new HexPositionComponent(position, Rotation.C),
                 new AnimationComponent(Animation.SUMMON),
                 load.getInitialStatsComponent(),
@@ -207,7 +207,7 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
     private Entity checkEntities(HexCoordinate coord) {
         EntitySet entities = entityData.getEntities(RenderComponent.class, HexPositionComponent.class);
         for (Entity e : entities) {
-            if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.DEBUG)) {
+            if (!e.get(RenderComponent.class).getRenderType().equals(RenderType.Debug)) {
                 HexPositionComponent posComp = entityData.getComponent(e.getId(), HexPositionComponent.class);
                 if (posComp != null && posComp.getPosition().equals(coord)) {
                     return e;
@@ -227,19 +227,19 @@ public class BattleSystem extends AbstractAppState implements MouseRayListener, 
             ArrayList<EntityComponent> comps = new ArrayList<>();
             RenderType renderType = e.get(RenderComponent.class).getRenderType();
             switch (renderType) {
-                case CORE:
+                case Core:
                     comps.add(entityData.getComponent(e.getId(), HealthComponent.class));
                     comps.add(entityData.getComponent(e.getId(), InfluenceComponent.class));
 //                    app.getStateManager().getState(AbstractHexGridAppState.class).showAreaRange(
 //                            e.get(HexPositionComponent.class).getPosition(), ((InfluenceComponent) comps.get(1)).getRange(), ColorRGBA.Red);
                     break;
-                case DEBUG:
+                case Debug:
                     break;
-                case ENVIRONMENT:
+                case Environment:
                     break;
-                case TITAN:
+                case Titan:
                     break;
-                case UNIT:
+                case Unit:
                     break;
                 default:
                     throw new UnsupportedOperationException(e.get(RenderComponent.class).getRenderType() + " is not currently supported.");

@@ -14,8 +14,8 @@ public class TitanLoader extends UnitLoader {
     private final InitialTitanStatsComponent initialStatsComponent;
 
     TitanLoader(JSONObject data, EntityLoader eLoader) {
-        super((JSONObject) data.get(RenderType.UNIT.toString() + "_STATS"), eLoader);
-        JSONObject titanData = (JSONObject) data.get(RenderType.TITAN.toString() + "_STATS");
+        super((JSONObject) data.get(RenderType.Unit.toString() + "_STATS"), eLoader);
+        JSONObject titanData = (JSONObject) data.get(RenderType.Titan.toString() + "_STATS");
 
         Number influenceRange = (Number) titanData.get("influenceRange");
         Number atbBurst = (Number) titanData.get("atbBurst");

@@ -57,15 +57,15 @@ public class CollisionSystem extends EntitySystemAppState {
      */
     public boolean isValidPosition(HexCoordinate castPosition, RenderType renderType) {
         switch (renderType) {
-            case CORE:
+            case Core:
                 return false;
-            case DEBUG:
+            case Debug:
                 return true;
-            case ENVIRONMENT:
+            case Environment:
                 return false;
-            case TITAN:
+            case Titan:
                 return false;
-            case UNIT:
+            case Unit:
 //                if (collisionLayer.containsKey((byte) 0)) {
 //                    return checkCollision(new Byte((byte) 0), castPosition);
 //                }

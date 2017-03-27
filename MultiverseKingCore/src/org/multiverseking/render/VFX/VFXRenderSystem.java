@@ -11,7 +11,6 @@ import org.hexgridapi.core.AbstractHexGridAppState;
 import org.hexgridapi.core.data.MapData;
 import org.multiverseking.core.utility.EntitySystemAppState;
 import org.multiverseking.core.utility.SubSystem;
-import org.multiverseking.render.RenderComponent;
 import org.multiverseking.render.RenderSystem;
 
 /**

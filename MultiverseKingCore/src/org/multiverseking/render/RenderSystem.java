@@ -244,19 +244,21 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
     }
 
     public Node getSubSystemNode(SubSystem subSystem) {
-        if (subSystems.contains(subSystem)) {
-            Node n = (Node) renderSystemNode.getChild(subSystem.getClass().getName());
-            if (n != null) {
-                return n;
+        if(subSystem != null) {
+            if (subSystems.contains(subSystem)) {
+                Node n = (Node) renderSystemNode.getChild(subSystem.getClass().getName());
+                if (n != null) {
+                    return n;
+                } else {
+                    LoggerFactory.getLogger(this.getClass()).info(
+                            "No Node referenced for : {} ",
+                            new Object[]{subSystem.getClass().getName()});
+                }
             } else {
-                LoggerFactory.getLogger(this.getClass()).info(
-                        "No Node referenced for : {} ",
+                    LoggerFactory.getLogger(this.getClass()).warn(
+                            "Trying to get a Node for a subSystem not referenced : {1} ",
                         new Object[]{subSystem.getClass().getName()});
             }
-        } else {
-                LoggerFactory.getLogger(this.getClass()).warn(
-                        "Trying to get a Node for a subSystem not referenced : {1} ",
-                    new Object[]{subSystem.getClass().getName()});
         }
         return null;
     }
@@ -278,7 +280,7 @@ public class RenderSystem extends EntitySystemAppState implements RootSystem {
         RenderComponent renderComp = e.get(RenderComponent.class);
         Spatial s = spatialInitializer.initialize(renderComp.getName(), renderComp.getRenderType());
         s.setName(computeSpatialName(e));
-        if (renderComp.getRenderType().equals(RenderComponent.RenderType.DEBUG)) {
+        if (renderComp.getRenderType().equals(RenderComponent.RenderType.Debug)) {
             s.setShadowMode(RenderQueue.ShadowMode.Cast);
         } else {
             s.setShadowMode(RenderQueue.ShadowMode.Inherit);

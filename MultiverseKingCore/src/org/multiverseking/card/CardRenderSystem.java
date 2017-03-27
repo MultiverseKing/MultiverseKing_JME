@@ -340,15 +340,15 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseRayLi
 
     private void activateCard(HexCoordinate castCoord, RenderType type) {
         switch (type) {
-            case CORE:
+            case Core:
                 break;
-            case DEBUG:
+            case Debug:
                 break;
-            case ENVIRONMENT:
+            case Environment:
                 break;
-            case TITAN:
+            case Titan:
                 break;
-            case UNIT:
+            case Unit:
                 CardRenderComponent cardRender = entities.getEntity(cardPreviewCast.getCardEntityUID()).get(CardRenderComponent.class);
                 String name = cardRender.getName();
                 UnitLoader unitLoader = new EntityLoader(app).loadUnitStats(name);
@@ -391,7 +391,7 @@ public class CardRenderSystem extends EntitySystemAppState implements MouseRayLi
                 if (!app.getStateManager().getState(GridMouseControlAppState.class).setCursorPulseMode(this)) {
                     return false;
                 }
-            } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.TITAN)) {
+            } else if (cardPreviewCast.getProperties().getRenderType().equals(RenderType.Titan)) {
                 /**
                  * We check if the collision system is currently running, if
                  * it's not the card will be directly casted.

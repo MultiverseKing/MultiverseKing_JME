@@ -77,7 +77,7 @@ public class ExplorationSystem extends AbstractAppState implements SubSystem {
         playerId = entityData.createEntity();
         String name = "Gilga";
         entityData.setComponents(playerId, new RenderComponent(
-                name, AbstractRender.RenderType.TITAN),
+                name, AbstractRender.RenderType.Titan),
                 new HexPositionComponent(startPosition),
                 new AnimationComponent(Animation.IDLE),
                 new CameraTrackComponent());

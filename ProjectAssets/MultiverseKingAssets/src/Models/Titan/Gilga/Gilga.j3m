@@ -1,6 +1,7 @@
 Material My Material : ShaderBlow/MatDefs/Dissolve/Lighting.j3md {
      MaterialParameters {
-        LightMap : Models/TITAN/Gilga/emit_05.png
+        UseVertexColor : true
+        VertexLighting : false
      }
     AdditionalRenderState {
       FaceCull Back

@@ -3,7 +3,7 @@
    "rarity":"MULTIVERSE",
    "eAttribut":"VOLT",
    "description":"Testing Unit used on the editor",
-   "UNIT_STATS":{
+   "Unit_STATS":{
       "healthPoint":50000,
       "atb":10,
       "loadSpeed":10,
@@ -17,7 +17,7 @@
             "type": "SELF"
         }
    },
-    "TITAN_STATS":{
+    "Titan_STATS":{
         "atbBurst":5,
         "influenceRange":5,
         "weaponSlots":4

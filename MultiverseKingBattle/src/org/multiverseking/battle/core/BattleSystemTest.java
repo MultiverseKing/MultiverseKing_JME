@@ -67,7 +67,7 @@ public class BattleSystemTest extends MultiverseGameState implements SubSystem {
         playerMainUnitsID[0] = entityData.createEntity();
         entityData.setComponents(playerMainUnitsID[0],
                 new RenderComponent((String) playerData.getUserData("coreName"),
-                        AbstractRender.RenderType.CORE, this),
+                        AbstractRender.RenderType.Core, this),
                 new HexPositionComponent(new HexCoordinate(
                                 HexCoordinate.Coordinate.OFFSET, Vector2Int.fromString(
                                         (String) playerData.getChild("battle").getUserData("corePosition")))),
@@ -93,7 +93,7 @@ public class BattleSystemTest extends MultiverseGameState implements SubSystem {
 
             //---------
             entityData.setComponents(id, new RenderComponent((String) data.getUserData("titan" + i),
-                    AbstractRender.RenderType.TITAN, this),
+                    AbstractRender.RenderType.Titan, this),
                     new HexPositionComponent(pos.add(Vector2Int.fromString(
                                             (String) data.getUserData("corePosition")))),
                     new AnimationComponent(Animation.SUMMON),

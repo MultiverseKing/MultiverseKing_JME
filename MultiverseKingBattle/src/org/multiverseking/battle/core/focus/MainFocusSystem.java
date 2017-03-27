@@ -43,7 +43,7 @@ public class MainFocusSystem extends EntitySystemAppState implements SubSystem {
         app.getStateManager().getState(RenderSystem.class).registerSubSystem(this);
         cursor = entityData.createEntity();
         entityData.setComponents(cursor, new RenderComponent("cursor", 
-                AbstractRender.RenderType.UTILITY, this, false, new MoveOnYControl()),
+                AbstractRender.RenderType.Utility, this, false, new MoveOnYControl()),
                 new HexPositionComponent(new HexCoordinate()));
         return entityData.getEntities(MainFocusComponent.class, MainTitanComponent.class);
     }
